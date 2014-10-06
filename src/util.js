@@ -1,8 +1,21 @@
-(function(win){
+define(function(require, exports, module) {
 
-	win.XScroll = win.XScroll || {};
+
+	window.XScroll = window.XScroll || {};
 
 	XScroll.Util = {
+		dispatchEvent: function(tgt, type, args) {
+			var event = document.createEvent('Event');
+			event.initEvent(type, true, true);
+			this.mix(event, args);
+			tgt.dispatchEvent(event);
+		},
+		mix: function(to, from) {
+			for (var i in from) {
+				to[i] = from[i];
+			}
+			return to;
+		},
 		/*
         vendors
         @example webkit|moz|ms|O 
@@ -28,9 +41,10 @@
 			if (this.vendor === '') return style;
 			return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
 		},
-		isAndroid:/Android /.test(window.navigator.appVersion)
+		isAndroid: /Android /.test(window.navigator.appVersion)
 	}
 
+	module.exports = XScroll.Util;
 
 
-})(window)
+})

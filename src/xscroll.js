@@ -5,7 +5,7 @@
  **/
  ;(function(win){
     //global namespace
-    win.XScroll = {};
+    win.XScroll = function(){};
     Xscroll.version = "1.0.0";
     //event names
     var SCROLL_END = "scrollEnd";
@@ -81,11 +81,6 @@
         event.target.dispatchEvent(simulatedEvent);
     }
 
-    var mix = function(){};
-
-
-
-
     /**
      *
      * @class Xscroll
@@ -101,7 +96,7 @@
 
             self.renderTo = document.getElementById(userConfig.renderTo);
 
-            var clsPrefix = self.clsPrefix = userConfig.clsPrefix || "xscroll-";
+            var clsPrefix = self.clsPrefix = userConfig.clsPrefix || "xs-";
 
             self.SROLL_ACCELERATION = userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
 
@@ -685,7 +680,6 @@
 
         }
     });
-    return XScroll;
 }
 
 })(window);

@@ -1,14 +1,11 @@
-
-
-;(function(win){
-	win.XScroll = win.XScroll || {};
+define(function(require,exports,module){
+	var Util = require("util");
 	var doc = window.document;
 	var PAN_START = 'panstart',
 		PAN_END = 'panend',
 		PAN = 'pan',
 		MIN_SPEED = 0.35,
 		MAX_SPEED = 8;
-	var $ = S.all;
 	var touch = {}, record = [];
 	var startX = 0;
 	var startY = 0;
@@ -37,7 +34,7 @@
 			e.deltaX = touch.deltaX;
 			e.deltaY = touch.deltaY;
 			this.gestureType = "pan";
-			$(e.target).fire(PAN_START, e);
+			Util.dispatchEvent(e.target,PAN_START, e);
 		} else {
 			if(this.gestureType != "pan") return;
 			touch.deltaX = e.touches[0].clientX - touch.startX;
@@ -59,9 +56,9 @@
 			e.velocityY = 0;
 			e.directionX = touch.directionX;
 			e.directionY = touch.directionY;
-			if (!e.isPropagationStopped()) {
-				$(e.target).fire(PAN, e);
-			}
+			// if (!e.isPropagationStopped()) {
+				Util.dispatchEvent(e.target,PAN,e);
+			// }
 		}
 
 
@@ -134,7 +131,7 @@
 		touch = {};
 		record = [];
 		if(this.gestureType == "pan"){
-			$(e.target).fire(PAN_END, e);
+			Util.dispatchEvent(e.target,PAN_END,e)
 			this.gestureType = ""
 		}
 	}
@@ -160,18 +157,13 @@
 		}
 	}
 
-	S.each([PAN], function(evt) {
-		S.Event.Special[evt] = {
-			setup: function() {
-				$(this).on('touchmove', touchMoveHandler);
-				$(this).on('touchend', touchEndHandler);
-			},
-			teardown: function() {
-				$(this).detach('touchmove', touchMoveHandler);
-				$(this).detach('touchend', touchEndHandler);
-			}
-		}
-	});
+	document.body.addEventListener("touchmove",touchMoveHandler)
+	document.body.addEventListener("touchend",touchEndHandler)
 
+	return {
+		PAN_START:PAN_START,
+		PAN_END:PAN_END,
+		PAN:PAN
+	}
 
-})(window);
+});
