@@ -207,7 +207,11 @@ pan = function (exports) {
 }({});
 tap = function (exports) {
   var Util = util;
-  var tap_max_touchtime = 250, tap_max_distance = 10, tap_hold_delay = 750, single_tap_delay = 100;
+  var TAP = 'tap';
+  var TAP_HOLD = 'tapHold';
+  var SINGLE_TAP = 'singleTap';
+  var DOUBLE_TAP = 'doubleTap';
+  var tap_max_touchtime = 250, tap_max_distance = 10, tap_hold_delay = 750, single_tap_delay = 200;
   var touches = [];
   var singleTouching = false;
   var tapHoldTimer = null;
@@ -272,12 +276,12 @@ tap = function (exports) {
         var eProxy = {};
         Util.mix(eProxy, e);
         Util.mix(eProxy, {
-          type: 'tapHold',
+          type: TAP_HOLD,
           pageX: startX,
           pageY: startY,
           originalEvent: e
         });
-        Util.dispatchEvent(e.target, 'tapHold', eProxy);
+        Util.dispatchEvent(e.target, TAP_HOLD, eProxy);
       }
       clearTimeout(tapHoldTimer);
     }, tap_hold_delay);
@@ -298,6 +302,7 @@ tap = function (exports) {
       distance: Math.sqrt(deltaX * deltaX + deltaY * deltaY),
       timeSpan: Number(Number(new Date()) - singleTouching.startTime)
     });
+    // console.log
     if (singleTouching.timeSpan > tap_max_touchtime) {
       singleTouching = false;
       return;
@@ -319,19 +324,19 @@ tap = function (exports) {
     var eProxy = {};
     Util.mix(eProxy, e);
     Util.mix(eProxy, {
-      type: 'tap',
+      type: TAP,
       pageX: endX,
       pageY: endY,
       originalEvent: e
     });
     var target = e.target;
     /*先触发tap，再触发doubleTap*/
-    Util.dispatchEvent(target, 'tap', eProxy);
+    Util.dispatchEvent(target, TAP, eProxy);
     /*doubleTap 和 singleTap 互斥*/
     if (doubleTapTimmer) {
       if (checkDoubleTap()) {
-        Util.mix(eProxy, { type: 'doubleTap' });
-        Util.dispatchEvent(target, 'doubleTap', eProxy);
+        Util.mix(eProxy, { type: DOUBLE_TAP });
+        Util.dispatchEvent(target, DOUBLE_TAP, eProxy);
       }
       clearTimeout(doubleTapTimmer);
       doubleTapTimmer = null;
@@ -340,13 +345,18 @@ tap = function (exports) {
     doubleTapTimmer = setTimeout(function () {
       clearTimeout(doubleTapTimmer);
       doubleTapTimmer = null;
-      Util.mix(eProxy, { type: 'singleTap' });
-      Util.dispatchEvent(target, 'singleTap', eProxy);
+      Util.mix(eProxy, { type: SINGLE_TAP });
+      Util.dispatchEvent(target, SINGLE_TAP, eProxy);
     }, single_tap_delay);
   }
   document.body.addEventListener('touchstart', touchStart);
   document.body.addEventListener('touchend', touchEnd);
-  return { TAP: 'tap' };
+  return {
+    TAP: TAP,
+    TAP_HOLD: TAP_HOLD,
+    SINGLE_TAP: SINGLE_TAP,
+    DOUBLE_TAP: DOUBLE_TAP
+  };
 }({});
 pinch = function (exports) {
   var Util = util;
@@ -760,9 +770,10 @@ core = function (exports) {
     },
     _renderScrollBars: function () {
       var self = this;
-      if (!self.userConfig.scrollbars)
+      if (!self.userConfig.scrollbars || self.__isScrollBarRendered)
         return;
       // console.log
+      self.__isScrollBarRendered = true;
       // if(self.lockX)
       self.scrollbarX = new ScrollBar({
         xscroll: self,
@@ -800,7 +811,6 @@ core = function (exports) {
     },
     _scale: function (scale, originX, originY, triggerEvent) {
       var self = this;
-      console.log(scale);
       if (!self.userConfig.scalable || self.scale == scale || !scale)
         return;
       if (!self.isScaling) {
@@ -1126,7 +1136,7 @@ core = function (exports) {
         e.preventDefault();
         self.stop();
       });
-      renderTo.addEventListener('tap', function (e) {
+      renderTo.addEventListener(Tap.TAP, function (e) {
         self.boundryCheck();
         if (!self.isScrollingX && !self.isScrollingY) {
           simulateMouseEvent(e, 'click');
@@ -1225,6 +1235,11 @@ core = function (exports) {
           } else if (self.scale > self.maxScale) {
             self.scaleTo(self.maxScale, originX, originY, SCALE_TO_DURATION);
           }
+        });
+        renderTo.addEventListener(Tap.DOUBLE_TAP, function (e) {
+          originX = (e.pageX - self.x) / self.containerWidth;
+          originY = (e.pageY - self.y) / self.containerHeight;
+          self.scale > self.minScale ? self.scaleTo(self.minScale, originX, originY, 200) : self.scaleTo(self.maxScale, originX, originY, 200);
         });
       }
       window.addEventListener('resize', function (e) {

@@ -174,8 +174,9 @@ define(function(require,exports,module){
         },
         _renderScrollBars:function(){
             var self = this;
-            if(!self.userConfig.scrollbars) return;
+            if(!self.userConfig.scrollbars || self.__isScrollBarRendered) return;
             // console.log
+            self.__isScrollBarRendered = true;
             // if(self.lockX)
             self.scrollbarX = new ScrollBar({xscroll:self,type:"x"});
             self.scrollbarY = new ScrollBar({xscroll:self,type:"y"});
@@ -207,7 +208,6 @@ define(function(require,exports,module){
         },
         _scale: function(scale, originX, originY,triggerEvent) {
             var self = this;
-            console.log(scale)
             if (!self.userConfig.scalable || self.scale == scale || !scale) return;
 
             if (!self.isScaling) {
@@ -505,7 +505,7 @@ define(function(require,exports,module){
                 self.stop();
             });
 
-            renderTo.addEventListener("tap", function(e) {
+            renderTo.addEventListener(Tap.TAP, function(e) {
                 self.boundryCheck();
                 if (!self.isScrollingX && !self.isScrollingY) {
                     simulateMouseEvent(e, "click");
@@ -604,6 +604,11 @@ define(function(require,exports,module){
                     } else if (self.scale > self.maxScale) {
                         self.scaleTo(self.maxScale, originX, originY, SCALE_TO_DURATION);
                     }
+                })
+                renderTo.addEventListener(Tap.DOUBLE_TAP,function(e){
+                    originX = (e.pageX - self.x) / self.containerWidth;
+                    originY = (e.pageY - self.y) / self.containerHeight;
+                    self.scale > self.minScale ? self.scaleTo(self.minScale, originX,originY,200) : self.scaleTo(self.maxScale, originX,originY,200);
                 })
             }
             window.addEventListener("resize", function(e) {

@@ -1,0 +1,16 @@
+{
+	"name": "xscroll",
+	"version": "1.0.0",
+	"main": [
+		"./src/core.js",
+		"./build/xscroll.js"
+	],
+	"dependencies": {},
+	"readmeFilename": "README.md",
+	"_id": "xscroll@1.0.0",
+	"description": "基于html5的移动端滚动高性能解决方案",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/huxiaoqi567/xscroll.git"
+	}
+}
