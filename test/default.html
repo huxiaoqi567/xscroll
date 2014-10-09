@@ -200,10 +200,22 @@ body {
     })
     seajs.use("core",function(XScroll){
         var xscroll = new XScroll({
-            renderTo:"#J_Scroll"
+            renderTo:"#J_Scroll",
+            scrollbars:true,
+            scalable:true
         });
 
         xscroll.render();
+
+        var onscroll = function(e){
+            console.log(e)
+        };
+
+        // xscroll.on("scroll",onscroll)
+
+        // xscroll.detach("scroll",onscroll)
+
+
 
         window.xscroll = xscroll
     })

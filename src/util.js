@@ -1,9 +1,7 @@
 define(function(require, exports, module) {
 
 
-	window.XScroll = window.XScroll || {};
-
-	XScroll.Util = {
+	var Util = {
 		dispatchEvent: function(tgt, type, args) {
 			var event = document.createEvent('Event');
 			event.initEvent(type, true, true);
@@ -44,7 +42,7 @@ define(function(require, exports, module) {
 		isAndroid: /Android /.test(window.navigator.appVersion)
 	}
 
-	module.exports = XScroll.Util;
+	module.exports = Util;
 
 
 })
