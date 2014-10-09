@@ -1,0 +1,7 @@
+{
+  "name": "xscroll",
+  "version": "1.0.0",
+  "devDependencies": {
+    "gulp": "^3.8.8"
+  }
+}
