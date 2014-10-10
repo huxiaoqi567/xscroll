@@ -1,5 +1,6 @@
 define(function(require,exports,module){
-	var Util = require("util");
+	var Util = require('util');
+	var Event = require("event");
 	var doc = window.document;
 	var PAN_START = 'panstart',
 		PAN_END = 'panend',
@@ -34,7 +35,7 @@ define(function(require,exports,module){
 			e.deltaX = touch.deltaX;
 			e.deltaY = touch.deltaY;
 			this.gestureType = "pan";
-			Util.dispatchEvent(e.target,PAN_START, e);
+			Event.dispatchEvent(e.target,PAN_START, e);
 		} else {
 			if(this.gestureType != "pan") return;
 			touch.deltaX = e.touches[0].clientX - touch.startX;
@@ -57,7 +58,7 @@ define(function(require,exports,module){
 			e.directionX = touch.directionX;
 			e.directionY = touch.directionY;
 			// if (!e.isPropagationStopped()) {
-				Util.dispatchEvent(e.target,PAN,e);
+				Event.dispatchEvent(e.target,PAN,e);
 			// }
 		}
 
@@ -131,7 +132,7 @@ define(function(require,exports,module){
 		touch = {};
 		record = [];
 		if(this.gestureType == "pan"){
-			Util.dispatchEvent(e.target,PAN_END,e)
+			Event.dispatchEvent(e.target,PAN_END,e)
 			this.gestureType = ""
 		}
 	}

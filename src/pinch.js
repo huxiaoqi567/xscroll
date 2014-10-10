@@ -1,6 +1,6 @@
 define(function(require,exports,module){
-	var Util = require("util");
-	var doc = window.document;
+	var Util = require('util');
+	var Event = require("event");
 	var doc = window.document;
 	var PINCH_START = 'gesturePinchStart',
 		PINCH_END = 'gesturePinchEnd',
@@ -29,14 +29,14 @@ define(function(require,exports,module){
 			this.isStart = 1;
 			this.startDistance = distance;
 			this.gestureType = "pinch";
-			Util.dispatchEvent(e.currentTarget,PINCH_START,e);
+			Event.dispatchEvent(e.target,PINCH_START,e);
 		}else{
 			if(this.gestureType != "pinch") return;
 			//pinchmove
 			e.distance = distance;
 			e.scale = distance/this.startDistance;
 			e.origin = origin;
-			Util.dispatchEvent(e.currentTarget,PINCH,e);
+			Event.dispatchEvent(e.target,PINCH,e);
 		}
 	}
 
@@ -44,10 +44,9 @@ define(function(require,exports,module){
 		this.isStart = 0;
 		if(this.gestureType != "pinch") return;
 		if(e.touches.length == 0){
-			Util.dispatchEvent(e.target,PINCH_END,e);
+			Event.dispatchEvent(e.target,PINCH_END,e);
 			this.gestureType = "";
 		}
-		
 	}
 
 

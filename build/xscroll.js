@@ -1,13 +1,7 @@
 ;(function() {
-var util, pan, tap, pinch, scrollbar, core;
+var util, pan, tap, pinch, scrollbar, core, _event_;
 util = function (exports) {
   var Util = {
-    dispatchEvent: function (tgt, type, args) {
-      var event = document.createEvent('Event');
-      event.initEvent(type, true, true);
-      this.mix(event, args);
-      tgt.dispatchEvent(event);
-    },
     mix: function (to, from) {
       for (var i in from) {
         to[i] = from[i];
@@ -44,14 +38,37 @@ util = function (exports) {
       if (this.vendor === '')
         return style;
       return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
-    },
-    isAndroid: /Android /.test(window.navigator.appVersion)
+    }
   };
   exports = Util;
   return exports;
 }({});
+_event_ = function (exports) {
+  var Util = util;
+  var gestures = {};
+  var Gesture = {
+    on: function (el, type, handler) {
+      el.addEventListener(type, handler);
+      this.target = el;
+      return this;
+    },
+    detach: function (el, type, handler) {
+      this.target = null;
+      el.removeEventListener(type, handler);
+      return this;
+    },
+    dispatchEvent: function (tgt, type, args) {
+      var event = document.createEvent('Event');
+      event.initEvent(type, true, true);
+      Util.mix(event, args);
+      tgt.dispatchEvent(event);
+    }
+  };
+  return Gesture;
+}({});
 pan = function (exports) {
   var Util = util;
+  var Event = _event_;
   var doc = window.document;
   var PAN_START = 'panstart', PAN_END = 'panend', PAN = 'pan', MIN_SPEED = 0.35, MAX_SPEED = 8;
   var touch = {}, record = [];
@@ -83,7 +100,7 @@ pan = function (exports) {
       e.deltaX = touch.deltaX;
       e.deltaY = touch.deltaY;
       this.gestureType = 'pan';
-      Util.dispatchEvent(e.target, PAN_START, e);
+      Event.dispatchEvent(e.target, PAN_START, e);
     } else {
       if (this.gestureType != 'pan')
         return;
@@ -107,7 +124,7 @@ pan = function (exports) {
       e.directionX = touch.directionX;
       e.directionY = touch.directionY;
       // if (!e.isPropagationStopped()) {
-      Util.dispatchEvent(e.target, PAN, e);
+      Event.dispatchEvent(e.target, PAN, e);
     }
   }
   function touchEndHandler(e) {
@@ -174,7 +191,7 @@ pan = function (exports) {
     touch = {};
     record = [];
     if (this.gestureType == 'pan') {
-      Util.dispatchEvent(e.target, PAN_END, e);
+      Event.dispatchEvent(e.target, PAN_END, e);
       this.gestureType = '';
     }
   }
@@ -207,6 +224,7 @@ pan = function (exports) {
 }({});
 tap = function (exports) {
   var Util = util;
+  var Event = _event_;
   var TAP = 'tap';
   var TAP_HOLD = 'tapHold';
   var SINGLE_TAP = 'singleTap';
@@ -281,7 +299,7 @@ tap = function (exports) {
           pageY: startY,
           originalEvent: e
         });
-        Util.dispatchEvent(e.target, TAP_HOLD, eProxy);
+        Event.dispatchEvent(e.target, TAP_HOLD, eProxy);
       }
       clearTimeout(tapHoldTimer);
     }, tap_hold_delay);
@@ -331,12 +349,12 @@ tap = function (exports) {
     });
     var target = e.target;
     /*先触发tap，再触发doubleTap*/
-    Util.dispatchEvent(target, TAP, eProxy);
+    Event.dispatchEvent(target, TAP, eProxy);
     /*doubleTap 和 singleTap 互斥*/
     if (doubleTapTimmer) {
       if (checkDoubleTap()) {
         Util.mix(eProxy, { type: DOUBLE_TAP });
-        Util.dispatchEvent(target, DOUBLE_TAP, eProxy);
+        Event.dispatchEvent(target, DOUBLE_TAP, eProxy);
       }
       clearTimeout(doubleTapTimmer);
       doubleTapTimmer = null;
@@ -346,7 +364,7 @@ tap = function (exports) {
       clearTimeout(doubleTapTimmer);
       doubleTapTimmer = null;
       Util.mix(eProxy, { type: SINGLE_TAP });
-      Util.dispatchEvent(target, SINGLE_TAP, eProxy);
+      Event.dispatchEvent(target, SINGLE_TAP, eProxy);
     }, single_tap_delay);
   }
   document.body.addEventListener('touchstart', touchStart);
@@ -360,7 +378,7 @@ tap = function (exports) {
 }({});
 pinch = function (exports) {
   var Util = util;
-  var doc = window.document;
+  var Event = _event_;
   var doc = window.document;
   var PINCH_START = 'gesturePinchStart', PINCH_END = 'gesturePinchEnd', PINCH = 'gesturePinch';
   function getDistance(p1, p2) {
@@ -386,7 +404,7 @@ pinch = function (exports) {
       this.isStart = 1;
       this.startDistance = distance;
       this.gestureType = 'pinch';
-      Util.dispatchEvent(e.currentTarget, PINCH_START, e);
+      Event.dispatchEvent(e.target, PINCH_START, e);
     } else {
       if (this.gestureType != 'pinch')
         return;
@@ -394,7 +412,7 @@ pinch = function (exports) {
       e.distance = distance;
       e.scale = distance / this.startDistance;
       e.origin = origin;
-      Util.dispatchEvent(e.currentTarget, PINCH, e);
+      Event.dispatchEvent(e.target, PINCH, e);
     }
   }
   function pinchEndHandler(e) {
@@ -402,7 +420,7 @@ pinch = function (exports) {
     if (this.gestureType != 'pinch')
       return;
     if (e.touches.length == 0) {
-      Util.dispatchEvent(e.target, PINCH_END, e);
+      Event.dispatchEvent(e.target, PINCH_END, e);
       this.gestureType = '';
     }
   }
@@ -604,6 +622,7 @@ scrollbar = function (exports) {
 core = function (exports) {
   var win = window;
   var Util = util;
+  var Event = _event_;
   var Pan = pan;
   var Tap = tap;
   var Pinch = pinch;
@@ -1132,11 +1151,10 @@ core = function (exports) {
         y: 0
       };
       var boundry = self.boundry;
-      renderTo.addEventListener('touchstart', function (e) {
+      Event.on(renderTo, 'touchstart', function (e) {
         e.preventDefault();
         self.stop();
-      });
-      renderTo.addEventListener(Tap.TAP, function (e) {
+      }).on(renderTo, Tap.TAP, function (e) {
         self.boundryCheck();
         if (!self.isScrollingX && !self.isScrollingY) {
           simulateMouseEvent(e, 'click');
@@ -1145,13 +1163,11 @@ core = function (exports) {
           self.isScrollingY = false;
           self.stop();
         }
-      });
-      renderTo.addEventListener(Pan.PAN_START, function (e) {
+      }).on(renderTo, Pan.PAN_START, function (e) {
         offset = self.getOffset();
         self.translate(offset);
         self.fire(PAN_START, { offset: offset });
-      });
-      renderTo.addEventListener(Pan.PAN, function (e) {
+      }).on(renderTo, Pan.PAN, function (e) {
         var posY = self.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
         var posX = self.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
         boundry = self.boundry;
@@ -1200,8 +1216,7 @@ core = function (exports) {
           directionX: self.directionX,
           directionY: self.directionY
         });
-      });
-      renderTo.addEventListener(Pan.PAN_END, function (e) {
+      }).on(renderTo, Pan.PAN_END, function (e) {
         self.panEndHandler(e);
         self.fire(PAN_END, {
           velocity: e.velocity,
@@ -1209,7 +1224,7 @@ core = function (exports) {
           velocityY: e.velocityY
         });
       });
-      container.addEventListener(transitionEnd, function (e) {
+      Event.on(container, transitionEnd, function (e) {
         if (e.target == content && !self.isScaling) {
           self.__scrollEndCallbackX && self.__scrollEndCallbackX({ type: 'x' });
         }
@@ -1220,15 +1235,15 @@ core = function (exports) {
       //可缩放
       if (self.userConfig.scalable) {
         var originX, originY;
-        renderTo.addEventListener(Pinch.PINCH_START, function (e) {
+        Event.on(renderTo, Pinch.PINCH_START, function (e) {
           scale = self.scale;
           originX = (e.origin.pageX - self.x) / self.containerWidth;
           originY = (e.origin.pageY - self.y) / self.containerHeight;
         });
-        renderTo.addEventListener(Pinch.PINCH, function (e) {
+        Event.on(renderTo, Pinch.PINCH, function (e) {
           self._scale(scale * e.scale, originX, originY, 'pinch');
         });
-        renderTo.addEventListener(Pinch.PINCH_END, function (e) {
+        Event.on(renderTo, Pinch.PINCH_END, function (e) {
           self.isScaling = false;
           if (self.scale < self.minScale) {
             self.scaleTo(self.minScale, originX, originY, SCALE_TO_DURATION);
@@ -1236,13 +1251,13 @@ core = function (exports) {
             self.scaleTo(self.maxScale, originX, originY, SCALE_TO_DURATION);
           }
         });
-        renderTo.addEventListener(Tap.DOUBLE_TAP, function (e) {
+        Event.on(renderTo, Tap.DOUBLE_TAP, function (e) {
           originX = (e.pageX - self.x) / self.containerWidth;
           originY = (e.pageY - self.y) / self.containerHeight;
           self.scale > self.minScale ? self.scaleTo(self.minScale, originX, originY, 200) : self.scaleTo(self.maxScale, originX, originY, 200);
         });
       }
-      window.addEventListener('resize', function (e) {
+      Event.on(win, 'resize', function (e) {
         self.refresh();
       });
     },
@@ -1378,8 +1393,12 @@ core = function (exports) {
       return transition;
     }
   });
-  window.XScroll = XScroll;
-  exports = XScroll;
+  // commonjs export
+  if (typeof module == 'object' && module.exports) {
+    exports = XScroll;
+  } else {
+    window.XScroll = XScroll;
+  }
   return exports;
 }({});
 }());

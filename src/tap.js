@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
-    var Util = require("util");
+    var Util = require('util');
+    var Event = require("event");
     var TAP = "tap";
     var TAP_HOLD = "tapHold";
     var SINGLE_TAP = "singleTap";
@@ -82,7 +83,7 @@ define(function(require, exports, module) {
                     pageY: startY,
                     originalEvent: e
                 });
-                Util.dispatchEvent(e.target, TAP_HOLD, eProxy);
+                Event.dispatchEvent(e.target, TAP_HOLD, eProxy);
             }
             clearTimeout(tapHoldTimer);
         }, tap_hold_delay);
@@ -131,7 +132,7 @@ define(function(require, exports, module) {
         });
         var target = e.target;
         /*先触发tap，再触发doubleTap*/
-        Util.dispatchEvent(target, TAP, eProxy);
+        Event.dispatchEvent(target, TAP, eProxy);
         /*doubleTap 和 singleTap 互斥*/
         if (doubleTapTimmer) {
             if (checkDoubleTap()) {
@@ -139,7 +140,7 @@ define(function(require, exports, module) {
                 Util.mix(eProxy, {
                     type: DOUBLE_TAP
                 });
-                Util.dispatchEvent(target, DOUBLE_TAP, eProxy);
+                Event.dispatchEvent(target, DOUBLE_TAP, eProxy);
             }
             clearTimeout(doubleTapTimmer);
             doubleTapTimmer = null;
@@ -151,7 +152,7 @@ define(function(require, exports, module) {
             Util.mix(eProxy, {
                 type: SINGLE_TAP
             });
-            Util.dispatchEvent(target, SINGLE_TAP, eProxy);
+            Event.dispatchEvent(target, SINGLE_TAP, eProxy);
         }, single_tap_delay);
 
     }

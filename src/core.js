@@ -1,14 +1,15 @@
-define(function(require,exports,module){
-	var win = window;
-	var Util = require('util');
-	var Pan = require('pan');
+define(function(require, exports, module) {
+    var win = window;
+    var Util = require('util');
+    var Event = require('event');
+    var Pan = require('pan');
     var Tap = require('tap');
     var Pinch = require('pinch');
     var ScrollBar = require('scrollbar');
-	  //global namespace
-    var XScroll = function(cfg){
-    	this.userConfig = cfg;
-    	this.init();
+    //global namespace
+    var XScroll = function(cfg) {
+        this.userConfig = cfg;
+        this.init();
     };
     XScroll.version = "1.0.0";
     //event names
@@ -33,7 +34,7 @@ define(function(require,exports,module){
     // reduced scale rate
     var SCALE_RATE = 0.7;
 
-   var SCALE_TO_DURATION = 300;
+    var SCALE_TO_DURATION = 300;
     //transform
     var transform = Util.prefixStyle("transform");
     //transition webkitTransition MozTransition OTransition msTtransition
@@ -65,8 +66,8 @@ define(function(require,exports,module){
 
     var vendors = ['webkit', 'moz', 'ms', 'o'];
     var cancelRAF = window.cancelAnimationFrame;
-    for (var i = 0; i < vendors.length;i++) {
-        if(window[vendors[i] + 'CancelAnimationFrame'] || window[vendors[i] + 'CancelRequestAnimationFrame']){
+    for (var i = 0; i < vendors.length; i++) {
+        if (window[vendors[i] + 'CancelAnimationFrame'] || window[vendors[i] + 'CancelRequestAnimationFrame']) {
             cancelRAF = window[vendors[i] + 'CancelAnimationFrame'] || window[vendors[i] + 'CancelRequestAnimationFrame'];
         }
     }
@@ -93,7 +94,7 @@ define(function(require,exports,module){
      * @constructor
      * @extends Base
      */
-    Util.mix(XScroll.prototype,{
+    Util.mix(XScroll.prototype, {
         init: function() {
             var self = this;
             self.__events = {};
@@ -101,7 +102,7 @@ define(function(require,exports,module){
                 scalable: false,
                 scrollbars: false
             }, self.userConfig, undefined, undefined, true);
-            self.renderTo = document.getElementById(userConfig.renderTo.replace("#",""));
+            self.renderTo = document.getElementById(userConfig.renderTo.replace("#", ""));
             self.boundryCheckEnabled = true;
             var clsPrefix = self.clsPrefix = userConfig.clsPrefix || "xs-";
             self.SROLL_ACCELERATION = userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
@@ -172,14 +173,20 @@ define(function(require,exports,module){
             self._renderScrollBars();
             self._bindEvt();
         },
-        _renderScrollBars:function(){
+        _renderScrollBars: function() {
             var self = this;
-            if(!self.userConfig.scrollbars || self.__isScrollBarRendered) return;
+            if (!self.userConfig.scrollbars || self.__isScrollBarRendered) return;
             // console.log
             self.__isScrollBarRendered = true;
             // if(self.lockX)
-            self.scrollbarX = new ScrollBar({xscroll:self,type:"x"});
-            self.scrollbarY = new ScrollBar({xscroll:self,type:"y"});
+            self.scrollbarX = new ScrollBar({
+                xscroll: self,
+                type: "x"
+            });
+            self.scrollbarY = new ScrollBar({
+                xscroll: self,
+                type: "y"
+            });
         },
         _createContainer: function() {
             var self = this;
@@ -206,7 +213,7 @@ define(function(require,exports,module){
             this.translateY(offset.y)
             return;
         },
-        _scale: function(scale, originX, originY,triggerEvent) {
+        _scale: function(scale, originX, originY, triggerEvent) {
             var self = this;
             if (!self.userConfig.scalable || self.scale == scale || !scale) return;
 
@@ -216,18 +223,18 @@ define(function(require,exports,module){
                 self.scaleBeginX = self.x;
                 self.scaleBeginY = self.y;
             }
-            if(originX){
+            if (originX) {
                 self.originX = originX;
             }
-            if(originY){
-                 self.originY = originY;
+            if (originY) {
+                self.originY = originY;
             }
             var boundry = self.boundry;
             var containerWidth = scale * self.initialContainerWidth;
             var containerHeight = scale * self.initialContainerHeight;
             self.containerWidth = Math.round(containerWidth > self.width ? containerWidth : self.width);
 
-            self.containerHeight =  Math.round(containerHeight > self.height ? containerHeight : self.height);
+            self.containerHeight = Math.round(containerHeight > self.height ? containerHeight : self.height);
             self.scale = scale;
             var x = originX * (self.initialContainerWidth * self.scaleBegin - self.containerWidth) + self.scaleBeginX;
             var y = originY * (self.initialContainerHeight * self.scaleBegin - self.containerHeight) + self.scaleBeginY;
@@ -248,11 +255,11 @@ define(function(require,exports,module){
             self._transform();
             self.fire(SCALE, {
                 scale: scale,
-                origin:{
-                    x:originX,
-                    y:originY
+                origin: {
+                    x: originX,
+                    y: originY
                 },
-                triggerEvent:triggerEvent
+                triggerEvent: triggerEvent
             })
         },
         /*
@@ -267,36 +274,39 @@ define(function(require,exports,module){
             var self = this;
             //不可缩放
             if (!self.userConfig.scalable || self.scale == scale || !scale) return;
-                var duration = duration || 1;
-                var easing = easing || "ease-out",
-                    transitionStr = [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("");
-                var start = Date.now();
-                self.destTimeScale = start + duration;
-                cancelRAF(self._rafScale);
-                var scaleStart = self.scale;
-                var step = 0;
-                var run = function() {
-                    var now = Date.now();
-                    if (now > start + duration && now >= self.destTimeScale) {
-                        self.isScaling = false;
-                        return;
-                    }
-                    self._rafScale = RAF(run);
+            var duration = duration || 1;
+            var easing = easing || "ease-out",
+                transitionStr = [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("");
+            var start = Date.now();
+            self.destTimeScale = start + duration;
+            cancelRAF(self._rafScale);
+            var scaleStart = self.scale;
+            var step = 0;
+            var run = function() {
+                var now = Date.now();
+                if (now > start + duration && now >= self.destTimeScale) {
+                    self.isScaling = false;
+                    return;
                 }
-                run();
-                self.container.style[transition] = transitionStr;
-                self.content.style[transition] = transitionStr;
-                self._scale(scale, originX, originY,"scaleTo");
-                self.fire(SCALE_ANIMATE, {
-                    scale: self.scale,
-                    duration: duration,
-                    easing: easing,
-                    offset: {
-                        x: self.x,
-                        y: self.y
-                    },
-                    origin:{x:originX,y:originY}
-                });
+                self._rafScale = RAF(run);
+            }
+            run();
+            self.container.style[transition] = transitionStr;
+            self.content.style[transition] = transitionStr;
+            self._scale(scale, originX, originY, "scaleTo");
+            self.fire(SCALE_ANIMATE, {
+                scale: self.scale,
+                duration: duration,
+                easing: easing,
+                offset: {
+                    x: self.x,
+                    y: self.y
+                },
+                origin: {
+                    x: originX,
+                    y: originY
+                }
+            });
         },
         translateX: function(x) {
             this.x = x;
@@ -318,7 +328,7 @@ define(function(require,exports,module){
         },
         stop: function() {
             var self = this;
-            if(self.isScaling) return;
+            if (self.isScaling) return;
             var offset = self.getOffset();
             self.translate(offset);
             self._noTransition();
@@ -327,13 +337,13 @@ define(function(require,exports,module){
             self.fire(SCROLL_END, {
                 offset: offset,
                 scale: self.scale,
-                zoomType:"xy"
+                zoomType: "xy"
             });
         },
-         _transform: function() {
+        _transform: function() {
             var translateZ = this.gpuAcceleration ? " translateZ(0) " : "";
             this.content.style[transform] = "translate(" + this.x + "px,0px)  scaleX(" + this.scale + ") scaleY(" + this.scale + ") " + translateZ;
-            this.container.style[transform] = "translate(0px," + this.y + "px) "+translateZ;
+            this.container.style[transform] = "translate(0px," + this.y + "px) " + translateZ;
         },
         getOffset: function() {
             var self = this;
@@ -376,7 +386,7 @@ define(function(require,exports,module){
             self.translateX(-x);
             var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
             content.style[transition] = transitionStr;
-            self._scrollHandler(-x,duration, callback, easing, transitionStr, "x");
+            self._scrollHandler(-x, duration, callback, easing, transitionStr, "x");
             return content.style[transition] = transitionStr;
         },
         scrollY: function(y, duration, easing, callback) {
@@ -389,14 +399,14 @@ define(function(require,exports,module){
             self.translateY(-y);
             var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
             container.style[transition] = transitionStr;
-            self._scrollHandler(-y,duration, callback, easing, transitionStr, "y");
+            self._scrollHandler(-y, duration, callback, easing, transitionStr, "y");
             return container.style[transition] = transitionStr;
         },
-        _scrollHandler: function(dest,duration, callback, easing, transitionStr, type) {
+        _scrollHandler: function(dest, duration, callback, easing, transitionStr, type) {
             var self = this;
             var offset = self.getOffset();
             //目标值等于当前至 则不发生滚动
-            if(offset[type] == dest) return;
+            if (offset[type] == dest) return;
             if (duration <= 0) {
                 self.fire(SCROLL, {
                     zoomType: type,
@@ -411,7 +421,7 @@ define(function(require,exports,module){
             self['destTime' + Type] = start + duration;
             cancelRAF(self['raf' + Type]);
             //注册滚动结束事件  供transitionEnd进行精确回调
-            self['__scrollEndCallback'+Type] = function(args){
+            self['__scrollEndCallback' + Type] = function(args) {
                 self['isScrolling' + Type] = false;
                 self.fire(SCROLL_END, {
                     offset: self.getOffset(),
@@ -467,7 +477,7 @@ define(function(require,exports,module){
             if (offset.y > boundry.top) {
                 offset.y = boundry.top;
                 self.scrollY(-offset.y, BOUNDRY_CHECK_DURATION, BOUNDRY_CHECK_EASING, callback);
-            } else if (offset.y + containerHeight < boundry.bottom){
+            } else if (offset.y + containerHeight < boundry.bottom) {
                 offset.y = boundry.bottom - containerHeight;
                 self.scrollY(-offset.y, BOUNDRY_CHECK_DURATION, BOUNDRY_CHECK_EASING, callback);
             }
@@ -480,8 +490,8 @@ define(function(require,exports,module){
         /**
          * enable the switch for boundry back bounce
          **/
-        bounce: function(isEnabled,callback) {
-            this.boundryCheckEnabled =  isEnabled;
+        bounce: function(isEnabled, callback) {
+            this.boundryCheckEnabled = isEnabled;
             isEnabled ? this.boundryCheck(callback) : undefined;
             return;
         },
@@ -500,12 +510,12 @@ define(function(require,exports,module){
             };
             var boundry = self.boundry;
 
-            renderTo.addEventListener("touchstart", function(e) {
+
+
+            Event.on(renderTo, "touchstart", function(e) {
                 e.preventDefault();
                 self.stop();
-            });
-
-            renderTo.addEventListener(Tap.TAP, function(e) {
+            }).on(renderTo, Tap.TAP, function(e) {
                 self.boundryCheck();
                 if (!self.isScrollingX && !self.isScrollingY) {
                     simulateMouseEvent(e, "click");
@@ -514,15 +524,13 @@ define(function(require,exports,module){
                     self.isScrollingY = false;
                     self.stop();
                 }
-            });
-            renderTo.addEventListener(Pan.PAN_START, function(e) {
+            }).on(renderTo, Pan.PAN_START, function(e) {
                 offset = self.getOffset();
                 self.translate(offset);
                 self.fire(PAN_START, {
                     offset: offset
                 });
-            });
-            renderTo.addEventListener(Pan.PAN, function(e) {
+            }).on(renderTo, Pan.PAN, function(e) {
                 var posY = self.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
                 var posX = self.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
                 boundry = self.boundry;
@@ -568,8 +576,7 @@ define(function(require,exports,module){
                     directionY: self.directionY
                 });
 
-            });
-            renderTo.addEventListener(Pan.PAN_END, function(e) {
+            }).on(renderTo, Pan.PAN_END, function(e) {
                 self.panEndHandler(e)
                 self.fire(PAN_END, {
                     velocity: e.velocity,
@@ -578,26 +585,30 @@ define(function(require,exports,module){
                 })
             })
 
-            container.addEventListener(transitionEnd,function(e){
-                if(e.target == content && !self.isScaling){
-                    self.__scrollEndCallbackX && self.__scrollEndCallbackX({type: "x"});
+            Event.on(container, transitionEnd, function(e) {
+                if (e.target == content && !self.isScaling) {
+                    self.__scrollEndCallbackX && self.__scrollEndCallbackX({
+                        type: "x"
+                    });
                 }
-                if(e.target == container && !self.isScaling){
-                    self.__scrollEndCallbackY && self.__scrollEndCallbackY({type:"y"});
+                if (e.target == container && !self.isScaling) {
+                    self.__scrollEndCallbackY && self.__scrollEndCallbackY({
+                        type: "y"
+                    });
                 }
-            },false);
+            }, false);
             //可缩放
             if (self.userConfig.scalable) {
                 var originX, originY;
-                renderTo.addEventListener(Pinch.PINCH_START, function(e) {
+                Event.on(renderTo, Pinch.PINCH_START, function(e) {
                     scale = self.scale;
                     originX = (e.origin.pageX - self.x) / self.containerWidth;
                     originY = (e.origin.pageY - self.y) / self.containerHeight;
                 });
-                renderTo.addEventListener(Pinch.PINCH, function(e) {
-                    self._scale(scale * e.scale, originX, originY,"pinch");
+                Event.on(renderTo, Pinch.PINCH, function(e) {
+                    self._scale(scale * e.scale, originX, originY, "pinch");
                 });
-                renderTo.addEventListener(Pinch.PINCH_END, function(e) {
+                Event.on(renderTo, Pinch.PINCH_END, function(e) {
                     self.isScaling = false;
                     if (self.scale < self.minScale) {
                         self.scaleTo(self.minScale, originX, originY, SCALE_TO_DURATION);
@@ -605,13 +616,13 @@ define(function(require,exports,module){
                         self.scaleTo(self.maxScale, originX, originY, SCALE_TO_DURATION);
                     }
                 })
-                renderTo.addEventListener(Tap.DOUBLE_TAP,function(e){
+                Event.on(renderTo, Tap.DOUBLE_TAP, function(e) {
                     originX = (e.pageX - self.x) / self.containerWidth;
                     originY = (e.pageY - self.y) / self.containerHeight;
-                    self.scale > self.minScale ? self.scaleTo(self.minScale, originX,originY,200) : self.scaleTo(self.maxScale, originX,originY,200);
+                    self.scale > self.minScale ? self.scaleTo(self.minScale, originX, originY, 200) : self.scaleTo(self.maxScale, originX, originY, 200);
                 })
             }
-            window.addEventListener("resize", function(e) {
+            Event.on(win, "resize", function(e) {
                 self.refresh();
             })
         },
@@ -667,24 +678,24 @@ define(function(require,exports,module){
                 }
             }
         },
-        fire:function(evt,args){
-        	var self = this;
-        	if(self.__events[evt] && self.__events[evt].length){
-        		for(var i in self.__events[evt]){
-        			self.__events[evt][i] && self.__events[evt][i](args);
-        		}
-        	}
+        fire: function(evt, args) {
+            var self = this;
+            if (self.__events[evt] && self.__events[evt].length) {
+                for (var i in self.__events[evt]) {
+                    self.__events[evt][i] && self.__events[evt][i](args);
+                }
+            }
         },
-        on:function(evt,fn){
-        	if(!this.__events[evt]){
-        		this.__events[evt] = [];
-        	}
-        	this.__events[evt].push(fn);
+        on: function(evt, fn) {
+            if (!this.__events[evt]) {
+                this.__events[evt] = [];
+            }
+            this.__events[evt].push(fn);
         },
-        detach:function(evt,fn){
-            if(!evt || !this.__events[evt]) return;
+        detach: function(evt, fn) {
+            if (!evt || !this.__events[evt]) return;
             var index = this.__events[evt].indexOf(fn);
-            if ( index > -1 ) {
+            if (index > -1) {
                 this.__events[evt].splice(index, 1);
             }
         },
@@ -749,8 +760,14 @@ define(function(require,exports,module){
         }
     });
 
-    window.XScroll = XScroll;
 
-	module.exports = XScroll;
+    // commonjs export
+    if (typeof module == 'object' && module.exports) {
+        module.exports = XScroll;
+    }
+    // browser export
+    else {
+        window.XScroll = XScroll;
+    }
 
 });
