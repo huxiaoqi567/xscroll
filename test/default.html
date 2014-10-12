@@ -206,15 +206,12 @@ body {
             maxScale:2
         });
 
+        
+        var pulldown = new XScroll.PullDown({
+            xscroll:xscroll
+        });
+
         xscroll.render();
-
-        var onscroll = function(e){
-            console.log(e)
-        };
-
-        // xscroll.on("scroll",onscroll)
-
-        // xscroll.detach("scroll",onscroll)
 
 
 

@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
 	var Util = {
+
 		mix: function(to, from) {
 			for (var i in from) {
 				to[i] = from[i];
@@ -35,6 +36,19 @@ define(function(require, exports, module) {
 			if (this.vendor === false) return false;
 			if (this.vendor === '') return style;
 			return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
+		},
+		hasClass:function(el,className){
+			return el && el.className && el.className.indexOf(className) != -1;
+		},
+		addClass:function(el,className){
+			if(el && !this.hasClass(el,className)){
+				el.className += " "+className;
+			}
+		},
+		removeClass:function(el,className){
+			if(el && el.className){
+				el.className = el.className.replace(className,"");
+			}
 		}
 	}
 	module.exports = Util;

@@ -6,11 +6,13 @@ define(function(require, exports, module) {
     var Tap = require('tap');
     var Pinch = require('pinch');
     var ScrollBar = require('scrollbar');
+    var PullDown = require('pulldown');
     //global namespace
     var XScroll = function(cfg) {
         this.userConfig = cfg;
         this.init();
     };
+    XScroll.PullDown = PullDown;
     XScroll.version = "1.0.0";
     //event names
     var SCROLL_END = "scrollend";
@@ -697,11 +699,11 @@ define(function(require, exports, module) {
                  self[boundryCheckFn]();
             }
         },
-        fire: function(evt, args) {
+        fire: function(evt) {
             var self = this;
             if (self.__events[evt] && self.__events[evt].length) {
                 for (var i in self.__events[evt]) {
-                    self.__events[evt][i] && self.__events[evt][i](args);
+                    self.__events[evt][i].apply(this,[].slice.call(arguments, 1));
                 }
             }
         },

@@ -1,0 +1,560 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+	<style type="text/css">
+	body,ul,li,div,img{
+		padding: 0;margin:0;
+	}
+	img{
+		display: block;
+	}
+	body{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+	}
+	.container{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background: #666;
+		display: none;
+	}
+	#row{
+		position: absolute;
+		width: 10%;
+		left:0;
+		height: 100%;
+		overflow: hidden;
+	}
+	#row table{
+		width: 100%;
+		height:1000px;
+	}
+	#row table td{
+		text-align: center;
+		color:#fff;
+		font-family: Arial;
+	}
+	#demo{
+		position: absolute;
+		width: 90%;
+		height: 100%;
+		overflow: hidden;
+		right:0;
+	}
+	table{
+		table-layout: fixed;
+	}
+	#demo table{
+		width: 1000px;
+		height: 1000px;
+	}
+	#demo table td{
+		border:1px solid #fff;		
+	}
+	
+	#indicator{
+		position: absolute;
+		width: 80px;
+		height: 50px;
+		background: #000;
+		opacity: 0.8;
+		z-index: 9999;
+		padding: 4px;
+		overflow: hidden;
+		display: none;
+	}
+	#indicator .zoomer{
+		-webkit-box-shadow:0px 0px 0px 1px red;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+	}
+
+	</style>
+	<div class="container">
+		<div id="indicator">
+			<div class="zoomer"></div>
+		</div>
+		<div id="row">
+			<div class="xs-container">
+				<div class="xs-content">
+					<table cellspacing="0" cellspadding="0">
+						<tr>
+							<td>A</td>
+						</tr>
+						<tr>
+							<td>B</td>
+						</tr>
+						<tr>
+							<td>C</td>
+						</tr>
+						<tr>
+							<td>D</td>
+						</tr>
+						<tr>
+							<td>E</td>
+						</tr>
+						<tr>
+							<td>F</td>
+						</tr>
+						<tr>
+							<td>G</td>
+						</tr>
+						<tr>
+							<td>H</td>
+						</tr>
+						<tr>
+							<td>I</td>
+						</tr>
+						<tr>
+							<td>J</td>
+						</tr>
+						<tr>
+							<td>K</td>
+						</tr>
+						<tr>
+							<td>L</td>
+						</tr>
+						<tr>
+							<td>M</td>
+						</tr>
+						<tr>
+							<td>N</td>
+						</tr>
+						<tr>
+							<td>O</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="demo">
+			<div class="xs-container">
+				<div class="xs-content">
+					<table cellspacing="0" cellspadding="0">
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="../build/xscroll.js"></script>
+	<script type="text/javascript">
+		var doc = document;
+		doc.querySelector(".container").style.display = "block";
+		var xscroll = new XScroll({
+			renderTo:"#demo",
+			scalable:true,
+			maxScale:1.2,
+		});
+
+
+		xscroll.render();
+
+		var minScale = xscroll.minScale;
+		var maxScale = xscroll.maxScale;
+
+
+        var row = new XScroll({
+        	renderTo:"#row",
+        	scalable:true,
+        	lockX:true,
+        	scrollbarX:false,
+        	scrollbarY:false
+        })
+
+
+        row.render()
+
+
+        xscroll.on("scroll",function(e){
+        	row.scrollY(-e.offset.y);
+        })
+
+        xscroll.on("scale",function(e){
+        	if(e.triggerEvent == "pinch"){
+        		row.scaleTo(e.scale,0.5,e.origin.y);
+        	}
+        	
+        })
+
+        xscroll.on("scaleanimate",function(e){
+        	row.scaleTo(e.scale,0.5,e.origin.y,e.duration);
+        })
+        
+        xscroll.scaleTo(minScale,0,0);
+        row.scaleTo(minScale,0.5,0);
+
+        var indicator = doc.getElementById("indicator"),
+        	zoomer = doc.querySelector(".zoomer"); 
+        	indicator.style.display = "block";
+        var width = indicator.offsetWidth;
+        var height = indicator.offsetHeight;
+        indicator.style.display = "none";
+        function updateIndicator(e){
+        	indicator.style.display = "block";
+        	var W =  xscroll.containerWidth;
+        	var w = xscroll.width;
+        	var H = xscroll.containerHeight;
+        	var h = xscroll.height;
+        	var scaleX = w/W;
+        	var scaleY = h/H;
+        	var left = (e && e.offset && e.offset.x === undefined ? xscroll.getOffsetLeft() : e && e.offset && e.offset.x)/W * width;
+        	var top = (e && e.offset && e.offset.y === undefined ? xscroll.getOffsetTop() : e && e.offset && e.offset.y)/H * height;
+        	zoomer.style.webkitTransform = "translate("+(-left)+"px,"+(-top)+"px) translateZ(0)"
+        	zoomer.style.width = width * w/W + "px";
+        	zoomer.style.height = height * h/H + "px";
+        	zoomer.style.webkitTransition = "all "+(e && e.duration/1000 || 0) + "s "+ (e && e.easing || "");
+        }
+
+         updateIndicator()
+
+         var evts = ["scaleanimate","scroll","scale"];
+         for(var i in evts){
+         	xscroll.on(evts[i],function(e){
+         		updateIndicator(e);
+         	})
+         }
+
+
+
+	</script>
+</body>
+</html>

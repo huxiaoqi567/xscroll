@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="demo.css">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #888;
+    }
+
+    #J_Scroll .xs-content{
+        background: #fff;
+        padding: 10px;
+        padding-bottom: 0;
+        width: 100%;
+    }
+    #J_Scroll{
+      bottom: 0;
+    }
+    </style>
+    <div id="header">XScroll</div>
+    <div id="J_Scroll">
+        <div class="xs-container">
+
+            <div class="xs-content">
+                    <h2 class="no-num no-toc" id=abstract>Abstract</h2>
+
+  <p>CSS Transitions allows property changes in CSS values to occur smoothly
+   over a specified duration.
+
+  <h2 class="no-num no-toc" id=status>Status of this document</h2>
+  <!--begin-status-->
+
+  <p><em>This section describes the status of this document at the time of
+   its publication. Other documents may supersede this document. A list of
+   current W3C publications and the latest revision of this technical report
+   can be found in the <a href="http://www.w3.org/TR/">W3C technical reports
+   index at http://www.w3.org/TR/.</a></em>
+
+  <p>Publication as a Working Draft does not imply endorsement by the W3C
+   Membership. This is a draft document and may be updated, replaced or
+   obsoleted by other documents at any time. It is inappropriate to cite this
+   document as other than work in progress.
+
+  <p>The (<a
+   href="http://lists.w3.org/Archives/Public/www-style/">archived</a>) public
+   mailing list <a href="mailto:www-style@w3.org">www-style@w3.org</a> (see
+   <a href="http://www.w3.org/Mail/Request">instructions</a>) is preferred
+   for discussion of this specification. When sending e-mail, please put the
+   text “css3-transitions” in the subject, preferably like this:
+   “[<!---->css3-transitions<!---->] <em>…summary of comment…</em>”
+
+  <p>This document was produced by the <a
+   href="http://www.w3.org/Style/CSS/members">CSS Working Group</a> (part of
+   the <a href="http://www.w3.org/Style/">Style Activity</a>).
+
+  <p>This document was produced by a group operating under the <a
+   href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February
+   2004 W3C Patent Policy</a>. W3C maintains a <a
+   href="http://www.w3.org/2004/01/pp-impl/32061/status"
+   rel=disclosure>public list of any patent disclosures</a> made in
+   connection with the deliverables of the group; that page also includes
+   instructions for disclosing a patent. An individual who has actual
+   knowledge of a patent which the individual believes contains <a
+   href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+   Claim(s)</a> must disclose the information in accordance with <a
+   href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+   6 of the W3C Patent Policy</a>.</p>
+  <!--end-status-->
+
+  <p> <strong>This document</strong> is expected to be relatively close to
+   last call. While some issues raised have yet to be addressed, new features
+   are extremely unlikely to be considered for this level.
+
+  <h2 class="no-num no-toc" id='contents'>Table of Contents</h2>
+
+  
+
+    
+
+  <h2 id=introduction><span class=secno>1. </span>Introduction</h2>
+
+  <p><em>This section is not normative.</em>
+
+  <p> This document introduces new CSS features to enable <em>implicit
+   transitions</em>, which describe how CSS properties can be made to change
+   smoothly from one value to another over a given duration.
+
+  <h2 id=transitions><span class=secno>2. </span><a
+   id=transitions->Transitions</a></h2>
+
+  <p> Normally when the value of a CSS property changes, the rendered result
+   is instantly updated, with the affected elements immediately changing from
+   the old property value to the new property value. This section describes a
+   way to specify transitions using new CSS properties. These properties are
+   used to animate smoothly from the old state to the new state over time.
+
+  <p> For example, suppose that transitions of one second have been defined
+   on the ‘<code class=property>left</code>’ and ‘<code
+   class=property>background-color</code>’ properties. The following
+   diagram illustrates the effect of updating those properties on an element,
+   in this case moving it to the right and changing the background from red
+   to blue. This assumes other transition parameters still have their default
+   values.
+
+  <div class=figure> </div>
+
+  <p class=caption> Transitions of ‘<code class=property>left</code>’ and
+   ‘<code class=property>background-color</code>’
+
+  <p> Transitions are a presentational effect. The computed value of a
+   property transitions over time from the old value to the new value.
+   Therefore if a script queries the computed style of a property as it is
+   transitioning, it will see an intermediate value that represents the
+   current animated value of the property.
+
+  <p> Only animatable CSS properties can be transitioned. See the table at
+   the end of this document for a list of properties that are animatable.
+
+  <p> The transition for a property is defined using a number of new
+   properties. For example:
+
+  <div class=example>
+   <p style="display:none"> Example(s):
+
+   <pre>
+  div {
+    transition-property: opacity;
+    transition-duration: 2s;
+  }
+  </pre>
+   The above example defines a transition on the ‘<code
+   class=property>opacity</code>’ property that, when a new value is
+   assigned to it, will cause a smooth change between the old value and the
+   new value over a period of two seconds.</div>
+
+  <p> Each of the transition properties accepts a comma-separated list,
+   allowing multiple transitions to be defined, each acting on a different
+   property. In this case, the individual transitions take their parameters
+   from the same index in all the lists. For example:
+
+  <div class=example>
+   <p style="display:none"> Example(s):
+
+   <pre>
+  div {
+    transition-property: opacity, left;
+    transition-duration: 2s, 4s;
+  }
+
+  </pre>
+   This will cause the ‘<code class=property>opacity</code>’ property to
+   transition over a period of two seconds and the left property to
+   transition over a period of four seconds.</div>
+
+  <p id=list-matching> In the case where the lists of values in transition
+   properties do not have the same length, the length of the ‘<a
+   href="#transition-property"><code
+   class=property>transition-property</code></a>’ list determines the
+   number of items in each list examined when starting transitions. The lists
+   are matched up from the first value: excess values at the end are not
+   used. If one of the other properties doesn't have enough comma-separated
+   values to match the number of values of ‘<a
+   href="#transition-property"><code
+   class=property>transition-property</code></a>’, the UA must calculate
+   its used value by repeating the list of values until there are enough.
+   This truncation or repetition does not affect the computed value. <span
+   class=note> Note: This is analogous to the behavior of the ‘<code
+   class=css>background-*</code>’ properties, with ‘<code
+   class=property>background-image</code>’ analogous to ‘<a
+   href="#transition-property"><code
+   class=property>transition-property</code></a>’. </span>
+
+  <div class=example>
+   <p style="display:none"> Example(s):
+
+   <pre>
+      div {
+        transition-property: opacity, left, top, width;
+        transition-duration: 2s, 1s;
+      }
+      </pre>
+   The above example defines a transition on the ‘<code
+   class=property>opacity</code>’ property of 2 seconds duration, a
+   transition on the ‘<code class=property>left</code>’ property of 1
+   second duration, a transition on the ‘<code class=property>top</code>’
+   property of 2 seconds duration and a transition on the ‘<code
+   class=property>width</code>’ property of 1 second duration.</div>
+
+  <p> While authors can use transitions to create dynamically changing
+   content, dynamically changing content can lead to seizures in some users.
+   For information on how to avoid content that can lead to seizures, see <a
+   href="http://www.w3.org/TR/WCAG20/#seizure">Guideline 2.3: Seizures: Do
+   not design content in a way that is known to cause seizures</a> (<a
+   href="#ref-WCAG20" rel=biblioentry>[WCAG20]<!--{{WCAG20}}--></a>).</p>
+  <!-- ======================================================================================================= -->
+
+  <h3 id=transition-property-property><span class=secno>2.1. </span><a
+   id=the-transition-property-property-> The ‘<code
+   class=property>transition-property</code>’ Property </a></h3>
+
+  <p> The ‘<a href="#transition-property"><code
+   class=property>transition-property</code></a>’ property specifies the
+   name of the CSS property to which the transition is applied.
+
+  <table class=propdef>
+   <tbody>
+    <tr>
+     <td> <em>Name:</em>
+
+     <td> <dfn id=transition-property>transition-property</dfn>
+
+    <tr>
+     <td> <em>Value:</em>
+
+     <td> none | <a
+      href="#single-transition-property">&lt;single-transition-property&gt;</a>
+      [ ‘<code class=css>,</code>’ <a
+      href="#single-transition-property">&lt;single-transition-property&gt;</a>
+      ]*
+
+    <tr>
+     <td> <em>Initial:</em>
+
+     <td> all
+
+    <tr>
+     <td> <em>Applies to:</em>
+
+     <td> all elements, :before and :after pseudo elements
+
+    <tr>
+     <td> <em>Inherited:</em>
+
+     <td> no
+
+    <tr>
+     <td> <em>Animatable:</em>
+
+     <td> no
+
+    <tr>
+     <td> <em>Percentages:</em>
+
+     <td> N/A
+
+    <tr>
+     <td> <em>Media:</em>
+
+     <td> visual
+
+    <tr>
+     <td> <em>Computed value:</em>
+
+     <td> Same as specified value.
+
+    <tr>
+     <td> <em>Canonical order:</em>
+
+     <td> <abbr title="follows order of property value definition">per
+      grammar</abbr>
+  </table>
+
+  <div class=prod> <dfn
+   id=single-transition-property>&lt;single-transition-property&gt;</dfn> =
+   all | &lt;IDENT&gt;</div>
+
+  <p> A value of ‘<code class=css>none</code>’ means that no property
+   will transition. Otherwise, a list of properties to be transitioned, or
+   the keyword ‘<code class=css>all</code>’ which indicates that all
+   properties are to be transitioned, is given.
+
+  <p> If one of the identifiers listed is not a recognized property name or
+   is not an animatable property, the implementation must still start
+   transitions on the animatable properties in the list using the duration,
+   delay, and timing function at their respective indices in the lists for
+   ‘<a href="#transition-duration"><code
+   class=property>transition-duration</code></a>’, ‘<a
+   href="#transition-delay"><code
+   class=property>transition-delay</code></a>’, and ‘<a
+   href="#transition-timing-function"><code
+   class=property>transition-timing-function</code></a>’. In other words,
+   unrecognized or non-animatable properties must be kept in the list to
+   preserve the matching of indices.
+
+  <p> The keywords ‘<code class=css>none</code>’, ‘<code
+   class=css>inherit</code>’, and ‘<code class=css>initial</code>’ are
+   not permitted as items within a list of more that one identifier; any list
+   that uses them is syntactically invalid. In other words, the &lt;IDENT&gt;
+   production in <a
+   href="#single-transition-property">&lt;single-transition-property&gt;</a>
+   matches any identifier other than these three keywords.
+
+  <p> For the keyword ‘<code class=css>all</code>’, or if one of the
+   identifiers listed is a shorthand property, implementations must start
+   transitions for any of its longhand sub-properties that are animatable
+   (or, for ‘<code class=css>all</code>’, all animatable properties),
+   using the duration, delay, and timing function at the index corresponding
+   to the shorthand.
+
+  <p> If a property is specified multiple times in the value of ‘<a
+   href="#transition-property"><code
+   class=property>transition-property</code></a>’ (either on its own, via a
+   shorthand that contains it, or via the ‘<code class=css>all</code>’
+   value), then the transition that starts uses the duration, delay, and
+   timing function at the index corresponding to the <em>last</em> item in
+   the value of ‘<a href="#transition-property"><code
+   class=property>transition-property</code></a>’ that calls for animating
+   that property.
+
+  <p class=note> Note: The ‘<code class=css>all</code>’ value and
+   ‘<code class=property>all</code>’ shorthand property work in similar
+   ways, so the ‘<code class=css>all</code>’ value is just like a
+   shorthand that covers all properties.</p>
+  <!-- ======================================================================================================= -->
+
+  <h3 id=transition-duration-property><span class=secno>2.2. </span><a
+   id=the-transition-duration-property-> The ‘<code
+   class=property>transition-duration</code>’ Property </a></h3>
+
+  <p> The ‘<a href="#transition-duration"><code
+   class=property>transition-duration</code></a>’ property defines the
+   length of time that a transition takes.
+
+  <table class=propdef>
+   <tbody>
+    <tr>
+     <td> <em>Name:</em>
+
+     <td> <dfn id=transition-duration>transition-duration</dfn>
+
+    <tr>
+     <td> <em>Value:</em>
+
+     <td> <span>&lt;time&gt;</span> [, <span>&lt;time&gt;</span>]*
+
+    <tr>
+     <td> <em>Initial:</em>
+
+     <td> 0s
+
+    <tr>
+     <td> <em>Applies to:</em>
+
+     <td> all elements, :before and :after pseudo elements
+
+    <tr>
+     <td> <em>Inherited:</em>
+
+     <td> no
+
+    <tr>
+     <td> <em>Animatable:</em>
+
+     <td> no
+
+    <tr>
+     <td> <em>Percentages:</em>
+
+     <td> N/A
+
+    <tr>
+     <td> <em>Media:</em>
+
+     <td> interactive
+
+    <tr>
+     <td> <em>Computed value:</em>
+
+     <td> Same as specified value.
+
+    <tr>
+     <td> <em>Canonical order:</em>
+
+     <td> <abbr title="follows order of property value definition">per
+      grammar</abbr>
+  </table>
+
+  <p> This property specifies how long the transition from the old value to
+   the new value should take. By default the value is ‘<code
+   class=css>0s</code>’, meaning that the transition is immediate (i.e.
+   there will be no animation). A negative value for ‘<a
+   href="#transition-duration"><code
+   class=property>transition-duration</code></a>’ renders the declaration
+   invalid.</p>
+  <!-- =======================================================================================================   
+        -->
+
+  <h3 id=transition-timing-function-property><span class=secno>2.3. </span><a
+   id="transition-timing-function_tag"> The ‘<code
+   class=property>transition-timing-function</code>’ Property </a></h3>
+
+  <p> The ‘<a href="#transition-timing-function"><code
+   class=property>transition-timing-function</code></a>’ property describes
+   how the intermediate values used during a transition will be calculated.
+   It allows for a transition to change speed over its duration. These
+   effects are commonly called <em>easing</em> functions. In either case, a
+   mathematical function that provides a smooth curve is used.
+
+  <p> Timing functions are either defined as a stepping function or a <a
+   href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B.C3.A9zier_curves">cubic
+   Bézier curve</a>. The timing function takes as its input the current
+   elapsed percentage of the transition duration and outputs the percentage
+   of the way the transition is from its start value to its end value. How
+   this output is used is defined by the <a
+   href="#animatable-types">interpolation rules</a> for the value type.
+
+  <p> A <a href="http://en.wikipedia.org/wiki/Step_function">stepping</a>
+   function is defined by a number that divides the domain of operation into
+   equally sized intervals. Each subsequent interval is a equal step closer
+   to the goal state. The function also specifies whether the change in
+   output percentage happens at the start or end of the interval (in other
+   words, if 0% on the input percentage is the point of initial change).
+
+  <div class=figure></div>
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="../build/xscroll.js"></script>
+    <script type="text/javascript">
+        var xscroll = new XScroll({
+            renderTo:"#J_Scroll",
+            autoRender:false,
+            scalable:true
+        });
+        xscroll.render();
+    </script>
+</body>
+</html>
