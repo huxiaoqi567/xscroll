@@ -6,6 +6,11 @@ define(function(require, exports, module) {
 			}
 			return to;
 		},
+		extend:function(superClass,subClass,attrs){
+			this.mix(subClass.prototype,superClass.prototype);
+			subClass.prototype.super = superClass;
+			this.mix(subClass.prototype,attrs)
+		},
 		/*
         vendors
         @example webkit|moz|ms|O 

@@ -100,7 +100,8 @@ define(function(require, exports, module) {
             self.__events = {};
             var userConfig = self.userConfig = Util.mix({
                 scalable: false,
-                scrollbars: false
+                scrollbarX: true,
+                scrollbarY:true
             }, self.userConfig, undefined, undefined, true);
             self.renderTo = document.getElementById(userConfig.renderTo.replace("#", ""));
             self.boundryCheckEnabled = true;
@@ -170,23 +171,31 @@ define(function(require, exports, module) {
 
             self.boundry.reset();
             self.fire(AFTER_RENDER);
-            self._renderScrollBars();
+            self.renderScrollBars();
             self._bindEvt();
         },
-        _renderScrollBars: function() {
+        renderScrollBars: function() {
             var self = this;
-            if (!self.userConfig.scrollbars || self.__isScrollBarRendered) return;
-            // console.log
-            self.__isScrollBarRendered = true;
-            // if(self.lockX)
-            self.scrollbarX = new ScrollBar({
-                xscroll: self,
-                type: "x"
-            });
-            self.scrollbarY = new ScrollBar({
-                xscroll: self,
-                type: "y"
-            });
+            if (self.userConfig.scrollbarX) {
+                if(self.scrollbarX){
+                    self.scrollbarX._update();
+                }else{
+                    self.scrollbarX = new ScrollBar({
+                        xscroll: self,
+                        type: "x"
+                    });
+                }
+            }
+            if (self.userConfig.scrollbarY) {
+                if(self.scrollbarY){
+                    self.scrollbarY._update();
+                }else{
+                    self.scrollbarY = new ScrollBar({
+                        xscroll: self,
+                        type: "y"
+                    });
+                }
+            }
         },
         _createContainer: function() {
             var self = this;
@@ -329,7 +338,12 @@ define(function(require, exports, module) {
         stop: function() {
             var self = this;
             if (self.isScaling) return;
+            var boundry = self.boundry;
             var offset = self.getOffset();
+            //outside of boundry 
+            if (offset.y > boundry.top || offset.y + self.containerHeight < boundry.bottom || offset.x > boundry.left || offset.x + self.containerWidth < boundry.right) {
+                return;
+            } 
             self.translate(offset);
             self._noTransition();
             cancelRAF(self.rafX);
@@ -379,7 +393,7 @@ define(function(require, exports, module) {
         scrollX: function(x, duration, easing, callback) {
             var self = this;
             var x = Math.round(x);
-            if (self.lockX) return;
+            if (self.userConfig.lockX) return;
             var duration = duration || 0;
             var easing = easing || "cubic-bezier(0.333333, 0.666667, 0.666667, 1)";
             var content = self.content;
@@ -392,7 +406,7 @@ define(function(require, exports, module) {
         scrollY: function(y, duration, easing, callback) {
             var self = this;
             var y = Math.round(y);
-            if (self.lockY) return;
+            if (self.userConfig.lockY) return;
             var duration = duration || 0;
             var easing = easing || "cubic-bezier(0.333333, 0.666667, 0.666667, 1)";
             var container = self.container;
@@ -456,7 +470,7 @@ define(function(require, exports, module) {
         },
         boundryCheckX: function(callback) {
             var self = this;
-            if (!self.boundryCheckEnabled || self.lockX) return;
+            if (!self.boundryCheckEnabled || self.userConfig.lockX) return;
             var offset = self.getOffset();
             var containerWidth = self.containerWidth;
             var boundry = self.boundry;
@@ -470,7 +484,7 @@ define(function(require, exports, module) {
         },
         boundryCheckY: function(callback) {
             var self = this;
-            if (!self.boundryCheckEnabled || self.lockY) return;
+            if (!self.boundryCheckEnabled || self.userConfig.lockY) return;
             var offset = self.getOffset();
             var containerHeight = self.containerHeight;
             var boundry = self.boundry;
@@ -531,8 +545,8 @@ define(function(require, exports, module) {
                     offset: offset
                 });
             }).on(renderTo, Pan.PAN, function(e) {
-                var posY = self.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
-                var posX = self.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
+                var posY = self.userConfig.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
+                var posX = self.userConfig.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
                 boundry = self.boundry;
                 containerWidth = self.containerWidth;
                 containerHeight = self.containerHeight;
@@ -639,43 +653,48 @@ define(function(require, exports, module) {
                 //保证常规滚动时间相同 x y方向不发生时间差
                 duration = Math.max(transX.duration, transY.duration);
             }
-            transX && self.scrollX(x, duration || transX['duration'], transX['easing'], function(e) {
-                self._scrollEndHandler("x");
-            });
-            transY && self.scrollY(y, duration || transY['duration'], transY['easing'], function(e) {
-                self._scrollEndHandler("y");
-            });
+            if(transX){
+                if(transX['duration'] < 100){
+                     self._scrollEndHandler("x");
+                }else{
+                    self.scrollX(x, duration || transX['duration'], transX['easing'], function(e) {
+                        self._scrollEndHandler("x");
+                    });
+                }
+            }
+            
+            if(transY){
+                if(transY['duration'] < 100){
+                    self._scrollEndHandler("y");
+                }else{
+                    self.scrollY(y, duration || transY['duration'], transY['easing'], function(e) {
+                        self._scrollEndHandler("y");
+                    });
+                }
+            }
             //judge the direction
             self.directionX = e.velocityX < 0 ? "left" : "right";
             self.directionY = e.velocityY < 0 ? "up" : "down";
         },
         _scrollEndHandler: function(type) {
             var self = this;
-            if (self["_bounce" + type]) {
+            var TYPE = type.toUpperCase();
+            var scrollFn = "scroll"+TYPE;
+            var boundryCheckFn = "boundryCheck"+TYPE;
+            var _bounce = "_bounce"+type;
+            if (self[_bounce]) {
                 self.fire("outOfBoundry")
-                var v = self["_bounce" + type];
+                var v = self[_bounce];
                 var a = 0.04 * (v / Math.abs(v));
                 var t = v / a;
                 var s0 = self.getOffset()[type];
                 var s = s0 + t * v / 2;
-                if (type == "x") {
-                    self.scrollX(-s, t, "cubic-bezier(" + quadratic2cubicBezier(-t, 0) + ")", function() {
-                        self["_bounce" + type] = 0;
-                        self.boundryCheckX()
-                    });
-                } else {
-                    self.scrollY(-s, t, "cubic-bezier(" + quadratic2cubicBezier(-t, 0) + ")", function() {
-                        self["_bounce" + type] = 0;
-                        self.boundryCheckY()
-                    });
-                }
+                self[scrollFn](-s, t, "cubic-bezier(" + quadratic2cubicBezier(-t, 0) + ")", function() {
+                    self[_bounce] = 0;
+                    self[boundryCheckFn]()
+                });
             } else {
-                if (type == "x") {
-                    self.boundryCheckX();
-
-                } else if (type == "y") {
-                    self.boundryCheckY();
-                }
+                 self[boundryCheckFn]();
             }
         },
         fire: function(evt, args) {
@@ -702,15 +721,16 @@ define(function(require, exports, module) {
         _bounce: function(type, offset, v, size, innerSize) {
             var self = this;
             var boundry = self.boundry;
-            var boundryOffset = boundry[type];
-            var boundrySize = type == "x" ? boundry.w : boundry.h;
+            var boundryStart = type == "x" ? boundry.left : boundry.top;
+            var boundryEnd = type == "x" ? boundry.right : boundry.bottom;
+            var size = boundryEnd - boundryStart; 
             var transition = {};
             if (v === 0) {
                 type == "x" ? self.boundryCheckX() : self.boundryCheckY();
                 return;
             }
-            if (type == "x" && self.lockX) return;
-            if (type == "y" && self.lockY) return;
+            if (type == "x" && self.userConfig.lockX) return;
+            if (type == "y" && self.userConfig.lockY) return;
             var userConfig = self.userConfig;
             var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
             if (v > maxSpeed) {
@@ -719,7 +739,7 @@ define(function(require, exports, module) {
             if (v < -maxSpeed) {
                 v = -maxSpeed;
             }
-            if (offset > 0 || offset < size - innerSize) {
+            if (offset > boundryStart || offset < size - innerSize) {
                 var a = BOUNDRY_CHECK_ACCELERATION * (v / Math.abs(v));
                 var t = v / a;
                 var s = offset + t * v / 2;
@@ -733,10 +753,10 @@ define(function(require, exports, module) {
             var t = v / a;
             var s = offset / 1 + t * v / 2;
             //over top boundry check bounce
-            if (s > 0) {
-                var _s = 0 - offset;
+            if (s > boundryStart) {
+                var _s = boundryStart - offset;
                 var _t = (v - Math.sqrt(-2 * a * _s + v * v)) / a;
-                transition['offset'] = 0;
+                transition['offset'] = -boundryStart;
                 transition['duration'] = _t;
                 transition['easing'] = "cubic-bezier(" + quadratic2cubicBezier(-t, -t + _t) + ")";
                 self["_bounce" + type] = v - a * _t;
@@ -757,6 +777,7 @@ define(function(require, exports, module) {
             }
             self['isScrolling' + type.toUpperCase()] = true;
             return transition;
+
         }
     });
 

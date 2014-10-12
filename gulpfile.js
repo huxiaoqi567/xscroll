@@ -18,4 +18,21 @@ gulp.task('build', function() {
       }));
     }
   });
+
+  requirejs.optimize({
+    'findNestedDependencies': true,
+    'baseUrl': './src/',
+    'optimize': 'none',
+    'include': ['xlist'],
+    'out': './build/xlist.js',
+    'onModuleBundleComplete': function(data) {
+      var fs = require('fs'),
+        amdclean = require('amdclean'),
+        outputFile = data.path;
+
+      fs.writeFileSync(outputFile, amdclean.clean({
+        'filePath': outputFile
+      }));
+    }
+  });
 });
