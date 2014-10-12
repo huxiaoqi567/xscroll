@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>default</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="demo.css">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+     #J_Scroll{
+        position: absolute;
+        top:45px;
+        bottom: 48px;
+        width:100%;
+     }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li.xs-row{
+        width: 100%;
+        display: none;
+    }
+    .xs-container{
+        width: 100%;
+    }
+    </style>
+    <div id="header">XList</div>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+
+
+            </ul>
+        </div>
+    </div>
+    <div id="footer">infinity-scroll</div>
+     <script type="text/javascript" src="../build/xlist.js"></script>
+    <script type="text/javascript">
+        var cols = 4;
+        var width = document.body.offsetWidth;
+        var itemHeight = width/cols;
+        var data = (function() {
+            var tmp = [],row;
+            for (var i = 1; i <= 1000; i++) {
+                tmp.push({num: i})
+            }
+            return tmp
+        })()
+
+        //格式化数据成cols列
+        var fdata = [];
+        for(var i in data){
+            if(i % cols == 0){
+                var tmp = [];
+                for(var j =i;j<i/1+cols/1;j++){
+                    tmp.push(data[j]);
+                }
+                fdata.push({data:tmp})
+            }
+        }
+
+
+        var xlist = new XList({
+            renderTo: "#J_Scroll",
+            data: fdata,
+            itemHeight: itemHeight ,
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,row){
+                var html = "";
+                for(var i in row.data){
+                     html +="<div class='cell' style='float:left;text-align:center;width:"+ 100/cols+"%;height:"+itemHeight+"px;line-height:"+itemHeight+"px;-webkit-box-shadow:0px 0px 1px 0.5px #ccc;'>"+
+                    row.data[i].num+
+                    '</div>'
+                }
+                el.innerHTML = html;
+            }
+        });
+        
+        xlist.render();
+
+    </script>
+</body>
+</html>

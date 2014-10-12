@@ -660,7 +660,7 @@ _pulldown_ = function (exports) {
         downContent: 'Pull Down To Refresh',
         upContent: 'Release To Refresh',
         loadingContent: loadingContent,
-        prefix: 'ks-xscroll-plugin-pulldown-'
+        prefix: 'xs-plugin-pulldown-'
       }, cfg);
       self.xscroll = self.userConfig.xscroll;
       prefix = self.userConfig.prefix;
@@ -1564,6 +1564,6 @@ core = function (exports) {
   } else {
     window.XScroll = XScroll;
   }
-  return exports;
+  return XScroll;
 }({});
 }());

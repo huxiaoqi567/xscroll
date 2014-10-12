@@ -660,7 +660,7 @@ _pulldown_ = function (exports) {
         downContent: 'Pull Down To Refresh',
         upContent: 'Release To Refresh',
         loadingContent: loadingContent,
-        prefix: 'ks-xscroll-plugin-pulldown-'
+        prefix: 'xs-plugin-pulldown-'
       }, cfg);
       self.xscroll = self.userConfig.xscroll;
       prefix = self.userConfig.prefix;
@@ -1564,7 +1564,7 @@ core = function (exports) {
   } else {
     window.XScroll = XScroll;
   }
-  return exports;
+  return XScroll;
 }({});
 dataset = function (exports) {
   var DataSet = function (cfg) {
@@ -1599,6 +1599,7 @@ xlist = function (exports) {
   var XList = function (cfg) {
     this.super.call(this, cfg);
   };
+  XList.DataSet = DataSet;
   Util.extend(XScroll, XList, {
     init: function () {
       var self = this;
@@ -1802,7 +1803,7 @@ xlist = function (exports) {
           var randomId = 'ks-xlist-row-' + Date.now();
           el.id = self.domInfo[i].id || randomId;
           self.domInfo[i].id = el.id;
-          self.$content.append(el);
+          self.content.appendChild(el);
           for (var attrName in self.domInfo[i].style) {
             if (attrName != 'height' && attrName != 'display' && attrName != 'position') {
               el.style[attrName] = self.domInfo[i].style[attrName];
@@ -1829,7 +1830,7 @@ xlist = function (exports) {
       sticky.style.position = 'absolute';
       sticky.style.top = '0';
       sticky.style.display = 'none';
-      self.$renderTo.prepend(sticky);
+      self.renderTo.appendChild(sticky);
       self.stickyElement = sticky;
       self.stickyDomInfo = [];
       for (var i = 0, l = self.domInfo.length; i < l; i++) {
@@ -1922,6 +1923,6 @@ xlist = function (exports) {
   } else {
     window.XList = XList;
   }
-  return exports;
+  return XList;
 }({});
 }());

@@ -20,7 +20,7 @@ define(function(require, exports, module) {
 				downContent: "Pull Down To Refresh",
 				upContent: "Release To Refresh",
 				loadingContent: loadingContent,
-				prefix: "ks-xscroll-plugin-pulldown-"
+				prefix: "xs-plugin-pulldown-"
 			}, cfg);
 
 			self.xscroll = self.userConfig.xscroll;

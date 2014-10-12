@@ -62,3 +62,36 @@ body {
     width: 100%;
     overflow: hidden;
 }
+#J_Scroll li{
+    width: 100%;
+    padding: 0 10px;
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #fff;
+    background-color: #fafafa;
+}
+
+.xs-plugin-pulldown-container{
+    text-align: center;
+    width: 100%;
+    line-height: 50px;
+}
+.xs-plugin-pulldown-up .up{
+    display: inline;
+}
+.xs-plugin-pulldown-up .down{
+    display: none;
+}
+.xs-plugin-pulldown-down .up{
+    display: none;
+}
+.xs-plugin-pulldown-down .down{
+    display: inline;
+}
+
+.xs-plugin-pullup-container{
+        line-height: 60px;
+        text-align: center;
+}
+

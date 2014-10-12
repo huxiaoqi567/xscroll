@@ -6,6 +6,7 @@ define(function(require, exports, module) {
 	var XList = function(cfg){
 		this.super.call(this,cfg)
 	}
+	XList.DataSet = DataSet;
 	Util.extend(XScroll,XList,{
 		init:function(){
 			var self = this;
@@ -209,7 +210,7 @@ define(function(require, exports, module) {
 					var randomId = "ks-xlist-row-"+Date.now()
 					el.id = self.domInfo[i].id || randomId;
 					self.domInfo[i].id = el.id;
-					self.$content.append(el);
+					self.content.appendChild(el);
 					for (var attrName in self.domInfo[i].style) {
 						if (attrName != "height" && attrName != "display" && attrName != "position") {
 							el.style[attrName] = self.domInfo[i].style[attrName];
@@ -236,7 +237,7 @@ define(function(require, exports, module) {
 			sticky.style.position = "absolute";
 			sticky.style.top = "0";
 			sticky.style.display = "none";
-			self.$renderTo.prepend(sticky);
+			self.renderTo.appendChild(sticky);
 			self.stickyElement = sticky;
 			self.stickyDomInfo = [];
 			for(var i =0,l = self.domInfo.length;i<l;i++){
@@ -333,5 +334,6 @@ define(function(require, exports, module) {
     else {
         window.XList = XList;
     }
+    return XList;
 
 });

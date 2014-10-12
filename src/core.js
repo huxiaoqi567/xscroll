@@ -793,4 +793,6 @@ define(function(require, exports, module) {
         window.XScroll = XScroll;
     }
 
+    return XScroll;
+
 });

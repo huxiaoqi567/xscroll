@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>stikcy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="demo.css">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #aaa;
+    }
+     #J_Scroll{
+        position: absolute;
+        top:45px;
+        bottom: 48px;
+        width:100%;
+        
+     }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li.xs-row{
+        width: 100%;
+    }
+    .xs-container{
+        width: 100%;
+    }
+    .sticky{
+        line-height: 40px;
+        text-align: center;
+    }
+    </style>
+    <div id="header">XList</div>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+
+                <li class="sticky" id="J_Sticky1">吸顶元素1</li>
+
+                <li class="xs-row">1</li>
+                <li class="xs-row">2</li>
+
+                <li id="J_Static1" style="width:100%;height:200px;background:yellow">
+                    no recycled element
+                </li>
+
+                <li class="xs-row">4</li>
+                <li id="J_Static2" style="width:100%;height:30px;background:red">
+                    no recycled element 2
+                </li>
+
+                <li class="xs-row">6</li>
+                <li class="xs-row">7</li>
+                <li class="xs-row">8</li>
+                <li class="xs-row">9</li>
+                <li class="xs-row">10</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+            </ul>
+        </div>
+    </div>
+    <div id="footer">infinity-scroll</div>
+    <script type="text/javascript" src="../build/xlist.js"></script>
+    <script type="text/javascript">
+        var data = (function() {
+            var tmp = [
+            // 吸顶元素
+            {
+                data:{
+                    text:document.getElementById("J_Sticky1").innerHTML
+                },
+                recycled:false,
+                className:"sticky",
+                style:{
+                    height:40,
+                    background:"#fff",
+                    color:"#000",
+                    position:"sticky",
+                    "z-index":100,
+                    width:"100%"
+                }
+            }
+            ];
+            for (var i = 1; i <= 1000; i++) {
+                if(i == 3){
+                    //非回收元素
+                    tmp.push({
+                        data:{
+                            text:document.getElementById("J_Static1").innerHTML
+                        },
+                        id:"J_Static1",
+                        recycled:false,
+                        style:{
+                            height:200,
+                            background:"yellow",
+                            color:"#000",
+                            width:"100%"
+                        }
+                    })
+                }else if(i == 5){
+                     //非回收元素
+                    tmp.push({
+                        data:{
+                            text:document.getElementById("J_Static2").innerHTML
+                        },
+                        id:"J_Static2",
+                        recycled:false,
+                        style:{
+                            height:30,
+                            background:"red",
+                            color:"#000",
+                            width:"100%"
+                        }
+                    })
+
+                }else if(i == 20){
+                     //非回收元素
+                    tmp.push({
+                        // id:"J_Sticky2",
+                        data:{
+                            text:"吸顶元素2"
+                        },
+                        recycled:false,
+                        className:"sticky",
+                        style:{
+                            height:40,
+                            background:"#fff",
+                            color:"#000",
+                            position:"sticky",
+                            "z-index":100,
+                            width:"100%"
+                        }
+                    })
+                    
+                }else{
+                    tmp.push({
+                        data:{num: i},
+                        recycled:true
+                    })
+                }
+
+                
+            }
+            return tmp
+        })()
+        var xlist = new XList({
+            renderTo: "#J_Scroll",
+            data: data,
+            itemHeight: 40 ,
+            autoRender:false,
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,data){
+                if(!data.recycled){
+                    el.innerHTML = data.data.text
+                }else{
+                    el.innerHTML = data.data.num;
+                }
+            }
+        });
+
+        xlist.render();
+
+
+    </script>
+</body>
+</html>
