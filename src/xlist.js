@@ -3,18 +3,18 @@ define(function(require, exports, module) {
 	var XScroll = require('core');
 	var DataSet = require('dataset');
 	var transform = Util.prefixStyle("transform");
-	var XList = function(cfg){
-		this.super.call(this,cfg)
+	var XList = function(cfg) {
+		this.super.call(this, cfg)
 	}
 	XList.DataSet = DataSet;
-	Util.extend(XScroll,XList,{
-		init:function(){
+	Util.extend(XScroll, XList, {
+		init: function() {
 			var self = this;
 			var userConfig = self.userConfig = Util.mix({
 				data: [],
-				gpuAcceleration:true,
-				lockX:true,
-				scrollbarX:false,
+				gpuAcceleration: true,
+				lockX: true,
+				scrollbarX: false,
 				itemHeight: 30
 			}, self.userConfig);
 			this.super.prototype.init.call(this)
@@ -41,51 +41,51 @@ define(function(require, exports, module) {
 				item.recycled = item.recycled === false ? false : true;
 				domInfo.push(item);
 				top += height;
-				if(!self.hasSticky && item.style && item.style.position == "sticky"){
+				if (!self.hasSticky && item.style && item.style.position == "sticky") {
 					self.hasSticky = true;
 				}
 			}
 			self.domInfo = domInfo;
 			return domInfo;
 		},
-		appendDataSet:function(ds){
+		appendDataSet: function(ds) {
 			var self = this;
-			if(!ds instanceof DataSet) return;
+			if (!ds instanceof DataSet) return;
 			self.datasets.push(ds);
 		},
-		removeDataSet:function(id){
+		removeDataSet: function(id) {
 			var self = this;
-			if(!id) return;
+			if (!id) return;
 			var index;
-			for(var i = 0,l = self.datasets.length;i < l;i++){
-				if(id == self.datasets[i].getId()){
+			for (var i = 0, l = self.datasets.length; i < l; i++) {
+				if (id == self.datasets[i].getId()) {
 					index = i;
 				}
 			}
-			self.datasets.splice(index,1);
+			self.datasets.splice(index, 1);
 		},
-		getDataSets:function(){
+		getDataSets: function() {
 			var self = this;
 			return self.datasets;
 		},
-		getDataSetById:function(id){
+		getDataSetById: function(id) {
 			var self = this;
-			if(!id) return;
-			for(var i = 0,l = self.datasets.length;i<l;i++){
-				if(self.datasets[i].getId() == id){
+			if (!id) return;
+			for (var i = 0, l = self.datasets.length; i < l; i++) {
+				if (self.datasets[i].getId() == id) {
 					return self.datasets[i];
 				}
 			}
 		},
-		_formatData:function(){
+		_formatData: function() {
 			var self = this;
 			var data = [];
-			for(var i in self.datasets){
+			for (var i in self.datasets) {
 				data = data.concat(self.datasets[i].getData());
 			}
 			return data;
 		},
-		_getChangedRows: function(newElementsPos,force) {
+		_getChangedRows: function(newElementsPos, force) {
 			var self = this;
 			var changedRows = {};
 			for (var i in self.elementsPos) {
@@ -98,7 +98,7 @@ define(function(require, exports, module) {
 					changedRows[i] = "add";
 				}
 			}
-			
+
 			self.elementsPos = newElementsPos;
 			return changedRows;
 		},
@@ -131,23 +131,23 @@ define(function(require, exports, module) {
 			if (containerHeight < height) {
 				containerHeight = height;
 			}
-			self.containerHeight =  containerHeight;
+			self.containerHeight = containerHeight;
 			self.container.style.height = containerHeight;
 			self.renderScrollBars();
 			//渲染非回收元素
 			self._renderNoRecycledEl();
 			//强制刷新
-			self._update(self.getOffsetTop(),true);
+			self._update(self.getOffsetTop(), true);
 		},
-		_update: function(offset,force) {
+		_update: function(offset, force) {
 			var self = this;
-			var translateZ = self.gpuAcceleration ? " translateZ(0) " : "";
-			var offset = offset === undefined ?  self.getOffsetTop() : offset;
+			var translateZ = self.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+			var offset = offset === undefined ? self.getOffsetTop() : offset;
 			var elementsPos = self._getElementsPos(offset);
-			var changedRows = self._getChangedRows(elementsPos,force);
+			var changedRows = self._getChangedRows(elementsPos, force);
 			var el = null;
 			//若强制刷新 则重新初始化dom
-			if(force){
+			if (force) {
 				for (var i = 0; i < self.infiniteLength; i++) {
 					self.infiniteElementsCache[i]._visible = false;
 					delete self.infiniteElementsCache[i]._row;
@@ -156,14 +156,14 @@ define(function(require, exports, module) {
 			}
 			//获取可用的节点
 			var getElIndex = function() {
-				for (var i = 0; i < self.infiniteLength; i++) {
-					if (!self.infiniteElementsCache[i]._visible) {
-						self.infiniteElementsCache[i]._visible = true;
-						return i;
+					for (var i = 0; i < self.infiniteLength; i++) {
+						if (!self.infiniteElementsCache[i]._visible) {
+							self.infiniteElementsCache[i]._visible = true;
+							return i;
+						}
 					}
 				}
-			}
-			//回收已使用的节点
+				//回收已使用的节点
 			var setEl = function(row) {
 				for (var i = 0; i < self.infiniteLength; i++) {
 					if (self.infiniteElementsCache[i]._row == row) {
@@ -194,20 +194,20 @@ define(function(require, exports, module) {
 						el.style.top = 0;
 						el.style.display = "block";
 						el.style.height = elementsPos[i]._height + "px";
-						el.style[transform] = "translateY(" + elementsPos[i]._top + "px) "+ translateZ;
+						el.style[transform] = "translateY(" + elementsPos[i]._top + "px) " + translateZ;
 						self.userConfig.renderHook.call(self, el, elementsPos[i]);
 					}
 				}
 			}
 		},
 		//非可回收元素渲染
-		_renderNoRecycledEl:function(){
+		_renderNoRecycledEl: function() {
 			var self = this;
-			var translateZ = self.gpuAcceleration ? " translateZ(0) " : "";
-			for(var i in self.domInfo){
-				if(self.domInfo[i]['recycled'] === false){
-					var el = self.domInfo[i].id && document.getElementById(self.domInfo[i].id.replace("#","")) || document.createElement("div");
-					var randomId = "ks-xlist-row-"+Date.now()
+			var translateZ = self.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+			for (var i in self.domInfo) {
+				if (self.domInfo[i]['recycled'] === false) {
+					var el = self.domInfo[i].id && document.getElementById(self.domInfo[i].id.replace("#", "")) || document.createElement("div");
+					var randomId = "ks-xlist-row-" + Date.now()
 					el.id = self.domInfo[i].id || randomId;
 					self.domInfo[i].id = el.id;
 					self.content.appendChild(el);
@@ -221,17 +221,17 @@ define(function(require, exports, module) {
 					el.style.display = "block";
 					el.style.height = self.domInfo[i]._height + "px";
 
-					el.style[transform] = "translateY(" + self.domInfo[i]._top + "px) "+ translateZ;
-					if(self.domInfo[i].className){
+					el.style[transform] = "translateY(" + self.domInfo[i]._top + "px) " + translateZ;
+					if (self.domInfo[i].className) {
 						el.className = self.domInfo[i].className;
 					}
 					self.userConfig.renderHook.call(self, el, self.domInfo[i]);
 				}
 			}
 		},
-		_initSticky:function(){
+		_initSticky: function() {
 			var self = this;
-			if(!self.hasSticky || self._isStickyRendered) return;
+			if (!self.hasSticky || self._isStickyRendered) return;
 			self._isStickyRendered = true;
 			var sticky = document.createElement("div");
 			sticky.style.position = "absolute";
@@ -240,34 +240,34 @@ define(function(require, exports, module) {
 			self.renderTo.appendChild(sticky);
 			self.stickyElement = sticky;
 			self.stickyDomInfo = [];
-			for(var i =0,l = self.domInfo.length;i<l;i++){
-				if(self.domInfo[i] && self.domInfo[i].style && "sticky" == self.domInfo[i].style.position){
+			for (var i = 0, l = self.domInfo.length; i < l; i++) {
+				if (self.domInfo[i] && self.domInfo[i].style && "sticky" == self.domInfo[i].style.position) {
 					self.stickyDomInfo.push(self.domInfo[i]);
 				}
 			}
 			self.stickyDomInfoLength = self.stickyDomInfo.length;
 		},
-		_stickyHandler:function(_offsetTop){
+		_stickyHandler: function(_offsetTop) {
 			var self = this;
-			if(!self.stickyDomInfoLength) return;
+			if (!self.stickyDomInfoLength) return;
 			var offsetTop = Math.abs(_offsetTop);
 			//视区上方的sticky索引
 			var index = [];
 			//所有sticky的top值
 			var allTops = [];
-			for(var i = 0;i < self.stickyDomInfoLength;i++){
+			for (var i = 0; i < self.stickyDomInfoLength; i++) {
 				allTops.push(self.stickyDomInfo[i]._top);
-				if(offsetTop >= self.stickyDomInfo[i]._top){
+				if (offsetTop >= self.stickyDomInfo[i]._top) {
 					index.push(i);
 				}
 			}
-			if(!index.length){
+			if (!index.length) {
 				self.stickyElement.style.display = "none";
 				self.curStickyIndex = undefined;
 				return;
-			} 
-			var curStickyIndex = Math.max.apply(null,index);
-			if(self.curStickyIndex !==curStickyIndex){
+			}
+			var curStickyIndex = Math.max.apply(null, index);
+			if (self.curStickyIndex !== curStickyIndex) {
 				self.curStickyIndex = curStickyIndex;
 				self.userConfig.renderHook.call(self, self.stickyElement, self.stickyDomInfo[self.curStickyIndex]);
 				self.stickyElement.style.display = "block";
@@ -281,19 +281,37 @@ define(function(require, exports, module) {
 			}
 
 			//如果超过第一个sticky则隐藏
-			if(-_offsetTop < Math.min.apply(null,allTops)) {
+			if (-_offsetTop < Math.min.apply(null, allTops)) {
 				self.stickyElement.style.display = "none";
 				self.curStickyIndex = undefined;
 				return;
 			}
 
 		},
+		enableGPUAcceleration: function() {
+			var self = this;
+			self.userConfig.gpuAcceleration = true;
+			for (var i = 0; i < self.infiniteLength; i++) {
+				if (!/translateZ/.test(self.infiniteElements[i].style[transform])) {
+					self.infiniteElements[i].style[transform] += " translateZ(0)";
+				}
+			}
+		},
+		disableGPUAcceleration: function() {
+			var self = this;
+			self.userConfig.gpuAcceleration = false;
+			for (var i = 0; i < self.infiniteLength; i++) {
+				self.infiniteElements[i].style[transform] = self.infiniteElements[i].style[transform].replace(/translateZ\(0px\)/, "");
+			}
+		},
 		_initInfinite: function() {
 			var self = this;
 			var el = self.userConfig.infiniteElements;
 			self.datasets = [];
-			if(self.userConfig.data && self.userConfig.data.length){
-				self.datasets.push(new DataSet({data:self.userConfig.data}));
+			if (self.userConfig.data && self.userConfig.data.length) {
+				self.datasets.push(new DataSet({
+					data: self.userConfig.data
+				}));
 			}
 			self.infiniteElements = self.renderTo.querySelectorAll(el);
 			self.infiniteLength = self.infiniteElements.length;
@@ -310,30 +328,17 @@ define(function(require, exports, module) {
 				self._update(e.offset.y);
 				self._stickyHandler(e.offset.y);
 			})
-			self.on("afterGpuAccelerationChange",function(e){
-				if(e.newVal){
-					for(var i =0;i<self.infiniteLength;i++){
-						if(!/translateZ/.test(self.infiniteElements[i].style[transform])){
-							self.infiniteElements[i].style[transform] += " translateZ(0)";
-						}
-					}
-				}else{
-					for(var i =0;i<self.infiniteLength;i++){
-						self.infiniteElements[i].style[transform] = self.infiniteElements[i].style[transform].replace(/translateZ\(0px\)/,"");
-					}
-				}
-			})
 		}
 	});
 
 	// commonjs export
-    if (typeof module == 'object' && module.exports) {
-        module.exports = XList;
-    }
-    // browser export
-    else {
-        window.XList = XList;
-    }
-    return XList;
+	if (typeof module == 'object' && module.exports) {
+		module.exports = XList;
+	}
+	// browser export
+	else {
+		window.XList = XList;
+	}
+	return XList;
 
 });

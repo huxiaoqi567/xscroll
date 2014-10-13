@@ -1735,7 +1735,7 @@ xlist = function (exports) {
     },
     _update: function (offset, force) {
       var self = this;
-      var translateZ = self.gpuAcceleration ? ' translateZ(0) ' : '';
+      var translateZ = self.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       var offset = offset === undefined ? self.getOffsetTop() : offset;
       var elementsPos = self._getElementsPos(offset);
       var changedRows = self._getChangedRows(elementsPos, force);
@@ -1796,7 +1796,7 @@ xlist = function (exports) {
     //非可回收元素渲染
     _renderNoRecycledEl: function () {
       var self = this;
-      var translateZ = self.gpuAcceleration ? ' translateZ(0) ' : '';
+      var translateZ = self.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       for (var i in self.domInfo) {
         if (self.domInfo[i]['recycled'] === false) {
           var el = self.domInfo[i].id && document.getElementById(self.domInfo[i].id.replace('#', '')) || document.createElement('div');
@@ -1880,6 +1880,22 @@ xlist = function (exports) {
         return;
       }
     },
+    enableGPUAcceleration: function () {
+      var self = this;
+      self.userConfig.gpuAcceleration = true;
+      for (var i = 0; i < self.infiniteLength; i++) {
+        if (!/translateZ/.test(self.infiniteElements[i].style[transform])) {
+          self.infiniteElements[i].style[transform] += ' translateZ(0)';
+        }
+      }
+    },
+    disableGPUAcceleration: function () {
+      var self = this;
+      self.userConfig.gpuAcceleration = false;
+      for (var i = 0; i < self.infiniteLength; i++) {
+        self.infiniteElements[i].style[transform] = self.infiniteElements[i].style[transform].replace(/translateZ\(0px\)/, '');
+      }
+    },
     _initInfinite: function () {
       var self = this;
       var el = self.userConfig.infiniteElements;
@@ -1901,19 +1917,6 @@ xlist = function (exports) {
       self.on('scroll', function (e) {
         self._update(e.offset.y);
         self._stickyHandler(e.offset.y);
-      });
-      self.on('afterGpuAccelerationChange', function (e) {
-        if (e.newVal) {
-          for (var i = 0; i < self.infiniteLength; i++) {
-            if (!/translateZ/.test(self.infiniteElements[i].style[transform])) {
-              self.infiniteElements[i].style[transform] += ' translateZ(0)';
-            }
-          }
-        } else {
-          for (var i = 0; i < self.infiniteLength; i++) {
-            self.infiniteElements[i].style[transform] = self.infiniteElements[i].style[transform].replace(/translateZ\(0px\)/, '');
-          }
-        }
       });
     }
   });
