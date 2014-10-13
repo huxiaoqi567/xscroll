@@ -32,6 +32,8 @@ define(function(require, exports, module) {
 			var domInfo = [];
 			var height = 0;
 			self.hasSticky = false;
+			//f = v/itemHeight*1000 < 60 => v = 0.06 * itemHeight
+			self.userConfig.maxSpeed = 0.06 * itemHeight;
 			for (var i = 0, l = data.length; i < l; i++) {
 				var item = data[i];
 				height = item.style && item.style.height >= 0 ? item.style.height : itemHeight;
@@ -150,8 +152,8 @@ define(function(require, exports, module) {
 			if (force) {
 				for (var i = 0; i < self.infiniteLength; i++) {
 					self.infiniteElementsCache[i]._visible = false;
+					self.infiniteElements[i].style.visibility = "hidden";
 					delete self.infiniteElementsCache[i]._row;
-					self.infiniteElements[i].style.display = "none";
 				}
 			}
 			//获取可用的节点
@@ -168,9 +170,7 @@ define(function(require, exports, module) {
 				for (var i = 0; i < self.infiniteLength; i++) {
 					if (self.infiniteElementsCache[i]._row == row) {
 						self.infiniteElementsCache[i]._visible = false;
-						self.infiniteElements[i].innerHTML = "";
-						self.infiniteElements[i].style.display = "none";
-						self.infiniteElements[i].style[transform] = "none";
+						self.infiniteElements[i].style.visibility = "hidden";
 						delete self.infiniteElementsCache[i]._row;
 					}
 				}
@@ -190,9 +190,9 @@ define(function(require, exports, module) {
 								el.style[attrName] = elementsPos[i].style[attrName];
 							}
 						}
-						el.style.position = "absolute";
-						el.style.top = 0;
-						el.style.display = "block";
+						//performance
+						el.style.visibility = "visible";
+						//performance
 						el.style.height = elementsPos[i]._height + "px";
 						el.style[transform] = "translateY(" + elementsPos[i]._top + "px) " + translateZ;
 						self.userConfig.renderHook.call(self, el, elementsPos[i]);
@@ -220,7 +220,6 @@ define(function(require, exports, module) {
 					el.style.position = "absolute";
 					el.style.display = "block";
 					el.style.height = self.domInfo[i]._height + "px";
-
 					el.style[transform] = "translateY(" + self.domInfo[i]._top + "px) " + translateZ;
 					if (self.domInfo[i].className) {
 						el.className = self.domInfo[i].className;
@@ -319,7 +318,12 @@ define(function(require, exports, module) {
 				var tmp = []
 				for (var i = 0; i < self.infiniteLength; i++) {
 					tmp.push({});
-					self.infiniteElements[i].style.display = "none";
+					//performance
+					self.infiniteElements[i].style.position = "absolute";
+					self.infiniteElements[i].style.top = 0;
+					self.infiniteElements[i].style.visibility = "hidden";
+					self.infiniteElements[i].style.display = "block";
+					//performance
 				}
 				return tmp;
 			})()

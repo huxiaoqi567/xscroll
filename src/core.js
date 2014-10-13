@@ -735,6 +735,7 @@ define(function(require, exports, module) {
             if (type == "y" && self.userConfig.lockY) return;
             var userConfig = self.userConfig;
             var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
+            console.log(maxSpeed)
             if (v > maxSpeed) {
                 v = maxSpeed;
             }
