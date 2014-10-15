@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>simple</title>
+    <title>slide-delete</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="demo.css">
 </head>
@@ -111,13 +111,14 @@
         </div>
     </div>
     <div id="footer">infinity-scroll</div>
-    <!-- // <script type="text/javascript" src="../build/xlist.js"></script> -->
-     <script src="../lib/sea.js"></script>
+     <!-- // <script type="text/javascript" src="../build/xlist.js"></script> -->
+      <script src="../lib/sea.js"></script>
     <script>
     seajs.config({
       base: "../src/"
     })
     seajs.use("xlist",function(XList){
+        //mock data
         var data = (function() {
             var tmp = [];
             for (var i = 1; i <= 1000; i++) {
@@ -128,55 +129,92 @@
             }
             return tmp
         })()
+
+         //acceration 
+        var acc = 1;
+        var maxWidth = document.body.offsetWidth*0.3;
+        var startX;
+
         var xlist = new XList({
             renderTo: "#J_Scroll",
             data: data,
             itemHeight: 60 ,
             infiniteElements:"#J_Scroll .xs-row",
-            renderHook:function(el,data){
-                el.innerHTML = '<div class="lbl-ctn"><div class="lbl">'+data.data.text+'</div><div class="del">Delete</div></div>';
+            renderHook:function(el,row){
+                var style = "";
+                if(row.data.status == "delete"){
+                    style = "-webkit-transform:translateX(-"+maxWidth+"px) translateZ(0)"
+                }
+                el.innerHTML = '<div class="lbl-ctn" style="'+style+'"><div class="lbl">'+row.data.text+'</div><div class="del">Delete</div></div>';
             }
         });
         
         xlist.render();
 
-        var startX;
-        var maxWidth = document.body.offsetWidth*0.3;
+        var isLocked = false;
+        var buffer = 20;
 
         xlist.on("panstart",function(e){
             startX = getComputedStyle(e.cell.element.querySelector(".lbl-ctn")).webkitTransform.match(/[-\d\.*\d*]+/g)[4]/1;
             e.cell.element.querySelector(".lbl-ctn").webkitTransition =  "none";
         })
+
         xlist.on("pan",function(e){
-            // e.cell.element.querySelector(".lbl").webkitTransition =  "none";
-            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 20){
+            /*
+            1.水平位移大于垂直位移
+            2.大于20px （参考值可自定） buffer
+            3.向左
+            */
+            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > buffer && e.deltaX < 0){
+                isLocked = true;
                 xlist.userConfig.lockY = true;
-                var left = startX + e.deltaX;
+                var left = startX + e.deltaX + buffer;
                 if(left > 0){return;}
                 if(Math.abs(left) < maxWidth){
-                    e.cell.element.querySelector(".lbl-ctn").webkitTransition =  "none";
                     e.cell.element.querySelector(".lbl-ctn").style.webkitTransform = "translateX("+left+"px) translateZ(0)"
                 }
-            }else{
+            }else if(!isLocked){
                 xlist.userConfig.lockY = false;
             }
-        })
-        var acc = 1;
-        xlist.on("panend",function(e){
-            var cpt = getComputedStyle(e.cell.element.querySelector(".lbl-ctn")).webkitTransform.match(/[-\d\.*\d*]+/g)[4]/1
-            if(e.touch.directionX == "left" && Math.abs(e.velocityX) > acc){
-                e.cell.element.querySelector(".lbl-ctn").style.webkitTransform = "translateX(-"+maxWidth+"px) translateZ(0)";
-            }else if(e.touch.directionX == "right" && Math.abs(e.velocityX) > acc){
-                e.cell.element.querySelector(".lbl-ctn").style.webkitTransform = "translateX(0) translateZ(0)";
-            }else if(Math.abs(cpt) < maxWidth/2){
-                 e.cell.element.querySelector(".lbl-ctn").style.webkitTransform = "translateX(0) translateZ(0)";
-            }else if(Math.abs(cpt) > maxWidth/2){
-                 e.cell.element.querySelector(".lbl-ctn").style.webkitTransform = "translateX(-"+maxWidth+"px) translateZ(0)";
-            }
-             e.cell.element.querySelector(".lbl-ctn").style.webkitTransition = "-webkit-transform 0.3s ease-out"
-             
+            e.cell.element.querySelector(".lbl-ctn").style.webkitTransition = "none";
         })
 
+       
+        xlist.on("panend",function(e){
+            isLocked = false;
+            var cpt = getComputedStyle(e.cell.element.querySelector(".lbl-ctn")).webkitTransform.match(/[-\d\.*\d*]+/g)[4]/1
+            if(e.touch.directionX == "left" && Math.abs(e.velocityX) > acc){
+               slideLeft(e)
+            }else if(e.touch.directionX == "right" && Math.abs(e.velocityX) > acc){
+                 slideRight(e)
+            }else if(Math.abs(cpt) < maxWidth/2){
+                 slideRight(e)
+            }else if(Math.abs(cpt) > maxWidth/2){
+                 slideLeft(e)
+            }
+        })
+        
+
+
+        function slideLeft(e){
+            var cell = e.cell.element.querySelector(".lbl-ctn");
+            cell.style.webkitTransform = "translateX(-"+maxWidth+"px) translateZ(0)";
+            cell.style.webkitTransition = "-webkit-transform 0.2s ease-out";
+            //update data
+            // xlist.domInfo
+            xlist.getData(0,e.cell._row).data.status = "delete";
+        }
+
+        function slideRight(e){
+            var cell = e.cell.element.querySelector(".lbl-ctn");
+            cell.style.webkitTransform = "translateX(0) translateZ(0)";
+            cell.style.webkitTransition = "-webkit-transform 0.2s ease";
+            xlist.getData(0,e.cell._row).data.status = "";
+        }
+
+    
+
+        //delete 
         xlist.on("click",function(e){
              if(e.target.className.match(/del/)){
                 xlist.removeData(0,e.cell._row)
@@ -184,10 +222,10 @@
              }
             
         })
+
         window.xlist = xlist
 
-
-})
+    })
 
     </script>
 </body>

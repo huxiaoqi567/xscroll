@@ -26,7 +26,10 @@ define(function(require, exports, module) {
 		}
 	};
 
-	DataSet.prototype.getData = function(){
+	DataSet.prototype.getData = function(index){
+		if(typeof index == "number"){
+			return this.data[index];
+		}
 		return this.data;
 	};
 

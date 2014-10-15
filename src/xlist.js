@@ -123,6 +123,17 @@ define(function(require, exports, module) {
 			}
 			return;
 		},
+		getData:function(datasetIndex,rowIndex){
+			var self = this;
+			if(datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
+				return self.datasets[datasetIndex].getData(rowIndex);
+			}
+		},
+		updateData:function(datasetIndex,rowIndex,data){
+			var self = this;
+			var d = self.getData(datasetIndex,rowIndex);
+			return d.data = data;
+		},
 		removeData:function(datasetIndex,rowIndex){
 			var self = this;
 			if(datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
