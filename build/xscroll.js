@@ -854,7 +854,11 @@ core = function (exports) {
     Util.vendor,
     '-transform'
   ].join('') : 'transform';
+  var quadratic = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  var circular = 'cubic-bezier(0.1, 0.57, 0.1, 1)';
   function quadratic2cubicBezier(a, b) {
+    // return [0.25, 0.46, 0.45, 0.94]
+    // return [0.1, 0.57, 0.1, 1]
     return [
       [
         (a / 3 + (a + b) / 3 - a) / (b - a),

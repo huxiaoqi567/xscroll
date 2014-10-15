@@ -36,3 +36,11 @@ gulp.task('build', function() {
     }
   });
 });
+
+gulp.task('watch',function(){
+  gulp.watch('src/**/*.js', ['build'])
+})
+
+// gulp.task('debug',['watch','build'])
+
+
