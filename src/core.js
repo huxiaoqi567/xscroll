@@ -147,10 +147,26 @@ define(function(require, exports, module) {
 
             self.boundry = {
                 reset: function() {
-                    this.left = 0;
+                    this.resetTop();
+                    this.resetLeft();
+                    this.resetBottom();
+                    this.resetRight();
+                    return this;
+                },
+                resetTop:function(){
                     this.top = 0;
-                    this.right = self.width;
+                    return this;
+                },
+                resetLeft:function(){
+                    this.left = 0;
+                    return this;
+                },
+                resetBottom:function(){
                     this.bottom = self.height;
+                    return this;
+                },
+                resetRight:function(){
+                    this.right = self.width;
                     return this;
                 },
                 expandTop: function(top) {
@@ -356,8 +372,14 @@ define(function(require, exports, module) {
                 zoomType: "xy"
             });
         },
+        enableGPUAcceleration:function(){
+            this.userConfig.gpuAcceleration = true;
+        },
+        disableGPUAcceleration: function() {
+            this.userConfig.gpuAcceleration = false;
+        },
         _transform: function() {
-            var translateZ = this.gpuAcceleration ? " translateZ(0) " : "";
+            var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
             this.content.style[transform] = "translate(" + this.x + "px,0px)  scaleX(" + this.scale + ") scaleY(" + this.scale + ") " + translateZ;
             this.container.style[transform] = "translate(0px," + this.y + "px) " + translateZ;
         },

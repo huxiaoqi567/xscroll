@@ -10,10 +10,8 @@ define(function(require, exports, module) {
 	Util.mix(PullDown.prototype, {
 		init: function(cfg) {
 			var self = this;
+			self.__events = {};
 			self.userConfig = Util.mix({
-				onRefresh: function() {
-					window.location.reload();
-				},
 				content: content,
 				height: 60,
 				autoRefresh: true, //是否自动刷新页面
@@ -84,7 +82,45 @@ define(function(require, exports, module) {
 			Util.removeClass(this.pulldown, prefix + prevVal)
 			Util.addClass(this.pulldown, prefix + status);
 			this.setContent(this.userConfig[status + "Content"]);
+			if(prevVal != status){
+				this.fire("statuschange",{
+					prevVal:prevVal,
+					newVal:status
+				});
+				if(status == "loading"){
+					this.fire("loading");
+				}
+			}
 		},
+		fire: function(evt) {
+            var self = this;
+            if (self.__events[evt] && self.__events[evt].length) {
+                for (var i in self.__events[evt]) {
+                    self.__events[evt][i].apply(this,[].slice.call(arguments, 1));
+                }
+            }
+        },
+        on: function(evt, fn) {
+            if (!this.__events[evt]) {
+                this.__events[evt] = [];
+            }
+            this.__events[evt].push(fn);
+        },
+        detach: function(evt, fn) {
+            if (!evt || !this.__events[evt]) return;
+            var index = this.__events[evt].indexOf(fn);
+            if (index > -1) {
+                this.__events[evt].splice(index, 1);
+            }
+        },
+        reset:function(callback){
+        	var self = this;
+        	var height = self.userConfig.height || 60;
+        	var xscroll = self.xscroll;
+        	xscroll.boundry.resetTop()
+			xscroll.bounce(true, callback);
+			self._expanded = false;
+        },
 		_panStartHandler: function(e) {
 			clearTimeout(this.loadingItv);
 		},
@@ -105,17 +141,25 @@ define(function(require, exports, module) {
 				xscroll.boundry.top = top;
 				!self._expanded && xscroll.boundry.expandTop(height);
 				self._expanded = true;
-				xscroll.bounce(true);
-				self._changeStatus("loading");
-				clearTimeout(self.loadingItv);
-				self.loadingItv = setTimeout(function() {
-					xscroll.boundry.expandTop(-height);
-					xscroll.bounce(true, function() {
-						self.userConfig.onRefresh && self.userConfig.onRefresh();
-					})
-				}, 800);
+				xscroll.bounce(true,function(){
+					self._changeStatus("loading");
+				});
+				
+				if(self.userConfig.autoRefresh){
+					clearTimeout(self.loadingItv);
+					self.loadingItv = setTimeout(function() {
+						xscroll.boundry.expandTop(-height);
+						xscroll.bounce(true, function() {
+							window.location.reload();
+						})
+					}, 800);
+				}else{
+
+				}
+				
 			}
 		},
+
 		setContent: function(content) {
 			var self = this;
 			if (content) {

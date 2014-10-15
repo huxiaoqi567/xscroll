@@ -649,10 +649,8 @@ _pulldown_ = function (exports) {
   Util.mix(PullDown.prototype, {
     init: function (cfg) {
       var self = this;
+      self.__events = {};
       self.userConfig = Util.mix({
-        onRefresh: function () {
-          window.location.reload();
-        },
         content: content,
         height: 60,
         autoRefresh: true,
@@ -721,6 +719,45 @@ _pulldown_ = function (exports) {
       Util.removeClass(this.pulldown, prefix + prevVal);
       Util.addClass(this.pulldown, prefix + status);
       this.setContent(this.userConfig[status + 'Content']);
+      if (prevVal != status) {
+        this.fire('statuschange', {
+          prevVal: prevVal,
+          newVal: status
+        });
+        if (status == 'loading') {
+          this.fire('loading');
+        }
+      }
+    },
+    fire: function (evt) {
+      var self = this;
+      if (self.__events[evt] && self.__events[evt].length) {
+        for (var i in self.__events[evt]) {
+          self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
+        }
+      }
+    },
+    on: function (evt, fn) {
+      if (!this.__events[evt]) {
+        this.__events[evt] = [];
+      }
+      this.__events[evt].push(fn);
+    },
+    detach: function (evt, fn) {
+      if (!evt || !this.__events[evt])
+        return;
+      var index = this.__events[evt].indexOf(fn);
+      if (index > -1) {
+        this.__events[evt].splice(index, 1);
+      }
+    },
+    reset: function (callback) {
+      var self = this;
+      var height = self.userConfig.height || 60;
+      var xscroll = self.xscroll;
+      xscroll.boundry.resetTop();
+      xscroll.bounce(true, callback);
+      self._expanded = false;
     },
     _panStartHandler: function (e) {
       clearTimeout(this.loadingItv);
@@ -743,15 +780,19 @@ _pulldown_ = function (exports) {
         xscroll.boundry.top = top;
         !self._expanded && xscroll.boundry.expandTop(height);
         self._expanded = true;
-        xscroll.bounce(true);
-        self._changeStatus('loading');
-        clearTimeout(self.loadingItv);
-        self.loadingItv = setTimeout(function () {
-          xscroll.boundry.expandTop(-height);
-          xscroll.bounce(true, function () {
-            self.userConfig.onRefresh && self.userConfig.onRefresh();
-          });
-        }, 800);
+        xscroll.bounce(true, function () {
+          self._changeStatus('loading');
+        });
+        if (self.userConfig.autoRefresh) {
+          clearTimeout(self.loadingItv);
+          self.loadingItv = setTimeout(function () {
+            xscroll.boundry.expandTop(-height);
+            xscroll.bounce(true, function () {
+              window.location.reload();
+            });
+          }, 800);
+        } else {
+        }
       }
     },
     setContent: function (content) {
@@ -906,10 +947,26 @@ core = function (exports) {
       self.maxScale = maxScale;
       self.boundry = {
         reset: function () {
-          this.left = 0;
+          this.resetTop();
+          this.resetLeft();
+          this.resetBottom();
+          this.resetRight();
+          return this;
+        },
+        resetTop: function () {
           this.top = 0;
-          this.right = self.width;
+          return this;
+        },
+        resetLeft: function () {
+          this.left = 0;
+          return this;
+        },
+        resetBottom: function () {
           this.bottom = self.height;
+          return this;
+        },
+        resetRight: function () {
+          this.right = self.width;
           return this;
         },
         expandTop: function (top) {
@@ -1121,8 +1178,14 @@ core = function (exports) {
         zoomType: 'xy'
       });
     },
+    enableGPUAcceleration: function () {
+      this.userConfig.gpuAcceleration = true;
+    },
+    disableGPUAcceleration: function () {
+      this.userConfig.gpuAcceleration = false;
+    },
     _transform: function () {
-      var translateZ = this.gpuAcceleration ? ' translateZ(0) ' : '';
+      var translateZ = this.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       this.content.style[transform] = 'translate(' + this.x + 'px,0px)  scaleX(' + this.scale + ') scaleY(' + this.scale + ') ' + translateZ;
       this.container.style[transform] = 'translate(0px,' + this.y + 'px) ' + translateZ;
     },
@@ -1951,7 +2014,7 @@ xlist = function (exports) {
     },
     enableGPUAcceleration: function () {
       var self = this;
-      self.userConfig.gpuAcceleration = true;
+      self.super.prototype.enableGPUAcceleration.call(self);
       for (var i = 0; i < self.infiniteLength; i++) {
         if (!/translateZ/.test(self.infiniteElements[i].style[transform])) {
           self.infiniteElements[i].style[transform] += ' translateZ(0)';
@@ -1960,7 +2023,7 @@ xlist = function (exports) {
     },
     disableGPUAcceleration: function () {
       var self = this;
-      self.userConfig.gpuAcceleration = false;
+      self.super.prototype.disableGPUAcceleration.call(self);
       for (var i = 0; i < self.infiniteLength; i++) {
         self.infiniteElements[i].style[transform] = self.infiniteElements[i].style[transform].replace(/translateZ\(0px\)/, '');
       }

@@ -353,7 +353,7 @@ define(function(require, exports, module) {
 		},
 		enableGPUAcceleration: function() {
 			var self = this;
-			self.userConfig.gpuAcceleration = true;
+			self.super.prototype.enableGPUAcceleration.call(self);
 			for (var i = 0; i < self.infiniteLength; i++) {
 				if (!/translateZ/.test(self.infiniteElements[i].style[transform])) {
 					self.infiniteElements[i].style[transform] += " translateZ(0)";
@@ -362,7 +362,7 @@ define(function(require, exports, module) {
 		},
 		disableGPUAcceleration: function() {
 			var self = this;
-			self.userConfig.gpuAcceleration = false;
+			self.super.prototype.disableGPUAcceleration.call(self);
 			for (var i = 0; i < self.infiniteLength; i++) {
 				self.infiniteElements[i].style[transform] = self.infiniteElements[i].style[transform].replace(/translateZ\(0px\)/, "");
 			}

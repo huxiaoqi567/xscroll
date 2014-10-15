@@ -123,20 +123,44 @@
         </div>
     </div>
     <div id="footer">scroll-y</div>
+     <script type="text/javascript" src="../lib/jquery.js"></script>
     <script type="text/javascript" src="../build/xscroll.js"></script>
+
+    <script src="../lib/sea.js"></script>
     <script>
+    seajs.config({
+      base: "../src/"
+    })
+    seajs.use("core",function(XScroll){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
             scrollbarX:false,
             lockX:true
         });
 
+        
+
         var pulldown = new XScroll.PullDown({
-            xscroll:xscroll
+            xscroll:xscroll,
+            autoRefresh:false
         });
+
+        pulldown.on("loading",function(e){
+            console.log("loading start")
+          $.ajax({
+                    url:"./data.json",
+                    dataType:"json",
+                    success:function(data){
+                        pulldown.reset();
+                        xscroll.render()
+                    }
+                })
+        })
 
         
         xscroll.render();
+
+         });
     </script>
 </body>
 </html>
