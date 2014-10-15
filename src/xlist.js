@@ -3,6 +3,9 @@ define(function(require, exports, module) {
 	var XScroll = require('core');
 	var DataSet = require('dataset');
 	var transform = Util.prefixStyle("transform");
+	var PAN_END = "panend";
+    var PAN_START = "panstart";
+    var PAN = "pan";
 	var XList = function(cfg) {
 		this.super.call(this, cfg)
 	}
@@ -65,6 +68,67 @@ define(function(require, exports, module) {
 				}
 			}
 			self.datasets.splice(index, 1);
+		},
+		_firePanStart:function(eventName,e){
+			var cell = this.getCellByPageY(e.touch.startY);
+			e.cell = cell;
+			this._curTouchedCell = cell;
+			this.super.prototype._firePanStart.call(this,eventName,e);
+		},
+		_firePan:function(eventName,e){
+			if(this._curTouchedCell){
+				e.cell = this._curTouchedCell;
+			}
+			this.super.prototype._firePan.call(this,eventName,e);
+		},
+		_firePanEnd:function(eventName,e){
+			if(this._curTouchedCell){
+				e.cell = this._curTouchedCell;
+			}
+			this.super.prototype._firePanEnd.call(this,eventName,e);
+			this._curTouchedCell = null;
+		},
+		_fireClick:function(eventName,e){
+			// console.log(e.pageX,e.pageY)
+			var cell = this.getCellByPageY(e.pageY);
+			e.cell = cell;
+			this.super.prototype._fireClick.call(this,eventName,e);
+		},
+		getCellByPageY:function(pageY){
+			var self = this;
+			var offsetY = pageY - self.renderTo.offsetTop + Math.abs(self.getOffsetTop());
+			return self.getCellByOffsetY(offsetY);
+		},
+		getCellByOffsetY:function(offsetY){
+			var self = this;
+			var len = self.domInfo.length;
+			var cell;
+			if(offsetY < 0) return;
+			for(var i = 0;i<len;i++){
+				cell = self.domInfo[i];
+				if(cell._top < offsetY && cell._top + cell._height > offsetY){
+					for(var j =0;j<self.infiniteLength;j++){
+						if(self.infiniteElementsCache[j]._visible && self.infiniteElementsCache[j]._row === cell._row){
+							cell.element = self.infiniteElements[j];
+						}
+					}
+					return cell;
+				}
+			}
+		},
+		insertData:function(datasetIndex,rowIndex,data){
+			var self = this;
+			if(data && datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
+				// return self.datasets
+			}
+			return;
+		},
+		removeData:function(datasetIndex,rowIndex){
+			var self = this;
+			if(datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
+				return self.datasets[datasetIndex].removeData(rowIndex);
+			}
+			return;
 		},
 		getDataSets: function() {
 			var self = this;

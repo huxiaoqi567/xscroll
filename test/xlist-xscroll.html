@@ -63,19 +63,18 @@ body {
     text-align: center;
 }
 
-#J_Scroll {
+#J_Menu,#J_Scroll {
     position: absolute;
     z-index: 1;
     top: 45px;
     bottom: 48px;
-    left: 0;
     width: 100%;
     overflow: hidden;
 }
 #J_Scroll ul{
     /*position: absolute;*/
 }
-#J_Scroll li{
+#J_Menu li,#J_Scroll li{
     padding: 0 10px;
 
     height: 40px;
@@ -96,6 +95,10 @@ body {
         width: 100%;
         height: 100%;
     }
+    #J_Scroll{
+        width:80%;
+        right: 0;
+    }
     #J_Scroll ul{
         width: 100%;
     }
@@ -105,14 +108,51 @@ body {
     .xs-container{
         width: 100%;
     }
+    #J_Menu{
+        width: 20%;
+    }
     </style>
     <div id="header">XScroll</div>
+    <div id="J_Menu">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+                <li>menu</li>
+            </ul>
+        </div>
+    </div>
     <div id="J_Scroll">
         <div class="xs-container">
             <ul class="xs-content">
-                <li>row1</li>
-                <li>row2</li>
-                <li>row3</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
                 <li>row</li>
                 <li>row</li>
                 <li>row</li>
@@ -178,9 +218,17 @@ body {
             // console.log(e)
         })
 
+        var xscroll = new XScroll({
+            renderTo:"#J_Menu",
+            lockX:true,
+            scrollbarX:false,
+            scrollbarY:false
+        });
+        xscroll.render();
 
+        window.xscroll = xscroll;
 
-        window.xlist = xlist
+        // window.xlist = xlist
     })
     </script>
 </body>

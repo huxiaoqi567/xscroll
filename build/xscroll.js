@@ -232,8 +232,8 @@ pan = function (exports) {
       velocityX: Math.abs(record[len - 1]['velocityX']) > MIN_SPEED ? velocityX : 0
     };
   }
-  document.body.addEventListener('touchmove', touchMoveHandler);
-  document.body.addEventListener('touchend', touchEndHandler);
+  document.addEventListener('touchmove', touchMoveHandler);
+  document.addEventListener('touchend', touchEndHandler);
   return {
     PAN_START: PAN_START,
     PAN_END: PAN_END,
@@ -385,8 +385,8 @@ tap = function (exports) {
       Event.dispatchEvent(target, SINGLE_TAP, eProxy);
     }, single_tap_delay);
   }
-  document.body.addEventListener('touchstart', touchStart);
-  document.body.addEventListener('touchend', touchEnd);
+  document.addEventListener('touchstart', touchStart);
+  document.addEventListener('touchend', touchEnd);
   return {
     TAP: TAP,
     TAP_HOLD: TAP_HOLD,
@@ -442,8 +442,8 @@ pinch = function (exports) {
       this.gestureType = '';
     }
   }
-  document.body.addEventListener('touchmove', pinchMoveHandler);
-  document.body.addEventListener('touchend', pinchEndHandler);
+  document.addEventListener('touchmove', pinchMoveHandler);
+  document.addEventListener('touchend', pinchEndHandler);
   //枚举
   return {
     PINCH_START: PINCH_START,
@@ -715,15 +715,15 @@ _pulldown_ = function (exports) {
         self._panEndHandler(e);
       });
     },
-    _panStartHandler: function (e) {
-      clearTimeout(this.loadingItv);
-    },
     _changeStatus: function (status) {
       var prevVal = this.status;
       this.status = status;
       Util.removeClass(this.pulldown, prefix + prevVal);
       Util.addClass(this.pulldown, prefix + status);
       this.setContent(this.userConfig[status + 'Content']);
+    },
+    _panStartHandler: function (e) {
+      clearTimeout(this.loadingItv);
     },
     _panHandler: function (e) {
       var self = this;
@@ -1295,6 +1295,18 @@ core = function (exports) {
       isEnabled ? this.boundryCheck(callback) : undefined;
       return;
     },
+    _firePanStart: function (eventName, e) {
+      this.fire(eventName, e);
+    },
+    _firePan: function (eventName, e) {
+      this.fire(eventName, e);
+    },
+    _firePanEnd: function (eventName, e) {
+      this.fire(eventName, e);
+    },
+    _fireClick: function (eventName, e) {
+      this.fire(eventName, e);
+    },
     _bindEvt: function () {
       var self = this;
       if (self.__isEvtBind)
@@ -1317,6 +1329,7 @@ core = function (exports) {
         self.boundryCheck();
         if (!self.isScrollingX && !self.isScrollingY) {
           simulateMouseEvent(e, 'click');
+          self._fireClick('click', e);
         } else {
           self.isScrollingX = false;
           self.isScrollingY = false;
@@ -1325,7 +1338,7 @@ core = function (exports) {
       }).on(renderTo, Pan.PAN_START, function (e) {
         offset = self.getOffset();
         self.translate(offset);
-        self.fire(PAN_START, { offset: offset });
+        self._firePanStart(PAN_START, Util.mix(e, { offset: offset }));
       }).on(renderTo, Pan.PAN, function (e) {
         var posY = self.userConfig.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
         var posX = self.userConfig.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
@@ -1357,7 +1370,7 @@ core = function (exports) {
         self.isScrollingY = false;
         self.directionX = e.directionX;
         self.directionY = e.directionY;
-        self.fire(SCROLL, {
+        var evtParam = Util.mix(e, {
           offset: {
             x: posX,
             y: posY
@@ -1365,23 +1378,11 @@ core = function (exports) {
           directionX: self.directionX,
           directionY: self.directionY
         });
-        self.fire(PAN, {
-          offset: {
-            x: posX,
-            y: posY
-          },
-          deltaX: e.deltaX,
-          deltaY: e.deltaY,
-          directionX: self.directionX,
-          directionY: self.directionY
-        });
+        self.fire(SCROLL, evtParam);
+        self._firePan(PAN, evtParam);
       }).on(renderTo, Pan.PAN_END, function (e) {
         self.panEndHandler(e);
-        self.fire(PAN_END, {
-          velocity: e.velocity,
-          velocityX: e.velocityX,
-          velocityY: e.velocityY
-        });
+        self._firePanEnd(PAN_END, e);
       });
       Event.on(container, transitionEnd, function (e) {
         if (e.target == content && !self.isScaling) {
@@ -1515,7 +1516,6 @@ core = function (exports) {
         return;
       var userConfig = self.userConfig;
       var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
-      console.log(maxSpeed);
       if (v > maxSpeed) {
         v = maxSpeed;
       }
@@ -1559,12 +1559,7 @@ core = function (exports) {
       return transition;
     }
   });
-  // commonjs export
-  if (typeof module == 'object' && module.exports) {
-    exports = XScroll;
-  } else {
-    window.XScroll = XScroll;
-  }
+  window.XScroll = XScroll;
   return XScroll;
 }({});
 }());

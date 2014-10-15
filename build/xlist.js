@@ -232,8 +232,8 @@ pan = function (exports) {
       velocityX: Math.abs(record[len - 1]['velocityX']) > MIN_SPEED ? velocityX : 0
     };
   }
-  document.body.addEventListener('touchmove', touchMoveHandler);
-  document.body.addEventListener('touchend', touchEndHandler);
+  document.addEventListener('touchmove', touchMoveHandler);
+  document.addEventListener('touchend', touchEndHandler);
   return {
     PAN_START: PAN_START,
     PAN_END: PAN_END,
@@ -385,8 +385,8 @@ tap = function (exports) {
       Event.dispatchEvent(target, SINGLE_TAP, eProxy);
     }, single_tap_delay);
   }
-  document.body.addEventListener('touchstart', touchStart);
-  document.body.addEventListener('touchend', touchEnd);
+  document.addEventListener('touchstart', touchStart);
+  document.addEventListener('touchend', touchEnd);
   return {
     TAP: TAP,
     TAP_HOLD: TAP_HOLD,
@@ -442,8 +442,8 @@ pinch = function (exports) {
       this.gestureType = '';
     }
   }
-  document.body.addEventListener('touchmove', pinchMoveHandler);
-  document.body.addEventListener('touchend', pinchEndHandler);
+  document.addEventListener('touchmove', pinchMoveHandler);
+  document.addEventListener('touchend', pinchEndHandler);
   //枚举
   return {
     PINCH_START: PINCH_START,
@@ -715,15 +715,15 @@ _pulldown_ = function (exports) {
         self._panEndHandler(e);
       });
     },
-    _panStartHandler: function (e) {
-      clearTimeout(this.loadingItv);
-    },
     _changeStatus: function (status) {
       var prevVal = this.status;
       this.status = status;
       Util.removeClass(this.pulldown, prefix + prevVal);
       Util.addClass(this.pulldown, prefix + status);
       this.setContent(this.userConfig[status + 'Content']);
+    },
+    _panStartHandler: function (e) {
+      clearTimeout(this.loadingItv);
     },
     _panHandler: function (e) {
       var self = this;
@@ -1295,6 +1295,18 @@ core = function (exports) {
       isEnabled ? this.boundryCheck(callback) : undefined;
       return;
     },
+    _firePanStart: function (eventName, e) {
+      this.fire(eventName, e);
+    },
+    _firePan: function (eventName, e) {
+      this.fire(eventName, e);
+    },
+    _firePanEnd: function (eventName, e) {
+      this.fire(eventName, e);
+    },
+    _fireClick: function (eventName, e) {
+      this.fire(eventName, e);
+    },
     _bindEvt: function () {
       var self = this;
       if (self.__isEvtBind)
@@ -1317,6 +1329,7 @@ core = function (exports) {
         self.boundryCheck();
         if (!self.isScrollingX && !self.isScrollingY) {
           simulateMouseEvent(e, 'click');
+          self._fireClick('click', e);
         } else {
           self.isScrollingX = false;
           self.isScrollingY = false;
@@ -1325,7 +1338,7 @@ core = function (exports) {
       }).on(renderTo, Pan.PAN_START, function (e) {
         offset = self.getOffset();
         self.translate(offset);
-        self.fire(PAN_START, { offset: offset });
+        self._firePanStart(PAN_START, Util.mix(e, { offset: offset }));
       }).on(renderTo, Pan.PAN, function (e) {
         var posY = self.userConfig.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
         var posX = self.userConfig.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
@@ -1357,7 +1370,7 @@ core = function (exports) {
         self.isScrollingY = false;
         self.directionX = e.directionX;
         self.directionY = e.directionY;
-        self.fire(SCROLL, {
+        var evtParam = Util.mix(e, {
           offset: {
             x: posX,
             y: posY
@@ -1365,23 +1378,11 @@ core = function (exports) {
           directionX: self.directionX,
           directionY: self.directionY
         });
-        self.fire(PAN, {
-          offset: {
-            x: posX,
-            y: posY
-          },
-          deltaX: e.deltaX,
-          deltaY: e.deltaY,
-          directionX: self.directionX,
-          directionY: self.directionY
-        });
+        self.fire(SCROLL, evtParam);
+        self._firePan(PAN, evtParam);
       }).on(renderTo, Pan.PAN_END, function (e) {
         self.panEndHandler(e);
-        self.fire(PAN_END, {
-          velocity: e.velocity,
-          velocityX: e.velocityX,
-          velocityY: e.velocityY
-        });
+        self._firePanEnd(PAN_END, e);
       });
       Event.on(container, transitionEnd, function (e) {
         if (e.target == content && !self.isScaling) {
@@ -1515,7 +1516,6 @@ core = function (exports) {
         return;
       var userConfig = self.userConfig;
       var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
-      console.log(maxSpeed);
       if (v > maxSpeed) {
         v = maxSpeed;
       }
@@ -1559,12 +1559,7 @@ core = function (exports) {
       return transition;
     }
   });
-  // commonjs export
-  if (typeof module == 'object' && module.exports) {
-    exports = XScroll;
-  } else {
-    window.XScroll = XScroll;
-  }
+  window.XScroll = XScroll;
   return XScroll;
 }({});
 dataset = function (exports) {
@@ -1575,8 +1570,17 @@ dataset = function (exports) {
   DataSet.prototype.appendData = function (data) {
     this.data = this.data.concat(data);
   };
-  DataSet.prototype.removeData = function () {
-    this.data = [];
+  DataSet.prototype.insertData = function (index, data) {
+    if (typeof index == 'number') {
+      this.data.splice(index, 0, data);
+    }
+  };
+  DataSet.prototype.removeData = function (index) {
+    if (typeof index == 'number' && this.data[index]) {
+      this.data.splice(index, 1);
+    } else {
+      this.data = [];
+    }
   };
   DataSet.prototype.getData = function () {
     return this.data;
@@ -1597,6 +1601,9 @@ xlist = function (exports) {
   var XScroll = core;
   var DataSet = dataset;
   var transform = Util.prefixStyle('transform');
+  var PAN_END = 'panend';
+  var PAN_START = 'panstart';
+  var PAN = 'pan';
   var XList = function (cfg) {
     this.super.call(this, cfg);
   };
@@ -1661,6 +1668,67 @@ xlist = function (exports) {
         }
       }
       self.datasets.splice(index, 1);
+    },
+    _firePanStart: function (eventName, e) {
+      var cell = this.getCellByPageY(e.touch.startY);
+      e.cell = cell;
+      this._curTouchedCell = cell;
+      this.super.prototype._firePanStart.call(this, eventName, e);
+    },
+    _firePan: function (eventName, e) {
+      if (this._curTouchedCell) {
+        e.cell = this._curTouchedCell;
+      }
+      this.super.prototype._firePan.call(this, eventName, e);
+    },
+    _firePanEnd: function (eventName, e) {
+      if (this._curTouchedCell) {
+        e.cell = this._curTouchedCell;
+      }
+      this.super.prototype._firePanEnd.call(this, eventName, e);
+      this._curTouchedCell = null;
+    },
+    _fireClick: function (eventName, e) {
+      // console.log(e.pageX,e.pageY)
+      var cell = this.getCellByPageY(e.pageY);
+      e.cell = cell;
+      this.super.prototype._fireClick.call(this, eventName, e);
+    },
+    getCellByPageY: function (pageY) {
+      var self = this;
+      var offsetY = pageY - self.renderTo.offsetTop + Math.abs(self.getOffsetTop());
+      return self.getCellByOffsetY(offsetY);
+    },
+    getCellByOffsetY: function (offsetY) {
+      var self = this;
+      var len = self.domInfo.length;
+      var cell;
+      if (offsetY < 0)
+        return;
+      for (var i = 0; i < len; i++) {
+        cell = self.domInfo[i];
+        if (cell._top < offsetY && cell._top + cell._height > offsetY) {
+          for (var j = 0; j < self.infiniteLength; j++) {
+            if (self.infiniteElementsCache[j]._visible && self.infiniteElementsCache[j]._row === cell._row) {
+              cell.element = self.infiniteElements[j];
+            }
+          }
+          return cell;
+        }
+      }
+    },
+    insertData: function (datasetIndex, rowIndex, data) {
+      var self = this;
+      if (data && datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0) {
+      }
+      return;
+    },
+    removeData: function (datasetIndex, rowIndex) {
+      var self = this;
+      if (datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0) {
+        return self.datasets[datasetIndex].removeData(rowIndex);
+      }
+      return;
     },
     getDataSets: function () {
       var self = this;

@@ -12,8 +12,18 @@ define(function(require, exports, module) {
 		this.data = this.data.concat(data)
 	};
 
-	DataSet.prototype.removeData = function(){
-		this.data = [];
+	DataSet.prototype.insertData = function(index,data){
+		if(typeof index == "number"){
+			this.data.splice(index,0,data);
+		}
+	};
+
+	DataSet.prototype.removeData = function(index){
+		if(typeof index == "number" && this.data[index]){
+			this.data.splice(index,1);
+		}else{
+			this.data = [];
+		}
 	};
 
 	DataSet.prototype.getData = function(){

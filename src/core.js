@@ -511,6 +511,18 @@ define(function(require, exports, module) {
             isEnabled ? this.boundryCheck(callback) : undefined;
             return;
         },
+        _firePanStart:function(eventName,e){
+            this.fire(eventName, e);
+        },
+        _firePan:function(eventName,e){
+            this.fire(eventName, e);
+        },
+        _firePanEnd:function(eventName,e){
+            this.fire(eventName, e);
+        },
+        _fireClick:function(eventName,e){
+            this.fire(eventName,e);
+        },
         _bindEvt: function() {
             var self = this;
             if (self.__isEvtBind) return;
@@ -535,6 +547,7 @@ define(function(require, exports, module) {
                 self.boundryCheck();
                 if (!self.isScrollingX && !self.isScrollingY) {
                     simulateMouseEvent(e, "click");
+                    self._fireClick("click",e);
                 } else {
                     self.isScrollingX = false;
                     self.isScrollingY = false;
@@ -543,9 +556,9 @@ define(function(require, exports, module) {
             }).on(renderTo, Pan.PAN_START, function(e) {
                 offset = self.getOffset();
                 self.translate(offset);
-                self.fire(PAN_START, {
+                self._firePanStart(PAN_START,Util.mix(e,{
                     offset: offset
-                });
+                }));
             }).on(renderTo, Pan.PAN, function(e) {
                 var posY = self.userConfig.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
                 var posX = self.userConfig.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
@@ -573,7 +586,7 @@ define(function(require, exports, module) {
                 self.isScrollingY = false;
                 self.directionX = e.directionX;
                 self.directionY = e.directionY;
-                self.fire(SCROLL, {
+                var evtParam = Util.mix(e,{
                     offset: {
                         x: posX,
                         y: posY
@@ -581,24 +594,12 @@ define(function(require, exports, module) {
                     directionX: self.directionX,
                     directionY: self.directionY
                 });
-                self.fire(PAN, {
-                    offset: {
-                        x: posX,
-                        y: posY
-                    },
-                    deltaX: e.deltaX,
-                    deltaY: e.deltaY,
-                    directionX: self.directionX,
-                    directionY: self.directionY
-                });
+                self.fire(SCROLL, evtParam);
+                self._firePan(PAN,evtParam);
 
             }).on(renderTo, Pan.PAN_END, function(e) {
-                self.panEndHandler(e)
-                self.fire(PAN_END, {
-                    velocity: e.velocity,
-                    velocityX: e.velocityX,
-                    velocityY: e.velocityY
-                })
+                self.panEndHandler(e);
+                self._firePanEnd(PAN_END,e)
             })
 
             Event.on(container, transitionEnd, function(e) {
@@ -735,7 +736,6 @@ define(function(require, exports, module) {
             if (type == "y" && self.userConfig.lockY) return;
             var userConfig = self.userConfig;
             var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
-            console.log(maxSpeed)
             if (v > maxSpeed) {
                 v = maxSpeed;
             }
@@ -785,14 +785,7 @@ define(function(require, exports, module) {
     });
 
 
-    // commonjs export
-    if (typeof module == 'object' && module.exports) {
-        module.exports = XScroll;
-    }
-    // browser export
-    else {
-        window.XScroll = XScroll;
-    }
+   window.XScroll = XScroll;
 
     return XScroll;
 

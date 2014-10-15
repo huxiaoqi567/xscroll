@@ -50,8 +50,8 @@ define(function(require,exports,module){
 	}
 
 
-	document.body.addEventListener("touchmove",pinchMoveHandler)
-	document.body.addEventListener("touchend",pinchEndHandler)
+	document.addEventListener("touchmove",pinchMoveHandler)
+	document.addEventListener("touchend",pinchEndHandler)
 	//枚举
 	return {
 		PINCH_START: PINCH_START,

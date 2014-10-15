@@ -78,15 +78,15 @@ define(function(require, exports, module) {
 			})
 
 		},
-		_panStartHandler: function(e) {
-			clearTimeout(this.loadingItv);
-		},
 		_changeStatus: function(status) {
 			var prevVal = this.status;
 			this.status = status;
 			Util.removeClass(this.pulldown, prefix + prevVal)
 			Util.addClass(this.pulldown, prefix + status);
 			this.setContent(this.userConfig[status + "Content"]);
+		},
+		_panStartHandler: function(e) {
+			clearTimeout(this.loadingItv);
 		},
 		_panHandler: function(e) {
 			var self = this;

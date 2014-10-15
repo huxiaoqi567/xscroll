@@ -157,8 +157,8 @@ define(function(require, exports, module) {
 
     }
 
-    document.body.addEventListener("touchstart", touchStart);
-    document.body.addEventListener("touchend", touchEnd);
+    document.addEventListener("touchstart", touchStart);
+    document.addEventListener("touchend", touchEnd);
 
     return {
         TAP: TAP,

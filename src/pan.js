@@ -158,8 +158,8 @@ define(function(require,exports,module){
 		}
 	}
 
-	document.body.addEventListener("touchmove",touchMoveHandler)
-	document.body.addEventListener("touchend",touchEndHandler)
+	document.addEventListener("touchmove",touchMoveHandler)
+	document.addEventListener("touchend",touchEndHandler)
 
 	return {
 		PAN_START:PAN_START,
