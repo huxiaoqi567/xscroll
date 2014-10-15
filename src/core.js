@@ -103,7 +103,8 @@ define(function(require, exports, module) {
             var userConfig = self.userConfig = Util.mix({
                 scalable: false,
                 scrollbarX: true,
-                scrollbarY:true
+                scrollbarY:true,
+                gpuAcceleration:true
             }, self.userConfig, undefined, undefined, true);
             self.renderTo = document.getElementById(userConfig.renderTo.replace("#", ""));
             self.boundryCheckEnabled = true;
