@@ -124,14 +124,8 @@
     </div>
     <div id="footer">scroll-y</div>
      <script type="text/javascript" src="../lib/jquery.js"></script>
-    <script type="text/javascript" src="../build/xscroll.js"></script>
-
-    <script src="../lib/sea.js"></script>
+     <script type="text/javascript" src="../build/xscroll.js"></script>
     <script>
-    seajs.config({
-      base: "../src/"
-    })
-    seajs.use("core",function(XScroll){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
             scrollbarX:false,
@@ -160,7 +154,6 @@
         
         xscroll.render();
 
-         });
     </script>
 </body>
 </html>
