@@ -912,6 +912,7 @@ core = function (exports) {
         gpuAcceleration: true
       }, self.userConfig, undefined, undefined, true);
       self.renderTo = document.getElementById(userConfig.renderTo.replace('#', ''));
+      self.scale = userConfig.scale || 1;
       self.boundryCheckEnabled = true;
       var clsPrefix = self.clsPrefix = userConfig.clsPrefix || 'xs-';
       self.SROLL_ACCELERATION = userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
@@ -938,7 +939,6 @@ core = function (exports) {
       var height = userConfig.height || self.renderTo.offsetHeight || 0;
       self.width = width;
       self.height = height;
-      self.scale = userConfig.scale || 1;
       var containerWidth = userConfig.containerWidth || self.content.offsetWidth;
       var containerHeight = userConfig.containerHeight || self.content.offsetHeight;
       self.containerWidth = containerWidth < self.width ? self.width : containerWidth;
@@ -1273,10 +1273,12 @@ core = function (exports) {
       var self = this;
       var offset = self.getOffset();
       //目标值等于当前至 则不发生滚动
-      if (offset[type] == dest)
-        return;
       if (duration <= 0) {
         self.fire(SCROLL, {
+          zoomType: type,
+          offset: offset
+        });
+        self.fire(SCROLL_END, {
           zoomType: type,
           offset: offset
         });
@@ -1363,14 +1365,17 @@ core = function (exports) {
       isEnabled ? this.boundryCheck(callback) : undefined;
       return;
     },
-    _firePanStart: function (eventName, e) {
-      this.fire(eventName, e);
+    _fireTouchStart: function (e) {
+      this.fire('touchstart', e);
     },
-    _firePan: function (eventName, e) {
-      this.fire(eventName, e);
+    _firePanStart: function (e) {
+      this.fire(PAN_START, e);
     },
-    _firePanEnd: function (eventName, e) {
-      this.fire(eventName, e);
+    _firePan: function (e) {
+      this.fire(PAN, e);
+    },
+    _firePanEnd: function (e) {
+      this.fire(PAN_END, e);
     },
     _fireClick: function (eventName, e) {
       this.fire(eventName, e);
@@ -1392,6 +1397,7 @@ core = function (exports) {
       var boundry = self.boundry;
       Event.on(renderTo, 'touchstart', function (e) {
         e.preventDefault();
+        self._fireTouchStart(e);
         self.stop();
       }).on(renderTo, Tap.TAP, function (e) {
         self.boundryCheck();
@@ -1406,7 +1412,7 @@ core = function (exports) {
       }).on(renderTo, Pan.PAN_START, function (e) {
         offset = self.getOffset();
         self.translate(offset);
-        self._firePanStart(PAN_START, Util.mix(e, { offset: offset }));
+        self._firePanStart(Util.mix(e, { offset: offset }));
       }).on(renderTo, Pan.PAN, function (e) {
         var posY = self.userConfig.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
         var posX = self.userConfig.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
@@ -1438,7 +1444,7 @@ core = function (exports) {
         self.isScrollingY = false;
         self.directionX = e.directionX;
         self.directionY = e.directionY;
-        var evtParam = Util.mix(e, {
+        var evt = Util.mix(e, {
           offset: {
             x: posX,
             y: posY
@@ -1446,11 +1452,11 @@ core = function (exports) {
           directionX: self.directionX,
           directionY: self.directionY
         });
-        self.fire(SCROLL, evtParam);
-        self._firePan(PAN, evtParam);
+        self.fire(SCROLL, evt);
+        self._firePan(evt);
       }).on(renderTo, Pan.PAN_END, function (e) {
         self.panEndHandler(e);
-        self._firePanEnd(PAN_END, e);
+        self._firePanEnd(e);
       });
       Event.on(container, transitionEnd, function (e) {
         if (e.target == content && !self.isScaling) {
@@ -1740,27 +1746,32 @@ xlist = function (exports) {
       }
       self.datasets.splice(index, 1);
     },
-    _firePanStart: function (eventName, e) {
+    _fireTouchStart: function (e) {
+      var cell = this.getCellByPageY(e.touches[0].pageY);
+      e.cell = cell;
+      this._curTouchedCell = cell;
+      this.super.prototype._fireTouchStart.call(this, e);
+    },
+    _firePanStart: function (e) {
       var cell = this.getCellByPageY(e.touch.startY);
       e.cell = cell;
       this._curTouchedCell = cell;
-      this.super.prototype._firePanStart.call(this, eventName, e);
+      this.super.prototype._firePanStart.call(this, e);
     },
-    _firePan: function (eventName, e) {
+    _firePan: function (e) {
       if (this._curTouchedCell) {
         e.cell = this._curTouchedCell;
       }
-      this.super.prototype._firePan.call(this, eventName, e);
+      this.super.prototype._firePan.call(this, e);
     },
-    _firePanEnd: function (eventName, e) {
+    _firePanEnd: function (e) {
       if (this._curTouchedCell) {
         e.cell = this._curTouchedCell;
       }
-      this.super.prototype._firePanEnd.call(this, eventName, e);
+      this.super.prototype._firePanEnd.call(this, e);
       this._curTouchedCell = null;
     },
     _fireClick: function (eventName, e) {
-      // console.log(e.pageX,e.pageY)
       var cell = this.getCellByPageY(e.pageY);
       e.cell = cell;
       this.super.prototype._fireClick.call(this, eventName, e);
@@ -1769,6 +1780,18 @@ xlist = function (exports) {
       var self = this;
       var offsetY = pageY - self.renderTo.offsetTop + Math.abs(self.getOffsetTop());
       return self.getCellByOffsetY(offsetY);
+    },
+    getCellByRow: function (row) {
+      var self = this, cell;
+      if (typeof row == 'number' && row < self.domInfo.length) {
+        for (var i = 0; i < self.infiniteLength; i++) {
+          if (row == self.infiniteElementsCache[i]._row) {
+            cell = self.domInfo[self.infiniteElementsCache[i]._row];
+            cell.element = self.infiniteElements[i];
+            return cell;
+          }
+        }
+      }
     },
     getCellByOffsetY: function (offsetY) {
       var self = this;
@@ -1779,12 +1802,7 @@ xlist = function (exports) {
       for (var i = 0; i < len; i++) {
         cell = self.domInfo[i];
         if (cell._top < offsetY && cell._top + cell._height > offsetY) {
-          for (var j = 0; j < self.infiniteLength; j++) {
-            if (self.infiniteElementsCache[j]._visible && self.infiniteElementsCache[j]._row === cell._row) {
-              cell.element = self.infiniteElements[j];
-            }
-          }
-          return cell;
+          return self.getCellByRow(i);
         }
       }
     },

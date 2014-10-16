@@ -69,27 +69,32 @@ define(function(require, exports, module) {
 			}
 			self.datasets.splice(index, 1);
 		},
-		_firePanStart:function(eventName,e){
+		_fireTouchStart:function(e){
+			var cell = this.getCellByPageY(e.touches[0].pageY);
+			e.cell = cell;
+			this._curTouchedCell = cell;
+			this.super.prototype._fireTouchStart.call(this,e);
+		},
+		_firePanStart:function(e){
 			var cell = this.getCellByPageY(e.touch.startY);
 			e.cell = cell;
 			this._curTouchedCell = cell;
-			this.super.prototype._firePanStart.call(this,eventName,e);
+			this.super.prototype._firePanStart.call(this,e);
 		},
-		_firePan:function(eventName,e){
+		_firePan:function(e){
 			if(this._curTouchedCell){
 				e.cell = this._curTouchedCell;
 			}
-			this.super.prototype._firePan.call(this,eventName,e);
+			this.super.prototype._firePan.call(this,e);
 		},
-		_firePanEnd:function(eventName,e){
+		_firePanEnd:function(e){
 			if(this._curTouchedCell){
 				e.cell = this._curTouchedCell;
 			}
-			this.super.prototype._firePanEnd.call(this,eventName,e);
+			this.super.prototype._firePanEnd.call(this,e);
 			this._curTouchedCell = null;
 		},
 		_fireClick:function(eventName,e){
-			// console.log(e.pageX,e.pageY)
 			var cell = this.getCellByPageY(e.pageY);
 			e.cell = cell;
 			this.super.prototype._fireClick.call(this,eventName,e);
@@ -99,6 +104,18 @@ define(function(require, exports, module) {
 			var offsetY = pageY - self.renderTo.offsetTop + Math.abs(self.getOffsetTop());
 			return self.getCellByOffsetY(offsetY);
 		},
+		getCellByRow:function(row){
+			var self = this,cell;
+			if(typeof row == "number" && row < self.domInfo.length){
+				for(var i = 0;i<self.infiniteLength;i++){
+					if(row == self.infiniteElementsCache[i]._row){
+						cell = self.domInfo[self.infiniteElementsCache[i]._row];
+						cell.element = self.infiniteElements[i];
+						return cell;
+					}
+				}
+			}
+		},
 		getCellByOffsetY:function(offsetY){
 			var self = this;
 			var len = self.domInfo.length;
@@ -107,12 +124,7 @@ define(function(require, exports, module) {
 			for(var i = 0;i<len;i++){
 				cell = self.domInfo[i];
 				if(cell._top < offsetY && cell._top + cell._height > offsetY){
-					for(var j =0;j<self.infiniteLength;j++){
-						if(self.infiniteElementsCache[j]._visible && self.infiniteElementsCache[j]._row === cell._row){
-							cell.element = self.infiniteElements[j];
-						}
-					}
-					return cell;
+					return self.getCellByRow(i);
 				}
 			}
 		},
