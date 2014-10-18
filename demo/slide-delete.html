@@ -134,13 +134,8 @@
         </div>
     </div>
     <div id="footer">infinity-scroll</div>
-      <!-- // <script type="text/javascript" src="../build/xlist.js"></script> -->
-     <script src="../lib/sea.js"></script>
+ <script type="text/javascript" src="../build/xlist.js"></script>
     <script>
-    seajs.config({
-      base: "../src/"
-    })
-    seajs.use("xlist",function(XList){
         //mock data
         var data = (function() {
             var tmp = [];
@@ -203,7 +198,6 @@
 
         window.xlist = xlist
 
-})
     </script>
 </body>
 </html>
