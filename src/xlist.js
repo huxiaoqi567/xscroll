@@ -2,6 +2,7 @@ define(function(require, exports, module) {
 	var Util = require('util');
 	var XScroll = require('core');
 	var DataSet = require('dataset');
+	var SwipeEdit = require('swipeedit');
 	var transform = Util.prefixStyle("transform");
 	var PAN_END = "panend";
     var PAN_START = "panstart";
@@ -10,6 +11,7 @@ define(function(require, exports, module) {
 		this.super.call(this, cfg)
 	}
 	XList.DataSet = DataSet;
+	XList.SwipeEdit = SwipeEdit;
 	Util.extend(XScroll, XList, {
 		init: function() {
 			var self = this;
@@ -197,7 +199,7 @@ define(function(require, exports, module) {
 			var data = self.domInfo;
 			var itemHeight = self.userConfig.itemHeight;
 			var elementsPerPage = Math.ceil(self.height / itemHeight);
-			var maxBufferedNum = Math.max(Math.ceil(elementsPerPage / 3), 0);
+			var maxBufferedNum = Math.max(Math.ceil(elementsPerPage / 3), 1);
 			var posTop = Math.max(offsetTop - maxBufferedNum * itemHeight, 0);
 			var tmp = {},
 				item;

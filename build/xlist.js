@@ -1,5 +1,5 @@
 ;(function() {
-var util, pan, tap, pinch, scrollbar, core, dataset, xlist, _event_, _pulldown_;
+var util, pan, tap, pinch, scrollbar, swipeedit, core, dataset, _xlist_, _event_, _pulldown_;
 util = function (exports) {
   var Util = {
     mix: function (to, from) {
@@ -804,6 +804,142 @@ _pulldown_ = function (exports) {
   });
   return PullDown;
 }({});
+swipeedit = function (exports) {
+  var Util = util;
+  //transform
+  var transform = Util.prefixStyle('transform');
+  //transition webkitTransition MozTransition OTransition msTtransition
+  var transition = Util.prefixStyle('transition');
+  var clsPrefix = 'xs-plugin-swipeedit-';
+  var isLocked = false;
+  var buffer = 20;
+  var isSliding = false;
+  var hasSlided = false;
+  var transformStr = Util.vendor ? [
+    '-',
+    Util.vendor,
+    '-transform'
+  ].join('') : 'transform';
+  //acceration 
+  var acc = 1;
+  var startX;
+  var SwipeEdit = function (cfg) {
+    this.userConfig = Util.mix({
+      labelSelector: clsPrefix + 'label',
+      renderHook: function (el) {
+        el.innerHTML = tpl;
+      }
+    }, cfg);
+  };
+  Util.mix(SwipeEdit.prototype, {
+    pluginId: 'xlist/plugin/swipeedit',
+    initializer: function (xlist) {
+      var self = this;
+      self.xlist = xlist;
+      self._bindEvt();
+    },
+    getTransformX: function (el) {
+      var trans = getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
+      return trans ? trans[4] / 1 : 0;
+    },
+    _bindEvt: function () {
+      var self = this;
+      var xlist = self.xlist;
+      var lbl = null;
+      xlist.on('panstart', function (e) {
+        hasSlided = false;
+        lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
+        startX = self.getTransformX(lbl);
+        lbl.style[transition] = 'none';
+        if (Math.abs(startX) > 0 && !isSliding) {
+          self.slideRight(e);
+        }
+      });
+      xlist.on('pan', function (e) {
+        if (e.touch.directionX == 'left') {
+          self.slideAllExceptRow(e.cell._row);
+        }
+        /*
+        1.水平位移大于垂直位移
+        2.大于20px （参考值可自定） buffer
+        3.向左
+        */
+        if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) / Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer) {
+          isLocked = true;
+          xlist.userConfig.lockY = true;
+          var left = startX + e.deltaX + buffer;
+          if (left > 0) {
+            return;
+          }
+          lbl.style[transition] = 'none';
+          lbl.style[transform] = 'translateX(' + left + 'px) translateZ(0)';
+        } else if (!isLocked) {
+          xlist.userConfig.lockY = false;
+        }
+      });
+      xlist.on('panend', function (e) {
+        isLocked = false;
+        var cpt = self.getTransformX(lbl);
+        if (e.touch.directionX == 'left' && Math.abs(e.velocityX) > acc) {
+          self.slideLeftHandler(e);
+        } else if (Math.abs(cpt) < self.userConfig.width / 2) {
+          self.slideRightHandler(e);
+        } else if (Math.abs(cpt) >= self.userConfig.width / 2) {
+          self.slideLeftHandler(e);
+        }
+      });
+      document.body.addEventListener('webkitTransitionEnd', function (e) {
+        if (new RegExp(self.userConfig.labelSelector.replace(/\./, '')).test(e.target.className)) {
+          isSliding = false;
+        }
+      });
+    },
+    slideLeft: function (row) {
+      var self = this;
+      var cell = xlist.getCellByRow(row);
+      if (!cell || !cell.element)
+        return;
+      var el = cell.element.querySelector(self.userConfig.labelSelector);
+      if (!el || !el.style)
+        return;
+      el.style[transform] = 'translateX(-' + self.userConfig.width + 'px) translateZ(0)';
+      el.style[transition] = transformStr + ' 0.15s ease';
+      xlist.getData(0, row).data.status = 'delete';
+    },
+    slideRight: function (row) {
+      var self = this;
+      var cell = xlist.getCellByRow(row);
+      if (!cell || !cell.element)
+        return;
+      var el = cell.element.querySelector(self.userConfig.labelSelector);
+      if (!el || !el.style)
+        return;
+      el.style[transform] = 'translateX(0) translateZ(0)';
+      el.style[transition] = transformStr + ' 0.5s ease';
+      xlist.getData(0, row).data.status = '';
+    },
+    slideLeftHandler: function (e) {
+      var self = this;
+      isSliding = true;
+      self.slideLeft(e.cell._row);
+    },
+    slideRightHandler: function (e) {
+      var self = this;
+      hasSlided = true;
+      isSliding = true;
+      self.slideRight(e.cell._row);
+    },
+    slideAllExceptRow: function (row) {
+      var self = this;
+      for (var i in xlist.infiniteElementsCache) {
+        if (row != xlist.infiniteElementsCache[i]._row || undefined === row) {
+          self.slideRight(xlist.infiniteElementsCache[i]._row);
+        }
+      }
+    }
+  });
+  return SwipeEdit;
+}({});
 core = function (exports) {
   var win = window;
   var Util = util;
@@ -813,6 +949,7 @@ core = function (exports) {
   var Pinch = pinch;
   var ScrollBar = scrollbar;
   var PullDown = _pulldown_;
+  var SwipeEdit = swipeedit;
   //global namespace
   var XScroll = function (cfg) {
     this.userConfig = cfg;
@@ -857,8 +994,6 @@ core = function (exports) {
   var quadratic = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
   var circular = 'cubic-bezier(0.1, 0.57, 0.1, 1)';
   function quadratic2cubicBezier(a, b) {
-    // return [0.25, 0.46, 0.45, 0.94]
-    // return [0.1, 0.57, 0.1, 1]
     return [
       [
         (a / 3 + (a + b) / 3 - a) / (b - a),
@@ -911,7 +1046,7 @@ core = function (exports) {
         scrollbarY: true,
         gpuAcceleration: true
       }, self.userConfig, undefined, undefined, true);
-      self.renderTo = document.getElementById(userConfig.renderTo.replace('#', ''));
+      self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
       self.scale = userConfig.scale || 1;
       self.boundryCheckEnabled = true;
       var clsPrefix = self.clsPrefix = userConfig.clsPrefix || 'xs-';
@@ -1416,7 +1551,6 @@ core = function (exports) {
       }).on(renderTo, Pan.PAN, function (e) {
         var posY = self.userConfig.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
         var posX = self.userConfig.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
-        boundry = self.boundry;
         containerWidth = self.containerWidth;
         containerHeight = self.containerHeight;
         if (posY > boundry.top) {
@@ -1501,27 +1635,27 @@ core = function (exports) {
       var offset = self.getOffset();
       var transX = self._bounce('x', offset.x, e.velocityX, self.width, self.containerWidth);
       var transY = self._bounce('y', offset.y, e.velocityY, self.height, self.containerHeight);
-      var x = transX ? transX['offset'] : 0;
-      var y = transY ? transY['offset'] : 0;
+      var x = transX ? transX.offset : 0;
+      var y = transY ? transY.offset : 0;
       var duration;
       if (transX && transY && transX.status && transY.status && transX.duration && transY.duration) {
         //保证常规滚动时间相同 x y方向不发生时间差
         duration = Math.max(transX.duration, transY.duration);
       }
       if (transX) {
-        if (transX['duration'] < 100) {
+        if (transX.duration < 100) {
           self._scrollEndHandler('x');
         } else {
-          self.scrollX(x, duration || transX['duration'], transX['easing'], function (e) {
+          self.scrollX(x, duration || transX.duration, transX.easing, function (e) {
             self._scrollEndHandler('x');
           });
         }
       }
       if (transY) {
-        if (transY['duration'] < 100) {
+        if (transY.duration < 100) {
           self._scrollEndHandler('y');
         } else {
-          self.scrollY(y, duration || transY['duration'], transY['easing'], function (e) {
+          self.scrollY(y, duration || transY.duration, transY.easing, function (e) {
             self._scrollEndHandler('y');
           });
         }
@@ -1600,9 +1734,9 @@ core = function (exports) {
         var a = BOUNDRY_CHECK_ACCELERATION * (v / Math.abs(v));
         var t = v / a;
         var s = offset + t * v / 2;
-        transition['offset'] = -s;
-        transition['duration'] = t;
-        transition['easing'] = 'cubic-bezier(' + quadratic2cubicBezier(-t, 0) + ')';
+        transition.offset = -s;
+        transition.duration = t;
+        transition.easing = 'cubic-bezier(' + quadratic2cubicBezier(-t, 0) + ')';
         return transition;
       }
       var a = self.SROLL_ACCELERATION * (v / Math.abs(v));
@@ -1612,25 +1746,56 @@ core = function (exports) {
       if (s > boundryStart) {
         var _s = boundryStart - offset;
         var _t = (v - Math.sqrt(-2 * a * _s + v * v)) / a;
-        transition['offset'] = -boundryStart;
-        transition['duration'] = _t;
-        transition['easing'] = 'cubic-bezier(' + quadratic2cubicBezier(-t, -t + _t) + ')';
+        transition.offset = -boundryStart;
+        transition.duration = _t;
+        transition.easing = 'cubic-bezier(' + quadratic2cubicBezier(-t, -t + _t) + ')';
         self['_bounce' + type] = v - a * _t;
       } else if (s < size - innerSize) {
         var _s = size - innerSize - offset;
         var _t = (v + Math.sqrt(-2 * a * _s + v * v)) / a;
-        transition['offset'] = innerSize - size;
-        transition['duration'] = _t;
-        transition['easing'] = 'cubic-bezier(' + quadratic2cubicBezier(-t, -t + _t) + ')';
+        transition.offset = innerSize - size;
+        transition.duration = _t;
+        transition.easing = 'cubic-bezier(' + quadratic2cubicBezier(-t, -t + _t) + ')';
         self['_bounce' + type] = v - a * _t;
       } else {
-        transition['offset'] = -s;
-        transition['duration'] = t;
-        transition['easing'] = 'cubic-bezier(' + quadratic2cubicBezier(-t, 0) + ')';
-        transition['status'] = 'normal';
+        transition.offset = -s;
+        transition.duration = t;
+        transition.easing = 'cubic-bezier(' + quadratic2cubicBezier(-t, 0) + ')';
+        transition.status = 'normal';
       }
       self['isScrolling' + type.toUpperCase()] = true;
       return transition;
+    },
+    plug: function (plugin) {
+      var self = this;
+      if (!plugin || !plugin.pluginId)
+        return;
+      if (!self.__plugins) {
+        self.__plugins = [];
+      }
+      plugin.initializer(self);
+      self.__plugins.push(plugin);
+    },
+    unplug: function (plugin) {
+      var self = this;
+      if (!plugin)
+        return;
+      var _plugin = typeof plugin == 'string' ? self.getPlugin(plugin) : plugin;
+      for (var i in self.__plugins) {
+        if (self.__plugins[i] == _plugin) {
+          return self.__plugins[i].splice(i, 1);
+        }
+      }
+    },
+    getPlugin: function (pluginId) {
+      var self = this;
+      var plugins = [];
+      for (var i in self.__plugins) {
+        if (self.__plugins[i] && self.__plugins[i].pluginId == pluginId) {
+          plugins.push(self.__plugins[i]);
+        }
+      }
+      return plugins.length > 1 ? plugins : plugins[0] || null;
     }
   });
   window.XScroll = XScroll;
@@ -1673,10 +1838,11 @@ dataset = function (exports) {
   };
   return DataSet;
 }({});
-xlist = function (exports) {
+_xlist_ = function (exports) {
   var Util = util;
   var XScroll = core;
   var DataSet = dataset;
+  var SwipeEdit = swipeedit;
   var transform = Util.prefixStyle('transform');
   var PAN_END = 'panend';
   var PAN_START = 'panstart';
@@ -1685,6 +1851,7 @@ xlist = function (exports) {
     this.super.call(this, cfg);
   };
   XList.DataSet = DataSet;
+  XList.SwipeEdit = SwipeEdit;
   Util.extend(XScroll, XList, {
     init: function () {
       var self = this;
@@ -1874,7 +2041,7 @@ xlist = function (exports) {
       var data = self.domInfo;
       var itemHeight = self.userConfig.itemHeight;
       var elementsPerPage = Math.ceil(self.height / itemHeight);
-      var maxBufferedNum = Math.max(Math.ceil(elementsPerPage / 3), 0);
+      var maxBufferedNum = Math.max(Math.ceil(elementsPerPage / 3), 1);
       var posTop = Math.max(offsetTop - maxBufferedNum * itemHeight, 0);
       var tmp = {}, item;
       for (var i = 0, len = data.length; i < len; i++) {

@@ -57,6 +57,7 @@
         text-align: center;
         position: absolute;
         background: #fff;
+        z-index: 1;
     }
     #J_Scroll ul li.active{
         background: #eee;
@@ -64,17 +65,25 @@
     #J_Scroll ul li.no-active{
         background: #fff;
     }
-    .del{
+    .control{
+        position:absolute;
+        white-space: nowrap;
+        width: 40%;
+        z-index:0;
+        right:0;
+    }
+    .btn{
         display: inline-block;
-        background: red;
-        vertical-align: top;
-        color:#fff;
-        width: 20%;
-        height: 60px;
-        line-height: 60px;
-        text-align: center;
-        position: absolute;
-        right: 0;
+        color:#fff;width:50%;text-align:center;
+    }
+    .btn-delete{
+        background:red;
+    }
+    .btn-mark{
+        background: #ccc;
+    }
+    .btn-marked{
+        background: green;
     }
     </style>
     <div id="header">XList</div>
@@ -125,8 +134,13 @@
         </div>
     </div>
     <div id="footer">infinity-scroll</div>
-      <script type="text/javascript" src="../build/xlist.js"></script>
+      <!-- // <script type="text/javascript" src="../build/xlist.js"></script> -->
+     <script src="../lib/sea.js"></script>
     <script>
+    seajs.config({
+      base: "../src/"
+    })
+    seajs.use("xlist",function(XList){
         //mock data
         var data = (function() {
             var tmp = [];
@@ -139,10 +153,6 @@
             return tmp
         })()
 
-         //acceration 
-        var acc = 1;
-        var maxWidth = document.body.offsetWidth*0.2;
-        var startX;
 
         var xlist = new XList({
             renderTo: "#J_Scroll",
@@ -150,125 +160,50 @@
             itemHeight: 62 ,
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
-                var style = "";
+                el.innerHTML = '<div class="lbl">'+row.data.text+'</div>'+
+                                '<div class="control"><div class="btn btn-mark">mark</div>'+
+                                '<div class="btn btn-delete">delete</div></div>';
+                // var style = "";
                 // if(row.data.status == "delete"){
                     // style = "-webkit-transform:translateX(-"+maxWidth+"px) translateZ(0)"
                 // }
-                el.innerHTML = '<div class="lbl-ctn" style="'+style+'"><div class="lbl">'+row.data.text+'</div></div><div class="del">Delete</div>';
+                // el.innerHTML = '<div class="lbl-ctn" style="'+style+'"><div class="lbl">'+row.data.text+'</div></div><div class="del">Delete</div>';
             }
         });
         
         xlist.render();
 
-        var isLocked = false;
-        var buffer = 20;
-        var isSliding = false;
-        var hasSlided = false;
+        var maxWidth = document.body.offsetWidth * 0.4;
 
-        xlist.on("click",function(e){
-            slideAllExceptRow();
+        var swipeEditPlugin = new XList.SwipeEdit({
+            labelSelector:".lbl",
+            width:maxWidth
         })
 
-        xlist.on("panstart",function(e){
-            hasSlided = false;
-            startX = getComputedStyle(e.cell.element.querySelector(".lbl-ctn")).webkitTransform.match(/[-\d\.*\d*]+/g)[4]/1;
-            e.cell.element.querySelector(".lbl-ctn").style.webkitTransition =  "none";
-            if(Math.abs(startX) > 0 && !isSliding){
-                slideRight(e)
-            }
-        })
-
-        xlist.on("pan",function(e){
-            if(e.touch.directionX == "left"){
-                slideAllExceptRow(e.cell._row);
-            }
-            /*
-            1.水平位移大于垂直位移
-            2.大于20px （参考值可自定） buffer
-            3.向左
-            */
-            // if(Math.abs(e.deltaY) > Math.abs(e.deltaX) && ) return;
-            if(Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX)/Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer){
-                isLocked = true;
-                xlist.userConfig.lockY = true;
-                var left = startX + e.deltaX + buffer;
-                if(left > 0){return;}
-                    e.cell.element.querySelector(".lbl-ctn").style.webkitTransition =  "none";
-                    e.cell.element.querySelector(".lbl-ctn").style.webkitTransform = "translateX("+left+"px) translateZ(0)"
-            }else if(!isLocked){
-                xlist.userConfig.lockY = false;
-            }
-        })
-       
-        xlist.on("panend",function(e){
-            isLocked = false;
-            var cpt = getComputedStyle(e.cell.element.querySelector(".lbl-ctn")).webkitTransform.match(/[-\d\.*\d*]+/g)[4]/1
-            if(e.touch.directionX == "left" && Math.abs(e.velocityX) > acc){
-               slideLeftHandler(e)
-            }else if(Math.abs(cpt) < maxWidth/2){
-                 slideRightHandler(e)
-            }else if(Math.abs(cpt) >= maxWidth/2){
-                 slideLeftHandler(e)
-            }
-        })
-
-        function slideLeft(row){
-            var cell = xlist.getCellByRow(row);
-            if(!cell || !cell.element) return;
-            var el = cell.element.querySelector('.lbl-ctn');
-            if(!el || !el.style) return;
-            el.style.webkitTransform = "translateX(-"+maxWidth+"px) translateZ(0)";
-            el.style.webkitTransition = "-webkit-transform 0.15s ease";
-            xlist.getData(0,row).data.status = "delete";
-        }
-
-        function slideRight(row){
-            var cell = xlist.getCellByRow(row);
-            if(!cell || !cell.element) return;
-            var el = cell.element.querySelector('.lbl-ctn');
-            if(!el || !el.style) return;
-            el.style.webkitTransform = "translateX(0) translateZ(0)";
-            el.style.webkitTransition = "-webkit-transform 0.5s ease";
-            xlist.getData(0,row).data.status = "";
-        }
-
-        function slideLeftHandler(e){
-            isSliding = true;
-            slideLeft(e.cell._row);
-        }
-
-        function slideRightHandler(e){
-            hasSlided = true;
-            isSliding = true;
-            slideRight(e.cell._row);
-        }
-
-        function slideAllExceptRow(row){
-            for(var i in xlist.infiniteElementsCache){
-                if(row != xlist.infiniteElementsCache[i]._row || undefined === row){
-                    slideRight(xlist.infiniteElementsCache[i]._row);
-                }
-            }
-        }
-
-        document.body.addEventListener("webkitTransitionEnd",function(e){
-            if(/lbl-ctn/.test(e.target.className)){
-                isSliding = false;
-            }
-        })
-
+        xlist.plug(swipeEditPlugin)
         //delete 
-        xlist.on("click",function(e){
-             if(e.target.className.match(/del/)){
-                xlist.removeData(0,e.cell._row)
-                xlist.render();
-             }
+       xlist.on("click",function(e){
+            if(e.target.className.match("btn-delete")){
+               xlist.removeData(0,e.cell._row)
+               xlist.render();
+            }
+            if(e.target.className.match("btn-mark") && !e.target.className.match("btn-marked")){
+                var data = xlist.getData(0,e.cell._row)
+                data.data.marked = true;
+                e.target.className += " btn-marked";
+            }
+       })
+
+       xlist.on("click", function(e) {
+                if(!e.target.parentNode.className.match('control')){
+                    swipeEditPlugin.slideAllExceptRow();
+                }
             
         })
 
         window.xlist = xlist
 
-
+})
     </script>
 </body>
 </html>
