@@ -1,5 +1,4 @@
 define(function(require, exports, module) {
-    var win = window;
     var Util = require('./util');
     var Event = require('./event');
     var Pan = require('./pan');
@@ -14,7 +13,7 @@ define(function(require, exports, module) {
         this.init();
     };
     XScroll.PullDown = PullDown;
-    XScroll.version = "1.0.0";
+    XScroll.version = "2.0.0";
     //event names
     var SCROLL_END = "scrollend";
     var SCROLL = "scroll";
@@ -685,23 +684,15 @@ define(function(require, exports, module) {
                 duration = Math.max(transX.duration, transY.duration);
             }
             if(transX){
-                if(transX.duration < 100){
-                     self._scrollEndHandler("x");
-                }else{
-                    self.scrollX(x, duration || transX.duration, transX.easing, function(e) {
-                        self._scrollEndHandler("x");
-                    });
-                }
+                self.scrollX(x, duration || transX.duration, transX.easing, function(e) {
+                    self._scrollEndHandler("x");
+                });
             }
             
             if(transY){
-                if(transY.duration < 100){
+                self.scrollY(y, duration || transY.duration, transY.easing, function(e) {
                     self._scrollEndHandler("y");
-                }else{
-                    self.scrollY(y, duration || transY.duration, transY.easing, function(e) {
-                        self._scrollEndHandler("y");
-                    });
-                }
+                });
             }
             //judge the direction
             self.directionX = e.velocityX < 0 ? "left" : "right";
