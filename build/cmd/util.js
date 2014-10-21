@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 	var Util = {
 
 		mix: function(to, from) {
@@ -51,3 +52,4 @@
 		}
 	}
 	module.exports = Util;
+});

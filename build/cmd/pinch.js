@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 	var Util = require('./util');
 	var Event = require("./event");
 	var doc = window.document;
@@ -60,3 +61,4 @@
 
 	module.exports = Pinch;
 
+});

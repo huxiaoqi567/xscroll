@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 
 	var Util = require('./util');
 	//最短滚动条高度
@@ -185,3 +186,4 @@
 
 	module.exports = ScrollBar;
 
+});

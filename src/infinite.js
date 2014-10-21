@@ -1,8 +1,7 @@
-define(function(require, exports, module) {
-	var Util = require('util');
-	var XScroll = require('core');
-	var DataSet = require('dataset');
-	var SwipeEdit = require('swipeedit');
+	var Util = require('./util');
+	var XScroll = require('./core');
+	var DataSet = require('./dataset');
+	var SwipeEdit = require('./swipeedit');
 	var transform = Util.prefixStyle("transform");
 	var PAN_END = "panend";
     var PAN_START = "panstart";
@@ -432,6 +431,4 @@ define(function(require, exports, module) {
 	else {
 		window.XList = XList;
 	}
-	return XList;
 
-});

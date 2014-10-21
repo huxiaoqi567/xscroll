@@ -1,5 +1,5 @@
 ;(function() {
-var util, pan, tap, pinch, scrollbar, swipeedit, core, dataset, _xlist_, _event_, _pulldown_;
+var util, pan, tap, pinch, scrollbar, swipeedit, core, dataset, infinite, _event_, _pulldown_;
 util = function (exports) {
   var Util = {
     mix: function (to, from) {
@@ -82,7 +82,8 @@ _event_ = function (exports) {
       tgt.dispatchEvent(event);
     }
   };
-  return Gesture;
+  exports = Gesture;
+  return exports;
 }({});
 pan = function (exports) {
   var Util = util;
@@ -234,11 +235,13 @@ pan = function (exports) {
   }
   document.addEventListener('touchmove', touchMoveHandler);
   document.addEventListener('touchend', touchEndHandler);
-  return {
+  var Pan = {
     PAN_START: PAN_START,
     PAN_END: PAN_END,
     PAN: PAN
   };
+  exports = Pan;
+  return exports;
 }({});
 tap = function (exports) {
   var Util = util;
@@ -387,12 +390,14 @@ tap = function (exports) {
   }
   document.addEventListener('touchstart', touchStart);
   document.addEventListener('touchend', touchEnd);
-  return {
+  var Tap = {
     TAP: TAP,
     TAP_HOLD: TAP_HOLD,
     SINGLE_TAP: SINGLE_TAP,
     DOUBLE_TAP: DOUBLE_TAP
   };
+  exports = Tap;
+  return exports;
 }({});
 pinch = function (exports) {
   var Util = util;
@@ -445,11 +450,13 @@ pinch = function (exports) {
   document.addEventListener('touchmove', pinchMoveHandler);
   document.addEventListener('touchend', pinchEndHandler);
   //枚举
-  return {
+  var Pinch = {
     PINCH_START: PINCH_START,
     PINCH: PINCH,
     PINCH_END: PINCH_END
   };
+  exports = Pinch;
+  return exports;
 }({});
 scrollbar = function (exports) {
   var Util = util;
@@ -635,7 +642,8 @@ scrollbar = function (exports) {
       self.scrollbar.style.opacity = 1;
     }
   });
-  return ScrollBar;
+  exports = ScrollBar;
+  return exports;
 }({});
 _pulldown_ = function (exports) {
   var Util = util;
@@ -802,7 +810,8 @@ _pulldown_ = function (exports) {
       }
     }
   });
-  return PullDown;
+  exports = PullDown;
+  return exports;
 }({});
 swipeedit = function (exports) {
   var Util = util;
@@ -938,7 +947,8 @@ swipeedit = function (exports) {
       }
     }
   });
-  return SwipeEdit;
+  exports = SwipeEdit;
+  return exports;
 }({});
 core = function (exports) {
   var win = window;
@@ -1625,7 +1635,7 @@ core = function (exports) {
           self.scale > self.minScale ? self.scaleTo(self.minScale, originX, originY, 200) : self.scaleTo(self.maxScale, originX, originY, 200);
         });
       }
-      Event.on(win, 'resize', function (e) {
+      Event.on(window, 'resize', function (e) {
         self.refresh();
       });
     },
@@ -1799,7 +1809,8 @@ core = function (exports) {
     }
   });
   window.XScroll = XScroll;
-  return XScroll;
+  exports = XScroll;
+  return exports;
 }({});
 dataset = function (exports) {
   var DataSet = function (cfg) {
@@ -1836,9 +1847,10 @@ dataset = function (exports) {
   DataSet.prototype.getId = function () {
     return this.id;
   };
-  return DataSet;
+  exports = DataSet;
+  return exports;
 }({});
-_xlist_ = function (exports) {
+infinite = function (exports) {
   var Util = util;
   var XScroll = core;
   var DataSet = dataset;
@@ -2266,6 +2278,6 @@ _xlist_ = function (exports) {
   } else {
     window.XList = XList;
   }
-  return XList;
+  return exports;
 }({});
 }());

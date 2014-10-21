@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 	var Util = require('./util');
 	var gestures = {};
 	var Gesture = {
@@ -19,4 +20,4 @@
 		}
 	};
 
-	module.exports = Gesture;
+	module.exports = Gesture;});

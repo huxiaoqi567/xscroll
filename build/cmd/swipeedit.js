@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 	var Util = require('./util');
 	//transform
 	var transform = Util.prefixStyle("transform");
@@ -133,3 +134,4 @@
 	});
 
 	module.exports = SwipeEdit;
+});

@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
     var Util = require('./util');
     var Event = require("./event");
     var TAP = "tap";
@@ -169,3 +170,4 @@
     module.exports = Tap;
 
 
+});

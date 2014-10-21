@@ -71,9 +71,6 @@ body {
     width: 100%;
     overflow: hidden;
 }
-#J_Scroll ul{
-    /*position: absolute;*/
-}
 #J_Menu li,#J_Scroll li{
     padding: 0 10px;
 
@@ -84,7 +81,6 @@ body {
     font-size: 16px;
     display: block;
     list-style: none;
-    /*-webkit-transition:-webkit-transform 0.2s ease-out 0s;*/
 }
 
     img{
@@ -176,10 +172,12 @@ body {
         </div>
     </div>
     <div id="footer">Scroll-Vertical</div>
-    <script src="../build/xscroll.js"></script>
-     <script src="../build/xlist.js"></script>
-
+     <script src="../lib/sea.js"></script>
     <script>
+    seajs.config({
+      base: "../build/cmd/"
+    })
+    seajs.use(["core","infinite"],function(XScroll,XList){
         var data = [];
         for(var i =0;i<100;i++){
             data.push({
@@ -195,7 +193,6 @@ body {
             renderTo:"#J_Scroll",
             infiniteElements:'#J_Scroll li',
             data:data,
-            // scrollbarY:false,
             renderHook:function(el,row){
                 el.innerHTML = row.data.row;
             }
@@ -204,16 +201,13 @@ body {
         xlist.render()
 
         xlist.on("click",function(e){
-            console.log(e)
         })
 
         xlist.on("panstart",function(e){
-            console.log(e)
         })
 
 
         xlist.on("pan",function(e){
-            // console.log(e)
         })
 
         var xscroll = new XScroll({
@@ -224,6 +218,7 @@ body {
         });
         xscroll.render();
 
+    })
     </script>
 </body>
 </html>

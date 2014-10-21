@@ -1,10 +1,19 @@
 var gulp    = require('gulp');
-gulp.task('build', function() {
-  var requirejs = require('requirejs');
+var concat = require('gulp-concat-util');
+var requirejs = require('requirejs');
+gulp.task('concat', function() {
+  var stream = gulp.src('src/**/*.js')
+ .pipe(concat.header('define(function(require, exports, module) {\n'))
+  .pipe(concat.footer('});'))
+  .pipe(gulp.dest("./build/cmd/"))
+  return stream;
 
-  requirejs.optimize({
+});
+
+gulp.task('amd-clean',['concat'],function(){
+    requirejs.optimize({
     'findNestedDependencies': true,
-    'baseUrl': './src/',
+    'baseUrl': './build/cmd/',
     'optimize': 'none',
     'include': ['core'],
     'out': './build/xscroll.js',
@@ -21,9 +30,9 @@ gulp.task('build', function() {
 
   requirejs.optimize({
     'findNestedDependencies': true,
-    'baseUrl': './src/',
+    'baseUrl': './build/cmd/',
     'optimize': 'none',
-    'include': ['xlist'],
+    'include': ['infinite'],
     'out': './build/xlist.js',
     'onModuleBundleComplete': function(data) {
       var fs = require('fs'),
@@ -35,12 +44,15 @@ gulp.task('build', function() {
       }));
     }
   });
-});
+
+})
+
+gulp.task('build',['amd-clean'])
 
 gulp.task('watch',function(){
   gulp.watch('src/**/*.js', ['build'])
 })
 
-// gulp.task('debug',['watch','build'])
+
 
 

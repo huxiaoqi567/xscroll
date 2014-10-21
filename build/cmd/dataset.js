@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 
 	var DataSet = function(cfg){
 
@@ -44,3 +45,4 @@
 
 	module.exports = DataSet;
 
+});

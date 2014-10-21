@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
     var win = window;
     var Util = require('./util');
     var Event = require('./event');
@@ -845,3 +846,4 @@
 
    module.exports = XScroll;
 
+});

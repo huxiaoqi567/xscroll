@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 	var Util = require('./util');
 	var prefix;
 	var containerCls;
@@ -168,3 +169,4 @@
 	})
 
 	module.exports = PullDown;
+});
