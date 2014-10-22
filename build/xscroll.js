@@ -56,6 +56,18 @@ util = function (exports) {
       if (el && el.className) {
         el.className = el.className.replace(className, '');
       }
+    },
+    getOffsetTop: function (e) {
+      var offset = e.offsetTop;
+      if (e.offsetParent != null)
+        offset += this.getOffsetTop(e.offsetParent);
+      return offset;
+    },
+    getOffsetLeft: function (e) {
+      var offset = e.offsetLeft;
+      if (e.offsetParent != null)
+        offset += this.getOffsetLeft(e.offsetParent);
+      return offset;
     }
   };
   if (typeof module == 'object' && module.exports) {

@@ -56,6 +56,18 @@ util = function (exports) {
       if (el && el.className) {
         el.className = el.className.replace(className, '');
       }
+    },
+    getOffsetTop: function (e) {
+      var offset = e.offsetTop;
+      if (e.offsetParent != null)
+        offset += this.getOffsetTop(e.offsetParent);
+      return offset;
+    },
+    getOffsetLeft: function (e) {
+      var offset = e.offsetLeft;
+      if (e.offsetParent != null)
+        offset += this.getOffsetLeft(e.offsetParent);
+      return offset;
     }
   };
   if (typeof module == 'object' && module.exports) {
@@ -1991,7 +2003,7 @@ infinite = function (exports) {
     },
     getCellByPageY: function (pageY) {
       var self = this;
-      var offsetY = pageY - self.renderTo.offsetTop + Math.abs(self.getOffsetTop());
+      var offsetY = pageY - Util.getOffsetTop(self.renderTo) + Math.abs(self.getOffsetTop());
       return self.getCellByOffsetY(offsetY);
     },
     getCellByRow: function (row) {
@@ -2022,6 +2034,7 @@ infinite = function (exports) {
     insertData: function (datasetIndex, rowIndex, data) {
       var self = this;
       if (data && datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0) {
+        return self.datasets[datasetIndex].data = self.datasets[datasetIndex].data.slice(0, rowIndex).concat(data).concat(self.datasets[datasetIndex].data.slice(rowIndex));
       }
       return;
     },
@@ -2105,7 +2118,7 @@ infinite = function (exports) {
       self._initSticky();
       var height = self.height;
       var lastItem = self.domInfo[self.domInfo.length - 1];
-      var containerHeight = lastItem && lastItem._top ? lastItem._top + lastItem._height : self.height;
+      var containerHeight = lastItem && lastItem._top !== undefined ? lastItem._top + lastItem._height : self.height;
       if (containerHeight < height) {
         containerHeight = height;
       }
@@ -2165,9 +2178,7 @@ infinite = function (exports) {
                 el.style[attrName] = elementsPos[i].style[attrName];
               }
             }
-            //performance
             el.style.visibility = 'visible';
-            //performance
             el.style.height = elementsPos[i]._height + 'px';
             el.style[transform] = 'translateY(' + elementsPos[i]._top + 'px) ' + translateZ;
             self.userConfig.renderHook.call(self, el, elementsPos[i]);
@@ -2291,7 +2302,6 @@ infinite = function (exports) {
         var tmp = [];
         for (var i = 0; i < self.infiniteLength; i++) {
           tmp.push({});
-          //performance
           self.infiniteElements[i].style.position = 'absolute';
           self.infiniteElements[i].style.top = 0;
           self.infiniteElements[i].style.visibility = 'hidden';

@@ -5,10 +5,10 @@
 			}
 			return to;
 		},
-		extend:function(superClass,subClass,attrs){
-			this.mix(subClass.prototype,superClass.prototype);
+		extend: function(superClass, subClass, attrs) {
+			this.mix(subClass.prototype, superClass.prototype);
 			subClass.prototype.super = superClass;
-			this.mix(subClass.prototype,attrs)
+			this.mix(subClass.prototype, attrs)
 		},
 		/*
         vendors
@@ -35,23 +35,33 @@
 			if (this.vendor === '') return style;
 			return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
 		},
-		hasClass:function(el,className){
+		hasClass: function(el, className) {
 			return el && el.className && el.className.indexOf(className) != -1;
 		},
-		addClass:function(el,className){
-			if(el && !this.hasClass(el,className)){
-				el.className += " "+className;
+		addClass: function(el, className) {
+			if (el && !this.hasClass(el, className)) {
+				el.className += " " + className;
 			}
 		},
-		removeClass:function(el,className){
-			if(el && el.className){
-				el.className = el.className.replace(className,"");
+		removeClass: function(el, className) {
+			if (el && el.className) {
+				el.className = el.className.replace(className, "");
 			}
+		},
+		getOffsetTop: function(e) {
+			var offset = e.offsetTop;
+			if (e.offsetParent != null) offset += this.getOffsetTop(e.offsetParent);
+			return offset;
+		},
+		getOffsetLeft: function(e) {
+			var offset = e.offsetLeft;
+			if (e.offsetParent != null) offset += this.getOffsetLeft(e.offsetParent);
+			return offset;
 		}
 	}
 
-	if(typeof module == 'object' && module.exports){
-        module.exports = Util;
-    }else{
-        return Util;
-    }
+	if (typeof module == 'object' && module.exports) {
+		module.exports = Util;
+	} else {
+		return Util;
+	}
