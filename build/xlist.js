@@ -58,7 +58,11 @@ util = function (exports) {
       }
     }
   };
-  exports = Util;
+  if (typeof module == 'object' && module.exports) {
+    exports = Util;
+  } else {
+    return Util;
+  }
   return exports;
 }({});
 _event_ = function (exports) {
@@ -80,16 +84,24 @@ _event_ = function (exports) {
       event.initEvent(type, true, true);
       Util.mix(event, args);
       tgt.dispatchEvent(event);
+    },
+    GESTURE_PREFIX: 'xs',
+    prefix: function (evt) {
+      return this.GESTURE_PREFIX + evt[0].toUpperCase() + evt.slice(1);
     }
   };
-  exports = Gesture;
+  if (typeof module == 'object' && module.exports) {
+    exports = Gesture;
+  } else {
+    return Gesture;
+  }
   return exports;
 }({});
 pan = function (exports) {
   var Util = util;
   var Event = _event_;
   var doc = window.document;
-  var PAN_START = 'panstart', PAN_END = 'panend', PAN = 'pan', MIN_SPEED = 0.35, MAX_SPEED = 8;
+  var PAN_START = Event.prefix('panstart'), PAN_END = Event.prefix('panend'), PAN = Event.prefix('pan'), MIN_SPEED = 0.35, MAX_SPEED = 8;
   var touch = {}, record = [];
   var startX = 0;
   var startY = 0;
@@ -240,16 +252,20 @@ pan = function (exports) {
     PAN_END: PAN_END,
     PAN: PAN
   };
-  exports = Pan;
+  if (typeof module == 'object' && module.exports) {
+    exports = Pan;
+  } else {
+    return Pan;
+  }
   return exports;
 }({});
 tap = function (exports) {
   var Util = util;
   var Event = _event_;
-  var TAP = 'tap';
-  var TAP_HOLD = 'tapHold';
-  var SINGLE_TAP = 'singleTap';
-  var DOUBLE_TAP = 'doubleTap';
+  var TAP = Event.prefix('tap');
+  var TAP_HOLD = Event.prefix('tapHold');
+  var SINGLE_TAP = Event.prefix('singleTap');
+  var DOUBLE_TAP = Event.prefix('doubleTap');
   var tap_max_touchtime = 250, tap_max_distance = 10, tap_hold_delay = 750, single_tap_delay = 200;
   var touches = [];
   var singleTouching = false;
@@ -396,14 +412,18 @@ tap = function (exports) {
     SINGLE_TAP: SINGLE_TAP,
     DOUBLE_TAP: DOUBLE_TAP
   };
-  exports = Tap;
+  if (typeof module == 'object' && module.exports) {
+    exports = Tap;
+  } else {
+    return Tap;
+  }
   return exports;
 }({});
 pinch = function (exports) {
   var Util = util;
   var Event = _event_;
   var doc = window.document;
-  var PINCH_START = 'gesturePinchStart', PINCH_END = 'gesturePinchEnd', PINCH = 'gesturePinch';
+  var PINCH_START = Event.prefix('pinchStart'), PINCH_END = Event.prefix('pinchEnd'), PINCH = Event.prefix('pinch');
   function getDistance(p1, p2) {
     var deltaX = p1.pageX - p2.pageX, deltaY = p1.pageY - p2.pageY;
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -455,7 +475,11 @@ pinch = function (exports) {
     PINCH: PINCH,
     PINCH_END: PINCH_END
   };
-  exports = Pinch;
+  if (typeof module == 'object' && module.exports) {
+    exports = Pinch;
+  } else {
+    return Pinch;
+  }
   return exports;
 }({});
 scrollbar = function (exports) {
@@ -642,7 +666,11 @@ scrollbar = function (exports) {
       self.scrollbar.style.opacity = 1;
     }
   });
-  exports = ScrollBar;
+  if (typeof module == 'object' && module.exports) {
+    exports = ScrollBar;
+  } else {
+    return ScrollBar;
+  }
   return exports;
 }({});
 _pulldown_ = function (exports) {
@@ -810,7 +838,11 @@ _pulldown_ = function (exports) {
       }
     }
   });
-  exports = PullDown;
+  if (typeof module == 'object' && module.exports) {
+    exports = PullDown;
+  } else {
+    return PullDown;
+  }
   return exports;
 }({});
 swipeedit = function (exports) {
@@ -947,7 +979,11 @@ swipeedit = function (exports) {
       }
     }
   });
-  exports = SwipeEdit;
+  if (typeof module == 'object' && module.exports) {
+    exports = SwipeEdit;
+  } else {
+    return SwipeEdit;
+  }
   return exports;
 }({});
 core = function (exports) {
@@ -1799,8 +1835,11 @@ core = function (exports) {
       return plugins.length > 1 ? plugins : plugins[0] || null;
     }
   });
-  window.XScroll = XScroll;
-  exports = XScroll;
+  if (typeof module == 'object' && module.exports) {
+    exports = XScroll;
+  } else {
+    return window.XScroll = XScroll;
+  }
   return exports;
 }({});
 dataset = function (exports) {
@@ -1838,7 +1877,11 @@ dataset = function (exports) {
   DataSet.prototype.getId = function () {
     return this.id;
   };
-  exports = DataSet;
+  if (typeof module == 'object' && module.exports) {
+    exports = DataSet;
+  } else {
+    return DataSet;
+  }
   return exports;
 }({});
 infinite = function (exports) {

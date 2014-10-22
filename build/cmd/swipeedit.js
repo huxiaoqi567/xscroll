@@ -133,5 +133,11 @@ define(function(require, exports, module) {
 		}
 	});
 
-	module.exports = SwipeEdit;
+	if(typeof module == 'object' && module.exports){
+		module.exports = SwipeEdit;
+	}else{
+		return SwipeEdit;
+	}
+
+	
 });

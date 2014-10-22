@@ -485,13 +485,9 @@
 			maxScale:1.2,
 		});
 
-
 		xscroll.render();
-
 		var minScale = xscroll.minScale;
 		var maxScale = xscroll.maxScale;
-
-
         var row = new XScroll({
         	renderTo:"#row",
         	scalable:true,
@@ -499,22 +495,15 @@
         	scrollbarX:false,
         	scrollbarY:false
         })
-
-
         row.render()
-
-
         xscroll.on("scroll",function(e){
         	row.scrollY(-e.offset.y);
         })
-
         xscroll.on("scale",function(e){
         	if(e.triggerEvent == "pinch"){
         		row.scaleTo(e.scale,0.5,e.origin.y);
         	}
-        	
         })
-
         xscroll.on("scaleanimate",function(e){
         	row.scaleTo(e.scale,0.5,e.origin.y,e.duration);
         })
@@ -525,8 +514,10 @@
         var indicator = doc.getElementById("indicator"),
         	zoomer = doc.querySelector(".zoomer"); 
         	indicator.style.display = "block";
-        var width = indicator.offsetWidth;
-        var height = indicator.offsetHeight;
+        var padding = 8;
+        //inner size
+        var width = indicator.offsetWidth - padding;
+        var height = indicator.offsetHeight - padding;
         indicator.style.display = "none";
         function updateIndicator(e){
         	indicator.style.display = "block";

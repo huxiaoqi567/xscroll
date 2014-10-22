@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>scroll-x</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+    *{
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-text-size-adjust: none;
+    }
+
+    html{
+        font-size: 12px;
+    }
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    #J_Scroll{
+        left:2rem;
+        right: 2rem;
+        top:0px;
+        position: absolute;
+        height: 4rem;
+        overflow: hidden;
+    }
+    #J_Scroll ul{
+        white-space: nowrap;
+        position: absolute;
+        height: 100%;
+        font-size: 0;
+    }
+    #J_Scroll ul li{
+        display: inline-block;
+        width: 10rem;
+        text-align: center;
+        line-height: 4rem;
+        height: 4rem;
+        color:#000;
+        font-size: 1rem;
+        background: #f7f7f7;
+    }
+     #J_Scroll ul li.cur{
+        color:#5bc0de;
+        background: #fff;
+        font-weight: bold;
+     }
+    .xs-container{
+        width: 100%;
+        height: 100%;
+
+    }
+    .prev,.next{
+        display: block;
+        position: absolute;
+        width: 2rem;
+        height: 4rem;
+        top:0;
+        text-decoration: none;
+        background: #fff;
+        line-height: 4rem;
+        text-align: center;
+        background: #eee;
+        color:#5bc0de;
+        font-weight: bold;
+    }
+    .prev{
+        left:0;
+    }
+    .next{
+        right: 0;
+    }
+    .disable{
+        color:#ccc;
+    }
+
+    </style>
+        <a href="#" class="prev">&lt;</a>
+        <a href="#" class="next">&gt;</a>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content nav nav-pills nav-justified">
+                <li class="cur">Home</li>
+                <li>Profile</li>
+                <li>Messages</li>
+                <li>Settings</li>
+                <li>Favourite</li>
+                <li>More</li>
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript" src="../build/xscroll.js"></script>
+    <script>
+        var xscroll = new XScroll({
+            renderTo:"#J_Scroll",
+            scrollbarY:false,
+            scrollbarX:false,
+            lockY:true
+        });
+        xscroll.render();
+        var menuWidth = document.querySelector("#J_Scroll li").offsetWidth;
+        var curIndex = 0;
+        //click to move
+        xscroll.renderTo.addEventListener("tap",function(e){
+            var offsetX = xscroll.getOffsetLeft();
+            var index = Math.floor((e.pageX+Math.abs(offsetX))/menuWidth);
+            switchTo(index);
+        });
+
+        
+
+        var prev = document.querySelector(".prev");
+        var next = document.querySelector(".next");
+        prev.addEventListener("touchstart",prevTo);
+        next.addEventListener("touchstart",nextTo);
+
+        var menus =  document.querySelectorAll("#J_Scroll li");
+        switchTo(0)
+        function switchTo(index){
+            if(index < 0 || index > menus.length - 1) return;
+            if(index == 0){
+                prev.className = !/disable/.test(prev.className) ? prev.className + " disable" : prev.className;
+                next.className = next.className.replace(/disable/,"");
+            }else if(index == menus.length - 1){
+                 next.className = !/disable/.test(next.className) ? next.className + " disable" : next.className;
+                prev.className = prev.className.replace(/disable/,"");
+            }
+            for(var i in menus){
+                menus[i].className = "";
+            }
+            menus[index].className = "cur";
+            var offset = index * menuWidth;
+            if(offset < 0){
+                offset = 0;
+            }else if(offset > xscroll.containerWidth - xscroll.width){
+                offset = xscroll.containerWidth - xscroll.width
+            }
+            xscroll.scrollX(offset,200)
+            curIndex = index;
+        }
+
+        function prevTo(){
+            if(curIndex <= 0){
+                switchTo(curIndex);
+                return;
+            }
+            curIndex --;
+            switchTo(curIndex);
+        }
+
+        function nextTo(){
+            if(curIndex >= menus.length - 1) {
+                switchTo(curIndex);
+                return;
+            }
+            curIndex ++;
+            switchTo(curIndex);
+        }
+
+
+
+
+
+    </script>
+</body>
+</html>

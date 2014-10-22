@@ -1,10 +1,10 @@
 define(function(require, exports, module) {
     var Util = require('./util');
     var Event = require("./event");
-    var TAP = "tap";
-    var TAP_HOLD = "tapHold";
-    var SINGLE_TAP = "singleTap";
-    var DOUBLE_TAP = "doubleTap";
+    var TAP = Event.prefix("tap");
+    var TAP_HOLD = Event.prefix("tapHold");
+    var SINGLE_TAP = Event.prefix("singleTap");
+    var DOUBLE_TAP = Event.prefix("doubleTap");
     var tap_max_touchtime = 250,
         tap_max_distance = 10,
         tap_hold_delay = 750,
@@ -167,7 +167,11 @@ define(function(require, exports, module) {
         DOUBLE_TAP:DOUBLE_TAP
     };
 
-    module.exports = Tap;
+    if(typeof module == 'object' && module.exports){
+        module.exports = Tap;
+    }else{
+        return Tap;
+    }
 
 
 });

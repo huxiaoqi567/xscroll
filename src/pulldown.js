@@ -167,4 +167,9 @@
 		}
 	})
 
-	module.exports = PullDown;
+	if(typeof module == 'object' && module.exports){
+		module.exports = PullDown;
+	}else{
+		return PullDown;
+	}
+	

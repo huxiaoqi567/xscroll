@@ -183,5 +183,9 @@
 		}
 	});
 
-	module.exports = ScrollBar;
+	if(typeof module == 'object' && module.exports){
+		module.exports = ScrollBar;
+	}else{
+		return ScrollBar;
+	}
 

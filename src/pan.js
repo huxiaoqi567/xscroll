@@ -1,9 +1,9 @@
 	var Util = require('./util');
 	var Event = require("./event");
 	var doc = window.document;
-	var PAN_START = 'panstart',
-		PAN_END = 'panend',
-		PAN = 'pan',
+	var PAN_START = Event.prefix('panstart'),
+		PAN_END = Event.prefix('panend'),
+		PAN = Event.prefix('pan'),
 		MIN_SPEED = 0.35,
 		MAX_SPEED = 8;
 	var touch = {}, record = [];
@@ -166,5 +166,10 @@
 		PAN:PAN
 	};
 
-	module.exports = Pan;
+	if(typeof module == 'object' && module.exports){
+		module.exports = Pan;
+	}else{
+		return Pan;
+	}
+	
 

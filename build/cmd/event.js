@@ -17,7 +17,16 @@ define(function(require, exports, module) {
 			event.initEvent(type, true, true);
 			Util.mix(event, args);
 			tgt.dispatchEvent(event);
+		},
+		GESTURE_PREFIX:"xs",
+		prefix:function(evt){
+			return this.GESTURE_PREFIX + evt[0].toUpperCase() + evt.slice(1);
 		}
 	};
 
-	module.exports = Gesture;});
+	if(typeof module == 'object' && module.exports){
+		module.exports = Gesture;
+	}else{
+		return Gesture;
+	}
+	});

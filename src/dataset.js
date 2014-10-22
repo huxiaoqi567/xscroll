@@ -41,6 +41,11 @@
 	DataSet.prototype.getId = function(){
 		return this.id;
 	};
-
-	module.exports = DataSet;
+	
+	if(typeof module == 'object' && module.exports){
+		module.exports = DataSet;
+	}else{
+		return DataSet;
+	}
+	
 

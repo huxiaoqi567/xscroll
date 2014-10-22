@@ -1,6 +1,5 @@
 define(function(require, exports, module) {
 	var Util = {
-
 		mix: function(to, from) {
 			for (var i in from) {
 				to[i] = from[i];
@@ -51,5 +50,10 @@ define(function(require, exports, module) {
 			}
 		}
 	}
-	module.exports = Util;
+
+	if(typeof module == 'object' && module.exports){
+        module.exports = Util;
+    }else{
+        return Util;
+    }
 });

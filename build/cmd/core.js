@@ -832,9 +832,13 @@ define(function(require, exports, module) {
         }
     });
 
+   if(typeof module == 'object' && module.exports){
+        module.exports = XScroll;
+   }else{
+        return window.XScroll = XScroll;
+   }
+  
 
-   window.XScroll = XScroll;
-
-   module.exports = XScroll;
+   
 
 });
