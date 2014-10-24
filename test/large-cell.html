@@ -22,8 +22,8 @@
     }
      #J_Scroll{
         position: absolute;
-        top:45px;
-        bottom: 48px;
+        top:0px;
+        bottom: 0px;
         width:100%;
      }
     #J_Scroll ul{
@@ -36,7 +36,6 @@
         width: 100%;
     }
     </style>
-    <div id="header">XList</div>
     <div id="J_Scroll">
         <div class="xs-container">
             <ul class="xs-content">
@@ -127,7 +126,6 @@
             </ul>
         </div>
     </div>
-    <div id="footer">infinity-scroll</div>
     <script type="text/javascript" src="../build/xlist.js"></script>
     <script type="text/javascript">
         var data = (function() {
@@ -135,7 +133,10 @@
             for (var i = 1; i <= 1; i++) {
                 tmp.push({
                     data:{num: i},
-                    recycled:true
+                    recycled:true,
+                    style:{
+                        background:"red"
+                    }
                 })
             }
             return tmp
@@ -143,7 +144,7 @@
         var xlist = new XList({
             renderTo: "#J_Scroll",
             data: data,
-            itemHeight: 500 ,
+            itemHeight: 840 ,
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,data){
                 el.innerText = data.data.num;
