@@ -95,3 +95,43 @@ body {
         text-align: center;
 }
 
+
+.lbl-ctn{
+        width: 100%;
+        position: absolute;
+        -webkit-transform:translateX(0) translateZ(0);
+         background: #fff;
+          z-index: 1;
+    }
+
+    .lbl{
+        width: 100%;
+        display: inline-block;
+        vertical-align: top;
+        text-align: center;
+        position: absolute;
+        background: #fff;
+        z-index: 1;
+        left: 0;
+    }
+    .control{
+        position:absolute;
+        white-space: nowrap;
+        width: 40%;
+        z-index:0;
+        right:0;
+    }
+    .btn{
+        display: inline-block;
+        color:#fff;width:50%;text-align:center;
+    }
+    .btn-delete{
+        background:red;
+    }
+    .btn-mark{
+        background: #ccc;
+    }
+    .btn-marked{
+        background: green;
+    }
+

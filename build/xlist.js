@@ -1507,7 +1507,7 @@ core = function (exports) {
       ];
       var Type = type.toUpperCase();
       //if dest value is equal to current value then return.
-      if (duration <= 0) {
+      if (duration <= 0 || dest == offset[type]) {
         self.fire(SCROLL, {
           zoomType: type,
           offset: offset
@@ -1639,7 +1639,6 @@ core = function (exports) {
           self.stop();
         }
       }).on(renderTo, Tap.TAP, function (e) {
-        self.boundryCheck();
         if (!self.isScrollingX && !self.isScrollingY) {
           simulateMouseEvent(e, 'click');
           self._fireClick('click', e);
@@ -1993,6 +1992,8 @@ swipeedit = function (exports) {
     pluginDestructor: function (xlist) {
     },
     getTransformX: function (el) {
+      if (!el)
+        return '';
       var trans = getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
       return trans ? trans[4] / 1 : 0;
     },
@@ -2003,6 +2004,8 @@ swipeedit = function (exports) {
       xlist.on('panstart', function (e) {
         hasSlided = false;
         lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
+        if (!lbl)
+          return;
         startX = self.getTransformX(lbl);
         lbl.style[transition] = 'none';
         if (Math.abs(startX) > 0 && !isSliding) {
@@ -2010,6 +2013,8 @@ swipeedit = function (exports) {
         }
       });
       xlist.on('pan', function (e) {
+        if (!lbl)
+          return;
         if (e.touch.directionX == 'left') {
           self.slideAllExceptRow(e.cell._row);
         }
@@ -2026,12 +2031,14 @@ swipeedit = function (exports) {
             return;
           }
           lbl.style[transition] = 'none';
-          lbl.style[transform] = 'translateX(' + left + 'px) translateZ(0)';
+          lbl.style[transform] = 'translateX(' + left + 'px)';
         } else if (!isLocked) {
           xlist.userConfig.lockY = false;
         }
       });
       xlist.on('panend', function (e) {
+        if (!lbl)
+          return;
         isLocked = false;
         var cpt = self.getTransformX(lbl);
         if (e.touch.directionX == 'left' && Math.abs(e.velocityX) > acc) {
@@ -2056,7 +2063,7 @@ swipeedit = function (exports) {
       var el = cell.element.querySelector(self.userConfig.labelSelector);
       if (!el || !el.style)
         return;
-      el.style[transform] = 'translateX(-' + self.userConfig.width + 'px) translateZ(0)';
+      el.style[transform] = 'translateX(-' + self.userConfig.width + 'px) ';
       el.style[transition] = transformStr + ' 0.15s ease';
       xlist.getData(0, row).data.status = 'delete';
     },
@@ -2068,7 +2075,7 @@ swipeedit = function (exports) {
       var el = cell.element.querySelector(self.userConfig.labelSelector);
       if (!el || !el.style)
         return;
-      el.style[transform] = 'translateX(0) translateZ(0)';
+      el.style[transform] = 'translateX(0)';
       el.style[transition] = transformStr + ' 0.5s ease';
       xlist.getData(0, row).data.status = '';
     },
@@ -2087,7 +2094,6 @@ swipeedit = function (exports) {
       var self = this;
       for (var i in xlist.infiniteElementsCache) {
         if (row != xlist.infiniteElementsCache[i]._row || undefined === row) {
-          self.slideRight(xlist.infiniteElementsCache[i]._row);
         }
       }
     }

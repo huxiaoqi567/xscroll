@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>menu-x</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="demo.css">
+</head>
+<body>
+    <style type="text/css">
+    *{
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-text-size-adjust: none;
+    }
+
+    html{
+        font-size: 12px;
+    }
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    #J_MenuX{
+        left:2rem;
+        right: 2rem;
+        top:0px;
+        position: absolute;
+        height: 4rem;
+        overflow: hidden;
+    }
+    #J_MenuX ul{
+        white-space: nowrap;
+        position: absolute;
+        height: 100%;
+        font-size: 0;
+    }
+    #J_MenuX ul li{
+        display: inline-block;
+        width: 10rem;
+        text-align: center;
+        line-height: 4rem;
+        height: 4rem;
+        color:#000;
+        font-size: 1rem;
+        background: #f7f7f7;
+    }
+     #J_MenuX ul li.cur{
+        color:#5bc0de;
+        background: #fff;
+        font-weight: bold;
+     }
+    .xs-container{
+        width: 100%;
+        height: 100%;
+
+    }
+    .prev,.next{
+        display: block;
+        position: absolute;
+        width: 2rem;
+        height: 4rem;
+        top:0;
+        text-decoration: none;
+        background: #fff;
+        line-height: 4rem;
+        text-align: center;
+        background: #eee;
+        color:#5bc0de;
+        font-weight: bold;
+    }
+    .prev{
+        left:0;
+    }
+    .next{
+        right: 0;
+    }
+    .disable{
+        color:#ccc;
+    }
+
+    #J_MenuY{
+        left:0;
+        top:4rem;
+        bottom:0;
+        width: 30%;
+        position: absolute;
+        overflow: hidden;
+    }
+    #J_MenuY ul{
+        white-space: nowrap;
+        position: absolute;
+        font-size: 0;
+        width: 100%;
+    }
+    #J_MenuY ul li{
+        display: block;
+        width: 100%;
+        text-align: center;
+        line-height: 6rem;
+        height: 6rem;
+        color:#000;
+        font-size: 1rem;
+        background: #f7f7f7;
+    }
+     #J_MenuY ul li.cur{
+        color:#5bc0de;
+        background: #fff;
+        font-weight: bold;
+     }
+
+     #J_List{
+        width: 70%;
+        position: absolute;
+        right: 0;
+        top:4rem;
+        bottom: 0;
+        overflow: hidden;
+     }
+     #J_List .xs-container{
+        top:0;
+     }
+     #J_List .xs-content{
+        width: 100%;
+     }
+     #J_List .xs-content li{
+        border:1px solid #ccc;
+        /*display: none;*/
+        height:70;
+        line-height:70px;
+        width:100%;
+        white-space: nowrap;
+       text-decoration: none;
+       color:#666;
+       text-align: center;
+     }
+     #J_List .content-title{
+         height:50;
+         display: none;
+        line-height:50px;
+        text-align: center;
+        width:100%;
+        white-space: nowrap;
+       text-decoration: none;
+       color:#fff;
+       background:#5bc0de;
+     }
+
+     #J_List .btn{
+        width: 100%;
+     }
+    </style>
+        <a href="#" class="prev">&lt;</a>
+        <a href="#" class="next">&gt;</a>
+    <div id="J_MenuX">
+        <div class="xs-container">
+            <ul class="xs-content nav nav-pills nav-justified">
+                <li class="cur">Home</li>
+                <li>Profile</li>
+                <li>Messages</li>
+                <li>Settings</li>
+                <li>Favourite</li>
+                <li>More</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="J_MenuY">
+        <div class="xs-container">
+            <ul class="xs-content nav nav-pills nav-justified">
+                <li class="cur">Home</li>
+                <li>Demo</li>
+                <li>Application</li>
+                <li>Document</li>
+                <li>Profile</li>
+                <li>Messages</li>
+                <li>Settings</li>
+                <li>Favourite</li>
+                <li>Link</li>
+                <li>More</li>
+                <li>Detail</li>
+                <li>About</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="J_List">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+                <li class="xs-row"></li>
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript" src="../lib/jquery.js"></script>
+    <script type="text/javascript" src="../build/xlist.js"></script>
+    <script type="text/javascript" src="./menu-x.js"></script>
+    <script type="text/javascript" src="./menu-y.js"></script>
+    <script>
+        
+        var menux = new menuX("#J_MenuX");
+
+
+
+        var menuy = new menuY("#J_MenuY");
+
+
+
+
+        var pageCache ={};
+        var page = 1;
+        var totalPage = 10;
+        var ds = new XList.DataSet();
+
+        var xlist = new XList({
+            renderTo:"#J_List",
+            infiniteElements:"#J_List .xs-row",
+            itemHeight:70,
+            SROLL_ACCELERATION:0.002,
+            renderHook:function(el,row){
+                var html = '';
+                if(row.data.type == "normal"){
+                    html = '<div class="lbl">'+row.data.text+'</div>'+
+                                '<div class="control">'+
+                                '<div class="btn btn-delete">delete</div></div>'
+                }else{
+                    !el.className.match(/content-title/)?el.className+=" content-title":"";
+                    html = row.data.text;
+                }
+                el.innerHTML = html;
+            }
+        });
+         xlist.appendDataSet(ds);
+
+        xlist.plug(new XList.Plugin.PullDown());
+
+        var maxWidth = xlist.renderTo.offsetWidth * 0.4;
+
+        var swipeEditPlugin = new XList.Plugin.SwipeEdit({
+            labelSelector:".lbl",
+            width:maxWidth
+        })
+
+        xlist.plug(swipeEditPlugin);
+
+         //delete 
+       xlist.on("click",function(e){
+            if(e.target.className.match("btn-delete")){
+               xlist.removeData(0,e.cell._row)
+               xlist.render();
+            }
+       })
+
+       xlist.on("click", function(e) {
+            if(!e.target.parentNode.className.match('control')){
+                swipeEditPlugin.slideAllExceptRow();
+            }
+        })
+
+       var pullup = new XList.Plugin.PullUp({
+            bufferHeight:100
+        });
+
+        xlist.plug(pullup);
+
+        pullup.on("loading",function(){
+            getData()
+        });
+
+        xlist.render();
+
+         getData();
+
+
+        document.querySelector("#J_MenuY").addEventListener("click",function(e){
+            console.log(e)
+
+        })
+
+        var menus = document.querySelectorAll("#J_MenuY li");
+
+        function getData(){
+            if(!pageCache[page]){
+                pageCache[page] = 1;
+                $.ajax({
+                    url:"./list.json",
+                    dataType:"json",
+                    success:function(data){
+                        if(page > totalPage) {
+                            pullup.reset();
+                            xlist.unplug(pullup);
+                            return; 
+                        };
+                        data[0].data.text = menus[page-1].innerHTML;
+                        ds.appendData(data);
+                        xlist.render();
+                         //loading complate
+                        pullup.complete();
+                        page++;
+                    }
+                })
+            }
+        }
+    </script>
+</body>
+</html>

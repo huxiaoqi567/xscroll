@@ -470,7 +470,7 @@
             var directions = type == "x" ? ["left","right"]:["top","bottom"];
              var Type = type.toUpperCase();
             //if dest value is equal to current value then return.
-            if (duration <= 0) {
+            if (duration <= 0 || dest == offset[type]) {
                 self.fire(SCROLL, {
                     zoomType: type,
                     offset: offset
@@ -600,7 +600,6 @@
                     self.stop();
                 }
             }).on(renderTo, Tap.TAP, function(e) {
-                self.boundryCheck();
                 if (!self.isScrollingX && !self.isScrollingY) {
                     simulateMouseEvent(e, "click");
                     self._fireClick("click", e);

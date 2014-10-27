@@ -42,49 +42,6 @@
     .xs-container{
         width: 100%;
     }
-    .lbl-ctn{
-        width: 100%;
-        position: absolute;
-        -webkit-transform:translateX(0) translateZ(0);
-         background: #fff;
-          z-index: 1;
-    }
-
-    .lbl{
-        width: 100%;
-        display: inline-block;
-        vertical-align: top;
-        text-align: center;
-        position: absolute;
-        background: #fff;
-        z-index: 1;
-    }
-    #J_Scroll ul li.active{
-        background: #eee;
-    }
-    #J_Scroll ul li.no-active{
-        background: #fff;
-    }
-    .control{
-        position:absolute;
-        white-space: nowrap;
-        width: 40%;
-        z-index:0;
-        right:0;
-    }
-    .btn{
-        display: inline-block;
-        color:#fff;width:50%;text-align:center;
-    }
-    .btn-delete{
-        background:red;
-    }
-    .btn-mark{
-        background: #ccc;
-    }
-    .btn-marked{
-        background: green;
-    }
     </style>
     <div id="header">XList</div>
     <div id="J_Scroll">
@@ -197,7 +154,6 @@
                 if(!e.target.parentNode.className.match('control')){
                     swipeEditPlugin.slideAllExceptRow();
                 }
-            
         })
 
        xlist.render();

@@ -34,6 +34,7 @@ define(function(require, exports, module) {
 			
 		},
 		getTransformX: function(el) {
+			if(!el) return '';
 			var trans = getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
 			return trans ? trans[4] / 1 : 0;
 		},
@@ -44,6 +45,7 @@ define(function(require, exports, module) {
 			xlist.on("panstart", function(e) {
 				hasSlided = false;
 				lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
+				if(!lbl) return;
 				startX = self.getTransformX(lbl);
 				lbl.style[transition] = "none";
 				if (Math.abs(startX) > 0 && !isSliding) {
@@ -52,6 +54,7 @@ define(function(require, exports, module) {
 			})
 
 			xlist.on("pan", function(e) {
+				if(!lbl) return;
 				if (e.touch.directionX == "left") {
 					self.slideAllExceptRow(e.cell._row);
 				}
@@ -68,13 +71,14 @@ define(function(require, exports, module) {
 						return;
 					}
 					lbl.style[transition] = "none";
-					lbl.style[transform] = "translateX(" + left + "px) translateZ(0)"
+					lbl.style[transform] = "translateX(" + left + "px)"
 				} else if (!isLocked) {
 					xlist.userConfig.lockY = false;
 				}
 			})
 
 			xlist.on("panend", function(e) {
+				if(!lbl) return;
 				isLocked = false;
 				var cpt = self.getTransformX(lbl);
 				if (e.touch.directionX == "left" && Math.abs(e.velocityX) > acc) {
@@ -101,7 +105,7 @@ define(function(require, exports, module) {
 			if (!cell || !cell.element) return;
 			var el = cell.element.querySelector(self.userConfig.labelSelector);
 			if (!el || !el.style) return;
-			el.style[transform] = "translateX(-" + self.userConfig.width + "px) translateZ(0)";
+			el.style[transform] = "translateX(-" + self.userConfig.width + "px) ";
 			el.style[transition] = transformStr+" 0.15s ease";
 			xlist.getData(0, row).data.status = "delete";
 		},
@@ -111,7 +115,7 @@ define(function(require, exports, module) {
 			if (!cell || !cell.element) return;
 			var el = cell.element.querySelector(self.userConfig.labelSelector);
 			if (!el || !el.style) return;
-			el.style[transform] = "translateX(0) translateZ(0)";
+			el.style[transform] = "translateX(0)";
 			el.style[transition] = transformStr+" 0.5s ease";
 			xlist.getData(0, row).data.status = "";
 		},
@@ -130,7 +134,7 @@ define(function(require, exports, module) {
 			var self = this;
 			for (var i in xlist.infiniteElementsCache) {
 				if (row != xlist.infiniteElementsCache[i]._row || undefined === row) {
-					self.slideRight(xlist.infiniteElementsCache[i]._row);
+					// self.slideRight(xlist.infiniteElementsCache[i]._row);
 				}
 			}
 		}
