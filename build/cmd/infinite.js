@@ -3,6 +3,8 @@ define(function(require, exports, module) {
 	var XScroll = require('./core');
 	var DataSet = require('./dataset');
 	var SwipeEdit = require('./swipeedit');
+	var PullUp = require('./pullup');
+	var PullDown = require('./pulldown');
 	var transform = Util.prefixStyle("transform");
 	var PAN_END = "panend";
     var PAN_START = "panstart";
@@ -10,8 +12,13 @@ define(function(require, exports, module) {
 	var XList = function(cfg) {
 		this.super.call(this, cfg)
 	}
+	//namespace for plugins
+	XList.Plugin = {
+		SwipeEdit:SwipeEdit,
+		PullUp:PullUp,
+		PullDown:PullDown
+	};
 	XList.DataSet = DataSet;
-	XList.SwipeEdit = SwipeEdit;
 	Util.extend(XScroll, XList, {
 		init: function() {
 			var self = this;
@@ -223,7 +230,7 @@ define(function(require, exports, module) {
 				containerHeight = height;
 			}
 			self.containerHeight = containerHeight;
-			self.container.style.height = containerHeight;
+			self.container.style.height = containerHeight + "px";
 			self.renderScrollBars();
 			//渲染非回收元素
 			self._renderNoRecycledEl();

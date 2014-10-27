@@ -117,49 +117,61 @@
 
         var pageCache ={};
 
-        
         var xlist = new XList({
             renderTo: "#J_Scroll",
-            itemHeight: 40 ,
+            itemHeight: 50 ,
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,data){
                 el.innerText = data.data.num;
             }
         });
-        
 
+        var ds = new XList.DataSet();
+
+        xlist.appendDataSet(ds);
 
         var page = 1;
+
+        var totalPage = 10;
+
         var getData = function(){
             if(!pageCache[page]){
                 pageCache[page] = 1;
-                var ds = new XList.DataSet();
                 $.ajax({
                     url:"./data.json",
                     dataType:"json",
                     success:function(data){
+                        if(page > totalPage) {
+                            pullup.reset();
+                            xlist.unplug(pullup);
+                            return; 
+                        };
                         ds.appendData(data);
-                        xlist.appendDataSet(ds);
                         xlist.render();
+                         //loading complate
+                        pullup.complete();
                         page++;
                     }
                 })
             }
         }
-        xlist.on("scroll",function(e){
-            if(e.offset.y<0 && Math.abs(e.offset.y)>=xlist.containerHeight-xlist.height  ){
-                getData();
-            }
-        })
 
+        var pullup = new XList.Plugin.PullUp({
+            upContent:"上拉加载更多",
+            downContent:"释放加载更多",
+            loadingContent:"加载中...",
+            bufferHeight:100,
+        });
 
+        xlist.plug(pullup);
 
-        getData()
+        pullup.on("loading",function(){
+            getData();
+        });
+
+        getData();
 
         xlist.render();
-
-
-        
 
     </script>
 </body>

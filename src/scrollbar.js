@@ -3,7 +3,7 @@
 	//最短滚动条高度
 	var MIN_SCROLLBAR_SIZE = 60;
 	//滚动条被卷去剩下的最小高度
-	var BAR_MIN_SIZE = 5;
+	var BAR_MIN_SIZE = 25;
 	//transform
     var transform = Util.prefixStyle("transform");
 
@@ -13,15 +13,6 @@
 
     var borderRadius = Util.prefixStyle("borderRadius");
 
-    var events = [
-		// "scale",
-		// "afterContainerHeightChange",
-		// "afterContainerWidthChange",
-		// "afterWidthChange",
-		// "afterHeightChange",
-		// "refresh"
-		];
-
 	var ScrollBar = function(cfg){
 		this.userConfig = cfg;
     	this.init(cfg.xscroll);
@@ -30,28 +21,11 @@
 	Util.mix(ScrollBar.prototype,{
 		init:function(xscroll){
 			var self = this;
-			// "offsetTop": {
-
-			// },
-			// "containerSize": {
-			// 	value: 0
-			// },
-			// "indicateSize": {
-			// 	value: 0
-			// },
-			// "barSize": {
-			// 	value: 0
-			// },
-			// "barOffset": {
-			// 	value: 0
-			// }
-			// self.userConfig = S.merge({
-			// 	type:"y"
-			// }, self.userConfig);
 			self.xscroll = xscroll;
 				self.type = self.userConfig.type;
 				self.isY = self.type == "y" ? true : false;
-				self.containerSize = self.isY ? self.xscroll.containerHeight:self.xscroll.containerWidth;
+				var boundry = self.xscroll.boundry;
+				self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom:self.xscroll.containerWidth + boundry._xright + boundry._xleft;
 				self.indicateSize= self.isY ? self.xscroll.height:self.xscroll.width;
 				self.offset = self.xscroll.getOffset();
 				self.render();
@@ -80,7 +54,7 @@
 			xscroll.renderTo.appendChild(self.scrollbar);
 			var size = self.isY ? "width:100%;":"height:100%;";
 			self.indicate = document.createElement("div");
-			self.indicate.style.cssText = size+"position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:1.5px;-moz-border-radius:1.5px;-o-border-radius:1.5px;"
+			self.indicate.style.cssText = size+"position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"
 			self.scrollbar.appendChild(self.indicate);
 			self._update();
 		},
@@ -89,7 +63,7 @@
 			var offset = offset || self.xscroll.getOffset();
 			var barInfo = self.computeScrollBar(offset);
 			var size = self.isY ? "height":"width";
-			self.indicate.style[size] = barInfo.size + "px";
+			self.indicate.style[size] = Math.round(barInfo.size) + "px";
 			if(duration && easing){
 				self.scrollTo(barInfo.offset,duration,easing);
 			}else{
@@ -100,36 +74,41 @@
 		computeScrollBar: function(offset) {
 			var self = this;
 			var type = self.isY ? "y" : "x";
-			var offset = offset && -offset[type];
-			self.containerSize = self.isY ? self.xscroll.containerHeight:self.xscroll.containerWidth;
-			self.indicateSize = self.isY ? self.xscroll.height:self.xscroll.width;
+			var offset = Math.round(offset && -offset[type]);
+			var spacing = 10;
+			var boundry = self.xscroll.boundry;
+			self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom:self.xscroll.containerWidth + boundry._xright + boundry._xleft;
+			//视区尺寸
+			self.size = self.isY ? self.xscroll.height : self.xscroll.width;
+			self.indicateSize = self.isY ? self.xscroll.height - spacing:self.xscroll.width - spacing;
 			//滚动条容器高度
 			var indicateSize = self.indicateSize;
 			var containerSize = self.containerSize;
+			//offset bottom/right
+			var offsetout = self.containerSize - self.size;
 			var ratio = offset / containerSize;
-			var barOffset = indicateSize * ratio;
-			var barSize = indicateSize * indicateSize / containerSize;
-			var _barOffset = barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize
+			var barOffset = Math.round(indicateSize * ratio);
+			var barSize = Math.round(indicateSize * indicateSize / containerSize);
+			var _barOffset = Math.round(barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize);
 			if (barSize < MIN_SCROLLBAR_SIZE) {
 				barSize = MIN_SCROLLBAR_SIZE;
 				barOffset = _barOffset;
 			}
-			//顶部回弹
 			if (barOffset < 0) {
 				barOffset = Math.abs(offset) * barSize/ MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE ? BAR_MIN_SIZE - barSize : offset * barSize / MIN_SCROLLBAR_SIZE;
-			} else if (barOffset + barSize > indicateSize) {
-				//底部回弹
-				var _offset = offset - containerSize + indicateSize;
-				if (_offset * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
-					barOffset = indicateSize - BAR_MIN_SIZE;
+			} else if (barOffset + barSize > indicateSize && offset - offsetout > 0) {
+				var _offset = offset - containerSize + indicateSize + spacing;
+				if (_offset * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE ) {
+					barOffset = indicateSize + spacing - BAR_MIN_SIZE ;
 				} else {
-					barOffset = indicateSize - barSize + _offset * barSize / MIN_SCROLLBAR_SIZE;
+					barOffset = indicateSize + spacing - barSize + _offset * barSize / MIN_SCROLLBAR_SIZE ;
 				}
+
 			}
-			self.barOffset =barOffset;
-			var result = {size: barSize};
+			self.barOffset =Math.round(barOffset);
+			var result = {size: Math.round(barSize)};
 			var _offset = {};
-			_offset[type] = barOffset;
+			_offset[type] = self.barOffset;
 			result.offset = _offset;
 			return result;
 		},
@@ -161,11 +140,6 @@
 				if(e.zoomType != type) return;
 				self._update(e.offset,e.duration,e.easing);
 			})
-
-			// for(var i in events){
-			// 	self.xscroll.on(events[i],function(e){self._update();})
-			// }
-			
 		},
 		reset:function(){
 			var self = this;

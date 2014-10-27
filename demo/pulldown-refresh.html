@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>PullDown Refresh</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="demo.css">
 </head>
@@ -10,7 +10,6 @@
     <style type="text/css">
 #J_Scroll li{
     padding: 0 10px;
-
     height: 40px;
     line-height: 40px;
     border-bottom: 1px solid #ccc;
@@ -132,15 +131,13 @@
             lockX:true
         });
 
-        
-
-        var pulldown = new XScroll.PullDown({
-            xscroll:xscroll,
+        var pulldown = new XScroll.Plugin.PullDown({
             autoRefresh:false
         });
 
+        xscroll.plug(pulldown);
+
         pulldown.on("loading",function(e){
-            console.log("loading start")
           $.ajax({
                     url:"./data.json",
                     dataType:"json",

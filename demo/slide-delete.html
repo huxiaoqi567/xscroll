@@ -166,16 +166,20 @@
             }
         });
         
-        xlist.render();
+        
 
         var maxWidth = document.body.offsetWidth * 0.4;
 
-        var swipeEditPlugin = new XList.SwipeEdit({
+        var swipeEditPlugin = new XList.Plugin.SwipeEdit({
             labelSelector:".lbl",
             width:maxWidth
         })
 
-        xlist.plug(swipeEditPlugin)
+       var pulldown = new XList.Plugin.PullDown();
+
+       xlist.plug(pulldown);
+
+       xlist.plug(swipeEditPlugin)
         //delete 
        xlist.on("click",function(e){
             if(e.target.className.match("btn-delete")){
@@ -187,7 +191,6 @@
                 data.data.marked = true;
                 e.target.className += " btn-marked";
             }
-            console.log(e.cell._row)
        })
 
        xlist.on("click", function(e) {
@@ -196,6 +199,8 @@
                 }
             
         })
+
+       xlist.render();
 
         window.xlist = xlist
 

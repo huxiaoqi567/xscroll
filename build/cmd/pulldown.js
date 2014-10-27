@@ -5,37 +5,33 @@ define(function(require, exports, module) {
 	var content = "Pull Down To Refresh";
 	var loadingContent = "Loading...";
 	var PullDown = function(cfg) {
-		this.init(cfg);
+		var self = this;
+		self.__events = {};
+		self.userConfig = Util.mix({
+			content: content,
+			height: 60,
+			autoRefresh: true, //是否自动刷新页面
+			downContent: "Pull Down To Refresh",
+			upContent: "Release To Refresh",
+			loadingContent: loadingContent,
+			prefix: "xs-plugin-pulldown-"
+		}, cfg);
 	}
 	Util.mix(PullDown.prototype, {
-		init: function(cfg) {
+		pluginId: "xscroll/plugin/pulldown",
+		pluginInitializer: function(xscroll) {
 			var self = this;
-			self.__events = {};
-			self.userConfig = Util.mix({
-				content: content,
-				height: 60,
-				autoRefresh: true, //是否自动刷新页面
-				downContent: "Pull Down To Refresh",
-				upContent: "Release To Refresh",
-				loadingContent: loadingContent,
-				prefix: "xs-plugin-pulldown-"
-			}, cfg);
-
-			self.xscroll = self.userConfig.xscroll;
-
+			self.xscroll = xscroll;
 			prefix = self.userConfig.prefix;
-
 			if (self.xscroll) {
 				self.xscroll.on("afterrender", function() {
 					self.render()
 				})
 			}
 		},
-		destroy: function() {
+		pluginDestructor: function() {
 			var self = this;
-			//remove element
 			self.pulldown && self.pulldown.remove();
-			// self.detach("afterStatusChange");
 			self.xscroll.detach("panstart", self._panStartHandler, self);
 			self.xscroll.detach("pan", self._panHandler, self);
 			self.xscroll.detach("panend", self._panEndHandler, self);
@@ -114,12 +110,9 @@ define(function(require, exports, module) {
             }
         },
         reset:function(callback){
-        	var self = this;
-        	var height = self.userConfig.height || 60;
-        	var xscroll = self.xscroll;
-        	xscroll.boundry.resetTop()
-			xscroll.bounce(true, callback);
-			self._expanded = false;
+        	this.xscroll.boundry.resetTop()
+			this.xscroll.bounce(true, callback);
+			this._expanded = false;
         },
 		_panStartHandler: function(e) {
 			clearTimeout(this.loadingItv);
@@ -153,8 +146,6 @@ define(function(require, exports, module) {
 							window.location.reload();
 						})
 					}, 800);
-				}else{
-
 				}
 				
 			}

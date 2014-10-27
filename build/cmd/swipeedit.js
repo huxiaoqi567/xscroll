@@ -25,10 +25,13 @@ define(function(require, exports, module) {
 	};
 	Util.mix(SwipeEdit.prototype, {
 		pluginId: "xlist/plugin/swipeedit",
-		initializer: function(xlist) {
+		pluginInitializer: function(xlist) {
 			var self = this;
 			self.xlist = xlist;
 			self._bindEvt();
+		},
+		pluginDestructor:function(xlist){
+			
 		},
 		getTransformX: function(el) {
 			var trans = getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);

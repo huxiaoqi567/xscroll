@@ -1,5 +1,5 @@
 ;(function() {
-var util, pan, tap, pinch, scrollbar, swipeedit, core, dataset, infinite, _event_, _pulldown_;
+var util, pan, tap, pinch, scrollbar, core, dataset, swipeedit, infinite, _event_, _pulldown_, _pullup_;
 util = function (exports) {
   var Util = {
     mix: function (to, from) {
@@ -499,7 +499,7 @@ scrollbar = function (exports) {
   //最短滚动条高度
   var MIN_SCROLLBAR_SIZE = 60;
   //滚动条被卷去剩下的最小高度
-  var BAR_MIN_SIZE = 5;
+  var BAR_MIN_SIZE = 25;
   //transform
   var transform = Util.prefixStyle('transform');
   var transformStr = Util.vendor ? [
@@ -510,7 +510,6 @@ scrollbar = function (exports) {
   //transition webkitTransition MozTransition OTransition msTtransition
   var transition = Util.prefixStyle('transition');
   var borderRadius = Util.prefixStyle('borderRadius');
-  var events = [];
   var ScrollBar = function (cfg) {
     this.userConfig = cfg;
     this.init(cfg.xscroll);
@@ -518,27 +517,11 @@ scrollbar = function (exports) {
   Util.mix(ScrollBar.prototype, {
     init: function (xscroll) {
       var self = this;
-      // "offsetTop": {
-      // },
-      // "containerSize": {
-      // 	value: 0
-      // },
-      // "indicateSize": {
-      // 	value: 0
-      // },
-      // "barSize": {
-      // 	value: 0
-      // },
-      // "barOffset": {
-      // 	value: 0
-      // }
-      // self.userConfig = S.merge({
-      // 	type:"y"
-      // }, self.userConfig);
       self.xscroll = xscroll;
       self.type = self.userConfig.type;
       self.isY = self.type == 'y' ? true : false;
-      self.containerSize = self.isY ? self.xscroll.containerHeight : self.xscroll.containerWidth;
+      var boundry = self.xscroll.boundry;
+      self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
       self.indicateSize = self.isY ? self.xscroll.height : self.xscroll.width;
       self.offset = self.xscroll.getOffset();
       self.render();
@@ -567,7 +550,7 @@ scrollbar = function (exports) {
       xscroll.renderTo.appendChild(self.scrollbar);
       var size = self.isY ? 'width:100%;' : 'height:100%;';
       self.indicate = document.createElement('div');
-      self.indicate.style.cssText = size + 'position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:1.5px;-moz-border-radius:1.5px;-o-border-radius:1.5px;';
+      self.indicate.style.cssText = size + 'position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;';
       self.scrollbar.appendChild(self.indicate);
       self._update();
     },
@@ -576,7 +559,7 @@ scrollbar = function (exports) {
       var offset = offset || self.xscroll.getOffset();
       var barInfo = self.computeScrollBar(offset);
       var size = self.isY ? 'height' : 'width';
-      self.indicate.style[size] = barInfo.size + 'px';
+      self.indicate.style[size] = Math.round(barInfo.size) + 'px';
       if (duration && easing) {
         self.scrollTo(barInfo.offset, duration, easing);
       } else {
@@ -587,36 +570,40 @@ scrollbar = function (exports) {
     computeScrollBar: function (offset) {
       var self = this;
       var type = self.isY ? 'y' : 'x';
-      var offset = offset && -offset[type];
-      self.containerSize = self.isY ? self.xscroll.containerHeight : self.xscroll.containerWidth;
-      self.indicateSize = self.isY ? self.xscroll.height : self.xscroll.width;
+      var offset = Math.round(offset && -offset[type]);
+      var spacing = 10;
+      var boundry = self.xscroll.boundry;
+      self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
+      //视区尺寸
+      self.size = self.isY ? self.xscroll.height : self.xscroll.width;
+      self.indicateSize = self.isY ? self.xscroll.height - spacing : self.xscroll.width - spacing;
       //滚动条容器高度
       var indicateSize = self.indicateSize;
       var containerSize = self.containerSize;
+      //offset bottom/right
+      var offsetout = self.containerSize - self.size;
       var ratio = offset / containerSize;
-      var barOffset = indicateSize * ratio;
-      var barSize = indicateSize * indicateSize / containerSize;
-      var _barOffset = barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize;
+      var barOffset = Math.round(indicateSize * ratio);
+      var barSize = Math.round(indicateSize * indicateSize / containerSize);
+      var _barOffset = Math.round(barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize);
       if (barSize < MIN_SCROLLBAR_SIZE) {
         barSize = MIN_SCROLLBAR_SIZE;
         barOffset = _barOffset;
       }
-      //顶部回弹
       if (barOffset < 0) {
         barOffset = Math.abs(offset) * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE ? BAR_MIN_SIZE - barSize : offset * barSize / MIN_SCROLLBAR_SIZE;
-      } else if (barOffset + barSize > indicateSize) {
-        //底部回弹
-        var _offset = offset - containerSize + indicateSize;
+      } else if (barOffset + barSize > indicateSize && offset - offsetout > 0) {
+        var _offset = offset - containerSize + indicateSize + spacing;
         if (_offset * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
-          barOffset = indicateSize - BAR_MIN_SIZE;
+          barOffset = indicateSize + spacing - BAR_MIN_SIZE;
         } else {
-          barOffset = indicateSize - barSize + _offset * barSize / MIN_SCROLLBAR_SIZE;
+          barOffset = indicateSize + spacing - barSize + _offset * barSize / MIN_SCROLLBAR_SIZE;
         }
       }
-      self.barOffset = barOffset;
-      var result = { size: barSize };
+      self.barOffset = Math.round(barOffset);
+      var result = { size: Math.round(barSize) };
       var _offset = {};
-      _offset[type] = barOffset;
+      _offset[type] = self.barOffset;
       result.offset = _offset;
       return result;
     },
@@ -692,23 +679,24 @@ _pulldown_ = function (exports) {
   var content = 'Pull Down To Refresh';
   var loadingContent = 'Loading...';
   var PullDown = function (cfg) {
-    this.init(cfg);
+    var self = this;
+    self.__events = {};
+    self.userConfig = Util.mix({
+      content: content,
+      height: 60,
+      autoRefresh: true,
+      //是否自动刷新页面
+      downContent: 'Pull Down To Refresh',
+      upContent: 'Release To Refresh',
+      loadingContent: loadingContent,
+      prefix: 'xs-plugin-pulldown-'
+    }, cfg);
   };
   Util.mix(PullDown.prototype, {
-    init: function (cfg) {
+    pluginId: 'xscroll/plugin/pulldown',
+    pluginInitializer: function (xscroll) {
       var self = this;
-      self.__events = {};
-      self.userConfig = Util.mix({
-        content: content,
-        height: 60,
-        autoRefresh: true,
-        //是否自动刷新页面
-        downContent: 'Pull Down To Refresh',
-        upContent: 'Release To Refresh',
-        loadingContent: loadingContent,
-        prefix: 'xs-plugin-pulldown-'
-      }, cfg);
-      self.xscroll = self.userConfig.xscroll;
+      self.xscroll = xscroll;
       prefix = self.userConfig.prefix;
       if (self.xscroll) {
         self.xscroll.on('afterrender', function () {
@@ -716,11 +704,9 @@ _pulldown_ = function (exports) {
         });
       }
     },
-    destroy: function () {
+    pluginDestructor: function () {
       var self = this;
-      //remove element
       self.pulldown && self.pulldown.remove();
-      // self.detach("afterStatusChange");
       self.xscroll.detach('panstart', self._panStartHandler, self);
       self.xscroll.detach('pan', self._panHandler, self);
       self.xscroll.detach('panend', self._panEndHandler, self);
@@ -800,12 +786,9 @@ _pulldown_ = function (exports) {
       }
     },
     reset: function (callback) {
-      var self = this;
-      var height = self.userConfig.height || 60;
-      var xscroll = self.xscroll;
-      xscroll.boundry.resetTop();
-      xscroll.bounce(true, callback);
-      self._expanded = false;
+      this.xscroll.boundry.resetTop();
+      this.xscroll.bounce(true, callback);
+      this._expanded = false;
     },
     _panStartHandler: function (e) {
       clearTimeout(this.loadingItv);
@@ -839,7 +822,6 @@ _pulldown_ = function (exports) {
               window.location.reload();
             });
           }, 800);
-        } else {
         }
       }
     },
@@ -857,144 +839,171 @@ _pulldown_ = function (exports) {
   }
   return exports;
 }({});
-swipeedit = function (exports) {
+_pullup_ = function (exports) {
   var Util = util;
-  //transform
-  var transform = Util.prefixStyle('transform');
-  //transition webkitTransition MozTransition OTransition msTtransition
-  var transition = Util.prefixStyle('transition');
-  var clsPrefix = 'xs-plugin-swipeedit-';
-  var isLocked = false;
-  var buffer = 20;
-  var isSliding = false;
-  var hasSlided = false;
-  var transformStr = Util.vendor ? [
-    '-',
-    Util.vendor,
-    '-transform'
-  ].join('') : 'transform';
-  //acceration 
-  var acc = 1;
-  var startX;
-  var SwipeEdit = function (cfg) {
-    this.userConfig = Util.mix({
-      labelSelector: clsPrefix + 'label',
-      renderHook: function (el) {
-        el.innerHTML = tpl;
-      }
+  var prefix;
+  var containerCls;
+  var loadingContent = 'Loading...';
+  var upContent = 'Pull Up To Refresh';
+  var downContent = 'Release To Refresh';
+  var pageEndContent = 'Last Page';
+  var PULL_UP_HEIGHT = 60;
+  var HEIGHT = 40;
+  var PullUp = function (cfg) {
+    var self = this;
+    self.__events = {};
+    self.userConfig = Util.mix({
+      upContent: upContent,
+      downContent: downContent,
+      pageEndContent: pageEndContent,
+      pullUpHeight: PULL_UP_HEIGHT,
+      height: HEIGHT,
+      autoRefresh: true,
+      //是否自动刷新页面
+      loadingContent: loadingContent,
+      boundry: {},
+      prefix: 'xs-plugin-pullup-'
     }, cfg);
   };
-  Util.mix(SwipeEdit.prototype, {
-    pluginId: 'xlist/plugin/swipeedit',
-    initializer: function (xlist) {
+  Util.mix(PullUp.prototype, {
+    pluginId: 'xscroll/plugin/pullup',
+    pluginInitializer: function (xscroll) {
       var self = this;
-      self.xlist = xlist;
-      self._bindEvt();
+      self.xscroll = xscroll;
+      prefix = self.userConfig.prefix;
+      if (self.xscroll) {
+        self.xscroll.on('afterrender', function () {
+          self.render();
+        });
+      }
     },
-    getTransformX: function (el) {
-      var trans = getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
-      return trans ? trans[4] / 1 : 0;
+    pluginDestructor: function () {
+      var self = this;
+      self.pullup && self.pullup.remove();
+      self.xscroll.detach('scroll', self._scrollHandler);
+      delete self;
+    },
+    render: function () {
+      var self = this;
+      if (self.__isRender)
+        return;
+      self.__isRender = true;
+      var containerCls = prefix + 'container';
+      var height = self.userConfig.height;
+      var pullup = self.pullup = document.createElement('div');
+      pullup.className = containerCls;
+      pullup.style.position = 'absolute';
+      pullup.style.width = '100%';
+      pullup.style.height = height + 'px';
+      pullup.style.bottom = -height + 'px';
+      self.xscroll.container.appendChild(pullup);
+      self.xscroll.boundry.expandBottom(40);
+      Util.addClass(pullup, prefix + self.status);
+      pullup.innerHTML = self.userConfig[self.status + 'Content'] || self.userConfig.content;
+      self._bindEvt();
     },
     _bindEvt: function () {
       var self = this;
-      var xlist = self.xlist;
-      var lbl = null;
-      xlist.on('panstart', function (e) {
-        hasSlided = false;
-        lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
-        startX = self.getTransformX(lbl);
-        lbl.style[transition] = 'none';
-        if (Math.abs(startX) > 0 && !isSliding) {
-          self.slideRight(e);
-        }
+      if (self._evtBinded)
+        return;
+      self._evtBinded = true;
+      var pullup = self.pullup;
+      var xscroll = self.xscroll;
+      xscroll.on('pan', function (e) {
+        self._scrollHandler(e);
       });
-      xlist.on('pan', function (e) {
-        if (e.touch.directionX == 'left') {
-          self.slideAllExceptRow(e.cell._row);
-        }
-        /*
-        1.水平位移大于垂直位移
-        2.大于20px （参考值可自定） buffer
-        3.向左
-        */
-        if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) / Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer) {
-          isLocked = true;
-          xlist.userConfig.lockY = true;
-          var left = startX + e.deltaX + buffer;
-          if (left > 0) {
-            return;
+      //load width a buffer
+      if (self.userConfig.bufferHeight > 0) {
+        xscroll.on('scroll', function (e) {
+          if (!self.isLoading && Math.abs(e.offset.y) + xscroll.height + self.userConfig.height + self.userConfig.bufferHeight >= xscroll.containerHeight + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
+            console.log(Math.abs(e.offset.y));
+            self._changeStatus('loading');
           }
-          lbl.style[transition] = 'none';
-          lbl.style[transform] = 'translateX(' + left + 'px) translateZ(0)';
-        } else if (!isLocked) {
-          xlist.userConfig.lockY = false;
-        }
-      });
-      xlist.on('panend', function (e) {
-        isLocked = false;
-        var cpt = self.getTransformX(lbl);
-        if (e.touch.directionX == 'left' && Math.abs(e.velocityX) > acc) {
-          self.slideLeftHandler(e);
-        } else if (Math.abs(cpt) < self.userConfig.width / 2) {
-          self.slideRightHandler(e);
-        } else if (Math.abs(cpt) >= self.userConfig.width / 2) {
-          self.slideLeftHandler(e);
-        }
-      });
-      document.body.addEventListener('webkitTransitionEnd', function (e) {
-        if (new RegExp(self.userConfig.labelSelector.replace(/\./, '')).test(e.target.className)) {
-          isSliding = false;
+        });
+      }
+      //bounce bottom
+      xscroll.on('scrollend', function (e) {
+        if (e.directionY == 'top' && e.offset.y == xscroll.height - xscroll.containerHeight - self.userConfig.height) {
+          self._changeStatus('loading');
         }
       });
     },
-    slideLeft: function (row) {
+    _scrollHandler: function (e) {
       var self = this;
-      var cell = xlist.getCellByRow(row);
-      if (!cell || !cell.element)
-        return;
-      var el = cell.element.querySelector(self.userConfig.labelSelector);
-      if (!el || !el.style)
-        return;
-      el.style[transform] = 'translateX(-' + self.userConfig.width + 'px) translateZ(0)';
-      el.style[transition] = transformStr + ' 0.15s ease';
-      xlist.getData(0, row).data.status = 'delete';
+      var xscroll = self.xscroll;
+      var offsetTop = xscroll.getOffsetTop();
+      if (offsetTop < xscroll.height - xscroll.containerHeight - self.userConfig.pullUpHeight) {
+        self._changeStatus('down');
+      } else {
+        self._changeStatus('up');
+      }
     },
-    slideRight: function (row) {
-      var self = this;
-      var cell = xlist.getCellByRow(row);
-      if (!cell || !cell.element)
+    _changeStatus: function (status) {
+      if (status != 'loading' && this.isLoading)
         return;
-      var el = cell.element.querySelector(self.userConfig.labelSelector);
-      if (!el || !el.style)
-        return;
-      el.style[transform] = 'translateX(0) translateZ(0)';
-      el.style[transition] = transformStr + ' 0.5s ease';
-      xlist.getData(0, row).data.status = '';
-    },
-    slideLeftHandler: function (e) {
-      var self = this;
-      isSliding = true;
-      self.slideLeft(e.cell._row);
-    },
-    slideRightHandler: function (e) {
-      var self = this;
-      hasSlided = true;
-      isSliding = true;
-      self.slideRight(e.cell._row);
-    },
-    slideAllExceptRow: function (row) {
-      var self = this;
-      for (var i in xlist.infiniteElementsCache) {
-        if (row != xlist.infiniteElementsCache[i]._row || undefined === row) {
-          self.slideRight(xlist.infiniteElementsCache[i]._row);
+      var prevVal = this.status;
+      this.status = status;
+      Util.removeClass(this.pullup, prefix + prevVal);
+      Util.addClass(this.pullup, prefix + status);
+      this.setContent(this.userConfig[status + 'Content']);
+      if (prevVal != status) {
+        this.fire('statuschange', {
+          prevVal: prevVal,
+          newVal: status
+        });
+        if (status == 'loading') {
+          this.isLoading = true;
+          this.fire('loading');
         }
+      }
+    },
+    complete: function () {
+      var self = this;
+      self.isLoading = false;
+      self._changeStatus('up');
+      if (!self.userConfig.bufferHeight)
+        return;
+      var trans = self.xscroll._bounce('y', self.xscroll._prevSpeed);
+      trans && self.xscroll.scrollY(trans.offset, trans.duration, trans.easing);
+    },
+    reset: function (callback) {
+      this.xscroll.boundry.resetBottom();
+      this.xscroll.bounce(true, callback);
+      this._expanded = false;
+    },
+    fire: function (evt) {
+      var self = this;
+      if (self.__events[evt] && self.__events[evt].length) {
+        for (var i in self.__events[evt]) {
+          self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
+        }
+      }
+    },
+    on: function (evt, fn) {
+      if (!this.__events[evt]) {
+        this.__events[evt] = [];
+      }
+      this.__events[evt].push(fn);
+    },
+    detach: function (evt, fn) {
+      if (!evt || !this.__events[evt])
+        return;
+      var index = this.__events[evt].indexOf(fn);
+      if (index > -1) {
+        this.__events[evt].splice(index, 1);
+      }
+    },
+    setContent: function (content) {
+      var self = this;
+      if (content) {
+        self.pullup.innerHTML = content;
       }
     }
   });
   if (typeof module == 'object' && module.exports) {
-    exports = SwipeEdit;
+    exports = PullUp;
   } else {
-    return SwipeEdit;
+    return PullUp;
   }
   return exports;
 }({});
@@ -1006,14 +1015,19 @@ core = function (exports) {
   var Pinch = pinch;
   var ScrollBar = scrollbar;
   var PullDown = _pulldown_;
-  var SwipeEdit = swipeedit;
+  var PullUp = _pullup_;
   //global namespace
   var XScroll = function (cfg) {
     this.userConfig = cfg;
     this.init();
   };
-  XScroll.PullDown = PullDown;
-  XScroll.version = '2.0.0';
+  //namespace for plugins
+  XScroll.Plugin = {
+    //pulldown refresh
+    PullDown: PullDown,
+    //pullup
+    PullUp: PullUp
+  };
   //event names
   var SCROLL_END = 'scrollend';
   var SCROLL = 'scroll';
@@ -1028,8 +1042,8 @@ core = function (exports) {
   //constant acceleration for scrolling
   var SROLL_ACCELERATION = 0.0005;
   //boundry checked bounce effect
-  var BOUNDRY_CHECK_DURATION = 300;
-  var BOUNDRY_CHECK_EASING = 'ease-in-out';
+  var BOUNDRY_CHECK_DURATION = 400;
+  var BOUNDRY_CHECK_EASING = 'ease-out';
   var BOUNDRY_CHECK_ACCELERATION = 0.1;
   //reduced boundry pan distance
   var PAN_RATE = 0.36;
@@ -1094,6 +1108,7 @@ core = function (exports) {
    * @extends Base
    */
   Util.mix(XScroll.prototype, {
+    version: '2.1.0',
     init: function () {
       var self = this;
       self.__events = {};
@@ -1110,6 +1125,67 @@ core = function (exports) {
       self.SROLL_ACCELERATION = userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
       self.containerClsName = clsPrefix + 'container';
       self.contentClsName = clsPrefix + 'content';
+      self.boundry = {
+        _xtop: 0,
+        _xright: 0,
+        _xleft: 0,
+        _xbottom: 0,
+        reset: function () {
+          this.resetTop();
+          this.resetLeft();
+          this.resetBottom();
+          this.resetRight();
+          return this;
+        },
+        resetTop: function () {
+          this._xtop = 0;
+          this.refresh();
+          return this;
+        },
+        resetLeft: function () {
+          this._xleft = 0;
+          this.refresh();
+          return this;
+        },
+        resetBottom: function () {
+          this._xbottom = 0;
+          this.refresh();
+          return this;
+        },
+        resetRight: function () {
+          this._xright = 0;
+          this.refresh();
+          return this;
+        },
+        expandTop: function (top) {
+          this._xtop = top;
+          this.refresh();
+          return this;
+        },
+        expandLeft: function (left) {
+          this._xleft = left;
+          this.refresh();
+          return this;
+        },
+        expandRight: function (right) {
+          this._xright = right;
+          this.refresh();
+          return this;
+        },
+        expandBottom: function (bottom) {
+          this._xbottom = bottom;
+          this.refresh();
+          return this;
+        },
+        refresh: function () {
+          this.top = this._xtop;
+          this.left = this._xleft;
+          this.bottom = (self.height || 0) - this._xbottom;
+          this.right = (self.width || 0) - this._xright;
+          return this;
+        }
+      };
+      self.boundry.refresh();
     },
     /*
         render & scroll to top
@@ -1137,53 +1213,11 @@ core = function (exports) {
       self.containerHeight = containerHeight < self.height ? self.height : containerHeight;
       self.initialContainerWidth = self.containerWidth;
       self.initialContainerHeight = self.containerHeight;
-      //最小缩放比
       var minScale = self.userConfig.minScale || Math.max(self.width / self.containerWidth, self.height / self.containerHeight);
       var maxScale = self.userConfig.maxScale || 1;
       self.minScale = minScale;
       self.maxScale = maxScale;
-      self.boundry = {
-        reset: function () {
-          this.resetTop();
-          this.resetLeft();
-          this.resetBottom();
-          this.resetRight();
-          return this;
-        },
-        resetTop: function () {
-          this.top = 0;
-          return this;
-        },
-        resetLeft: function () {
-          this.left = 0;
-          return this;
-        },
-        resetBottom: function () {
-          this.bottom = self.height;
-          return this;
-        },
-        resetRight: function () {
-          this.right = self.width;
-          return this;
-        },
-        expandTop: function (top) {
-          this.top += top || 0;
-          return this;
-        },
-        expandLeft: function (left) {
-          this.left += left || 0;
-          return this;
-        },
-        expandRight: function (right) {
-          this.right -= right || 0;
-          return this;
-        },
-        expandBottom: function (bottom) {
-          this.bottom -= bottom || 0;
-          return this;
-        }
-      };
-      self.boundry.reset();
+      self.boundry.refresh();
       self.fire(AFTER_RENDER);
       self.renderScrollBars();
       self._bindEvt();
@@ -1286,15 +1320,15 @@ core = function (exports) {
     },
     /*
         scale(0.5,0.5,0.5,500,"ease-out")
-        @param {Number} scale 缩放比
-        @param {Float} 0~1之间的缩放中心值 水平方向
-        @param {Fload} 0~1之间的缩放中心值 垂直方向
-        @param {Number} 动画周期
-        @param {String} 动画函数
+        @param {Number} scale 
+        @param {Float} 0~1 originX
+        @param {Fload} 0~1 originY
+        @param {Number} duration
+        @param {String} callback
     */
     scaleTo: function (scale, originX, originY, duration, easing, callback) {
       var self = this;
-      //不可缩放
+      //unscalable
       if (!self.userConfig.scalable || self.scale == scale || !scale)
         return;
       var duration = duration || 1;
@@ -1464,7 +1498,15 @@ core = function (exports) {
     _scrollHandler: function (dest, duration, callback, easing, transitionStr, type) {
       var self = this;
       var offset = self.getOffset();
-      //目标值等于当前至 则不发生滚动
+      var directions = type == 'x' ? [
+        'left',
+        'right'
+      ] : [
+        'top',
+        'bottom'
+      ];
+      var Type = type.toUpperCase();
+      //if dest value is equal to current value then return.
       if (duration <= 0) {
         self.fire(SCROLL, {
           zoomType: type,
@@ -1476,28 +1518,31 @@ core = function (exports) {
         });
         return;
       }
-      var Type = type.toUpperCase();
       self['isScrolling' + Type] = true;
       var start = Date.now();
       self['destTime' + Type] = start + duration;
       cancelRAF(self['raf' + Type]);
-      //注册滚动结束事件  供transitionEnd进行精确回调
-      self['__scrollEndCallback' + Type] = function (args) {
+      //regist transitionEnd callback function
+      self['__scrollEndCallback' + Type] = function (e) {
         self['isScrolling' + Type] = false;
-        self.fire(SCROLL_END, {
+        var params = {
           offset: self.getOffset(),
-          zoomType: args.type
-        });
-        callback && callback(args);
+          zoomType: e.type
+        };
+        params['direction' + e.type.toUpperCase()] = dest - offset[e.type] < 0 ? directions[1] : directions[0];
+        self.fire(SCROLL_END, params);
+        callback && callback(e);
       };
       var run = function () {
         var now = Date.now();
         if (self['isScrolling' + Type]) {
           RAF(function () {
-            self.fire(SCROLL, {
+            var params = {
               zoomType: type,
               offset: self.getOffset()
-            });
+            };
+            params['direction' + type.toUpperCase()] = dest - offset[type] < 0 ? directions[1] : directions[0];
+            self.fire(SCROLL, params);
           }, 0);
         }
         self['raf' + Type] = RAF(run);
@@ -1590,7 +1635,9 @@ core = function (exports) {
       Event.on(renderTo, 'touchstart', function (e) {
         e.preventDefault();
         self._fireTouchStart(e);
-        self.stop();
+        if (self.isScrollingX || self.isScrollingY) {
+          self.stop();
+        }
       }).on(renderTo, Tap.TAP, function (e) {
         self.boundryCheck();
         if (!self.isScrollingX && !self.isScrollingY) {
@@ -1599,9 +1646,9 @@ core = function (exports) {
         } else {
           self.isScrollingX = false;
           self.isScrollingY = false;
-          self.stop();
         }
       }).on(renderTo, Pan.PAN_START, function (e) {
+        self._prevSpeed = 0;
         offset = self.getOffset();
         self.translate(offset);
         self._firePanStart(Util.mix(e, { offset: offset }));
@@ -1633,18 +1680,27 @@ core = function (exports) {
         self._noTransition();
         self.isScrollingX = false;
         self.isScrollingY = false;
-        self.directionX = e.directionX;
-        self.directionY = e.directionY;
-        var evt = Util.mix(e, {
+        //pan trigger the opposite direction
+        self.directionX = e.directionX == 'left' ? 'right' : e.directionX == 'right' ? 'left' : '';
+        self.directionY = e.directionY == 'top' ? 'bottom' : e.directionY == 'bottom' ? 'top' : '';
+        self._firePan(Util.mix(e, {
+          offset: {
+            x: posX,
+            y: posY
+          },
+          directionX: e.directionX,
+          directionY: e.directionY,
+          triggerType: PAN
+        }));
+        self.fire(SCROLL, Util.mix(e, {
           offset: {
             x: posX,
             y: posY
           },
           directionX: self.directionX,
-          directionY: self.directionY
-        });
-        self.fire(SCROLL, evt);
-        self._firePan(evt);
+          directionY: self.directionY,
+          triggerType: PAN
+        }));
       }).on(renderTo, Pan.PAN_END, function (e) {
         self.panEndHandler(e);
         self._firePanEnd(e);
@@ -1657,7 +1713,7 @@ core = function (exports) {
           self.__scrollEndCallbackY && self.__scrollEndCallbackY({ type: 'y' });
         }
       }, false);
-      //可缩放
+      //scalable
       if (self.userConfig.scalable) {
         var originX, originY;
         Event.on(renderTo, Pinch.PINCH_START, function (e) {
@@ -1689,14 +1745,13 @@ core = function (exports) {
     panEndHandler: function (e) {
       var self = this;
       var userConfig = self.userConfig;
-      var offset = self.getOffset();
-      var transX = self._bounce('x', offset.x, e.velocityX, self.width, self.containerWidth);
-      var transY = self._bounce('y', offset.y, e.velocityY, self.height, self.containerHeight);
+      var transX = self._bounce('x', e.velocityX);
+      var transY = self._bounce('y', e.velocityY);
       var x = transX ? transX.offset : 0;
       var y = transY ? transY.offset : 0;
       var duration;
       if (transX && transY && transX.status && transY.status && transX.duration && transY.duration) {
-        //保证常规滚动时间相同 x y方向不发生时间差
+        //ensure the same duration
         duration = Math.max(transX.duration, transY.duration);
       }
       if (transX) {
@@ -1720,12 +1775,11 @@ core = function (exports) {
       var boundryCheckFn = 'boundryCheck' + TYPE;
       var _bounce = '_bounce' + type;
       if (self[_bounce]) {
-        self.fire('outOfBoundry');
+        self.fire('boundryout', { zoomType: type });
         var v = self[_bounce];
-        var a = 0.04 * (v / Math.abs(v));
+        var a = 0.04 * v / Math.abs(v);
         var t = v / a;
-        var s0 = self.getOffset()[type];
-        var s = s0 + t * v / 2;
+        var s = self.getOffset()[type] + t * v / 2;
         self[scrollFn](-s, t, 'cubic-bezier(' + quadratic2cubicBezier(-t, 0) + ')', function () {
           self[_bounce] = 0;
           self[boundryCheckFn]();
@@ -1756,12 +1810,15 @@ core = function (exports) {
         this.__events[evt].splice(index, 1);
       }
     },
-    _bounce: function (type, offset, v, size, innerSize) {
+    _bounce: function (type, v) {
       var self = this;
+      var offset = self.getOffset()[type];
       var boundry = self.boundry;
       var boundryStart = type == 'x' ? boundry.left : boundry.top;
       var boundryEnd = type == 'x' ? boundry.right : boundry.bottom;
+      var innerSize = type == 'x' ? self.containerWidth : self.containerHeight;
       var size = boundryEnd - boundryStart;
+      var userConfig = self.userConfig;
       var transition = {};
       if (v === 0) {
         type == 'x' ? self.boundryCheckX() : self.boundryCheckY();
@@ -1771,7 +1828,6 @@ core = function (exports) {
         return;
       if (type == 'y' && self.userConfig.lockY)
         return;
-      var userConfig = self.userConfig;
       var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
       if (v > maxSpeed) {
         v = maxSpeed;
@@ -1799,6 +1855,7 @@ core = function (exports) {
         transition.duration = _t;
         transition.easing = 'cubic-bezier(' + quadratic2cubicBezier(-t, -t + _t) + ')';
         self['_bounce' + type] = v - a * _t;
+        self._prevSpeed = 0;
       } else if (s < size - innerSize) {
         var _s = size - innerSize - offset;
         var _t = (v + Math.sqrt(-2 * a * _s + v * v)) / a;
@@ -1806,11 +1863,13 @@ core = function (exports) {
         transition.duration = _t;
         transition.easing = 'cubic-bezier(' + quadratic2cubicBezier(-t, -t + _t) + ')';
         self['_bounce' + type] = v - a * _t;
+        self._prevSpeed = v - a * _t;
       } else {
         transition.offset = -s;
         transition.duration = t;
         transition.easing = 'cubic-bezier(' + quadratic2cubicBezier(-t, 0) + ')';
         transition.status = 'normal';
+        self._prevSpeed = 0;
       }
       self['isScrolling' + type.toUpperCase()] = true;
       return transition;
@@ -1822,7 +1881,7 @@ core = function (exports) {
       if (!self.__plugins) {
         self.__plugins = [];
       }
-      plugin.initializer(self);
+      plugin.pluginInitializer(self);
       self.__plugins.push(plugin);
     },
     unplug: function (plugin) {
@@ -1830,9 +1889,10 @@ core = function (exports) {
       if (!plugin)
         return;
       var _plugin = typeof plugin == 'string' ? self.getPlugin(plugin) : plugin;
+      _plugin.pluginDestructor(self);
       for (var i in self.__plugins) {
         if (self.__plugins[i] == _plugin) {
-          return self.__plugins[i].splice(i, 1);
+          return self.__plugins.splice(i, 1);
         }
       }
     },
@@ -1896,11 +1956,156 @@ dataset = function (exports) {
   }
   return exports;
 }({});
+swipeedit = function (exports) {
+  var Util = util;
+  //transform
+  var transform = Util.prefixStyle('transform');
+  //transition webkitTransition MozTransition OTransition msTtransition
+  var transition = Util.prefixStyle('transition');
+  var clsPrefix = 'xs-plugin-swipeedit-';
+  var isLocked = false;
+  var buffer = 20;
+  var isSliding = false;
+  var hasSlided = false;
+  var transformStr = Util.vendor ? [
+    '-',
+    Util.vendor,
+    '-transform'
+  ].join('') : 'transform';
+  //acceration 
+  var acc = 1;
+  var startX;
+  var SwipeEdit = function (cfg) {
+    this.userConfig = Util.mix({
+      labelSelector: clsPrefix + 'label',
+      renderHook: function (el) {
+        el.innerHTML = tpl;
+      }
+    }, cfg);
+  };
+  Util.mix(SwipeEdit.prototype, {
+    pluginId: 'xlist/plugin/swipeedit',
+    pluginInitializer: function (xlist) {
+      var self = this;
+      self.xlist = xlist;
+      self._bindEvt();
+    },
+    pluginDestructor: function (xlist) {
+    },
+    getTransformX: function (el) {
+      var trans = getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
+      return trans ? trans[4] / 1 : 0;
+    },
+    _bindEvt: function () {
+      var self = this;
+      var xlist = self.xlist;
+      var lbl = null;
+      xlist.on('panstart', function (e) {
+        hasSlided = false;
+        lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
+        startX = self.getTransformX(lbl);
+        lbl.style[transition] = 'none';
+        if (Math.abs(startX) > 0 && !isSliding) {
+          self.slideRight(e);
+        }
+      });
+      xlist.on('pan', function (e) {
+        if (e.touch.directionX == 'left') {
+          self.slideAllExceptRow(e.cell._row);
+        }
+        /*
+        1.水平位移大于垂直位移
+        2.大于20px （参考值可自定） buffer
+        3.向左
+        */
+        if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) / Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer) {
+          isLocked = true;
+          xlist.userConfig.lockY = true;
+          var left = startX + e.deltaX + buffer;
+          if (left > 0) {
+            return;
+          }
+          lbl.style[transition] = 'none';
+          lbl.style[transform] = 'translateX(' + left + 'px) translateZ(0)';
+        } else if (!isLocked) {
+          xlist.userConfig.lockY = false;
+        }
+      });
+      xlist.on('panend', function (e) {
+        isLocked = false;
+        var cpt = self.getTransformX(lbl);
+        if (e.touch.directionX == 'left' && Math.abs(e.velocityX) > acc) {
+          self.slideLeftHandler(e);
+        } else if (Math.abs(cpt) < self.userConfig.width / 2) {
+          self.slideRightHandler(e);
+        } else if (Math.abs(cpt) >= self.userConfig.width / 2) {
+          self.slideLeftHandler(e);
+        }
+      });
+      document.body.addEventListener('webkitTransitionEnd', function (e) {
+        if (new RegExp(self.userConfig.labelSelector.replace(/\./, '')).test(e.target.className)) {
+          isSliding = false;
+        }
+      });
+    },
+    slideLeft: function (row) {
+      var self = this;
+      var cell = xlist.getCellByRow(row);
+      if (!cell || !cell.element)
+        return;
+      var el = cell.element.querySelector(self.userConfig.labelSelector);
+      if (!el || !el.style)
+        return;
+      el.style[transform] = 'translateX(-' + self.userConfig.width + 'px) translateZ(0)';
+      el.style[transition] = transformStr + ' 0.15s ease';
+      xlist.getData(0, row).data.status = 'delete';
+    },
+    slideRight: function (row) {
+      var self = this;
+      var cell = xlist.getCellByRow(row);
+      if (!cell || !cell.element)
+        return;
+      var el = cell.element.querySelector(self.userConfig.labelSelector);
+      if (!el || !el.style)
+        return;
+      el.style[transform] = 'translateX(0) translateZ(0)';
+      el.style[transition] = transformStr + ' 0.5s ease';
+      xlist.getData(0, row).data.status = '';
+    },
+    slideLeftHandler: function (e) {
+      var self = this;
+      isSliding = true;
+      self.slideLeft(e.cell._row);
+    },
+    slideRightHandler: function (e) {
+      var self = this;
+      hasSlided = true;
+      isSliding = true;
+      self.slideRight(e.cell._row);
+    },
+    slideAllExceptRow: function (row) {
+      var self = this;
+      for (var i in xlist.infiniteElementsCache) {
+        if (row != xlist.infiniteElementsCache[i]._row || undefined === row) {
+          self.slideRight(xlist.infiniteElementsCache[i]._row);
+        }
+      }
+    }
+  });
+  if (typeof module == 'object' && module.exports) {
+    exports = SwipeEdit;
+  } else {
+    return SwipeEdit;
+  }
+  return exports;
+}({});
 infinite = function (exports) {
   var Util = util;
   var XScroll = core;
   var DataSet = dataset;
   var SwipeEdit = swipeedit;
+  var PullUp = _pullup_;
+  var PullDown = _pulldown_;
   var transform = Util.prefixStyle('transform');
   var PAN_END = 'panend';
   var PAN_START = 'panstart';
@@ -1908,8 +2113,13 @@ infinite = function (exports) {
   var XList = function (cfg) {
     this.super.call(this, cfg);
   };
+  //namespace for plugins
+  XList.Plugin = {
+    SwipeEdit: SwipeEdit,
+    PullUp: PullUp,
+    PullDown: PullDown
+  };
   XList.DataSet = DataSet;
-  XList.SwipeEdit = SwipeEdit;
   Util.extend(XScroll, XList, {
     init: function () {
       var self = this;
@@ -2123,7 +2333,7 @@ infinite = function (exports) {
         containerHeight = height;
       }
       self.containerHeight = containerHeight;
-      self.container.style.height = containerHeight;
+      self.container.style.height = containerHeight + 'px';
       self.renderScrollBars();
       //渲染非回收元素
       self._renderNoRecycledEl();
