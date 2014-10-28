@@ -2082,6 +2082,10 @@ swipeedit = function (exports) {
       var el = cell.element.querySelector(self.userConfig.labelSelector);
       if (!el || !el.style)
         return;
+      var matrix = window.getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
+      var transX = matrix ? Math.round(matrix[4]) : 0;
+      if (transX == 0)
+        return;
       el.style[transform] = 'translateX(0)';
       el.style[transition] = transformStr + ' 0.5s ease';
       xlist.getData(0, row).data.status = '';
@@ -2101,6 +2105,7 @@ swipeedit = function (exports) {
       var self = this;
       for (var i in xlist.infiniteElementsCache) {
         if (row != xlist.infiniteElementsCache[i]._row || undefined === row) {
+          self.slideRight(xlist.infiniteElementsCache[i]._row);
         }
       }
     }
