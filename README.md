@@ -25,14 +25,14 @@ bower install xscroll
 * `config`：
     * `renderTo` 渲染节点，内部需要包含class为xs-container，xs-content两个容器
     * `height` 外容器视窗高度
-	* `width` 外容器视窗宽度
-	* `containerHeight` 内容器高度
-	* `containerWidth` 内容器宽度
+    * `width` 外容器视窗宽度
+    * `containerHeight` 内容器高度
+    * `containerWidth` 内容器宽度
     * `scrollbarX` 是否开启横向滚动条
     * `scrollbarY` 是否开启纵向滚动条
-	* `lockX` 是否锁定横向滚动
-	* `lockY` 是否锁定纵向滚动
-	* `gpuAcceleration` 是否开启GPU硬件加速（在性能提升的同时需要注意内存控制）
+    * `lockX` 是否锁定横向滚动
+    * `lockY` 是否锁定纵向滚动
+    * `gpuAcceleration` 是否开启GPU硬件加速（在性能提升的同时需要注意内存控制）
 * `enableGPUAcceleration()` 开启硬件加速
 * `disableGPUAcceleration()` 开启硬件加速
 * `getOffset()` 获取水平和垂直偏移量，如:{x:0,y:100}
@@ -118,7 +118,151 @@ xlist.render();
 * `setId(datasetId)` 设置ID
 * `getId()` 获取ID
 
+### Plugins
 
+#### PullDown
+
+-  pull down to refresh or reload.
+  
+##### Example
+
+```
+    var xlist = new XList();
+    // or XScroll.Plugin.PullDown
+    var pulldown = new XList.Plugin.PullDown();
+    //plug
+    xlist.plug(pulldown);
+    
+    xlist.render();
+
+```
+
+* `config`
+    * `content` 内容，若需要使用动画进行如上下箭头切换，则配置此项
+    * `downContent` 下拉前展示的内容，默认为'Pull Down To Refresh'
+    * `upContent` 松手展示内容，默认为'Release To Refresh'
+    * `loadingContent` 加载中展示内容，默认为'Loading...'
+    * `prefix` class前缀，默认为'xs-plugin-pulldown-'
+    * `height` 进行下拉和松手以及加载状态切换的高度，默认60
+* `setContent(html)` 改变数据
+* `reset(callback)` 数据加载完毕后，通知控件进行回弹
+* `on("loading",fn)` 监听loading事件，进行异步请求等逻辑
+
+
+#### PullUp
+
+-  pull up to reload.
+  
+##### Example
+
+```
+    var xlist = new XList();
+    
+    var pullup = new XList.Plugin.PullUp();
+    //plug
+    xlist.plug(pullup);
+    
+    xlist.render();
+    
+    pullup.on("loading",function(){
+        // get remote data
+        getData();
+    });
+    
+    var page = 1,
+        totalPage = 10;
+    
+    function getData(){
+      //  $.ajax({
+            url:"demo.php",
+            dataType:"json",
+            callback:function(data){
+                if(page > totalPage) {
+                    //last page
+                    pullup.reset();
+                    //destroy plugin
+                    xlist.unplug(pullup);
+                    return; 
+                };
+                ds.appendData(data);
+                xlist.render();
+                 //loading complate
+                pullup.complete();
+                page++;
+            }
+        
+      })
+    }
+
+```
+
+* `config`
+    * `content` 内容，同PullDown
+    * `upContent` 下拉前展示的内容，默认为'Pull Up To Refresh'
+    * `downContent` 松手展示内容，默认为'Release To Refresh'
+    * `loadingContent` 加载中展示内容，默认为'Loading...'
+    * `prefix` class前缀，默认为'xs-plugin-pullup-'
+    * `height` 加载状态时底部被拓展的边界高度，默认40
+    * `pullUpHeight` up和down切换的高度，默认80
+* `setContent(html)` 改变数据
+* `reset(callback)` 数据加载完毕后，通知控件进行回弹
+* `on("loading",fn)` 监听loading事件，进行异步请求等逻辑
+* `complete()` 加载结束后恢复上拉控件的状态至'up'
+
+#### SwipeEdit
+
+-  swipe left to delete or favourite etc.
+  
+##### Example
+
+```
+var xlist = new XList({
+    renderTo: "#J_Scroll",
+    data: data,
+    itemHeight: 62 ,
+    infiniteElements:"#J_Scroll .xs-row",
+    renderHook:function(el,row){
+        el.innerHTML = '<div class="lbl">'+row.data.text+'</div>'+
+                        '<div class="control"><div class="btn btn-mark">mark</div>'+
+                        '<div class="btn btn-delete">delete</div></div>';
+    }
+});
+
+var swipeEditPlugin = new XList.Plugin.SwipeEdit({
+    labelSelector:".lbl",
+    width:maxWidth
+});
+
+xlist.plug(swipeEditPlugin);
+
+xlist.on("click",function(e){
+    //delete
+    if(e.target.className.match("btn-delete")){
+       xlist.removeData(0,e.cell._row)
+       xlist.render();
+    }
+    //mark
+    if(e.target.className.match("btn-mark") && !e.target.className.match("btn-marked")){
+        var data = xlist.getData(0,e.cell._row)
+        data.data.marked = true;
+        e.target.className += " btn-marked";
+    }
+})
+
+xlist.on("click", function(e) {
+    //hide the buttons
+    if(!e.target.parentNode.className.match('control')){
+        swipeEditPlugin.slideAllExceptRow();
+    }
+});
+
+xlist.render();
+
+```
+
+* `config`
+    * `labelSelector` 操作栏的类选择器，如'.lbl'
+    * `width` 操作栏总宽度
 
 
 ## Questions?

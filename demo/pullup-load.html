@@ -142,7 +142,9 @@
                     dataType:"json",
                     success:function(data){
                         if(page > totalPage) {
+                            //last page
                             pullup.reset();
+                            //destroy plugin
                             xlist.unplug(pullup);
                             return; 
                         };
