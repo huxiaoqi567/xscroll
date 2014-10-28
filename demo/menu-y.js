@@ -1,4 +1,5 @@
-function menuY(renderTo) {
+function menuY(renderTo,cfg) {
+    var self = this;
     var xscroll = new XScroll({
         renderTo: renderTo,
         scrollbarY: false,
@@ -11,9 +12,12 @@ function menuY(renderTo) {
     //click to move
     xscroll.renderTo.addEventListener("click", function(e) {
         var offset = xscroll.getOffsetTop();
-        var index = Math.floor((e.pageY + Math.abs(offset)) / menuHeight);
+        var index = Math.floor((e.pageY - XScroll.Util.getOffsetTop(xscroll.renderTo) + Math.abs(offset)) / menuHeight);
         switchTo(index);
+        cfg && cfg.onSwitch && cfg.onSwitch(index);
     });
+
+
 
 
     var menus = document.querySelectorAll(renderTo + " li");

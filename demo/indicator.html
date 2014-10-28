@@ -495,18 +495,18 @@
         	scrollbarX:false,
         	scrollbarY:false
         })
-        row.render()
+        row.render();
         xscroll.on("scroll",function(e){
         	row.scrollY(-e.offset.y);
-        })
+        });
         xscroll.on("scale",function(e){
         	if(e.triggerEvent == "pinch"){
         		row.scaleTo(e.scale,0.5,e.origin.y);
         	}
-        })
+        });
         xscroll.on("scaleanimate",function(e){
         	row.scaleTo(e.scale,0.5,e.origin.y,e.duration);
-        })
+        });
         
         xscroll.scaleTo(minScale,0,0);
         row.scaleTo(minScale,0.5,0);

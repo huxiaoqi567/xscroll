@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
 	var Util = require('./util');
+	var Base = require('./base');
 	var prefix;
 	var containerCls;
 	var loadingContent = "Loading...";
@@ -10,21 +11,20 @@ define(function(require, exports, module) {
 	var HEIGHT = 40;
 
 	var PullUp = function(cfg) {
-		var self = this;
-		self.__events = {};
-		self.userConfig = Util.mix({
-			upContent:upContent,
-			downContent:downContent,
-			pageEndContent:pageEndContent,
+		PullUp.superclass.constructor.call(this);
+		this.userConfig = Util.mix({
+			upContent: upContent,
+			downContent: downContent,
+			pageEndContent: pageEndContent,
 			pullUpHeight: PULL_UP_HEIGHT,
-			height:HEIGHT,
+			height: HEIGHT,
 			autoRefresh: true, //是否自动刷新页面
 			loadingContent: loadingContent,
-			boundry:{},
+			boundry: {},
 			prefix: "xs-plugin-pullup-"
 		}, cfg);
 	}
-	Util.mix(PullUp.prototype, {
+	Util.extend(PullUp, Base, {
 		pluginId: "xscroll/plugin/pullup",
 		pluginInitializer: function(xscroll) {
 			var self = this;
@@ -70,18 +70,16 @@ define(function(require, exports, module) {
 				self._scrollHandler(e);
 			});
 			//load width a buffer
-			if(self.userConfig.bufferHeight > 0){
-				xscroll.on("scroll",function(e){
-					
-					if(!self.isLoading &&  Math.abs(e.offset.y) + xscroll.height +  self.userConfig.height + self.userConfig.bufferHeight >= xscroll.containerHeight + xscroll.boundry._xtop + xscroll.boundry._xbottom){
-						console.log(Math.abs(e.offset.y))
+			if (self.userConfig.bufferHeight > 0) {
+				xscroll.on("scroll", function(e) {
+					if (!self.isLoading && Math.abs(e.offset.y) + xscroll.height + self.userConfig.height + self.userConfig.bufferHeight >= xscroll.containerHeight + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
 						self._changeStatus("loading");
 					}
 				});
 			}
 			//bounce bottom
-			xscroll.on("scrollend",function(e){
-				if(e.directionY == "top" && e.offset.y ==  xscroll.height - xscroll.containerHeight - self.userConfig.height){
+			xscroll.on("scrollend", function(e) {
+				if (e.directionY == "top" && e.offset.y == xscroll.height - xscroll.containerHeight - self.userConfig.height) {
 					self._changeStatus("loading");
 				}
 			})
@@ -90,64 +88,46 @@ define(function(require, exports, module) {
 			var self = this;
 			var xscroll = self.xscroll;
 			var offsetTop = xscroll.getOffsetTop();
-			if (offsetTop <  xscroll.height - xscroll.containerHeight - self.userConfig.pullUpHeight) {
+			if (offsetTop < xscroll.height - xscroll.containerHeight - self.userConfig.pullUpHeight) {
 				self._changeStatus("down")
-			}else{
+			} else {
 				self._changeStatus("up");
 			}
 		},
 		_changeStatus: function(status) {
-			if(status != "loading" && this.isLoading) return;
+			if (status != "loading" && this.isLoading) return;
 			var prevVal = this.status;
 			this.status = status;
 			Util.removeClass(this.pullup, prefix + prevVal)
 			Util.addClass(this.pullup, prefix + status);
 			this.setContent(this.userConfig[status + "Content"]);
-			if(prevVal != status){
-				this.fire("statuschange",{
-					prevVal:prevVal,
-					newVal:status
+			if (prevVal != status) {
+				this.fire("statuschange", {
+					prevVal: prevVal,
+					newVal: status
 				});
-				if(status == "loading"){
+				if (status == "loading") {
 					this.isLoading = true;
 					this.fire("loading");
 				}
 			}
 		},
-		complete:function(){
+		complete: function() {
 			var self = this;
+			var xscroll = self.xscroll;
 			self.isLoading = false;
 			self._changeStatus("up");
-			if(!self.userConfig.bufferHeight) return;
-			var trans = self.xscroll._bounce("y",self.xscroll._prevSpeed);
-            trans && self.xscroll.scrollY(trans.offset,trans.duration,trans.easing);
+			if (!self.userConfig.bufferHeight) return;
+			var trans = xscroll._bounce("y", xscroll._prevSpeed);
+			trans && self.xscroll.scrollY(trans.offset, trans.duration, trans.easing, function(e) {
+				xscroll._scrollEndHandler("y");
+			});
 		},
-		reset:function(callback){
-        	this.xscroll.boundry.resetBottom()
+		reset: function(callback) {
+			this.xscroll.boundry.resetBottom()
 			this.xscroll.bounce(true, callback);
 			this._expanded = false;
-        },
-		fire: function(evt) {
-            var self = this;
-            if (self.__events[evt] && self.__events[evt].length) {
-                for (var i in self.__events[evt]) {
-                    self.__events[evt][i].apply(this,[].slice.call(arguments, 1));
-                }
-            }
-        },
-        on: function(evt, fn) {
-            if (!this.__events[evt]) {
-                this.__events[evt] = [];
-            }
-            this.__events[evt].push(fn);
-        },
-        detach: function(evt, fn) {
-            if (!evt || !this.__events[evt]) return;
-            var index = this.__events[evt].indexOf(fn);
-            if (index > -1) {
-                this.__events[evt].splice(index, 1);
-            }
-        },
+		},
 		setContent: function(content) {
 			var self = this;
 			if (content) {
@@ -156,10 +136,8 @@ define(function(require, exports, module) {
 		}
 	})
 
-	if(typeof module == 'object' && module.exports){
+	if (typeof module == 'object' && module.exports) {
 		module.exports = PullUp;
-	}else{
+	} else {
 		return PullUp;
-	}
-	
-});
+	}});

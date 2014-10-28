@@ -1,13 +1,13 @@
 define(function(require, exports, module) {
 	var Util = require('./util');
+	var Base = require('./base');
 	var prefix;
 	var containerCls;
 	var content = "Pull Down To Refresh";
 	var loadingContent = "Loading...";
 	var PullDown = function(cfg) {
-		var self = this;
-		self.__events = {};
-		self.userConfig = Util.mix({
+		PullDown.superclass.constructor.call(this);
+		this.userConfig = Util.mix({
 			content: content,
 			height: 60,
 			autoRefresh: true, //是否自动刷新页面
@@ -17,7 +17,7 @@ define(function(require, exports, module) {
 			prefix: "xs-plugin-pulldown-"
 		}, cfg);
 	}
-	Util.mix(PullDown.prototype, {
+	Util.extend(PullDown,Base, {
 		pluginId: "xscroll/plugin/pulldown",
 		pluginInitializer: function(xscroll) {
 			var self = this;
@@ -88,27 +88,6 @@ define(function(require, exports, module) {
 				}
 			}
 		},
-		fire: function(evt) {
-            var self = this;
-            if (self.__events[evt] && self.__events[evt].length) {
-                for (var i in self.__events[evt]) {
-                    self.__events[evt][i].apply(this,[].slice.call(arguments, 1));
-                }
-            }
-        },
-        on: function(evt, fn) {
-            if (!this.__events[evt]) {
-                this.__events[evt] = [];
-            }
-            this.__events[evt].push(fn);
-        },
-        detach: function(evt, fn) {
-            if (!evt || !this.__events[evt]) return;
-            var index = this.__events[evt].indexOf(fn);
-            if (index > -1) {
-                this.__events[evt].splice(index, 1);
-            }
-        },
         reset:function(callback){
         	this.xscroll.boundry.resetTop()
 			this.xscroll.bounce(true, callback);
@@ -137,7 +116,6 @@ define(function(require, exports, module) {
 				xscroll.bounce(true,function(){
 					self._changeStatus("loading");
 				});
-				
 				if(self.userConfig.autoRefresh){
 					clearTimeout(self.loadingItv);
 					self.loadingItv = setTimeout(function() {
@@ -147,17 +125,15 @@ define(function(require, exports, module) {
 						})
 					}, 800);
 				}
-				
 			}
 		},
-
 		setContent: function(content) {
 			var self = this;
 			if (content) {
 				self.pulldown.innerHTML = content;
 			}
 		}
-	})
+	});
 
 	if(typeof module == 'object' && module.exports){
 		module.exports = PullDown;

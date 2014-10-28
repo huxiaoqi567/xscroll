@@ -1,4 +1,19 @@
 define(function(require, exports, module) {
+
+	function Empty() {}
+
+	function createObject(proto, constructor) {
+		var newProto;
+		if (Object.create) {
+			newProto = Object.create(proto);
+		} else {
+			Empty.prototype = proto;
+			newProto = new Empty();
+		}
+		newProto.constructor = constructor;
+		return newProto;
+	}
+
 	var Util = {
 		mix: function(to, from) {
 			for (var i in from) {
@@ -6,10 +21,25 @@ define(function(require, exports, module) {
 			}
 			return to;
 		},
-		extend: function(superClass, subClass, attrs) {
-			this.mix(subClass.prototype, superClass.prototype);
-			subClass.prototype.super = superClass;
-			this.mix(subClass.prototype, attrs)
+		extend: function(r, s, px, sx) {
+			if (!s || !r) {
+				return r;
+			}
+			var sp = s.prototype,
+				rp;
+			// add prototype chain
+			rp = createObject(sp, r);
+			r.prototype = this.mix(rp, r.prototype);
+			r.superclass = createObject(sp, s);
+			// add prototype overrides
+			if (px) {
+				this.mix(rp, px);
+			}
+			// add object overrides
+			if (sx) {
+				this.mix(r, sx);
+			}
+			return r;
 		},
 		/*
         vendors

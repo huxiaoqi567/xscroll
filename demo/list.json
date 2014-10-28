@@ -6,21 +6,7 @@
 			"height":50
 		}
 	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
+	
 	{
 		"data":{"text":"just a list item","type":"normal"}
 	},{
@@ -41,98 +27,6 @@
 	{
 		"data":{"text":"just a list item","type":"normal"}
 	},{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
-		"data":{"text":"just a list item","type":"normal"}
-	},
-	{
 		"data":{"text":"just a list item","type":"normal"}
 	},
 	{
@@ -141,4 +35,5 @@
 	{
 		"data":{"text":"just a list item","type":"normal"}
 	}
+	
 ]

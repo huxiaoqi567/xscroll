@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <script src=""></script>
 </head>
 <body>
     <style type="text/css">
@@ -77,7 +76,6 @@ body {
 }
 #J_Scroll li{
     padding: 0 10px;
-
     height: 40px;
     line-height: 40px;
     border-bottom: 1px solid #ccc;
@@ -85,7 +83,6 @@ body {
     font-size: 16px;
     display: block;
     list-style: none;
-    /*-webkit-transition:-webkit-transform 0.2s ease-out 0s;*/
 }
 
     img{
@@ -105,6 +102,7 @@ body {
     .xs-container{
         width: 100%;
     }
+
     </style>
     <div id="header">XScroll</div>
     <div id="J_Scroll">
@@ -144,13 +142,9 @@ body {
         </div>
     </div>
     <div id="footer">Scroll-Vertical</div>
-    <script src="../lib/jquery.js"></script>
-     <script src="../lib/sea.js"></script>
+     <script type="text/javascript" src="../lib/jquery.js"></script>
+     <script type="text/javascript" src="../build/xlist.js"></script>
     <script>
-    seajs.config({
-      base: "../src/"
-    })
-    seajs.use("xlist",function(XList){
         var data = [];
         for(var i =0;i<100;i++){
             data.push({
@@ -166,23 +160,19 @@ body {
             renderTo:"#J_Scroll",
             infiniteElements:'#J_Scroll li',
             data:data,
-            // scrollbarY:false,
             renderHook:function(el,row){
                 el.innerHTML = row.data.row;
             }
         });
 
-        var pulldown = new XScroll.PullDown({
-            xscroll:xlist,
+        var pulldown = new XList.Plugin.PullDown({
             autoRefresh:false
-            // be
         });
+        xlist.plug(pulldown)
 
         xlist.render()
-
         
         pulldown.on("loading",function(e){
-            console.log("loading start")
           $.ajax({
                     url:"./data.json",
                     dataType:"json",
@@ -198,8 +188,9 @@ body {
 
 
 
+
+
         window.xlist = xlist
-    })
     </script>
 </body>
 </html>

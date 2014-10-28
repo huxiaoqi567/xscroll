@@ -1,3 +1,4 @@
+    var Base = require('./base');
     var Util = require('./util');
     var Event = require('./event');
     var Pan = require('./pan');
@@ -8,9 +9,12 @@
     var PullUp = require('./pullup');
     //global namespace
     var XScroll = function(cfg) {
+        XScroll.superclass.constructor.call(this)
         this.userConfig = cfg;
         this.init();
     };
+
+    XScroll.Util = Util;
     //namespace for plugins
     XScroll.Plugin = {
         //pulldown refresh
@@ -102,11 +106,11 @@
          * @constructor
          * @extends Base
          */
-    Util.mix(XScroll.prototype, {
+
+    Util.extend(XScroll,Base, {
         version:"2.1.0",
         init: function() {
             var self = this;
-            self.__events = {};
             var userConfig = self.userConfig = Util.mix({
                 scalable: false,
                 scrollbarX: true,
@@ -260,8 +264,8 @@
         },
         //translate a element 
         translate: function(offset) {
-            this.translateX(offset.x)
-            this.translateY(offset.y)
+            this.translateX(offset.x);
+            this.translateY(offset.y);
             return;
         },
         _scale: function(scale, originX, originY, triggerEvent) {
@@ -304,6 +308,7 @@
             self.x = x;
             self.y = y;
             self._transform();
+            self._noTransition();
             self.fire(SCALE, {
                 scale: scale,
                 origin: {
@@ -342,9 +347,9 @@
                 self._rafScale = RAF(run);
             }
             run();
+            self._scale(scale, originX, originY, "scaleTo");
             self.container.style[transition] = transitionStr;
             self.content.style[transition] = transitionStr;
-            self._scale(scale, originX, originY, "scaleTo");
             self.fire(SCALE_ANIMATE, {
                 scale: self.scale,
                 duration: duration,
@@ -404,8 +409,11 @@
         },
         _transform: function() {
             var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
-            this.content.style[transform] = "translate(" + this.x + "px,0px)  scaleX(" + this.scale + ") scaleY(" + this.scale + ") " + translateZ;
-            this.container.style[transform] = "translate(0px," + this.y + "px) " + translateZ;
+            var scale = this.userConfig.scalable ? " scale(" + this.scale + ") " :"";
+            this.content.style[transform] = "translate(" + this.x + "px,0px) "+ scale + translateZ;
+            if(!this.userConfig.lockY){
+                this.container.style[transform] = "translate(0px," + this.y + "px) " + translateZ;
+            }
         },
         getOffset: function() {
             var self = this;
@@ -753,27 +761,6 @@
                 self[boundryCheckFn]();
             }
         },
-        fire: function(evt) {
-            var self = this;
-            if (self.__events[evt] && self.__events[evt].length) {
-                for (var i in self.__events[evt]) {
-                    self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
-                }
-            }
-        },
-        on: function(evt, fn) {
-            if (!this.__events[evt]) {
-                this.__events[evt] = [];
-            }
-            this.__events[evt].push(fn);
-        },
-        detach: function(evt, fn) {
-            if (!evt || !this.__events[evt]) return;
-            var index = this.__events[evt].indexOf(fn);
-            if (index > -1) {
-                this.__events[evt].splice(index, 1);
-            }
-        },
         _bounce: function(type, v) {
             var self = this;
             var offset = self.getOffset()[type];
@@ -839,36 +826,6 @@
             self['isScrolling' + type.toUpperCase()] = true;
             return transition;
 
-        },
-        plug: function(plugin) {
-            var self = this;
-            if (!plugin || !plugin.pluginId) return;
-            if (!self.__plugins) {
-                self.__plugins = [];
-            }
-            plugin.pluginInitializer(self);
-            self.__plugins.push(plugin);
-        },
-        unplug: function(plugin) {
-            var self = this;
-            if (!plugin) return;
-            var _plugin = typeof plugin == "string" ? self.getPlugin(plugin) : plugin;
-            _plugin.pluginDestructor(self);
-            for (var i in self.__plugins) {
-                if (self.__plugins[i] == _plugin) {
-                    return self.__plugins.splice(i, 1);
-                }
-            }
-        },
-        getPlugin: function(pluginId) {
-            var self = this;
-            var plugins = [];
-            for (var i in self.__plugins) {
-                if (self.__plugins[i] && self.__plugins[i].pluginId == pluginId) {
-                    plugins.push(self.__plugins[i])
-                }
-            }
-            return plugins.length > 1 ? plugins : plugins[0] || null;
         }
     });
 

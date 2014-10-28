@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
 	var Util = require('./util');
+	var Base = require('./base');
 	//transform
 	var transform = Util.prefixStyle("transform");
 	//transition webkitTransition MozTransition OTransition msTtransition
@@ -12,10 +13,9 @@ define(function(require, exports, module) {
 	var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 	//acceration 
 	var acc = 1;
-	
 	var startX;
-
 	var SwipeEdit = function(cfg) {
+		SwipeEdit.superclass.constructor.call(this);
 		this.userConfig = Util.mix({
 			labelSelector: clsPrefix + "label",
 			renderHook: function(el) {
@@ -23,7 +23,7 @@ define(function(require, exports, module) {
 			}
 		}, cfg);
 	};
-	Util.mix(SwipeEdit.prototype, {
+	Util.extend(SwipeEdit,Base, {
 		pluginId: "xlist/plugin/swipeedit",
 		pluginInitializer: function(xlist) {
 			var self = this;

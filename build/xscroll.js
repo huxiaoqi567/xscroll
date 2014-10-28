@@ -1,6 +1,19 @@
 ;(function() {
-var util, pan, tap, pinch, scrollbar, core, _event_, _pulldown_, _pullup_;
+var util, base, pan, tap, pinch, scrollbar, core, _event_, _pulldown_, _pullup_;
 util = function (exports) {
+  function Empty() {
+  }
+  function createObject(proto, constructor) {
+    var newProto;
+    if (Object.create) {
+      newProto = Object.create(proto);
+    } else {
+      Empty.prototype = proto;
+      newProto = new Empty();
+    }
+    newProto.constructor = constructor;
+    return newProto;
+  }
   var Util = {
     mix: function (to, from) {
       for (var i in from) {
@@ -8,10 +21,24 @@ util = function (exports) {
       }
       return to;
     },
-    extend: function (superClass, subClass, attrs) {
-      this.mix(subClass.prototype, superClass.prototype);
-      subClass.prototype.super = superClass;
-      this.mix(subClass.prototype, attrs);
+    extend: function (r, s, px, sx) {
+      if (!s || !r) {
+        return r;
+      }
+      var sp = s.prototype, rp;
+      // add prototype chain
+      rp = createObject(sp, r);
+      r.prototype = this.mix(rp, r.prototype);
+      r.superclass = createObject(sp, s);
+      // add prototype overrides
+      if (px) {
+        this.mix(rp, px);
+      }
+      // add object overrides
+      if (sx) {
+        this.mix(r, sx);
+      }
+      return r;
     },
     /*
         vendors
@@ -74,6 +101,74 @@ util = function (exports) {
     exports = Util;
   } else {
     return Util;
+  }
+  return exports;
+}({});
+base = function (exports) {
+  var Util = util;
+  var Base = function () {
+    this.__events = {};
+  };
+  Util.mix(Base.prototype, {
+    plug: function (plugin) {
+      var self = this;
+      if (!plugin || !plugin.pluginId)
+        return;
+      if (!self.__plugins) {
+        self.__plugins = [];
+      }
+      plugin.pluginInitializer(self);
+      self.__plugins.push(plugin);
+    },
+    unplug: function (plugin) {
+      var self = this;
+      if (!plugin)
+        return;
+      var _plugin = typeof plugin == 'string' ? self.getPlugin(plugin) : plugin;
+      _plugin.pluginDestructor(self);
+      for (var i in self.__plugins) {
+        if (self.__plugins[i] == _plugin) {
+          return self.__plugins.splice(i, 1);
+        }
+      }
+    },
+    getPlugin: function (pluginId) {
+      var self = this;
+      var plugins = [];
+      for (var i in self.__plugins) {
+        if (self.__plugins[i] && self.__plugins[i].pluginId == pluginId) {
+          plugins.push(self.__plugins[i]);
+        }
+      }
+      return plugins.length > 1 ? plugins : plugins[0] || null;
+    },
+    fire: function (evt) {
+      var self = this;
+      if (self.__events[evt] && self.__events[evt].length) {
+        for (var i in self.__events[evt]) {
+          self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
+        }
+      }
+    },
+    on: function (evt, fn) {
+      if (!this.__events[evt]) {
+        this.__events[evt] = [];
+      }
+      this.__events[evt].push(fn);
+    },
+    detach: function (evt, fn) {
+      if (!evt || !this.__events[evt])
+        return;
+      var index = this.__events[evt].indexOf(fn);
+      if (index > -1) {
+        this.__events[evt].splice(index, 1);
+      }
+    }
+  });
+  if (typeof module == 'object' && module.exports) {
+    exports = Base;
+  } else {
+    return Base;
   }
   return exports;
 }({});
@@ -674,14 +769,14 @@ scrollbar = function (exports) {
 }({});
 _pulldown_ = function (exports) {
   var Util = util;
+  var Base = base;
   var prefix;
   var containerCls;
   var content = 'Pull Down To Refresh';
   var loadingContent = 'Loading...';
   var PullDown = function (cfg) {
-    var self = this;
-    self.__events = {};
-    self.userConfig = Util.mix({
+    PullDown.superclass.constructor.call(this);
+    this.userConfig = Util.mix({
       content: content,
       height: 60,
       autoRefresh: true,
@@ -692,7 +787,7 @@ _pulldown_ = function (exports) {
       prefix: 'xs-plugin-pulldown-'
     }, cfg);
   };
-  Util.mix(PullDown.prototype, {
+  Util.extend(PullDown, Base, {
     pluginId: 'xscroll/plugin/pulldown',
     pluginInitializer: function (xscroll) {
       var self = this;
@@ -763,28 +858,6 @@ _pulldown_ = function (exports) {
         }
       }
     },
-    fire: function (evt) {
-      var self = this;
-      if (self.__events[evt] && self.__events[evt].length) {
-        for (var i in self.__events[evt]) {
-          self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
-        }
-      }
-    },
-    on: function (evt, fn) {
-      if (!this.__events[evt]) {
-        this.__events[evt] = [];
-      }
-      this.__events[evt].push(fn);
-    },
-    detach: function (evt, fn) {
-      if (!evt || !this.__events[evt])
-        return;
-      var index = this.__events[evt].indexOf(fn);
-      if (index > -1) {
-        this.__events[evt].splice(index, 1);
-      }
-    },
     reset: function (callback) {
       this.xscroll.boundry.resetTop();
       this.xscroll.bounce(true, callback);
@@ -841,6 +914,7 @@ _pulldown_ = function (exports) {
 }({});
 _pullup_ = function (exports) {
   var Util = util;
+  var Base = base;
   var prefix;
   var containerCls;
   var loadingContent = 'Loading...';
@@ -850,9 +924,8 @@ _pullup_ = function (exports) {
   var PULL_UP_HEIGHT = 60;
   var HEIGHT = 40;
   var PullUp = function (cfg) {
-    var self = this;
-    self.__events = {};
-    self.userConfig = Util.mix({
+    PullUp.superclass.constructor.call(this);
+    this.userConfig = Util.mix({
       upContent: upContent,
       downContent: downContent,
       pageEndContent: pageEndContent,
@@ -865,7 +938,7 @@ _pullup_ = function (exports) {
       prefix: 'xs-plugin-pullup-'
     }, cfg);
   };
-  Util.mix(PullUp.prototype, {
+  Util.extend(PullUp, Base, {
     pluginId: 'xscroll/plugin/pullup',
     pluginInitializer: function (xscroll) {
       var self = this;
@@ -916,7 +989,6 @@ _pullup_ = function (exports) {
       if (self.userConfig.bufferHeight > 0) {
         xscroll.on('scroll', function (e) {
           if (!self.isLoading && Math.abs(e.offset.y) + xscroll.height + self.userConfig.height + self.userConfig.bufferHeight >= xscroll.containerHeight + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
-            console.log(Math.abs(e.offset.y));
             self._changeStatus('loading');
           }
         });
@@ -959,39 +1031,20 @@ _pullup_ = function (exports) {
     },
     complete: function () {
       var self = this;
+      var xscroll = self.xscroll;
       self.isLoading = false;
       self._changeStatus('up');
       if (!self.userConfig.bufferHeight)
         return;
-      var trans = self.xscroll._bounce('y', self.xscroll._prevSpeed);
-      trans && self.xscroll.scrollY(trans.offset, trans.duration, trans.easing);
+      var trans = xscroll._bounce('y', xscroll._prevSpeed);
+      trans && self.xscroll.scrollY(trans.offset, trans.duration, trans.easing, function (e) {
+        xscroll._scrollEndHandler('y');
+      });
     },
     reset: function (callback) {
       this.xscroll.boundry.resetBottom();
       this.xscroll.bounce(true, callback);
       this._expanded = false;
-    },
-    fire: function (evt) {
-      var self = this;
-      if (self.__events[evt] && self.__events[evt].length) {
-        for (var i in self.__events[evt]) {
-          self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
-        }
-      }
-    },
-    on: function (evt, fn) {
-      if (!this.__events[evt]) {
-        this.__events[evt] = [];
-      }
-      this.__events[evt].push(fn);
-    },
-    detach: function (evt, fn) {
-      if (!evt || !this.__events[evt])
-        return;
-      var index = this.__events[evt].indexOf(fn);
-      if (index > -1) {
-        this.__events[evt].splice(index, 1);
-      }
     },
     setContent: function (content) {
       var self = this;
@@ -1008,6 +1061,7 @@ _pullup_ = function (exports) {
   return exports;
 }({});
 core = function (exports) {
+  var Base = base;
   var Util = util;
   var Event = _event_;
   var Pan = pan;
@@ -1018,9 +1072,11 @@ core = function (exports) {
   var PullUp = _pullup_;
   //global namespace
   var XScroll = function (cfg) {
+    XScroll.superclass.constructor.call(this);
     this.userConfig = cfg;
     this.init();
   };
+  XScroll.Util = Util;
   //namespace for plugins
   XScroll.Plugin = {
     //pulldown refresh
@@ -1107,11 +1163,10 @@ core = function (exports) {
    * @constructor
    * @extends Base
    */
-  Util.mix(XScroll.prototype, {
+  Util.extend(XScroll, Base, {
     version: '2.1.0',
     init: function () {
       var self = this;
-      self.__events = {};
       var userConfig = self.userConfig = Util.mix({
         scalable: false,
         scrollbarX: true,
@@ -1309,6 +1364,7 @@ core = function (exports) {
       self.x = x;
       self.y = y;
       self._transform();
+      self._noTransition();
       self.fire(SCALE, {
         scale: scale,
         origin: {
@@ -1354,9 +1410,9 @@ core = function (exports) {
         self._rafScale = RAF(run);
       };
       run();
+      self._scale(scale, originX, originY, 'scaleTo');
       self.container.style[transition] = transitionStr;
       self.content.style[transition] = transitionStr;
-      self._scale(scale, originX, originY, 'scaleTo');
       self.fire(SCALE_ANIMATE, {
         scale: self.scale,
         duration: duration,
@@ -1417,8 +1473,11 @@ core = function (exports) {
     },
     _transform: function () {
       var translateZ = this.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
-      this.content.style[transform] = 'translate(' + this.x + 'px,0px)  scaleX(' + this.scale + ') scaleY(' + this.scale + ') ' + translateZ;
-      this.container.style[transform] = 'translate(0px,' + this.y + 'px) ' + translateZ;
+      var scale = this.userConfig.scalable ? ' scale(' + this.scale + ') ' : '';
+      this.content.style[transform] = 'translate(' + this.x + 'px,0px) ' + scale + translateZ;
+      if (!this.userConfig.lockY) {
+        this.container.style[transform] = 'translate(0px,' + this.y + 'px) ' + translateZ;
+      }
     },
     getOffset: function () {
       var self = this;
@@ -1787,28 +1846,6 @@ core = function (exports) {
         self[boundryCheckFn]();
       }
     },
-    fire: function (evt) {
-      var self = this;
-      if (self.__events[evt] && self.__events[evt].length) {
-        for (var i in self.__events[evt]) {
-          self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
-        }
-      }
-    },
-    on: function (evt, fn) {
-      if (!this.__events[evt]) {
-        this.__events[evt] = [];
-      }
-      this.__events[evt].push(fn);
-    },
-    detach: function (evt, fn) {
-      if (!evt || !this.__events[evt])
-        return;
-      var index = this.__events[evt].indexOf(fn);
-      if (index > -1) {
-        this.__events[evt].splice(index, 1);
-      }
-    },
     _bounce: function (type, v) {
       var self = this;
       var offset = self.getOffset()[type];
@@ -1872,38 +1909,6 @@ core = function (exports) {
       }
       self['isScrolling' + type.toUpperCase()] = true;
       return transition;
-    },
-    plug: function (plugin) {
-      var self = this;
-      if (!plugin || !plugin.pluginId)
-        return;
-      if (!self.__plugins) {
-        self.__plugins = [];
-      }
-      plugin.pluginInitializer(self);
-      self.__plugins.push(plugin);
-    },
-    unplug: function (plugin) {
-      var self = this;
-      if (!plugin)
-        return;
-      var _plugin = typeof plugin == 'string' ? self.getPlugin(plugin) : plugin;
-      _plugin.pluginDestructor(self);
-      for (var i in self.__plugins) {
-        if (self.__plugins[i] == _plugin) {
-          return self.__plugins.splice(i, 1);
-        }
-      }
-    },
-    getPlugin: function (pluginId) {
-      var self = this;
-      var plugins = [];
-      for (var i in self.__plugins) {
-        if (self.__plugins[i] && self.__plugins[i].pluginId == pluginId) {
-          plugins.push(self.__plugins[i]);
-        }
-      }
-      return plugins.length > 1 ? plugins : plugins[0] || null;
     }
   });
   if (typeof module == 'object' && module.exports) {

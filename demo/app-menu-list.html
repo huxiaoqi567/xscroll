@@ -123,7 +123,7 @@
      #J_List .xs-content{
         width: 100%;
      }
-     #J_List .xs-content li{
+     #J_List  li{
         border:1px solid #ccc;
         /*display: none;*/
         height:70;
@@ -247,34 +247,44 @@
     <script type="text/javascript" src="./menu-x.js"></script>
     <script type="text/javascript" src="./menu-y.js"></script>
     <script>
+
+        function hasClass(el, className) {
+            return el && el.className && el.className.indexOf(className) != -1;
+        }
+        function addClass(el, className) {
+            if (el && !this.hasClass(el, className)) {
+                el.className += " " + className;
+            }
+        }
+        function removeClass(el, className) {
+            if (el && el.className) {
+                el.className = el.className.replace(className, "");
+            }
+        }
         
         var menux = new menuX("#J_MenuX");
-
-
-
-        var menuy = new menuY("#J_MenuY");
-
-
+        var menuy = new menuY("#J_MenuY",{
+            onSwitch:onSwitch
+        });
 
 
         var pageCache ={};
         var page = 1;
-        var totalPage = 10;
         var ds = new XList.DataSet();
 
         var xlist = new XList({
             renderTo:"#J_List",
             infiniteElements:"#J_List .xs-row",
             itemHeight:70,
-            SROLL_ACCELERATION:0.002,
             renderHook:function(el,row){
                 var html = '';
                 if(row.data.type == "normal"){
+                    removeClass(el,"content-title");
                     html = '<div class="lbl">'+row.data.text+'</div>'+
                                 '<div class="control">'+
                                 '<div class="btn btn-delete">delete</div></div>'
                 }else{
-                    !el.className.match(/content-title/)?el.className+=" content-title":"";
+                    addClass(el,"content-title");
                     html = row.data.text;
                 }
                 el.innerHTML = html;
@@ -319,15 +329,14 @@
 
         xlist.render();
 
-         getData();
-
-
-        document.querySelector("#J_MenuY").addEventListener("click",function(e){
-            console.log(e)
-
-        })
+        getData();
 
         var menus = document.querySelectorAll("#J_MenuY li");
+        var totalPage = menus.length;
+
+        function onSwitch(index){
+
+        }
 
         function getData(){
             if(!pageCache[page]){
