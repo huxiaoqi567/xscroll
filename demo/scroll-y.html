@@ -131,6 +131,10 @@
             lockX:true
         });
         xscroll.render();
+
+        xscroll.on("scrollend",function(e){
+            console.log("scrollend")
+        })
     </script>
 </body>
 </html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>choose-date</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+    *{
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-text-size-adjust: none;
+    }
+
+    html{
+        font-size: 12px;
+    }
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    .item{
+       position: relative;
+       width: 30%;
+       height: 200px;
+       overflow: hidden;
+       margin: 100px auto;
+    }
+    .item li{
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+    }
+    .filter{
+        position: absolute;
+        width: 100%;
+        border:1px solid ;
+        height: 40px;
+        top:80px;
+    }
+    </style>
+    <div class="item" id="year">
+        <div class="filter"></div>
+        <div class="xs-container">
+            <ul class="xs-content nav nav-pills nav-justified">
+                <li class="cur">Home</li>
+                <li>Demo</li>
+                <li>Application</li>
+                <li>Document</li>
+                <li>Profile</li>
+                <li>Messages</li>
+                <li>Settings</li>
+                <li>Favourite</li>
+                <li>Link</li>
+                <li>More</li>
+                <li>Detail</li>
+                <li>About</li>
+                <li class="cur">Home</li>
+                <li>Demo</li>
+                <li>Application</li>
+                <li>Document</li>
+                <li>Profile</li>
+                <li>Messages</li>
+                <li>Settings</li>
+                <li>Favourite</li>
+                <li>Link</li>
+                <li>More</li>
+                <li>Detail</li>
+                <li>About</li>
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript" src="../build/xscroll.js"></script>
+    <script>
+    var year = new XScroll({
+        renderTo:"#year",
+        lockX:true,
+        scrollbarX:false
+    })
+    year.render();
+    var cellHeight = document.querySelector("#year li").offsetHeight;
+    year.on("scrollend",function  (e) {
+        var offset = e.offset.y;
+        var snap = 0;
+        if(offset%cellHeight == 0 || offset.y>0 || offset.y<year.height -year.containerHeight) return;
+        snap = Math.round(offset/cellHeight) 
+        year.scrollY(-snap * cellHeight,500,"ease");
+    })
+
+    </script>
+</body>
+</html>
