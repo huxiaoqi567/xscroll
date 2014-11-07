@@ -34,7 +34,7 @@ bower install xscroll
     * `lockY` 是否锁定纵向滚动
     * `gpuAcceleration` 是否开启GPU硬件加速（在性能提升的同时需要注意内存控制）
 * `enableGPUAcceleration()` 开启硬件加速
-* `disableGPUAcceleration()` 开启硬件加速
+* `disableGPUAcceleration()` 关闭硬件加速
 * `getOffset()` 获取水平和垂直偏移量，如:{x:0,y:100}
 * `getOffsetTop()` 获取垂直偏移量
 * `getOffsetLeft()` 获取水平偏移量
