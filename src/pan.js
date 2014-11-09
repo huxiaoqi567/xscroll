@@ -163,6 +163,15 @@
 	var ismousedown = false;
 	document.addEventListener("mousedown", function(e) {
 		ismousedown = true;
+		var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("touchstart",true,true);
+		var param = {
+			clientX: e.clientX,
+			clientY: e.clientY
+		};
+		evt.touches = [param];
+		evt.changedTouches = [param];
+		e.target.dispatchEvent(evt);
 	});
 	document.addEventListener("mousemove", function(e) {
 		if (!ismousedown) return;
