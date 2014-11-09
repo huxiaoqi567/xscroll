@@ -4,10 +4,77 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="demo.css">
+    <script src=""></script>
 </head>
 <body>
     <style type="text/css">
+    * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin:0;
+    padding: 0;
+}
+
+html {
+    -ms-touch-action: none;
+}
+
+body,ul,li {
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+body {
+    font-size: 12px;
+    font-family: ubuntu, helvetica, arial;
+    overflow: hidden; 
+}
+
+#header {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 45px;
+    line-height: 45px;
+    background: #f60;
+    padding: 0;
+    color: #eee;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+#footer {
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background: #444;
+    padding: 0;
+    border-top: 1px solid #444;
+    line-height: 48px;
+    color:#fff;
+    text-align: center;
+}
+
+#J_Scroll {
+    position: absolute;
+    z-index: 1;
+    top: 45px;
+    bottom: 48px;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+}
+#J_Scroll ul{
+    /*position: absolute;*/
+}
 #J_Scroll li{
     padding: 0 10px;
 
@@ -42,6 +109,9 @@
     <div id="J_Scroll">
         <div class="xs-container">
             <ul class="xs-content">
+                <li>row1</li>
+                <li>row2</li>
+                <li>row3</li>
                 <li>row</li>
                 <li>row</li>
                 <li>row</li>
@@ -122,15 +192,64 @@
             </ul>
         </div>
     </div>
-    <div id="footer">scroll-y</div>
+    <div id="footer">Scroll-Vertical</div>
     <script type="text/javascript" src="../build/xscroll.js"></script>
     <script>
+    // seajs.config({
+    //   base: "../src/"
+    // })
+    // seajs.use("core",function(XScroll){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
-            scrollbarX:false,
-            lockX:true
+            scrollbars:true,
+            scalable:true
         });
+
         xscroll.render();
+
+        var isMouseDown = false;
+
+        xscroll.renderTo.addEventListener("mousedown",function(e){
+            // isMouseDown = true;
+            // var evt = document.createEvent("HTMLEvents");
+            // evt.initEvent("touchstart",true,true);
+            // var param = {
+            //     clientX:e.clientX,
+            //     clientY:e.clientY
+            // }
+            // evt.touches = [param]
+            // evt.changedTouches = [param]
+            // e.target.dispatchEvent(evt,{touches:[]});
+        })
+
+         xscroll.renderTo.addEventListener("mousemove",function(e){
+            // if(!isMouseDown) return;
+            // var evt = document.createEvent("HTMLEvents");
+            // evt.initEvent("touchmove",true,true);
+            // var param = {
+            //     clientX:e.clientX,
+            //     clientY:e.clientY
+            // }
+            // evt.touches = [param]
+            // evt.changedTouches = [param]
+            // e.target.dispatchEvent(evt,{touches:[]});
+        })
+
+           xscroll.renderTo.addEventListener("mouseup",function(e){
+            // isMouseDown = false;
+            // var evt = document.createEvent("HTMLEvents");
+            // evt.initEvent("touchend",true,true);
+            // var param = {
+            //     clientX:e.clientX,
+            //     clientY:e.clientY
+            // }
+            // evt.touches = [param]
+            // evt.changedTouches = [param]
+            // e.target.dispatchEvent(evt,{touches:[]});
+        })
+
+        // window.xscroll = xscroll
+    // })
     </script>
 </body>
 </html>

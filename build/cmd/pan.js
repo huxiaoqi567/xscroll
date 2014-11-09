@@ -7,14 +7,15 @@ define(function(require, exports, module) {
 		PAN = Event.prefix('pan'),
 		MIN_SPEED = 0.35,
 		MAX_SPEED = 8;
-	var touch = {}, record = [];
+	var touch = {},
+		record = [];
 	var startX = 0;
 	var startY = 0;
 
 	function touchMoveHandler(e) {
 		if (e.touches.length > 1) return;
 		if (this.gestureType && this.gestureType != "pan") return;
-		if(this.gestureType == ""){
+		if (this.gestureType == "") {
 			record = [];
 		}
 		if (!record.length) {
@@ -35,13 +36,13 @@ define(function(require, exports, module) {
 			e.deltaX = touch.deltaX;
 			e.deltaY = touch.deltaY;
 			this.gestureType = "pan";
-			Event.dispatchEvent(e.target,PAN_START, e);
+			Event.dispatchEvent(e.target, PAN_START, e);
 		} else {
-			if(this.gestureType != "pan") return;
+			if (this.gestureType != "pan") return;
 			touch.deltaX = e.touches[0].clientX - touch.startX;
 			touch.deltaY = e.touches[0].clientY - touch.startY;
-			touch.directionX = e.touches[0].clientX - touch.prevX > 0 ? "right":"left";
-			touch.directionY = e.touches[0].clientY - touch.prevY > 0 ? "bottom":"top";
+			touch.directionX = e.touches[0].clientX - touch.prevX > 0 ? "right" : "left";
+			touch.directionY = e.touches[0].clientY - touch.prevY > 0 ? "bottom" : "top";
 			touch.prevX = e.touches[0].clientX;
 			touch.prevY = e.touches[0].clientY;
 			e.touch = touch;
@@ -58,7 +59,7 @@ define(function(require, exports, module) {
 			e.directionX = touch.directionX;
 			e.directionY = touch.directionY;
 			// if (!e.isPropagationStopped()) {
-				Event.dispatchEvent(e.target,PAN,e);
+			Event.dispatchEvent(e.target, PAN, e);
 			// }
 		}
 
@@ -131,8 +132,8 @@ define(function(require, exports, module) {
 		e.velocity = Math.sqrt(Math.pow(e.velocityX, 2) + Math.pow(e.velocityY, 2))
 		touch = {};
 		record = [];
-		if(this.gestureType == "pan"){
-			Event.dispatchEvent(e.target,PAN_END,e)
+		if (this.gestureType == "pan") {
+			Event.dispatchEvent(e.target, PAN_END, e)
 			this.gestureType = ""
 		}
 	}
@@ -158,20 +159,46 @@ define(function(require, exports, module) {
 		}
 	}
 
-	document.addEventListener("touchmove",touchMoveHandler)
-	document.addEventListener("touchend",touchEndHandler)
+	document.addEventListener("touchmove", touchMoveHandler);
+	document.addEventListener("touchend", touchEndHandler);
+	var ismousedown = false;
+	document.addEventListener("mousedown", function(e) {
+		ismousedown = true;
+	});
+	document.addEventListener("mousemove", function(e) {
+		if (!ismousedown) return;
+		var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("touchmove",true,true);
+		var param = {
+			clientX: e.clientX,
+			clientY: e.clientY
+		};
+		evt.touches = [param];
+		evt.changedTouches = [param];
+		e.target.dispatchEvent(evt);
+	});
+
+	document.addEventListener("mouseup", function(e) {
+		ismousedown = false;
+		var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("touchend",true,true);
+		var param = {
+			clientX: e.clientX,
+			clientY: e.clientY
+		};
+		evt.touches = [param];
+		evt.changedTouches = [param];
+		e.target.dispatchEvent(evt);
+	});
 
 	var Pan = {
-		PAN_START:PAN_START,
-		PAN_END:PAN_END,
-		PAN:PAN
+		PAN_START: PAN_START,
+		PAN_END: PAN_END,
+		PAN: PAN
 	};
 
-	if(typeof module == 'object' && module.exports){
+	if (typeof module == 'object' && module.exports) {
 		module.exports = Pan;
-	}else{
+	} else {
 		return Pan;
-	}
-	
-
-});
+	}});
