@@ -69,6 +69,20 @@ define(function(require, exports, module) {
 			xscroll.on("pan", function(e) {
 				self._scrollHandler(e);
 			});
+
+			self.__isBoundryOut = false;
+			xscroll.on("boundryout", function() {
+				self.__isBoundryOut = true;
+			})
+
+			xscroll.on("scroll", function(e) {
+				if (e.offset.y + xscroll.containerHeight > xscroll.height + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
+					self.__isBoundryOut = false;
+				}
+			});
+
+
+
 			//load width a buffer
 			if (self.userConfig.bufferHeight > 0) {
 				xscroll.on("scroll", function(e) {
@@ -118,10 +132,12 @@ define(function(require, exports, module) {
 			self.isLoading = false;
 			self._changeStatus("up");
 			if (!self.userConfig.bufferHeight) return;
-			var trans = xscroll._bounce("y", xscroll._prevSpeed);
-			trans && self.xscroll.scrollY(trans.offset, trans.duration, trans.easing, function(e) {
-				xscroll._scrollEndHandler("y");
-			});
+			if (!self.__isBoundryOut) {
+				var trans = xscroll._bounce("y", xscroll._prevSpeed);
+				trans && self.xscroll.scrollY(trans.offset, trans.duration, trans.easing, function(e) {
+					xscroll._scrollEndHandler("y");
+				});
+			}
 		},
 		reset: function(callback) {
 			this.xscroll.boundry.resetBottom()
