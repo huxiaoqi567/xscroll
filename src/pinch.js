@@ -49,10 +49,14 @@
 	}
 
 
-	document.addEventListener("touchmove",pinchMoveHandler)
-	document.addEventListener("touchend",pinchEndHandler)
+
+	
 	//枚举
 	var Pinch = {
+		init:function(){
+			document.addEventListener("touchmove",pinchMoveHandler);
+			document.addEventListener("touchend",pinchEndHandler);	
+		},
 		PINCH_START: PINCH_START,
 		PINCH: PINCH,
 		PINCH_END: PINCH_END

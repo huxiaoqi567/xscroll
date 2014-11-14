@@ -108,7 +108,7 @@
          */
 
     Util.extend(XScroll,Base, {
-        version:"2.1.0",
+        version:"2.1.1",
         init: function() {
             var self = this;
             var userConfig = self.userConfig = Util.mix({
@@ -453,11 +453,7 @@
             var duration = duration || 0;
             var easing = easing || "cubic-bezier(0.333333, 0.666667, 0.666667, 1)";
             var content = self.content;
-            self.translateX(-x);
-            var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
-            content.style[transition] = transitionStr;
-            self._scrollHandler(-x, duration, callback, easing, transitionStr, "x");
-            return content.style[transition] = transitionStr;
+            return self._scrollHandler(-x, duration, callback, easing, "x");
         },
         scrollY: function(y, duration, easing, callback) {
             var self = this;
@@ -466,26 +462,28 @@
             var duration = duration || 0;
             var easing = easing || "cubic-bezier(0.333333, 0.666667, 0.666667, 1)";
             var container = self.container;
-            self.translateY(-y);
-            var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
-            container.style[transition] = transitionStr;
-            self._scrollHandler(-y, duration, callback, easing, transitionStr, "y");
-            return container.style[transition] = transitionStr;
+            return self._scrollHandler(-y, duration, callback, easing, "y");
         },
-        _scrollHandler: function(dest, duration, callback, easing, transitionStr, type) {
+        _scrollHandler: function(dest, duration, callback, easing, type) {
             var self = this;
+            var Type = type.toUpperCase();
             var offset = self.getOffset();
+            var el = type == "x" ? self.content : self.container;
             var directions = type == "x" ? ["left","right"]:["top","bottom"];
-             var Type = type.toUpperCase();
+            var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
+            type == "x" ? self.translateX(dest) : self.translateY(dest);
+            el.style[transition] = transitionStr;
             //if dest value is equal to current value then return.
             if (duration <= 0 || dest == offset[type]) {
                 self.fire(SCROLL, {
                     zoomType: type,
-                    offset: offset
+                    offset: offset,
+                    type:SCROLL
                 });
                 self.fire(SCROLL_END, {
                     zoomType: type,
-                    offset: offset
+                    offset: offset,
+                    type:SCROLL_END
                 });
                 return;
             }
@@ -498,7 +496,8 @@
                 self['isScrolling' + Type] = false;
                 var params = {
                     offset: self.getOffset(),
-                    zoomType: e.type
+                    zoomType: e.type,
+                    type:SCROLL_END
                 };
                 params['direction'+e.type.toUpperCase()] = dest - offset[e.type] < 0 ? directions[1] : directions[0];
                 self.fire(SCROLL_END, params)
@@ -510,7 +509,8 @@
                     RAF(function() {
                         var params = {
                             zoomType: type,
-                            offset: self.getOffset()
+                            offset: self.getOffset(),
+                            type:SCROLL
                         };
                         params['direction'+type.toUpperCase()] = dest - offset[type] < 0 ? directions[1] : directions[0];
                         self.fire(SCROLL, params);
@@ -687,13 +687,22 @@
             //scalable
             if (self.userConfig.scalable) {
                 var originX, originY;
+                //init pinch gesture
+                Pinch.init();
                 Event.on(renderTo, Pinch.PINCH_START, function(e) {
                     scale = self.scale;
                     originX = (e.origin.pageX - self.x) / self.containerWidth;
                     originY = (e.origin.pageY - self.y) / self.containerHeight;
                 });
                 Event.on(renderTo, Pinch.PINCH, function(e) {
-                    self._scale(scale * e.scale, originX, originY, "pinch");
+                    var __scale = scale * e.scale;
+                    if(__scale <= self.userConfig.minScale){
+                         __scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
+                    }
+                    if(__scale >= self.userConfig.maxScale){
+                        __scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
+                    }
+                    self._scale(__scale, originX, originY, "pinch");
                 });
                 Event.on(renderTo, Pinch.PINCH_END, function(e) {
                     self.isScaling = false;

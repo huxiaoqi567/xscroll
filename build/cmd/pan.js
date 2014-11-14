@@ -161,44 +161,6 @@ define(function(require, exports, module) {
 
 	document.addEventListener("touchmove", touchMoveHandler);
 	document.addEventListener("touchend", touchEndHandler);
-	var ismousedown = false;
-	document.addEventListener("mousedown", function(e) {
-		ismousedown = true;
-		var evt = document.createEvent("HTMLEvents");
-        evt.initEvent("touchstart",true,true);
-		var param = {
-			clientX: e.clientX,
-			clientY: e.clientY
-		};
-		evt.touches = [param];
-		evt.changedTouches = [param];
-		e.target.dispatchEvent(evt);
-	});
-	document.addEventListener("mousemove", function(e) {
-		if (!ismousedown) return;
-		var evt = document.createEvent("HTMLEvents");
-        evt.initEvent("touchmove",true,true);
-		var param = {
-			clientX: e.clientX,
-			clientY: e.clientY
-		};
-		evt.touches = [param];
-		evt.changedTouches = [param];
-		e.target.dispatchEvent(evt);
-	});
-
-	document.addEventListener("mouseup", function(e) {
-		ismousedown = false;
-		var evt = document.createEvent("HTMLEvents");
-        evt.initEvent("touchend",true,true);
-		var param = {
-			clientX: e.clientX,
-			clientY: e.clientY
-		};
-		evt.touches = [param];
-		evt.changedTouches = [param];
-		e.target.dispatchEvent(evt);
-	});
 
 	var Pan = {
 		PAN_START: PAN_START,

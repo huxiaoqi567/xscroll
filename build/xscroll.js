@@ -354,44 +354,6 @@ pan = function (exports) {
   }
   document.addEventListener('touchmove', touchMoveHandler);
   document.addEventListener('touchend', touchEndHandler);
-  var ismousedown = false;
-  document.addEventListener('mousedown', function (e) {
-    ismousedown = true;
-    var evt = document.createEvent('HTMLEvents');
-    evt.initEvent('touchstart', true, true);
-    var param = {
-      clientX: e.clientX,
-      clientY: e.clientY
-    };
-    evt.touches = [param];
-    evt.changedTouches = [param];
-    e.target.dispatchEvent(evt);
-  });
-  document.addEventListener('mousemove', function (e) {
-    if (!ismousedown)
-      return;
-    var evt = document.createEvent('HTMLEvents');
-    evt.initEvent('touchmove', true, true);
-    var param = {
-      clientX: e.clientX,
-      clientY: e.clientY
-    };
-    evt.touches = [param];
-    evt.changedTouches = [param];
-    e.target.dispatchEvent(evt);
-  });
-  document.addEventListener('mouseup', function (e) {
-    ismousedown = false;
-    var evt = document.createEvent('HTMLEvents');
-    evt.initEvent('touchend', true, true);
-    var param = {
-      clientX: e.clientX,
-      clientY: e.clientY
-    };
-    evt.touches = [param];
-    evt.changedTouches = [param];
-    e.target.dispatchEvent(evt);
-  });
   var Pan = {
     PAN_START: PAN_START,
     PAN_END: PAN_END,
@@ -612,10 +574,12 @@ pinch = function (exports) {
       this.gestureType = '';
     }
   }
-  document.addEventListener('touchmove', pinchMoveHandler);
-  document.addEventListener('touchend', pinchEndHandler);
   //枚举
   var Pinch = {
+    init: function () {
+      document.addEventListener('touchmove', pinchMoveHandler);
+      document.addEventListener('touchend', pinchEndHandler);
+    },
     PINCH_START: PINCH_START,
     PINCH: PINCH,
     PINCH_END: PINCH_END
@@ -742,7 +706,8 @@ scrollbar = function (exports) {
     },
     scrollTo: function (offset, duration, easing) {
       var self = this;
-      self.isY ? self.indicate.style[transform] = 'translateY(' + offset.y + 'px) translateZ(0)' : self.indicate.style[transform] = 'translateX(' + offset.x + 'px)  translateZ(0)';
+      var translateZ = self.xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
+      self.isY ? self.indicate.style[transform] = 'translateY(' + offset.y + 'px) ' + translateZ : self.indicate.style[transform] = 'translateX(' + offset.x + 'px) ' + translateZ;
       self.indicate.style[transition] = [
         'all ',
         duration,
@@ -754,7 +719,8 @@ scrollbar = function (exports) {
     moveTo: function (offset) {
       var self = this;
       self.show();
-      self.isY ? self.indicate.style[transform] = 'translateY(' + offset.y + 'px)  translateZ(0)' : self.indicate.style[transform] = 'translateX(' + offset.x + 'px)  translateZ(0)';
+      var translateZ = self.xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
+      self.isY ? self.indicate.style[transform] = 'translateY(' + offset.y + 'px) ' + translateZ : self.indicate.style[transform] = 'translateX(' + offset.x + 'px) ' + translateZ;
       self.indicate.style[transition] = '';
     },
     _bindEvt: function () {
@@ -915,20 +881,18 @@ _pulldown_ = function (exports) {
     _panEndHandler: function (e) {
       var self = this;
       var xscroll = self.xscroll;
-      var top = xscroll.boundry.top;
       var height = self.userConfig.height || 60;
       var offsetTop = xscroll.getOffsetTop();
       if (offsetTop > height) {
-        xscroll.boundry.top = top;
-        !self._expanded && xscroll.boundry.expandTop(height);
-        self._expanded = true;
+        xscroll.boundry.resetTop();
+        xscroll.boundry.expandTop(height);
         xscroll.bounce(true, function () {
           self._changeStatus('loading');
         });
         if (self.userConfig.autoRefresh) {
           clearTimeout(self.loadingItv);
           self.loadingItv = setTimeout(function () {
-            xscroll.boundry.expandTop(-height);
+            xscroll.boundry.resetTop();
             xscroll.bounce(true, function () {
               window.location.reload();
             });
@@ -1213,7 +1177,7 @@ core = function (exports) {
    * @extends Base
    */
   Util.extend(XScroll, Base, {
-    version: '2.1.0',
+    version: '2.1.1',
     init: function () {
       var self = this;
       var userConfig = self.userConfig = Util.mix({
@@ -1569,18 +1533,7 @@ core = function (exports) {
       var duration = duration || 0;
       var easing = easing || 'cubic-bezier(0.333333, 0.666667, 0.666667, 1)';
       var content = self.content;
-      self.translateX(-x);
-      var transitionStr = duration > 0 ? [
-        transformStr,
-        ' ',
-        duration / 1000,
-        's ',
-        easing,
-        ' 0s'
-      ].join('') : 'none';
-      content.style[transition] = transitionStr;
-      self._scrollHandler(-x, duration, callback, easing, transitionStr, 'x');
-      return content.style[transition] = transitionStr;
+      return self._scrollHandler(-x, duration, callback, easing, 'x');
     },
     scrollY: function (y, duration, easing, callback) {
       var self = this;
@@ -1590,7 +1543,20 @@ core = function (exports) {
       var duration = duration || 0;
       var easing = easing || 'cubic-bezier(0.333333, 0.666667, 0.666667, 1)';
       var container = self.container;
-      self.translateY(-y);
+      return self._scrollHandler(-y, duration, callback, easing, 'y');
+    },
+    _scrollHandler: function (dest, duration, callback, easing, type) {
+      var self = this;
+      var Type = type.toUpperCase();
+      var offset = self.getOffset();
+      var el = type == 'x' ? self.content : self.container;
+      var directions = type == 'x' ? [
+        'left',
+        'right'
+      ] : [
+        'top',
+        'bottom'
+      ];
       var transitionStr = duration > 0 ? [
         transformStr,
         ' ',
@@ -1599,30 +1565,19 @@ core = function (exports) {
         easing,
         ' 0s'
       ].join('') : 'none';
-      container.style[transition] = transitionStr;
-      self._scrollHandler(-y, duration, callback, easing, transitionStr, 'y');
-      return container.style[transition] = transitionStr;
-    },
-    _scrollHandler: function (dest, duration, callback, easing, transitionStr, type) {
-      var self = this;
-      var offset = self.getOffset();
-      var directions = type == 'x' ? [
-        'left',
-        'right'
-      ] : [
-        'top',
-        'bottom'
-      ];
-      var Type = type.toUpperCase();
+      type == 'x' ? self.translateX(dest) : self.translateY(dest);
+      el.style[transition] = transitionStr;
       //if dest value is equal to current value then return.
       if (duration <= 0 || dest == offset[type]) {
         self.fire(SCROLL, {
           zoomType: type,
-          offset: offset
+          offset: offset,
+          type: SCROLL
         });
         self.fire(SCROLL_END, {
           zoomType: type,
-          offset: offset
+          offset: offset,
+          type: SCROLL_END
         });
         return;
       }
@@ -1635,7 +1590,8 @@ core = function (exports) {
         self['isScrolling' + Type] = false;
         var params = {
           offset: self.getOffset(),
-          zoomType: e.type
+          zoomType: e.type,
+          type: SCROLL_END
         };
         params['direction' + e.type.toUpperCase()] = dest - offset[e.type] < 0 ? directions[1] : directions[0];
         self.fire(SCROLL_END, params);
@@ -1647,7 +1603,8 @@ core = function (exports) {
           RAF(function () {
             var params = {
               zoomType: type,
-              offset: self.getOffset()
+              offset: self.getOffset(),
+              type: SCROLL
             };
             params['direction' + type.toUpperCase()] = dest - offset[type] < 0 ? directions[1] : directions[0];
             self.fire(SCROLL, params);
@@ -1823,13 +1780,22 @@ core = function (exports) {
       //scalable
       if (self.userConfig.scalable) {
         var originX, originY;
+        //init pinch gesture
+        Pinch.init();
         Event.on(renderTo, Pinch.PINCH_START, function (e) {
           scale = self.scale;
           originX = (e.origin.pageX - self.x) / self.containerWidth;
           originY = (e.origin.pageY - self.y) / self.containerHeight;
         });
         Event.on(renderTo, Pinch.PINCH, function (e) {
-          self._scale(scale * e.scale, originX, originY, 'pinch');
+          var __scale = scale * e.scale;
+          if (__scale <= self.userConfig.minScale) {
+            __scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
+          }
+          if (__scale >= self.userConfig.maxScale) {
+            __scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
+          }
+          self._scale(__scale, originX, originY, 'pinch');
         });
         Event.on(renderTo, Pinch.PINCH_END, function (e) {
           self.isScaling = false;

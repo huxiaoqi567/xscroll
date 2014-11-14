@@ -81,6 +81,7 @@
     year.render();
     var cellHeight = document.querySelector("#year li").offsetHeight;
     year.on("scrollend",function  (e) {
+        console.log("end")
         var offset = e.offset.y;
         var snap = 0;
         if(offset%cellHeight == 0 || offset.y>0 || offset.y<year.height -year.containerHeight) return;

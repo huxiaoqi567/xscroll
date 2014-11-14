@@ -106,20 +106,18 @@ define(function(require, exports, module) {
 		_panEndHandler: function(e) {
 			var self = this;
 			var xscroll = self.xscroll;
-			var top = xscroll.boundry.top;
 			var height = self.userConfig.height || 60;
 			var offsetTop = xscroll.getOffsetTop();
 			if (offsetTop > height) {
-				xscroll.boundry.top = top;
-				!self._expanded && xscroll.boundry.expandTop(height);
-				self._expanded = true;
+				xscroll.boundry.resetTop();
+				xscroll.boundry.expandTop(height);
 				xscroll.bounce(true,function(){
 					self._changeStatus("loading");
 				});
 				if(self.userConfig.autoRefresh){
 					clearTimeout(self.loadingItv);
 					self.loadingItv = setTimeout(function() {
-						xscroll.boundry.expandTop(-height);
+						xscroll.boundry.resetTop();
 						xscroll.bounce(true, function() {
 							window.location.reload();
 						})

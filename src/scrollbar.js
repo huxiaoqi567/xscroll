@@ -13,6 +13,7 @@
 
     var borderRadius = Util.prefixStyle("borderRadius");
 
+
 	var ScrollBar = function(cfg){
 		this.userConfig = cfg;
     	this.init(cfg.xscroll);
@@ -115,13 +116,15 @@
 
 		scrollTo: function(offset, duration, easing) {
 			var self = this;
-			self.isY ? self.indicate.style[transform] = "translateY(" + offset.y + "px) translateZ(0)" : self.indicate.style[transform] = "translateX(" + offset.x + "px)  translateZ(0)"
+			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+			self.isY ? self.indicate.style[transform] = "translateY(" + offset.y + "px) "+translateZ : self.indicate.style[transform] = "translateX(" + offset.x + "px) "+translateZ
 			self.indicate.style[transition] = ["all ",duration, "s ", easing, " 0"].join("");
 		},
 		moveTo: function(offset) {
 			var self = this;
 			self.show();
-			self.isY ? self.indicate.style[transform] = "translateY(" + offset.y + "px)  translateZ(0)" : self.indicate.style[transform] = "translateX(" + offset.x + "px)  translateZ(0)"
+			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+			self.isY ? self.indicate.style[transform] = "translateY(" + offset.y + "px) "+translateZ : self.indicate.style[transform] = "translateX(" + offset.x + "px) "+translateZ
 			self.indicate.style[transition] = "";
 		},
 		_bindEvt: function() {
