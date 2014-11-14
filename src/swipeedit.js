@@ -43,6 +43,7 @@
 			var lbl = null;
 			xlist.on("panstart", function(e) {
 				hasSlided = false;
+				if(!e.cell || !e.cell.element) return;
 				lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
 				if(!lbl) return;
 				startX = self.getTransformX(lbl);

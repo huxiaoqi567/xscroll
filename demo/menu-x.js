@@ -36,7 +36,7 @@
              menus[i].className = "";
          }
          menus[index].className = "cur";
-         var offset = index * menuWidth;
+         var offset = index * menuWidth - xscroll.width/2 +  menuWidth/2 ;
          if (offset < 0) {
              offset = 0;
          } else if (offset > xscroll.containerWidth - xscroll.width) {

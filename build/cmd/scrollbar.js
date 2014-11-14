@@ -87,11 +87,11 @@ define(function(require, exports, module) {
 			var indicateSize = self.indicateSize;
 			var containerSize = self.containerSize;
 			//offset bottom/right
-			var offsetout = self.containerSize - self.size;
+			var offsetout = containerSize - self.size;
 			var ratio = offset / containerSize;
-			var barOffset = Math.round(indicateSize * ratio);
-			var barSize = Math.round(indicateSize * indicateSize / containerSize);
-			var _barOffset = Math.round(barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize);
+			var barOffset = indicateSize * ratio;
+			var barSize = Math.round(indicateSize * self.size / containerSize);
+			var _barOffset = barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize;
 			if (barSize < MIN_SCROLLBAR_SIZE) {
 				barSize = MIN_SCROLLBAR_SIZE;
 				barOffset = _barOffset;
@@ -105,7 +105,6 @@ define(function(require, exports, module) {
 				} else {
 					barOffset = indicateSize + spacing - barSize + _offset * barSize / MIN_SCROLLBAR_SIZE ;
 				}
-
 			}
 			self.barOffset =Math.round(barOffset);
 			var result = {size: Math.round(barSize)};

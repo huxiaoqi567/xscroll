@@ -453,7 +453,10 @@
             var duration = duration || 0;
             var easing = easing || "cubic-bezier(0.333333, 0.666667, 0.666667, 1)";
             var content = self.content;
-            return self._scrollHandler(-x, duration, callback, easing, "x");
+            self.translateX(-x);
+            var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
+            content.style[transition] = transitionStr;
+            self._scrollHandler(-x, duration, callback, easing, transitionStr, "x");
         },
         scrollY: function(y, duration, easing, callback) {
             var self = this;
@@ -462,17 +465,16 @@
             var duration = duration || 0;
             var easing = easing || "cubic-bezier(0.333333, 0.666667, 0.666667, 1)";
             var container = self.container;
-            return self._scrollHandler(-y, duration, callback, easing, "y");
-        },
-        _scrollHandler: function(dest, duration, callback, easing, type) {
-            var self = this;
-            var Type = type.toUpperCase();
-            var offset = self.getOffset();
-            var el = type == "x" ? self.content : self.container;
-            var directions = type == "x" ? ["left","right"]:["top","bottom"];
+            self.translateY(-y);
             var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
-            type == "x" ? self.translateX(dest) : self.translateY(dest);
-            el.style[transition] = transitionStr;
+            container.style[transition] = transitionStr;
+            self._scrollHandler(-y, duration, callback, easing, transitionStr, "y");
+        },
+        _scrollHandler: function(dest, duration, callback, easing, transitionStr, type) {
+            var self = this;
+            var offset = self.getOffset();
+            var directions = type == "x" ? ["left","right"]:["top","bottom"];
+             var Type = type.toUpperCase();
             //if dest value is equal to current value then return.
             if (duration <= 0 || dest == offset[type]) {
                 self.fire(SCROLL, {

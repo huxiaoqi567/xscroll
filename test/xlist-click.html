@@ -127,9 +127,9 @@
             width:maxWidth
         })
 
-       // var pulldown = new XList.Plugin.PullDown();
+       var pulldown = new XList.Plugin.PullDown();
 
-       // xlist.plug(pulldown);
+       xlist.plug(pulldown);
 
        xlist.plug(swipeEditPlugin)
         //delete 
@@ -152,7 +152,7 @@
         })
 
        xlist.on("scroll",function(e){
-        console.log(e.type)
+        // console.log(e.type)
        })
 
        xlist.render();

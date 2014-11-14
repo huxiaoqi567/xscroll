@@ -242,7 +242,6 @@
 			var offset = offset === undefined ? self.getOffsetTop() : offset;
 			var elementsPos = self._getElementsPos(offset);
 			var changedRows = self._getChangedRows(elementsPos, force);
-			console.log(elementsPos,changedRows)
 			var el = null;
 			//若强制刷新 则重新初始化dom
 			if (force) {

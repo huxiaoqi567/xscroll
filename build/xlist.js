@@ -678,11 +678,11 @@ scrollbar = function (exports) {
       var indicateSize = self.indicateSize;
       var containerSize = self.containerSize;
       //offset bottom/right
-      var offsetout = self.containerSize - self.size;
+      var offsetout = containerSize - self.size;
       var ratio = offset / containerSize;
-      var barOffset = Math.round(indicateSize * ratio);
-      var barSize = Math.round(indicateSize * indicateSize / containerSize);
-      var _barOffset = Math.round(barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize);
+      var barOffset = indicateSize * ratio;
+      var barSize = Math.round(indicateSize * self.size / containerSize);
+      var _barOffset = barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize;
       if (barSize < MIN_SCROLLBAR_SIZE) {
         barSize = MIN_SCROLLBAR_SIZE;
         barOffset = _barOffset;
@@ -1533,7 +1533,17 @@ core = function (exports) {
       var duration = duration || 0;
       var easing = easing || 'cubic-bezier(0.333333, 0.666667, 0.666667, 1)';
       var content = self.content;
-      return self._scrollHandler(-x, duration, callback, easing, 'x');
+      self.translateX(-x);
+      var transitionStr = duration > 0 ? [
+        transformStr,
+        ' ',
+        duration / 1000,
+        's ',
+        easing,
+        ' 0s'
+      ].join('') : 'none';
+      content.style[transition] = transitionStr;
+      self._scrollHandler(-x, duration, callback, easing, transitionStr, 'x');
     },
     scrollY: function (y, duration, easing, callback) {
       var self = this;
@@ -1543,20 +1553,7 @@ core = function (exports) {
       var duration = duration || 0;
       var easing = easing || 'cubic-bezier(0.333333, 0.666667, 0.666667, 1)';
       var container = self.container;
-      return self._scrollHandler(-y, duration, callback, easing, 'y');
-    },
-    _scrollHandler: function (dest, duration, callback, easing, type) {
-      var self = this;
-      var Type = type.toUpperCase();
-      var offset = self.getOffset();
-      var el = type == 'x' ? self.content : self.container;
-      var directions = type == 'x' ? [
-        'left',
-        'right'
-      ] : [
-        'top',
-        'bottom'
-      ];
+      self.translateY(-y);
       var transitionStr = duration > 0 ? [
         transformStr,
         ' ',
@@ -1565,8 +1562,20 @@ core = function (exports) {
         easing,
         ' 0s'
       ].join('') : 'none';
-      type == 'x' ? self.translateX(dest) : self.translateY(dest);
-      el.style[transition] = transitionStr;
+      container.style[transition] = transitionStr;
+      self._scrollHandler(-y, duration, callback, easing, transitionStr, 'y');
+    },
+    _scrollHandler: function (dest, duration, callback, easing, transitionStr, type) {
+      var self = this;
+      var offset = self.getOffset();
+      var directions = type == 'x' ? [
+        'left',
+        'right'
+      ] : [
+        'top',
+        'bottom'
+      ];
+      var Type = type.toUpperCase();
       //if dest value is equal to current value then return.
       if (duration <= 0 || dest == offset[type]) {
         self.fire(SCROLL, {
@@ -2025,6 +2034,8 @@ swipeedit = function (exports) {
       var lbl = null;
       xlist.on('panstart', function (e) {
         hasSlided = false;
+        if (!e.cell || !e.cell.element)
+          return;
         lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
         if (!lbl)
           return;
@@ -2379,7 +2390,6 @@ infinite = function (exports) {
       var offset = offset === undefined ? self.getOffsetTop() : offset;
       var elementsPos = self._getElementsPos(offset);
       var changedRows = self._getChangedRows(elementsPos, force);
-      console.log(elementsPos, changedRows);
       var el = null;
       //若强制刷新 则重新初始化dom
       if (force) {

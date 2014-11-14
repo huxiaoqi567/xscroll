@@ -8,7 +8,7 @@
 
 ## Vision
 
-2.1.0
+2.1.1
 
 ## Build
 
@@ -268,4 +268,12 @@ xlist.render();
 ## Questions?
 
  - Email：<huxiaoqi567@gmail.com>
+
+
+## ChangeLog    
+
+### v2.1.1
+- pinch缩放优化
+- 滚动条计算问题
+- 去除mouse事件
 
