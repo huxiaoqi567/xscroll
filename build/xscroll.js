@@ -212,9 +212,24 @@ pan = function (exports) {
   var touch = {}, record = [];
   var startX = 0;
   var startY = 0;
+  //current touch
+  var curTouch = null;
+  function judgeCurTouch(e) {
+  }
   function touchMoveHandler(e) {
-    if (e.touches.length > 1)
-      return;
+    if (e.touches.length == 1) {
+      curTouch = e.touches[0];
+      console.log(curTouch.identifier);
+    }
+    if (e.touches.length > 1 && e.changedTouches[0]) {
+      if (e.changedTouches[0].identifier != curTouch.identifier) {
+        //restart pan
+        record = [];
+        curTouch = e.changedTouches[0];
+      }
+    }
+    // if (e.touches.length > 1) return;
+    // console.log(e.changedTouches[0].clientX,e.changedTouches[0].clientY)
     if (this.gestureType && this.gestureType != 'pan')
       return;
     if (this.gestureType == '') {
@@ -222,8 +237,8 @@ pan = function (exports) {
     }
     if (!record.length) {
       touch = {};
-      touch.startX = e.touches[0].clientX;
-      touch.startY = e.touches[0].clientY;
+      touch.startX = curTouch.clientX;
+      touch.startY = curTouch.clientY;
       touch.deltaX = 0;
       touch.deltaY = 0;
       e.touch = touch;
@@ -234,7 +249,6 @@ pan = function (exports) {
         deltaY: touch.deltaY,
         timeStamp: e.timeStamp
       });
-      //be same to kissy
       e.deltaX = touch.deltaX;
       e.deltaY = touch.deltaY;
       this.gestureType = 'pan';
@@ -242,19 +256,18 @@ pan = function (exports) {
     } else {
       if (this.gestureType != 'pan')
         return;
-      touch.deltaX = e.touches[0].clientX - touch.startX;
-      touch.deltaY = e.touches[0].clientY - touch.startY;
-      touch.directionX = e.touches[0].clientX - touch.prevX > 0 ? 'right' : 'left';
-      touch.directionY = e.touches[0].clientY - touch.prevY > 0 ? 'bottom' : 'top';
-      touch.prevX = e.touches[0].clientX;
-      touch.prevY = e.touches[0].clientY;
+      touch.deltaX = curTouch.clientX - touch.startX;
+      touch.deltaY = curTouch.clientY - touch.startY;
+      touch.directionX = curTouch.clientX - touch.prevX > 0 ? 'right' : 'left';
+      touch.directionY = curTouch.clientY - touch.prevY > 0 ? 'bottom' : 'top';
+      touch.prevX = curTouch.clientX;
+      touch.prevY = curTouch.clientY;
       e.touch = touch;
       record.push({
         deltaX: touch.deltaX,
         deltaY: touch.deltaY,
         timeStamp: e.timeStamp
       });
-      //be same to kissy
       e.deltaX = touch.deltaX;
       e.deltaY = touch.deltaY;
       e.velocityX = 0;
@@ -267,11 +280,8 @@ pan = function (exports) {
   }
   function touchEndHandler(e) {
     var flickStartIndex = 0, flickStartYIndex = 0, flickStartXIndex = 0;
-    if (e.touches.length > 1)
-      return;
-    touch.deltaX = e.changedTouches[0].clientX - touch.startX;
-    touch.deltaY = e.changedTouches[0].clientY - touch.startY;
-    //be same to kissy
+    touch.deltaX = curTouch.clientX - touch.startX;
+    touch.deltaY = curTouch.clientY - touch.startY;
     e.deltaX = touch.deltaX;
     e.deltaY = touch.deltaY;
     e.touch = touch;
@@ -1109,7 +1119,7 @@ core = function (exports) {
   var AFTER_RENDER = 'afterrender';
   var REFRESH = 'refresh';
   //constant acceleration for scrolling
-  var SROLL_ACCELERATION = 0.0005;
+  var SROLL_ACCELERATION = 0.001;
   //boundry checked bounce effect
   var BOUNDRY_CHECK_DURATION = 400;
   var BOUNDRY_CHECK_EASING = 'ease-out';
@@ -1184,6 +1194,7 @@ core = function (exports) {
         scalable: false,
         scrollbarX: true,
         scrollbarY: true,
+        bounceSize: 100,
         gpuAcceleration: true
       }, self.userConfig, undefined, undefined, true);
       self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
@@ -1799,9 +1810,11 @@ core = function (exports) {
         Event.on(renderTo, Pinch.PINCH, function (e) {
           var __scale = scale * e.scale;
           if (__scale <= self.userConfig.minScale) {
+            // s = 1/2 * a * 2^(s/a)
             __scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
           }
           if (__scale >= self.userConfig.maxScale) {
+            // s = 2 * a * 1/2^(a/s)
             __scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
           }
           self._scale(__scale, originX, originY, 'pinch');
@@ -1856,12 +1869,40 @@ core = function (exports) {
       var scrollFn = 'scroll' + TYPE;
       var boundryCheckFn = 'boundryCheck' + TYPE;
       var _bounce = '_bounce' + type;
+      var boundry = self.boundry;
+      var bounceSize = self.userConfig.bounceSize || 0;
       if (self[_bounce]) {
+        var minsize = type == 'x' ? boundry.top : boundry.left;
+        var maxsize = type == 'x' ? boundry.bottom : boundry.right;
+        var containerSize = type == 'x' ? self.containerWidth : self.containerHeight;
         self.fire('boundryout', { zoomType: type });
         var v = self[_bounce];
-        var a = 0.04 * v / Math.abs(v);
+        var a = 0.01 * v / Math.abs(v);
         var t = v / a;
         var s = self.getOffset()[type] + t * v / 2;
+        var tmin = 100;
+        var tmax = 150;
+        var oversize = 0;
+        //limit bounce
+        if (s > minsize) {
+          if (s > minsize + bounceSize) {
+            s = minsize + bounceSize;
+          }
+          oversize = Math.abs(s - minsize);
+        } else if (s < maxsize - containerSize) {
+          if (s < maxsize - containerSize - bounceSize) {
+            s = maxsize - containerSize - bounceSize;
+          }
+          oversize = Math.abs(maxsize - containerSize - s);
+        }
+        /*
+            bounceSize  0 -> 100
+            t           100 -> 200
+            t = cursize / bouncesize * (tmax - tmin) + tmin
+        */
+        // t = t < 100 ? 100 : t > 150 ? 150 : t ;
+        t = oversize / bounceSize * (tmax - tmin) + tmin;
+        //bounce
         self[scrollFn](-s, t, 'cubic-bezier(' + quadratic2cubicBezier(-t, 0) + ')', function () {
           self[_bounce] = 0;
           self[boundryCheckFn]();

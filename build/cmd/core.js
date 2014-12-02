@@ -35,7 +35,7 @@ define(function(require, exports, module) {
     var AFTER_RENDER = "afterrender";
     var REFRESH = "refresh";
     //constant acceleration for scrolling
-    var SROLL_ACCELERATION = 0.0005;
+    var SROLL_ACCELERATION = 0.001;
     //boundry checked bounce effect
     var BOUNDRY_CHECK_DURATION = 400;
     var BOUNDRY_CHECK_EASING = "ease-out";
@@ -116,6 +116,7 @@ define(function(require, exports, module) {
                 scalable: false,
                 scrollbarX: true,
                 scrollbarY: true,
+                bounceSize: 100,
                 gpuAcceleration: true
             }, self.userConfig, undefined, undefined, true);
             self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
@@ -700,9 +701,11 @@ define(function(require, exports, module) {
                 Event.on(renderTo, Pinch.PINCH, function(e) {
                     var __scale = scale * e.scale;
                     if(__scale <= self.userConfig.minScale){
+                        // s = 1/2 * a * 2^(s/a)
                          __scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
                     }
                     if(__scale >= self.userConfig.maxScale){
+                        // s = 2 * a * 1/2^(a/s)
                         __scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
                     }
                     self._scale(__scale, originX, originY, "pinch");
@@ -757,14 +760,43 @@ define(function(require, exports, module) {
             var scrollFn = "scroll" + TYPE;
             var boundryCheckFn = "boundryCheck" + TYPE;
             var _bounce = "_bounce" + type;
+            var boundry = self.boundry;
+            var bounceSize = self.userConfig.bounceSize || 0;
+
             if (self[_bounce]) {
+                var minsize = type == "x" ? boundry.top : boundry.left;
+                var maxsize = type == "x" ? boundry.bottom  : boundry.right;
+                var containerSize = type == "x" ? self.containerWidth : self.containerHeight;
                 self.fire("boundryout", {
                     zoomType: type
                 })
                 var v = self[_bounce];
-                var a = 0.04 * v / Math.abs(v);
+                var a = 0.01 * v / Math.abs(v);
                 var t = v / a;
                 var s = self.getOffset()[type] + t * v / 2;
+                var tmin = 100;
+                var tmax = 150;
+                var oversize = 0;
+                //limit bounce
+                if(s > minsize){
+                    if(s > minsize + bounceSize){
+                        s = minsize + bounceSize;
+                    }
+                    oversize = Math.abs(s - minsize);
+                }else if(s < maxsize - containerSize){
+                    if(s < maxsize - containerSize - bounceSize){
+                        s = maxsize - containerSize - bounceSize
+                    }
+                    oversize = Math.abs(maxsize - containerSize - s);
+                }
+                /*
+                    bounceSize  0 -> 100
+                    t           100 -> 200
+                    t = cursize / bouncesize * (tmax - tmin) + tmin
+                */
+                // t = t < 100 ? 100 : t > 150 ? 150 : t ;
+                t = oversize / bounceSize * (tmax - tmin) + tmin;
+                //bounce
                 self[scrollFn](-s, t, "cubic-bezier(" + quadratic2cubicBezier(-t, 0) + ")", function() {
                     self[_bounce] = 0;
                     self[boundryCheckFn]()

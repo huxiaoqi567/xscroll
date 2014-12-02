@@ -10,17 +10,37 @@
 		record = [];
 	var startX = 0;
 	var startY = 0;
+	//current touch
+	var curTouch = null;
+	
+	function judgeCurTouch(e){
+
+	}
+
 
 	function touchMoveHandler(e) {
-		if (e.touches.length > 1) return;
+		if(e.touches.length == 1){
+			curTouch = e.touches[0];
+			console.log(curTouch.identifier)
+		}
+		if(e.touches.length > 1 && e.changedTouches[0]){
+			if(e.changedTouches[0].identifier != curTouch.identifier){
+				//restart pan
+				record = [];
+				curTouch = e.changedTouches[0];
+			}
+			
+		}
+		// if (e.touches.length > 1) return;
+		// console.log(e.changedTouches[0].clientX,e.changedTouches[0].clientY)
 		if (this.gestureType && this.gestureType != "pan") return;
 		if (this.gestureType == "") {
 			record = [];
 		}
 		if (!record.length) {
 			touch = {};
-			touch.startX = e.touches[0].clientX;
-			touch.startY = e.touches[0].clientY;
+			touch.startX = curTouch.clientX;
+			touch.startY = curTouch.clientY;
 			touch.deltaX = 0;
 			touch.deltaY = 0;
 			e.touch = touch;
@@ -31,26 +51,24 @@
 				deltaY: touch.deltaY,
 				timeStamp: e.timeStamp
 			});
-			//be same to kissy
 			e.deltaX = touch.deltaX;
 			e.deltaY = touch.deltaY;
 			this.gestureType = "pan";
 			Event.dispatchEvent(e.target, PAN_START, e);
 		} else {
 			if (this.gestureType != "pan") return;
-			touch.deltaX = e.touches[0].clientX - touch.startX;
-			touch.deltaY = e.touches[0].clientY - touch.startY;
-			touch.directionX = e.touches[0].clientX - touch.prevX > 0 ? "right" : "left";
-			touch.directionY = e.touches[0].clientY - touch.prevY > 0 ? "bottom" : "top";
-			touch.prevX = e.touches[0].clientX;
-			touch.prevY = e.touches[0].clientY;
+			touch.deltaX = curTouch.clientX - touch.startX;
+			touch.deltaY = curTouch.clientY - touch.startY;
+			touch.directionX = curTouch.clientX - touch.prevX > 0 ? "right" : "left";
+			touch.directionY = curTouch.clientY - touch.prevY > 0 ? "bottom" : "top";
+			touch.prevX = curTouch.clientX;
+			touch.prevY = curTouch.clientY;
 			e.touch = touch;
 			record.push({
 				deltaX: touch.deltaX,
 				deltaY: touch.deltaY,
 				timeStamp: e.timeStamp
 			});
-			//be same to kissy
 			e.deltaX = touch.deltaX;
 			e.deltaY = touch.deltaY;
 			e.velocityX = 0;
@@ -69,10 +87,8 @@
 		var flickStartIndex = 0,
 			flickStartYIndex = 0,
 			flickStartXIndex = 0;
-		if (e.touches.length > 1) return;
-		touch.deltaX = e.changedTouches[0].clientX - touch.startX;
-		touch.deltaY = e.changedTouches[0].clientY - touch.startY;
-		//be same to kissy
+		touch.deltaX = curTouch.clientX - touch.startX;
+		touch.deltaY = curTouch.clientY - touch.startY;
 		e.deltaX = touch.deltaX;
 		e.deltaY = touch.deltaY;
 
