@@ -29,7 +29,7 @@ function menuY(renderTo,cfg) {
             menus[i].className = "";
         }
         menus[index].className = "cur";
-        var offset = index * menuHeight;
+        var offset = index * menuHeight - xscroll.height/2 + menuHeight/2;
         if (offset < 0) {
             offset = 0;
         } else if (offset > xscroll.containerHeight - xscroll.height) {

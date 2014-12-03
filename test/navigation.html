@@ -69,15 +69,15 @@ body {
     top: 45px;
     bottom: 48px;
     left: 0;
-    width: 100%;
-    overflow: hidden;
+    min-width: 100%;
+    white-space: nowrap;
+    font-size: 0;
 }
 #J_NavContainer .view{
-    position: absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    right: 0;
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 #J_NavContainer ul{
     width: 100%;
@@ -368,33 +368,72 @@ body {
      <script src="../lib/sea.js"></script>
     <script>
     seajs.config({
-      base: "../src/"
+      base: "../build/cmd/"
     })
+    document.addEventListener("touchmove",function(e){e.preventDefault();})
     seajs.use("core",function(XScroll){
-
-        var views = document.querySelectorAll(".view");
-            
-        for(var i in views){
+        var J_NavContainer = document.querySelector("#J_NavContainer");
+        var views = document.querySelectorAll("#J_NavContainer .view");
+        var viewsLength = views.length;
+        var currentViewIndex = 0; 
+        var isPanning = false;
+        var startX = 0;
+        for(var i =0;i< viewsLength;i++){
             render(views[i])
         }
-
         function render(renderTo){
             var xscroll = new XScroll({
                 renderTo:renderTo,
-                scrollbars:true,
-                scalable:true,
-                maxScale:2
+                scrollbarY:true,
+                scrollbarX:false,
+                lockX:true
             });
-
-            
-            var pulldown = new XScroll.PullDown({
-                xscroll:xscroll
-            });
-
-            
-
+            var pulldown = new XScroll.Plugin.PullDown();
+            xscroll.plug(pulldown);
             xscroll.render();
+            xscroll.on("panstart",function(e){
+                // startX = 
+            })
+            xscroll.on("pan",function(e){
+                if(isPanning || (Math.abs(e.deltaX) > 40 && Math.abs(e.deltaX) > Math.abs(e.deltaY))){
+                    isPanning = true;
+                }
+            })
+            xscroll.on("panend",function(e){
+                if(isPanning){
+                     e.deltaX > 0 ? prev():next();
+                }
+                isPanning = false;
+            })
         }
+
+        function next(){
+            if(currentViewIndex < viewsLength - 1){
+                currentViewIndex ++;
+                switchTo(currentViewIndex);
+            }
+        }
+
+        function prev(){
+            if(currentViewIndex > 0){
+                currentViewIndex --;
+                switchTo(currentViewIndex);
+            }
+        }
+
+        function switchTo(index,duration,easing){
+            var duration = duration || 500;
+            var easing = easing || "ease";
+            var width = document.body.offsetWidth;
+            J_NavContainer.style.webkitTransform = "translateX(-"+index*width+"px) translateZ(0)";
+            J_NavContainer.style.webkitTransition = "-webkit-transform "+duration+"ms "+easing;
+        }
+
+        function move(x){
+            J_NavContainer.style.webkitTransform = "translateX("+x+"px) translateZ(0)";
+            J_NavContainer.style.webkitTransition = "";
+        }
+
 
     })
     </script>

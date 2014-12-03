@@ -96,7 +96,7 @@
         //mock data
         var data = (function() {
             var tmp = [];
-            for (var i = 1; i <= 1000; i++) {
+            for (var i = 1; i <= 10000; i++) {
                 tmp.push({
                     data:{text: 'Slide Left To DeleteMe! '+i},
                     recycled:true
@@ -115,11 +115,6 @@
                 el.innerHTML = '<div class="lbl">'+row.data.text+'</div>'+
                                 '<div class="control"><div class="btn btn-mark">mark</div>'+
                                 '<div class="btn btn-delete">delete</div></div>';
-                // var style = "";
-                // if(row.data.status == "delete"){
-                    // style = "-webkit-transform:translateX(-"+maxWidth+"px) translateZ(0)"
-                // }
-                // el.innerHTML = '<div class="lbl-ctn" style="'+style+'"><div class="lbl">'+row.data.text+'</div></div><div class="del">Delete</div>';
             }
         });
         
@@ -155,6 +150,10 @@
                     swipeEditPlugin.slideAllExceptRow();
                 }
         })
+
+       xlist.on("scroll",function(e){
+        // console.log(e.type)
+       })
 
        xlist.render();
 

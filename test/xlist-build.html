@@ -193,7 +193,7 @@ body {
         </div>
     </div>
     <div id="footer">Scroll-Vertical</div>
-    <script type="text/javascript" src="../build/xlist.js"></script>
+    <script type="text/javascript" src="http://g.tbcdn.cn/xscroll/xlist.js"></script>
     <script>
     (function(){
         var data = [];
@@ -212,7 +212,7 @@ body {
             infiniteElements:'#J_Scroll li',
             data:data,
             renderHook:function(el,row){
-                el.innerHTML = row.data.row;
+                el.innerHTML = "<a href='http://www.baidu.com'>"+row.data.row+"</a>";
             }
         });
 

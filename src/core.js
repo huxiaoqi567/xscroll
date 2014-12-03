@@ -34,7 +34,7 @@
     var AFTER_RENDER = "afterrender";
     var REFRESH = "refresh";
     //constant acceleration for scrolling
-    var SROLL_ACCELERATION = 0.0005;
+    var SROLL_ACCELERATION = 0.001;
     //boundry checked bounce effect
     var BOUNDRY_CHECK_DURATION = 400;
     var BOUNDRY_CHECK_EASING = "ease-out";
@@ -108,13 +108,14 @@
          */
 
     Util.extend(XScroll,Base, {
-        version:"2.1.0",
+        version:"2.1.1",
         init: function() {
             var self = this;
             var userConfig = self.userConfig = Util.mix({
                 scalable: false,
                 scrollbarX: true,
                 scrollbarY: true,
+                bounceSize: 100,
                 gpuAcceleration: true
             }, self.userConfig, undefined, undefined, true);
             self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
@@ -457,7 +458,6 @@
             var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
             content.style[transition] = transitionStr;
             self._scrollHandler(-x, duration, callback, easing, transitionStr, "x");
-            return content.style[transition] = transitionStr;
         },
         scrollY: function(y, duration, easing, callback) {
             var self = this;
@@ -470,7 +470,6 @@
             var transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", easing, " 0s"].join("") : "none";
             container.style[transition] = transitionStr;
             self._scrollHandler(-y, duration, callback, easing, transitionStr, "y");
-            return container.style[transition] = transitionStr;
         },
         _scrollHandler: function(dest, duration, callback, easing, transitionStr, type) {
             var self = this;
@@ -481,11 +480,13 @@
             if (duration <= 0 || dest == offset[type]) {
                 self.fire(SCROLL, {
                     zoomType: type,
-                    offset: offset
+                    offset: offset,
+                    type:SCROLL
                 });
                 self.fire(SCROLL_END, {
                     zoomType: type,
-                    offset: offset
+                    offset: offset,
+                    type:SCROLL_END
                 });
                 return;
             }
@@ -498,7 +499,8 @@
                 self['isScrolling' + Type] = false;
                 var params = {
                     offset: self.getOffset(),
-                    zoomType: e.type
+                    zoomType: e.type,
+                    type:SCROLL_END
                 };
                 params['direction'+e.type.toUpperCase()] = dest - offset[e.type] < 0 ? directions[1] : directions[0];
                 self.fire(SCROLL_END, params)
@@ -510,7 +512,8 @@
                     RAF(function() {
                         var params = {
                             zoomType: type,
-                            offset: self.getOffset()
+                            offset: self.getOffset(),
+                            type:SCROLL
                         };
                         params['direction'+type.toUpperCase()] = dest - offset[type] < 0 ? directions[1] : directions[0];
                         self.fire(SCROLL, params);
@@ -687,13 +690,24 @@
             //scalable
             if (self.userConfig.scalable) {
                 var originX, originY;
+                //init pinch gesture
+                Pinch.init();
                 Event.on(renderTo, Pinch.PINCH_START, function(e) {
                     scale = self.scale;
                     originX = (e.origin.pageX - self.x) / self.containerWidth;
                     originY = (e.origin.pageY - self.y) / self.containerHeight;
                 });
                 Event.on(renderTo, Pinch.PINCH, function(e) {
-                    self._scale(scale * e.scale, originX, originY, "pinch");
+                    var __scale = scale * e.scale;
+                    if(__scale <= self.userConfig.minScale){
+                        // s = 1/2 * a * 2^(s/a)
+                         __scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
+                    }
+                    if(__scale >= self.userConfig.maxScale){
+                        // s = 2 * a * 1/2^(a/s)
+                        __scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
+                    }
+                    self._scale(__scale, originX, originY, "pinch");
                 });
                 Event.on(renderTo, Pinch.PINCH_END, function(e) {
                     self.isScaling = false;
@@ -745,14 +759,43 @@
             var scrollFn = "scroll" + TYPE;
             var boundryCheckFn = "boundryCheck" + TYPE;
             var _bounce = "_bounce" + type;
+            var boundry = self.boundry;
+            var bounceSize = self.userConfig.bounceSize || 0;
+
             if (self[_bounce]) {
+                var minsize = type == "x" ? boundry.top : boundry.left;
+                var maxsize = type == "x" ? boundry.bottom  : boundry.right;
+                var containerSize = type == "x" ? self.containerWidth : self.containerHeight;
                 self.fire("boundryout", {
                     zoomType: type
                 })
                 var v = self[_bounce];
-                var a = 0.04 * v / Math.abs(v);
+                var a = 0.01 * v / Math.abs(v);
                 var t = v / a;
                 var s = self.getOffset()[type] + t * v / 2;
+                var tmin = 100;
+                var tmax = 150;
+                var oversize = 0;
+                //limit bounce
+                if(s > minsize){
+                    if(s > minsize + bounceSize){
+                        s = minsize + bounceSize;
+                    }
+                    oversize = Math.abs(s - minsize);
+                }else if(s < maxsize - containerSize){
+                    if(s < maxsize - containerSize - bounceSize){
+                        s = maxsize - containerSize - bounceSize
+                    }
+                    oversize = Math.abs(maxsize - containerSize - s);
+                }
+                /*
+                    bounceSize  0 -> 100
+                    t           100 -> 200
+                    t = cursize / bouncesize * (tmax - tmin) + tmin
+                */
+                // t = t < 100 ? 100 : t > 150 ? 150 : t ;
+                t = oversize / bounceSize * (tmax - tmin) + tmin;
+                //bounce
                 self[scrollFn](-s, t, "cubic-bezier(" + quadratic2cubicBezier(-t, 0) + ")", function() {
                     self[_bounce] = 0;
                     self[boundryCheckFn]()

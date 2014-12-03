@@ -1,10 +1,11 @@
 {
   "name": "xscroll",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "devDependencies": {
     "gulp": "^3.8.8",
     "requirejs": "^2.1.15",
     "gulp-util": "^3.0.1",
-    "gulp-concat-util": "^0.5.1"
+    "gulp-concat-util": "^0.5.1",
+    "amdclean": "^2.3.0"
   }
 }

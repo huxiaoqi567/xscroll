@@ -196,7 +196,7 @@ body {
      <script src="../lib/sea.js"></script>
     <script>
     seajs.config({
-      base: "../src/"
+      base: "../build/cmd"
     })
     seajs.use("core",function(XScroll){
         var xscroll = new XScroll({
@@ -205,11 +205,12 @@ body {
             scalable:true,
             maxScale:2
         });
-
         
-        var pulldown = new XScroll.PullDown({
+        var pulldown = new XScroll.Plugin.PullDown({
             xscroll:xscroll
         });
+
+        xscroll.plug(pulldown);
 
         xscroll.render();
 

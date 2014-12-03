@@ -195,10 +195,6 @@ body {
     <div id="footer">Scroll-Vertical</div>
     <script type="text/javascript" src="../build/xscroll.js"></script>
     <script>
-    // seajs.config({
-    //   base: "../src/"
-    // })
-    // seajs.use("core",function(XScroll){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
             scrollbars:true,
@@ -210,46 +206,44 @@ body {
         var isMouseDown = false;
 
         xscroll.renderTo.addEventListener("mousedown",function(e){
-            // isMouseDown = true;
-            // var evt = document.createEvent("HTMLEvents");
-            // evt.initEvent("touchstart",true,true);
-            // var param = {
-            //     clientX:e.clientX,
-            //     clientY:e.clientY
-            // }
-            // evt.touches = [param]
-            // evt.changedTouches = [param]
-            // e.target.dispatchEvent(evt,{touches:[]});
+            isMouseDown = true;
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("touchstart",true,true);
+            var param = {
+                clientX:e.clientX,
+                clientY:e.clientY
+            }
+            evt.touches = [param]
+            evt.changedTouches = [param]
+            e.target.dispatchEvent(evt);
         })
 
          xscroll.renderTo.addEventListener("mousemove",function(e){
-            // if(!isMouseDown) return;
-            // var evt = document.createEvent("HTMLEvents");
-            // evt.initEvent("touchmove",true,true);
-            // var param = {
-            //     clientX:e.clientX,
-            //     clientY:e.clientY
-            // }
-            // evt.touches = [param]
-            // evt.changedTouches = [param]
-            // e.target.dispatchEvent(evt,{touches:[]});
+            if(!isMouseDown) return;
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("touchmove",true,true);
+            var param = {
+                clientX:e.clientX,
+                clientY:e.clientY
+            }
+            evt.touches = [param]
+            evt.changedTouches = [param]
+            e.target.dispatchEvent(evt);
         })
 
            xscroll.renderTo.addEventListener("mouseup",function(e){
-            // isMouseDown = false;
-            // var evt = document.createEvent("HTMLEvents");
-            // evt.initEvent("touchend",true,true);
-            // var param = {
-            //     clientX:e.clientX,
-            //     clientY:e.clientY
-            // }
-            // evt.touches = [param]
-            // evt.changedTouches = [param]
-            // e.target.dispatchEvent(evt,{touches:[]});
+            isMouseDown = false;
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("touchend",true,true);
+            var param = {
+                clientX:e.clientX,
+                clientY:e.clientY
+            }
+            evt.touches = [param]
+            evt.changedTouches = [param]
+            e.target.dispatchEvent(evt);
         })
 
-        // window.xscroll = xscroll
-    // })
     </script>
 </body>
 </html>
