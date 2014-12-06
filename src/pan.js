@@ -14,18 +14,8 @@
 	var curTouch = null;
 	
 	function judgeCurTouch(e){
-		//
-
-
-	}
-
-
-
-	function touchMoveHandler(e) {
-
 		if(e.touches.length == 1){
 			curTouch = e.touches[0];
-			// console.log(curTouch.identifier)
 		}
 		if(e.touches.length > 1 && e.changedTouches[0]){
 			if(e.changedTouches[0].identifier != curTouch.identifier){
@@ -33,10 +23,11 @@
 				record = [];
 				curTouch = e.changedTouches[0];
 			}
-			
 		}
-		// if (e.touches.length > 1) return;
-		// console.log(e.changedTouches[0].clientX,e.changedTouches[0].clientY)
+	}
+
+	function touchMoveHandler(e) {
+		judgeCurTouch(e);
 		if (this.gestureType && this.gestureType != "pan") return;
 		if (this.gestureType == "") {
 			record = [];

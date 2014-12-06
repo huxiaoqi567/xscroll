@@ -503,7 +503,7 @@
         	row.scaleTo(e.scale,0.5,e.origin.y);
         });
           xscroll.on("pinch",function(e){
-        		row.scale(e.scale,0.5,e.origin.y);
+        	row._scale(e.scale,e.origin.x,e.origin.y);
         });
         xscroll.on("scaleanimate",function(e){
         	row.scaleTo(e.scale,0.5,e.origin.y,e.duration);

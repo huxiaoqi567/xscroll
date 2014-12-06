@@ -46,10 +46,7 @@ Util.extend(Timer, Base, {
 		self.start = Date.now();
 		self.percent = 0;
 		// epsilon determines the precision of the solved values
-		// a good approximation is:
 		var epsilon = (1000 / 60 / duration) / 4;
-		console.log(self.cfg.easing,duration)
-		// var easeIn = bezier(0.42, 0, 1.0, 1.0, epsilon);
 		var b = Easing[self.cfg.easing];
 		self.easingFn = Bezier(b[0], b[1], b[2], b[3], epsilon);
 

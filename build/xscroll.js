@@ -224,8 +224,6 @@ pan = function (exports) {
   //current touch
   var curTouch = null;
   function judgeCurTouch(e) {
-  }
-  function touchMoveHandler(e) {
     if (e.touches.length == 1) {
       curTouch = e.touches[0];
     }
@@ -236,8 +234,9 @@ pan = function (exports) {
         curTouch = e.changedTouches[0];
       }
     }
-    // if (e.touches.length > 1) return;
-    // console.log(e.changedTouches[0].clientX,e.changedTouches[0].clientY)
+  }
+  function touchMoveHandler(e) {
+    judgeCurTouch(e);
     if (this.gestureType && this.gestureType != 'pan')
       return;
     if (this.gestureType == '') {
@@ -778,10 +777,7 @@ timer = function (exports) {
       self.start = Date.now();
       self.percent = 0;
       // epsilon determines the precision of the solved values
-      // a good approximation is:
       var epsilon = 1000 / 60 / duration / 4;
-      console.log(self.cfg.easing, duration);
-      // var easeIn = bezier(0.42, 0, 1.0, 1.0, epsilon);
       var b = Easing[self.cfg.easing];
       self.easingFn = Bezier(b[0], b[1], b[2], b[3], epsilon);
       self._run();
@@ -886,7 +882,9 @@ scrollbar = function (exports) {
         return;
       self.__isRender = true;
       var xscroll = self.xscroll;
-      var css = self.isY ? 'width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' : 'height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;';
+      var translateZ = xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
+      var transform = translateZ ? transformStr + ':' + translateZ + ';' : '';
+      var css = self.isY ? 'width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform : 'height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform;
       self.scrollbar = document.createElement('div');
       self.scrollbar.style.cssText = css;
       xscroll.renderTo.appendChild(self.scrollbar);
@@ -991,7 +989,6 @@ scrollbar = function (exports) {
           self._update(e.offset);
         });
       }
-      // self.xscroll.on
       self.xscroll.on('scrollend', function (e) {
         if (e.zoomType.indexOf(type) > -1) {
           self._update(e.offset);
@@ -1811,7 +1808,6 @@ core = function (exports) {
       self._scrollHandler(-y, duration, callback, easing, 'y');
     },
     _scrollHandler: function (dest, duration, callback, easing, type) {
-      console.log(easing);
       var self = this;
       var offset = self.getOffset();
       var directions = type == 'x' ? [

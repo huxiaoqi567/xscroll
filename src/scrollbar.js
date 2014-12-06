@@ -46,8 +46,10 @@
 			if (self.__isRender) return;
 			self.__isRender = true;
 			var xscroll = self.xscroll;
-			var css = self.isY ? "width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;" : 
-								"height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;";
+			var translateZ = xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+			var transform = translateZ ? transformStr+":"+translateZ +";": ""
+			var css = self.isY ? "width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform : 
+								"height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform;
 			self.scrollbar = document.createElement("div");
 			self.scrollbar.style.cssText = css;
 			xscroll.renderTo.appendChild(self.scrollbar);
@@ -141,10 +143,6 @@
 				self.xscroll.on("scroll",function(e){self._update(e.offset);});
 				
 			}
-
-			
-			
-			// self.xscroll.on
 
 			self.xscroll.on("scrollend",function(e){
 				if(e.zoomType.indexOf(type) > -1){

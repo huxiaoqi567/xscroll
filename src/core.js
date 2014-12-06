@@ -403,7 +403,6 @@
             self._scrollHandler(-y, duration, callback, easing, "y");
         },
         _scrollHandler: function(dest, duration, callback, easing, type) {
-            console.log(easing)
             var self = this;
             var offset = self.getOffset();
             var directions = type == "x" ? ["left", "right"] : ["top", "bottom"];
