@@ -1,0 +1,62 @@
+ <input type="button" value="run">
+ <input type="button" value="stop">
+ <input type="button" value="reset">
+<div id="block"></div>
+<style type="text/css">
+	#block{
+		position: absolute;top:100px;left:0;
+		width: 100px;
+		height: 100px;
+		background: red;
+	}
+</style>
+ <script src="../lib/sea.js"></script>
+<script>
+
+	var inputs = document.querySelectorAll("input")
+	var block = document.querySelector("#block");
+    seajs.config({
+      base: "../build/cmd/"
+    })
+    seajs.use(["timer","easing"],function(Timer,Easing){
+    	var timer = new Timer({
+    		duration:1000,
+            easing:"quadratic"
+    	});
+
+
+
+    	timer.detach("run")
+
+        timer.on("run",function(e){
+    		block.innerHTML = (e.percent*100).toFixed(0)+"%"
+    		block.style.webkitTransform = "translateX("+e.percent*500+"px) translateZ(0)";
+    	})
+
+    	timer.on("end",function  () {
+    		block.innerHTML = "finished"
+    		console.log("end")
+    	})
+
+
+    	// timer.run();
+
+    	inputs[0].addEventListener("click",function(){
+    		timer.run();
+		})
+		inputs[1].addEventListener("click",function(){
+    		timer.stop();
+		})
+
+		inputs[2].addEventListener("click",function(){
+    		timer.reset({
+               easing:"linear"
+            });
+		})
+
+
+
+    })
+	
+
+</script>

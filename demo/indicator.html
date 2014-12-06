@@ -499,10 +499,11 @@
         xscroll.on("scroll",function(e){
         	row.scrollY(-e.offset.y);
         });
-        xscroll.on("scale",function(e){
-        	if(e.triggerEvent == "pinch"){
-        		row.scaleTo(e.scale,0.5,e.origin.y);
-        	}
+        xscroll.on("scaleTo",function(e){
+        	row.scaleTo(e.scale,0.5,e.origin.y);
+        });
+          xscroll.on("pinch",function(e){
+        		row.scale(e.scale,0.5,e.origin.y);
         });
         xscroll.on("scaleanimate",function(e){
         	row.scaleTo(e.scale,0.5,e.origin.y,e.duration);
@@ -537,7 +538,7 @@
 
          updateIndicator()
 
-         var evts = ["scaleanimate","scroll","scale"];
+         var evts = ["scaleanimate","scroll","scaleTo"];
          for(var i in evts){
          	xscroll.on(evts[i],function(e){
          		updateIndicator(e);

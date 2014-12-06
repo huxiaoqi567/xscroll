@@ -37,23 +37,32 @@ Util.mix(Base.prototype, {
 	},
 	fire: function(evt) {
 		var self = this;
-		if (self.__events[evt] && self.__events[evt].length) {
+		if (self.__events && self.__events[evt] && self.__events[evt].length) {
 			for (var i in self.__events[evt]) {
 				self.__events[evt][i].apply(this, [].slice.call(arguments, 1));
 			}
 		}
 	},
 	on: function(evt, fn) {
+		var self = this;
+		if(!this.__events){
+			this.__events = {};
+		}
 		if (!this.__events[evt]) {
 			this.__events[evt] = [];
 		}
 		this.__events[evt].push(fn);
 	},
 	detach: function(evt, fn) {
-		if (!evt || !this.__events[evt]) return;
+		var self = this;
+		if (!evt || !this.__events || !this.__events[evt]) return;
 		var index = this.__events[evt].indexOf(fn);
 		if (index > -1) {
+			//remove only fn
 			this.__events[evt].splice(index, 1);
+		}else if(self.__events && self.__events[evt]){
+			//remove all events
+			delete self.__events[evt];
 		}
 	}
 });

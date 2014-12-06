@@ -15,14 +15,18 @@ define(function(require, exports, module) {
 	var curTouch = null;
 	
 	function judgeCurTouch(e){
+		//
+
 
 	}
 
 
+
 	function touchMoveHandler(e) {
+
 		if(e.touches.length == 1){
 			curTouch = e.touches[0];
-			console.log(curTouch.identifier)
+			// console.log(curTouch.identifier)
 		}
 		if(e.touches.length > 1 && e.changedTouches[0]){
 			if(e.changedTouches[0].identifier != curTouch.identifier){
@@ -85,6 +89,7 @@ define(function(require, exports, module) {
 	}
 
 	function touchEndHandler(e) {
+		if(!curTouch) return;
 		var flickStartIndex = 0,
 			flickStartYIndex = 0,
 			flickStartXIndex = 0;
@@ -92,7 +97,6 @@ define(function(require, exports, module) {
 		touch.deltaY = curTouch.clientY - touch.startY;
 		e.deltaX = touch.deltaX;
 		e.deltaY = touch.deltaY;
-
 		e.touch = touch;
 		e.touch.record = record;
 		var startX = e.touch.startX;

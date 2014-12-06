@@ -129,9 +129,15 @@
             gpuAcceleration:false,
             renderTo:"#J_Scroll",
             scrollbarX:false,
+            useTransition:false,
             lockX:true
         });
         xscroll.render();
+
+        xscroll.on("scrollend",function(e){
+            // console.log("end")
+            // console.log(e.offset.y)
+        })
     </script>
 </body>
 </html>
