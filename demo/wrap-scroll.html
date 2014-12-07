@@ -1,0 +1,197 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="demo.css">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        /*-webkit-backface-visibility:hidden;*/
+    }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li{
+        width: 100%;
+        position: relative;
+    }
+    .xs-container{
+        width: 100%;
+    }
+
+
+     #J_Scroll2 ul{
+        white-space: nowrap;
+        position: absolute;
+        height: 100%;
+        font-size: 0;
+    }
+    #J_Scroll2 ul li{
+        display: inline-block;
+        width: 100px;
+        height: 100%;
+        border-left:1px solid #ccc;
+        border-right:1px solid #fff;
+    }
+
+    #J_Scroll .xs-container, #J_Scroll .xs-content{
+        width: 100%;
+    }
+
+    #J_Scroll2 .xs-container, #J_Scroll2 .xs-content{
+        width: auto;
+    }
+    </style>
+    <div id="header">XScroll</div>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <div class="xs-content">
+                <div style="height:100px;width:100%;position:relative;">
+                    <div id="J_Scroll2">
+                        <div class="xs-container">
+                            <ul class="xs-content">
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                    <li>block</li>
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+                <ul style="-webkit-transform:translateZ(0);">
+                <li>row2</li>
+                <li>row3</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+            </ul>
+            </div>
+        </div>
+    </div>
+    <div id="footer">Scroll-Vertical</div>
+   <script type="text/javascript" src="../build/xscroll.js"></script>
+   <script type="text/javascript">
+        var xscroll = new XScroll({
+            renderTo:"#J_Scroll",
+            lockX:true,
+            scrollbarX:false
+        });
+
+        xscroll.render();
+
+        var xscroll2 = new XScroll({
+            renderTo:"#J_Scroll2",
+            lockY:true,
+            scrollbarY:false
+        });
+
+        xscroll2.render()
+        //横竖事件锁
+        xscroll2.on("pan",function(e){
+            if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){
+                xscroll.userConfig.lockY = true;
+            }else{
+                xscroll.userConfig.lockY = false;
+            }
+        })
+
+        xscroll2.on("panend",function(e){
+            xscroll.userConfig.lockY = false
+        })
+    </script>
+</body>
+</html>

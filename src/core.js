@@ -847,8 +847,9 @@
 
         }
     });
+    
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
     } else {
-        window.XScroll = XScroll;
+        return window.XScroll = XScroll;
     }

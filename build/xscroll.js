@@ -2248,7 +2248,7 @@ core = function (exports) {
   if (typeof module == 'object' && module.exports) {
     exports = XScroll;
   } else {
-    window.XScroll = XScroll;
+    return window.XScroll = XScroll;
   }
   return exports;
 }({});
