@@ -6,7 +6,7 @@
 
 [http://huxiaoqi567.github.io/](http://huxiaoqi567.github.io/)
 
-## Vision
+## Version
 
 2.0.0
 
