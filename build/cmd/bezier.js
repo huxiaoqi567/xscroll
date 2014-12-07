@@ -53,6 +53,6 @@ function Bezier(x1, y1, x2, y2, epsilon) {
 
 if (typeof module == 'object' && module.exports) {
 	module.exports = Bezier;
-} else {
+}else{
 	return Bezier;
 }});

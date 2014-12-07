@@ -574,6 +574,7 @@
             }).on(renderTo, Pan.PAN_START, function(e) {
                 self._prevSpeed = 0;
                 offset = self.getOffset();
+                // console.log(offset)
                 self.translate(offset);
                 self._firePanStart(Util.mix(e, {
                     offset: offset
@@ -846,9 +847,8 @@
 
         }
     });
-
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
     } else {
-        return window.XScroll = XScroll;
+        window.XScroll = XScroll;
     }

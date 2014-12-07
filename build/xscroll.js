@@ -221,22 +221,9 @@ pan = function (exports) {
   var touch = {}, record = [];
   var startX = 0;
   var startY = 0;
-  //current touch
-  var curTouch = null;
-  function judgeCurTouch(e) {
-    if (e.touches.length == 1) {
-      curTouch = e.touches[0];
-    }
-    if (e.touches.length > 1 && e.changedTouches[0]) {
-      if (e.changedTouches[0].identifier != curTouch.identifier) {
-        //restart pan
-        record = [];
-        curTouch = e.changedTouches[0];
-      }
-    }
-  }
   function touchMoveHandler(e) {
-    judgeCurTouch(e);
+    if (e.touches.length > 1)
+      return;
     if (this.gestureType && this.gestureType != 'pan')
       return;
     if (this.gestureType == '') {
@@ -244,8 +231,8 @@ pan = function (exports) {
     }
     if (!record.length) {
       touch = {};
-      touch.startX = curTouch.clientX;
-      touch.startY = curTouch.clientY;
+      touch.startX = e.touches[0].clientX;
+      touch.startY = e.touches[0].clientY;
       touch.deltaX = 0;
       touch.deltaY = 0;
       e.touch = touch;
@@ -256,6 +243,7 @@ pan = function (exports) {
         deltaY: touch.deltaY,
         timeStamp: e.timeStamp
       });
+      //be same to kissy
       e.deltaX = touch.deltaX;
       e.deltaY = touch.deltaY;
       this.gestureType = 'pan';
@@ -263,18 +251,19 @@ pan = function (exports) {
     } else {
       if (this.gestureType != 'pan')
         return;
-      touch.deltaX = curTouch.clientX - touch.startX;
-      touch.deltaY = curTouch.clientY - touch.startY;
-      touch.directionX = curTouch.clientX - touch.prevX > 0 ? 'right' : 'left';
-      touch.directionY = curTouch.clientY - touch.prevY > 0 ? 'bottom' : 'top';
-      touch.prevX = curTouch.clientX;
-      touch.prevY = curTouch.clientY;
+      touch.deltaX = e.touches[0].clientX - touch.startX;
+      touch.deltaY = e.touches[0].clientY - touch.startY;
+      touch.directionX = e.touches[0].clientX - touch.prevX > 0 ? 'right' : 'left';
+      touch.directionY = e.touches[0].clientY - touch.prevY > 0 ? 'bottom' : 'top';
+      touch.prevX = e.touches[0].clientX;
+      touch.prevY = e.touches[0].clientY;
       e.touch = touch;
       record.push({
         deltaX: touch.deltaX,
         deltaY: touch.deltaY,
         timeStamp: e.timeStamp
       });
+      //be same to kissy
       e.deltaX = touch.deltaX;
       e.deltaY = touch.deltaY;
       e.velocityX = 0;
@@ -286,11 +275,12 @@ pan = function (exports) {
     }
   }
   function touchEndHandler(e) {
-    if (!curTouch)
-      return;
     var flickStartIndex = 0, flickStartYIndex = 0, flickStartXIndex = 0;
-    touch.deltaX = curTouch.clientX - touch.startX;
-    touch.deltaY = curTouch.clientY - touch.startY;
+    if (e.touches.length > 1)
+      return;
+    touch.deltaX = e.changedTouches[0].clientX - touch.startX;
+    touch.deltaY = e.changedTouches[0].clientY - touch.startY;
+    //be same to kissy
     e.deltaX = touch.deltaX;
     e.deltaY = touch.deltaY;
     e.touch = touch;
@@ -1990,6 +1980,7 @@ core = function (exports) {
       }).on(renderTo, Pan.PAN_START, function (e) {
         self._prevSpeed = 0;
         offset = self.getOffset();
+        // console.log(offset)
         self.translate(offset);
         self._firePanStart(Util.mix(e, { offset: offset }));
       }).on(renderTo, Pan.PAN, function (e) {
@@ -2257,7 +2248,7 @@ core = function (exports) {
   if (typeof module == 'object' && module.exports) {
     exports = XScroll;
   } else {
-    return window.XScroll = XScroll;
+    window.XScroll = XScroll;
   }
   return exports;
 }({});

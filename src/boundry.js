@@ -12,8 +12,8 @@ Util.extend(Boundry, Base, {
         self._xleft = 0;
         self._xbottom = 0;
         self.refresh({
-            width:self.cfg.width,
-            height:self.cfg.height
+            width: self.cfg.width,
+            height: self.cfg.height
         });
     },
     reset: function() {
