@@ -563,9 +563,9 @@
                     self.stop();
                 }
             }).on(renderTo, Tap.TAP, function(e) {
+                self._fireClick("click", e);
                 if (!self.isScrollingX && !self.isScrollingY) {
                     simulateMouseEvent(e, "click");
-                    self._fireClick("click", e);
                 } else {
                     self.isScrollingX = false;
                     self.isScrollingY = false;
@@ -839,6 +839,7 @@
                 transition.duration = t;
                 transition.easing = self.userConfig.easing;
                 transition.status = "normal";
+                self["_bounce" + type] = 0;
                 self._prevSpeed = 0;
             }
             self['isScrolling' + type.toUpperCase()] = true;
