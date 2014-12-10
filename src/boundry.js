@@ -1,7 +1,10 @@
 var Util = require('./util');
 var Base = require('./base');
 var Boundry = function(cfg) {
-    this.cfg = cfg || {};
+    this.cfg = Util.mix({
+        width:0,
+        height:0
+    },cfg)
     this.init();
 }
 Util.extend(Boundry, Base, {
@@ -64,6 +67,7 @@ Util.extend(Boundry, Base, {
         return this;
     },
     refresh: function(cfg) {
+        Util.mix(this.cfg,cfg);
         this.top = this._xtop;
         this.left = this._xleft;
         this.bottom = (cfg && cfg.height || this.cfg.height || 0) - this._xbottom;

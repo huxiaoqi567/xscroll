@@ -61,7 +61,7 @@ Util.mix(Base.prototype, {
 		if (index > -1) {
 			//remove only fn
 			this.__events[evt].splice(index, 1);
-		}else if(self.__events && self.__events[evt]){
+		}else if(self.__events && self.__events[evt] && undefined === fn){
 			//remove all events
 			delete self.__events[evt];
 		}

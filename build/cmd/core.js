@@ -11,7 +11,6 @@ define(function(require, exports, module) {
     var PullUp = require('./pullup');
     var Boundry = require('./boundry');
     var Easing = require('./easing');
-
     var XScroll = function(cfg) {
         XScroll.superclass.constructor.call(this);
         this.userConfig = cfg;

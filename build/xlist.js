@@ -168,7 +168,7 @@ base = function (exports) {
       if (index > -1) {
         //remove only fn
         this.__events[evt].splice(index, 1);
-      } else if (self.__events && self.__events[evt]) {
+      } else if (self.__events && self.__events[evt] && undefined === fn) {
         //remove all events
         delete self.__events[evt];
       }
@@ -1316,7 +1316,10 @@ _boundry_ = function (exports) {
   var Util = util;
   var Base = base;
   var Boundry = function (cfg) {
-    this.cfg = cfg || {};
+    this.cfg = Util.mix({
+      width: 0,
+      height: 0
+    }, cfg);
     this.init();
   };
   Util.extend(Boundry, Base, {
@@ -1379,6 +1382,7 @@ _boundry_ = function (exports) {
       return this;
     },
     refresh: function (cfg) {
+      Util.mix(this.cfg, cfg);
       this.top = this._xtop;
       this.left = this._xleft;
       this.bottom = (cfg && cfg.height || this.cfg.height || 0) - this._xbottom;
