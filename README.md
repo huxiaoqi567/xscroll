@@ -33,6 +33,13 @@ bower install xscroll
     * `lockX` 是否锁定横向滚动
     * `lockY` 是否锁定纵向滚动
     * `gpuAcceleration` 是否开启GPU硬件加速（在性能提升的同时需要注意内存控制）
+    * `snap` 是否开启折段滚动效果 
+    * `snapWidth` 段落宽度
+    * `snapHeight` 段落高度
+    * `snapEasing` 动画效果
+    * `snapDuration` 动画周期
+    * `snapColsNum` 段落列数
+    * `snapRowsNum` 段落行数
 * `enableGPUAcceleration()` 开启硬件加速
 * `disableGPUAcceleration()` 关闭硬件加速
 * `getOffset()` 获取水平和垂直偏移量，如:{x:0,y:100}
@@ -48,6 +55,10 @@ bower install xscroll
 * `plug(plugin)` 绑定插件
 * `unplug(pluginId|plugin)` 移除某插件
 * `getPlugin(pluginId)` 获取某个插件
+* `addView(xscroll)` 新增子view
+* `removeView(id)` 删除子view
+* `getViewById()` 获取子view
+* `getViews()` 获取所有子view
 
 ### XList
 
