@@ -8,7 +8,7 @@
 
 ## Version
 
-2.2.0
+2.3.0
 
 ## Build
 
@@ -282,9 +282,15 @@ xlist.render();
 - 支持水平方向无尽滚动
 - 修复滚动停止时重绘、闪烁的问题
 - 新增useTransition配置，支持帧动画
-- 新增easing配置 如：ease ease-out ease-in
+- 新增easing配置 如：ease ease-out easeq-in
 - API调整 
     - getCellByRow -> getCellByRowOrCol
     - getCellByOffsetTop -> getCellByOffset
     - getCellByPageY -> getCellByPagePos
+
+
+### v2.3.0
+- 新增snap功能
+- 新增多个xscroll相互嵌套的管理机制
+
 
