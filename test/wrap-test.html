@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <script type="text/javascript">
+        ! function() {
+            function a() {
+                window.remFontSize = document.documentElement.clientWidth / 16;
+                document.documentElement.style.fontSize = document.documentElement.clientWidth / 16 + "px"
+            }
+            var b = null;
+            window.addEventListener("resize", function() {
+                clearTimeout(b), b = setTimeout(a, 300)
+            }, !1), a()
+        }(window);
+        </script>
+</head>
+<body>
+    <style type="text/css">
+    *{
+        margin:0;padding: 0;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    #J_Scroll{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    #J_Scroll .xs-content{
+        width: 100%;
+        /*height: 100%;*/
+    }
+    .xs-container{
+        width: 100%;
+        /*height: 100%;*/
+    }
+    
+ #J_Scroll .xs-plugin-pulldown-container{
+    text-align: center;
+    line-height: 60px;
+    font-size: .6rem;
+ }
+    h1{
+        background: #f60;
+        color:#fff;
+        padding: .4rem 0;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+
+    #J_Slider{
+        height: 5rem;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        font-size: 0;
+        white-space: nowrap;
+    }
+    #J_Slider .xs-content,#J_Slider .xs-container{
+        position: absolute;
+        width:80rem;
+    }
+    #J_Slider ul
+    {
+        height: 100%;
+        position: absolute;
+    }
+    #J_Slider li{
+        width: 16rem;
+        list-style:none;
+        display: inline-block;
+         height: 100%;
+    }   
+    #J_Slider img{
+        width:100%;
+        height: 100%;
+        display: block;
+    }
+
+
+     #J_Tab{
+        height: 2rem;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        margin:auto;
+        white-space: nowrap;
+        font-size: 0;
+    }
+    #J_Tab .xs-content{
+        width: auto;
+        height: 100%;
+    }
+    #J_Tab li{
+        list-style:none;
+        display: inline-block;
+        height: 2rem;
+        line-height:  2rem;
+        padding:0 .5rem;
+        font-size: .7rem;
+        border-right: 1px solid #ccc;
+    }
+
+    .page-item{
+        width: 100%;
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+    }
+    .page-item .xs-container,.page-item .xs-content{
+        width: 100%;
+        height: 100%;
+    }
+    .page-item li{
+        list-style:none;
+        display: block;
+        border-bottom: 1px solid #ccc;
+        width: 100%;
+        height:4rem;
+        line-height: 4rem;
+        text-align: center;
+    }
+
+    #J_Nav,#J_Nav2{
+        position: relative;
+        width:100%;
+        height: 10rem;
+        white-space: nowrap;
+        font-size: 0;
+    }
+
+    #J_Nav2{
+        height: 15rem;
+    }
+
+    #J_Nav .xs-container,#J_Nav2 .xs-container{
+        position: relative;
+        height: 100%;
+        width: auto;
+    }
+
+    #J_Nav .xs-content,#J_Nav2 .xs-content{
+        position: relative;
+        height: 100%;
+        width: auto;
+    }
+
+    #J_Nav .page-item,#J_Nav2 .page-item{
+        display: inline-block;
+        font-size: 1rem;
+        width: 16rem;
+    }
+    #J_Nav .page-item li,#J_Nav2 .page-item li{
+         width: 16rem;
+    }
+
+    .footer{
+        background: #000;
+    }
+
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <div class="xs-content">
+                <h1>XScroll</h1>
+                <div id="J_Slider">
+                     <div class="xs-container">
+                        <ul class="xs-content">
+                           <li>
+                                <a href="http://m.taobao.com">
+                                    <img src="http://gw.alicdn.com/tps/i4/TB1vP1UGFXXXXXNapXXdIns_XXX-1125-352.jpg_640x640Q90.jpg" alt="1"/>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://m.taobao.com">
+                                    <img src="http://gw.alicdn.com/tps/i1/TB1SUjuGVXXXXaAXXXXdIns_XXX-1125-352.jpg_640x640Q90.jpg"
+                                         alt="2"/>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://m.taobao.com">
+                                    <img src="http://i.mmcdn.cn/simba/img/TB1ZYruGVXXXXaAXXXXSutbFXXX.jpg_640x640Q90.jpg"
+                                         alt="3"/>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://m.taobao.com">
+                                    <img src="http://gw.alicdn.com/tps/i3/TB1GvnuGVXXXXXtXpXXdIns_XXX-1125-352.jpg_640x640Q90.jpg"
+                                         alt="4"/>
+                                </a>
+                            </li>
+                            <li><a href="#"><img src="http://i.mmcdn.cn/simba/img/TB1ZYruGVXXXXaAXXXXSutbFXXX.jpg_640x640Q90.jpg" alt=""></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="J_Tab">
+                     <div class="xs-container">
+                        <ul class="xs-content">
+                            <li>category</li>
+                            <li>category</li>
+                            <li>category</li>
+                            <li>category</li>
+                             <li>category</li>
+                            <li>category</li>
+                             <li>category</li>
+                            <li>category</li>
+                             <li>category</li>
+                            <li>category</li>
+                             <li>category</li>
+                            <li>category</li>
+                             <li>category</li>
+                            <li>category</li>
+                             <li>category</li>
+                            <li>category</li>
+                             <li>category</li>
+                            <li>category</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="navigation" id="J_Nav">
+                    <div class="xs-container">
+                        <div class="xs-content">
+                            <div class="page-item">
+                                 <div class="xs-container">
+                                    <ul class="xs-content">
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                             <div class="page-item">
+                                 <div class="xs-container">
+                                    <ul class="xs-content">
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                             <div class="page-item">
+                                 <div class="xs-container">
+                                    <ul class="xs-content">
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                    </ul>
+                                </div>
+                            </div>
+                           
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <h1>楼层</h1>
+
+
+                <div class="navigation" id="J_Nav2">
+                    <div class="xs-container">
+                        <div class="xs-content">
+                            <div class="page-item">
+                                 <div class="xs-container">
+                                    <ul class="xs-content">
+                                         <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                             <div class="page-item">
+                                 <div class="xs-container">
+                                    <ul class="xs-content">
+                                         <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="page-item">
+                                 <div class="xs-container">
+                                    <ul class="xs-content">
+                                         <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                        <li>row</li>
+                                    </ul>
+                                </div>
+                            </div>
+                           
+                        </div>
+                    </div>
+
+                </div>
+                <h1 class="footer">
+                    footer
+                </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../lib/sea.js"></script>
+    <script>
+    seajs.config({
+      base: "../build/cmd/"
+    })
+    seajs.use(["pan","core","infinite"],function(Pan,XScroll,XList){
+        document.addEventListener("touchmove",function(e){e.preventDefault()})
+        var xscroll = new XScroll({
+            renderTo:"#J_Scroll",
+            scrollbarX:false,
+            lockX:true,
+            scrollbarY:false
+        });
+
+        xscroll.plug(new XScroll.Plugin.PullDown())
+
+        xscroll.render();
+
+
+
+
+
+        var slider = new XScroll({
+            renderTo:"#J_Slider",
+            lockY:true,
+            scrollbarY:false,
+            scrollbarX:false,
+            snap:true,
+            snapDuration:300,
+            snapEasing:"ease-out",
+            snapWidth:remFontSize * 16,
+            snapHeight:document.querySelector("#J_Slider").offsetHeight,
+            snapColsNum:5
+        })
+        slider.render();
+
+        slider.on("pan",function(e){
+            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
+            if(Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
+        })
+
+
+        var tab = new XScroll({
+            renderTo:"#J_Tab",
+            scrollbarY:false,
+            lockY:true,
+            scrollbarX:false
+        })
+
+        tab.render();
+
+        tab.on("pan",function(e){
+            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
+            if(Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
+        })
+
+
+         var data = [];
+        for(var i =0;i<100;i++){
+            data.push({
+                style:{
+                    height:window.remFontSize * 4
+                },
+                data:{
+                    row:i+1
+                }
+            })
+        }
+
+        var nav = new XScroll({
+            renderTo:"#J_Nav",
+            lockY:true,
+            scrollbarY:false,
+            scrollbarX:false,
+            snapDuration:300,
+            snapEasing:"ease-out",
+            snap:true,
+            snapWidth:remFontSize * 16,
+            snapHeight:document.querySelector("#J_Nav").offsetHeight,
+            snapColsNum:3
+        })
+
+        nav.render();
+
+        nav.on("pan",function(e){
+            // if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
+            //     e.stopPropagation();
+            // }
+            // if(Math.abs(e.deltaX) > 10){
+            //     e.stopPropagation();
+            // }
+            // if(Math.abs(e.deltaY) > 10){
+            //     e.stopPropagation();
+            // }
+            // if(e)
+
+
+        })
+
+        // nav.on("panend",function(e){
+            // if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 30){
+                // e.stopPropagation();
+            // }
+        // })
+
+        var nav2 = new XScroll({
+            renderTo:"#J_Nav2",
+            lockY:true,
+            scrollbarY:false,
+            scrollbarX:false,
+            snap:true,
+            snapWidth:remFontSize * 16,
+            snapHeight:document.querySelector("#J_Nav2").offsetHeight,
+            snapColsNum:3
+        })
+
+        nav2.render();
+
+
+        var pageEls = document.querySelectorAll(".page-item");
+
+
+
+        for(var i =0;i<pageEls.length;i++){
+
+            var xlist = new XList({
+                renderTo:pageEls[i],
+                infiniteElements:"ul li",
+                data:data,
+                renderHook:function(el,row){
+                    el.innerHTML = "<a href='http://www.taobao.com'>"+row.data.row+"</a>";
+                }
+            });
+            xlist.render();
+
+            xlist.on("pan",function(e){
+                 //判断如果未滚动至边界 则阻止默认事件
+                if(e.offset.y < xlist.boundry.top && e.offset.y > xlist.boundry.bottom - xlist.containerHeight){
+                    e.stopPropagation();
+                }
+            })
+
+
+            xlist.on("panend",function(e){
+                var xlist =this;
+                var offset = xlist.getOffset();
+                if((offset.y < xlist.boundry.top && offset.y > xlist.boundry.bottom - xlist.containerHeight) && (Math.abs(e.deltaY) > 10 && Math.abs(e.deltaX) < Math.abs(e.deltaY))){
+                    e.stopPropagation();
+                }
+            })
+
+            
+            xscroll.addView(xlist)
+        }
+
+
+        xscroll.addView(slider);
+        xscroll.addView(tab);
+        xscroll.addView(nav);
+        window.xscroll = xscroll
+    });
+
+
+
+    </script>
+</body>
+</html>

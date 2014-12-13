@@ -228,7 +228,7 @@ define(function(require, exports, module) {
 			var offset = -(offset || (self.isY ? self.getOffsetTop() : self.getOffsetLeft()));
 			var itemSize = self.isY ? self.userConfig.itemHeight : self.userConfig.itemWidth;
 			var elementsPerPage = self.isY ? Math.ceil(self.height / itemSize) : Math.ceil(self.width / itemSize);
-			var maxBufferedNum = Math.max(Math.ceil(elementsPerPage / 3), 1);
+			var maxBufferedNum = self.userConfig.maxBufferedNum === undefined ? Math.max(Math.ceil(elementsPerPage / 3), 1) : self.userConfig.maxBufferedNum;
 			var pos = Math.max(offset - maxBufferedNum * itemSize, 0);
 			var tmp = {},
 				item;

@@ -84,21 +84,34 @@ define(function(require, exports, module) {
          */
 
     Util.extend(XScroll, Base, {
-        version: "2.2.0",
+        version: "2.3.0",
         init: function() {
             var self = this;
             var userConfig = self.userConfig = Util.mix({
+                snap:false,
+                snapWidth:100,
+                snapHeight:100,
+                snapRowIndex:0,
+                snapColIndex:0,
+                snapEasing:"ease",
+                snapDuration:500,
+                snapColsNum:1,
+                snapRowsNum:1,
+                bounce: true,
+                bounceDirections: ["top", "right", "bottom", "left"],
                 scalable: false,
                 scrollbarX: true,
                 scrollbarY: true,
                 bounceSize: 100,
                 useTransition: true,
                 gpuAcceleration: true,
-                BOUNDRY_CHECK_EASING:BOUNDRY_CHECK_EASING,
-                BOUNDRY_CHECK_DURATION:BOUNDRY_CHECK_DURATION,
-                BOUNDRY_CHECK_ACCELERATION:BOUNDRY_CHECK_ACCELERATION,
-                easing:"quadratic"
+                BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
+                BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,
+                BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
+                easing: "quadratic"
             }, self.userConfig, undefined, undefined, true);
+            //generate guid
+            self.guid = Util.guid();
             self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
             self.scale = userConfig.scale || 1;
             //timer for animtion
@@ -142,11 +155,12 @@ define(function(require, exports, module) {
             self.minScale = minScale;
             self.maxScale = maxScale;
             self.boundry.refresh({
-                width:self.scale * self.width,
-                height:self.scale * self.height
+                width: self.scale * self.width,
+                height: self.scale * self.height
             });
             self.fire(AFTER_RENDER);
             self.renderScrollBars();
+            self.userConfig.snap && self.initSnap();
             self._bindEvt();
         },
         renderScrollBars: function() {
@@ -267,8 +281,8 @@ define(function(require, exports, module) {
                         y: originY
                     }
                 })
-                if(!self.userConfig.useTransition){
-                    self._scale(_scale,originX,originY);
+                if (!self.userConfig.useTransition) {
+                    self._scale(_scale, originX, originY);
                 }
             })
             self.timer.scale.detach("end");
@@ -276,7 +290,7 @@ define(function(require, exports, module) {
                 self.isScaling = false;
             })
 
-            if(self.userConfig.useTransition){
+            if (self.userConfig.useTransition) {
                 self._scale(scale, originX, originY);
                 self.container.style[transition] = transitionStr;
                 self.content.style[transition] = transitionStr;
@@ -324,11 +338,11 @@ define(function(require, exports, module) {
             if (offset.y > boundry.top || offset.y + self.containerHeight < boundry.bottom || offset.x > boundry.left || offset.x + self.containerWidth < boundry.right) {
                 return;
             }
-            if(self.userConfig.useTransition){
+            if (self.userConfig.useTransition) {
                 self.translate(offset);
                 self._noTransition();
-            }else{
-                for(var i in self.timer){
+            } else {
+                for (var i in self.timer) {
                     self.timer[i].stop()
                 }
             }
@@ -386,6 +400,21 @@ define(function(require, exports, module) {
             self.scrollX(x, duration, easing, callback);
             self.scrollY(y, duration, easing, callback);
         },
+        scrollBy: function(offset, duration, easing, callback) {
+            var self = this;
+            self.scrollByX(offset.x, duration, easing, callback);
+            self.scrollByY(offset.y, duration, easing, callback);
+        },
+        scrollByX: function(x, duration, easing, callback) {
+            var self = this;
+            var left = -self.getOffsetLeft();
+            self.scrollX(Number(x) + Number(left), duration, easing, callback);
+        },
+        scrollByY: function(y, duration, easing, callback) {
+            var self = this;
+            var top = -self.getOffsetTop();
+            self.scrollY(Number(y) + Number(top), duration, easing, callback);
+        },
         scrollX: function(x, duration, easing, callback) {
             var self = this;
             var x = Math.round(x);
@@ -423,7 +452,7 @@ define(function(require, exports, module) {
 
             if (self.userConfig.useTransition) {
                 //transition
-                transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", Easing.format(easing)," 0s"].join("") : "none";
+                transitionStr = duration > 0 ? [transformStr, " ", duration / 1000, "s ", Easing.format(easing), " 0s"].join("") : "none";
                 el.style[transition] = transitionStr;
                 type == "x" ? self.translateX(dest) : self.translateY(dest);
             }
@@ -431,7 +460,7 @@ define(function(require, exports, module) {
             self.timer[type] = self.timer[type] || new Timer();
             self.timer[type].reset({
                 duration: duration,
-                easing:easing
+                easing: easing
             });
             self.timer[type].detach("run");
             self.timer[type].on("run", function(e) {
@@ -450,7 +479,7 @@ define(function(require, exports, module) {
             self.timer[type].on("end", function() {
                 if (!self.userConfig.useTransition) {
                     __scrollEndCallbackFn({
-                        type:type
+                        type: type
                     });
                 }
             })
@@ -472,8 +501,8 @@ define(function(require, exports, module) {
             }
             self['isScrolling' + Type] = true;
             //regist transitionEnd callback function
-            if(self.userConfig.useTransition){
-                 self['__scrollEndCallback' + Type] = __scrollEndCallbackFn;
+            if (self.userConfig.useTransition) {
+                self['__scrollEndCallback' + Type] = __scrollEndCallbackFn;
             }
 
             self.fire(SCROLL_ANIMATE, {
@@ -543,59 +572,61 @@ define(function(require, exports, module) {
         _fireClick: function(eventName, e) {
             this.fire(eventName, e);
         },
-        _bindEvt: function() {
-            var self = this;
-            if (self.__isEvtBind) return;
-            self.__isEvtBind = true;
-            var renderTo = self.renderTo;
-            var container = self.container;
-            var content = self.content;
-            var containerWidth = self.containerWidth;
-            var containerHeight = self.containerHeight;
-            var offset = {
-                x: 0,
-                y: 0
-            };
-            var boundry = self.boundry;
-            Event.on(renderTo, "touchstart", function(e) {
+        __handlers: {
+            touchstart: function(e) {
+                var self = this;
                 e.preventDefault();
                 self._fireTouchStart(e);
                 if (self.isScrollingX || self.isScrollingY) {
                     self.stop();
                 }
-            }).on(renderTo, Tap.TAP, function(e) {
+            },
+            tap: function(e) {
+                var self = this;
+                self._fireClick("click", e);
                 if (!self.isScrollingX && !self.isScrollingY) {
                     simulateMouseEvent(e, "click");
-                    self._fireClick("click", e);
                 } else {
                     self.isScrollingX = false;
                     self.isScrollingY = false;
                 }
-            }).on(renderTo, Pan.PAN_START, function(e) {
+            },
+            panstart: function(e) {
+                var self = this;
                 self._prevSpeed = 0;
-                offset = self.getOffset();
-                // console.log(offset)
+                var offset = self.offset = self.getOffset();
+                var boundry = self.boundry;
+                var containerWidth = self.containerWidth;
+                var containerHeight = self.containerHeight;
+                var boundry = self.boundry;
                 self.translate(offset);
                 self._firePanStart(Util.mix(e, {
                     offset: offset
                 }));
-            }).on(renderTo, Pan.PAN, function(e) {
-                var posY = self.userConfig.lockY ? Number(offset.y) : Number(offset.y) + e.deltaY;
-                var posX = self.userConfig.lockX ? Number(offset.x) : Number(offset.x) + e.deltaX;
-                containerWidth = self.containerWidth;
-                containerHeight = self.containerHeight;
+                return offset;
+            },
+            pan: function(e) {
+                var self = this;
+                var boundry = self.boundry;
+                var posY = self.userConfig.lockY ? Number(self.offset.y) : Number(self.offset.y) + e.deltaY;
+                var posX = self.userConfig.lockX ? Number(self.offset.x) : Number(self.offset.x) + e.deltaX;
+                //enable bounce
+                var bounce = self.userConfig.bounce;
+                var containerWidth = self.containerWidth;
+                var containerHeight = self.containerHeight;
                 if (posY > boundry.top) { //overtop 
-                    posY = (posY - boundry.top) * PAN_RATE + boundry.top;
+                    posY = bounce || xscroll.getPlugin("xscroll/plugin/pulldown") ? (posY - boundry.top) * PAN_RATE + boundry.top : boundry.top;
                 }
                 if (posY < boundry.bottom - containerHeight) { //overbottom 
-                    posY = posY + (boundry.bottom - containerHeight - posY) * PAN_RATE;
+                    posY = bounce ? posY + (boundry.bottom - containerHeight - posY) * PAN_RATE : boundry.bottom - containerHeight;
                 }
                 if (posX > boundry.left) { //overleft
-                    posX = (posX - boundry.left) * PAN_RATE + boundry.left;
+                    posX = bounce ? (posX - boundry.left) * PAN_RATE + boundry.left : boundry.left;
                 }
                 if (posX < boundry.right - containerWidth) { //overright
-                    posX = posX + (boundry.right - containerWidth - posX) * PAN_RATE;
+                    posX = bounce ? posX + (boundry.right - containerWidth - posX) * PAN_RATE : boundry.right - containerWidth;
                 }
+                
                 self.translate({
                     x: posX,
                     y: posY
@@ -624,10 +655,36 @@ define(function(require, exports, module) {
                     directionY: self.directionY,
                     triggerType: PAN
                 }));
-            }).on(renderTo, Pan.PAN_END, function(e) {
-                self.panEndHandler(e);
+            },
+            panend: function(e) {
+                var self = this;
+                var offset = self.getOffset();
+                var boundry = self.boundry;
+                self.userConfig.snap ? self._snapAnimate(e):self._scrollAnimate(e);
+                delete self.offset;
                 self._firePanEnd(e);
-            })
+            }
+        },
+        _bindEvt: function() {
+            var self = this;
+            if (self.__isEvtBind) return;
+            self.__isEvtBind = true;
+            var renderTo = self.renderTo;
+            var container = self.container;
+            var content = self.content;
+            var containerWidth = self.containerWidth;
+            var containerHeight = self.containerHeight;
+            Event.on(renderTo, "touchstart", function(e) {
+                self.__handlers.touchstart.call(self, e);
+            }).on(renderTo, Tap.TAP, function(e) {
+                self.__handlers.tap.call(self, e);
+            }).on(renderTo, Pan.PAN_START, function(e) {
+                self.__handlers.panstart.call(self, e);
+            }).on(renderTo, Pan.PAN, function(e) {
+                self.__handlers.pan.call(self, e);
+            }).on(renderTo, Pan.PAN_END, function(e) {
+                self.__handlers.panend.call(self, e);
+            });
 
             if (self.userConfig.useTransition) {
                 Event.on(container, transitionEnd, function(e) {
@@ -663,11 +720,9 @@ define(function(require, exports, module) {
                 Event.on(renderTo, Pinch.PINCH, function(e) {
                     var __scale = scale * e.scale;
                     if (__scale <= self.userConfig.minScale) {
-                        // s = 1/2 * a * 2^(s/a)
                         __scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
                     }
                     if (__scale >= self.userConfig.maxScale) {
-                        // s = 2 * a * 1/2^(a/s)
                         __scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
                     }
                     self._scale(__scale, originX, originY);
@@ -704,7 +759,48 @@ define(function(require, exports, module) {
                 self.refresh();
             })
         },
-        panEndHandler: function(e) {
+        initSnap:function(){
+            var self = this;
+            self.snapRowIndex = self.userConfig.snapRowIndex;
+            self.snapColIndex = self.userConfig.snapColIndex;
+        },
+        snapTo:function(col,row,callback){
+            var self = this;
+            var userConfig = self.userConfig;
+            var snapWidth = userConfig.snapWidth;
+            var snapHeight = userConfig.snapHeight;
+            var snapColsNum = userConfig.snapColsNum;
+            var snapRowsNum = userConfig.snapRowsNum;
+            col = col >= snapColsNum ? snapColsNum - 1 : col < 0 ? 0 : col;
+            row = row >= snapRowsNum ? snapRowsNum - 1 : row < 0 ? 0 : row;
+            self.snapRowIndex = row;
+            self.snapColIndex = col;
+            var top = self.snapRowIndex * snapHeight;
+            var left = self.snapColIndex * snapWidth;
+            self.scrollTo({x:left,y:top},userConfig.snapDuration,userConfig.snapEasing,callback);
+        },
+        //snap
+        _snapAnimate:function(e){
+            var self = this;
+            var userConfig = self.userConfig;
+            var snapWidth = userConfig.snapWidth;
+            var snapHeight = userConfig.snapHeight;
+            var cx = snapWidth/2;
+            var cy = snapHeight/2;
+            var direction = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.touch.directionX : e.touch.directionY;
+            if(e.velocity > 0.5){
+                direction == "left" ? self.snapColIndex ++ : direction == "right" ? self.snapColIndex -- : undefined;
+                direction == "top" ? self.snapRowIndex ++ : direction == "bottom" ? self.snapRowIndex -- : undefined;
+            }else{
+                var offset = self.getOffset();
+                var left = Math.abs(offset.x);
+                var top = Math.abs(offset.y);
+                self.snapColIndex = Math.round(left/snapWidth);
+                self.snapRowIndex = Math.round(top/snapHeight);
+            }
+            self.snapTo(self.snapColIndex,self.snapRowIndex)
+        },
+        _scrollAnimate: function(e) {
             var self = this;
             var userConfig = self.userConfig;
             var transX = self._bounce("x", e.velocityX);
@@ -716,16 +812,12 @@ define(function(require, exports, module) {
                 //ensure the same duration
                 duration = Math.max(transX.duration, transY.duration);
             }
-            if (transX) {
-                self.scrollX(x, duration || transX.duration, transX.easing, function(e) {
-                    self._scrollEndHandler("x");
-                });
-            }
-            if (transY) {
-                self.scrollY(y, duration || transY.duration, transY.easing, function(e) {
-                    self._scrollEndHandler("y");
-                });
-            }
+            transX && self.scrollX(x, duration || transX.duration, transX.easing, function(e) {
+                self._scrollEndHandler("x");
+            });
+            transY && self.scrollY(y, duration || transY.duration, transY.easing, function(e) {
+                self._scrollEndHandler("y");
+            });
             //judge the direction
             self.directionX = e.velocityX < 0 ? "left" : "right";
             self.directionY = e.velocityY < 0 ? "up" : "down";
@@ -742,41 +834,40 @@ define(function(require, exports, module) {
                 var minsize = type == "x" ? boundry.left : boundry.top;
                 var maxsize = type == "x" ? boundry.right : boundry.bottom;
                 var containerSize = type == "x" ? self.containerWidth : self.containerHeight;
-                self.fire("boundryout", {
-                    zoomType: type
-                })
-                var v = self[_bounce];
-                var a = 0.01 * v / Math.abs(v);
-                var t = v / a;
-                var s = self.getOffset()[type] + t * v / 2;
-                var tmin = 100;
-                var tmax = 150;
-                var oversize = 0;
-
-                //limit bounce
-                if (s > minsize) {
-                    if (s > minsize + bounceSize) {
-                        s = minsize + bounceSize;
+                var param = {
+                    zoomType: type,
+                    velocityX: 0,
+                    velocityY: 0
+                };
+                param["velocity" + TYPE] = self[_bounce];
+                self.fire("boundryout", param);
+                if (self.userConfig.bounce) {
+                    var v = self[_bounce];
+                    var a = 0.01 * v / Math.abs(v);
+                    var t = v / a;
+                    var s = self.getOffset()[type] + t * v / 2;
+                    var tmin = 100;
+                    var tmax = 150;
+                    var oversize = 0;
+                    //limit bounce
+                    if (s > minsize) {
+                        if (s > minsize + bounceSize) {
+                            s = minsize + bounceSize;
+                        }
+                        oversize = Math.abs(s - minsize);
+                    } else if (s < maxsize - containerSize) {
+                        if (s < maxsize - containerSize - bounceSize) {
+                            s = maxsize - containerSize - bounceSize
+                        }
+                        oversize = Math.abs(maxsize - containerSize - s);
                     }
-                    oversize = Math.abs(s - minsize);
-                } else if (s < maxsize - containerSize) {
-                    if (s < maxsize - containerSize - bounceSize) {
-                        s = maxsize - containerSize - bounceSize
-                    }
-                    oversize = Math.abs(maxsize - containerSize - s);
+                    t = oversize / bounceSize * (tmax - tmin) + tmin;
+                    //bounce
+                    self[scrollFn](-s, t, "linear", function() {
+                        self[_bounce] = 0;
+                        self[boundryCheckFn]()
+                    });
                 }
-                /*
-                    bounceSize  0 -> 100
-                    t           100 -> 200
-                    t = cursize / bouncesize * (tmax - tmin) + tmin
-                */
-                // t = t < 100 ? 100 : t > 150 ? 150 : t ;
-                t = oversize / bounceSize * (tmax - tmin) + tmin;
-                //bounce
-                self[scrollFn](-s, t,"linear", function() {
-                    self[_bounce] = 0;
-                    self[boundryCheckFn]()
-                });
             } else {
                 self[boundryCheckFn]();
             }
@@ -840,14 +931,57 @@ define(function(require, exports, module) {
                 transition.duration = t;
                 transition.easing = self.userConfig.easing;
                 transition.status = "normal";
+                self["_bounce" + type] = 0;
                 self._prevSpeed = 0;
             }
             self['isScrolling' + type.toUpperCase()] = true;
             return transition;
 
+        },
+        addView: function(view) {
+            var self = this;
+            if (!view || !view instanceof XScroll) return;
+            if (!self.__subViews) {
+                self.__subViews = [];
+            }
+            if (view.guid && !self.getViewById(view.guid)) {
+                //set parent scrollview
+                view.parentView = {
+                    instance: self
+                };
+                //bounce
+                view.on("boundryout", function(e) {
+                    self._scrollAnimate(e);
+                });
+                return self.__subViews.push(view);
+            }
+            return;
+        },
+        getViewById: function(id) {
+            var self = this;
+            if (!self.__subViews) return;
+            for (var i = 0, l = self.__subViews.length; i < l; i++) {
+                if (id && id == self.__subViews[i].guid) {
+                    return self.__subViews[i];
+                }
+            }
+            return;
+        },
+        getViews: function() {
+            return this.__subViews;
+        },
+        removeView: function(id) {
+            var self = this;
+            for (var i = 0, l = self.__subViews.length; i < l; i++) {
+                if (id && id == self.__subViews[i].guid) {
+                    delete self.__subViews[i].parentView;
+                    return self.__subViews.splice(i, 1);
+                }
+            }
+
         }
     });
-    
+
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
     } else {

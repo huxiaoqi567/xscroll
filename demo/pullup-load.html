@@ -119,7 +119,8 @@
 
         var xlist = new XList({
             renderTo: "#J_Scroll",
-            itemHeight: 50 ,
+            itemHeight: 80 ,
+            // useTransition:false,
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,data){
                 el.innerText = data.data.num;
@@ -132,7 +133,7 @@
 
         var page = 1;
 
-        var totalPage = 10;
+        var totalPage = 2;
 
         var getData = function(){
             if(!pageCache[page]){
@@ -150,7 +151,7 @@
                         };
                         ds.appendData(data);
                         xlist.render();
-                         //loading complate
+                         //loading complete
                         pullup.complete();
                         page++;
                     }
