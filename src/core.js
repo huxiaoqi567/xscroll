@@ -34,6 +34,7 @@
     var SCROLL_ANIMATE = "scrollanimate";
     var SCALE_ANIMATE = "scaleanimate";
     var SCALE = "scale";
+    var SCALE_END = "scaleend";
     var AFTER_RENDER = "afterrender";
     var REFRESH = "refresh";
     //constant acceleration for scrolling
@@ -133,7 +134,9 @@
                 x: 0,
                 y: 0
             });
-            self.fire(REFRESH)
+            self.fire(REFRESH,{
+                type:REFRESH
+            })
         },
         render: function() {
             var self = this;
@@ -274,12 +277,13 @@
             self.timer.scale.on("run", function(e) {
                 var _scale = (scale - scaleStart) * e.percent + scaleStart;
                 self.fire(SCALE, {
+                    type:SCALE,
                     scale: _scale,
                     origin: {
                         x: originX,
                         y: originY
                     }
-                })
+                });
                 if (!self.userConfig.useTransition) {
                     self._scale(_scale, originX, originY);
                 }
@@ -287,6 +291,14 @@
             self.timer.scale.detach("end");
             self.timer.scale.on("end", function() {
                 self.isScaling = false;
+                self.fire(SCALE_END,{
+                    type:SCALE_END,
+                    scale:self.scale,
+                    origin:{
+                        x: originX,
+                        y: originY
+                    }
+                })
             })
 
             if (self.userConfig.useTransition) {
@@ -340,15 +352,15 @@
             if (self.userConfig.useTransition) {
                 self.translate(offset);
                 self._noTransition();
-            } else {
-                for (var i in self.timer) {
-                    self.timer[i].stop()
-                }
+            }
+            for (var i in self.timer) {
+                self.timer[i].stop()
             }
             //clear the bounce
             self._bouncex = 0;
             self._bouncey = 0;
             self.fire(SCROLL_END, {
+                type:SCROLL_END,
                 offset: offset,
                 scale: self.scale,
                 zoomType: "xy"
@@ -475,7 +487,7 @@
                 self.fire(SCROLL, params);
             });
             self.timer[type].detach("end");
-            self.timer[type].on("end", function() {
+            self.timer[type].on("end", function(e) {
                 if (!self.userConfig.useTransition) {
                     __scrollEndCallbackFn({
                         type: type

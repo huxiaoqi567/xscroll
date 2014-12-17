@@ -1,10 +1,11 @@
 define(function(require, exports, module) {
+	var Util = require('./util');
 
 	var DataSet = function(cfg){
 
 		this.data = cfg && cfg.data || [];
 
-		this.id = cfg && cfg.id || "_ds_"+Date.now();
+		this.id = cfg && cfg.id || "_ds_"+Util.guid();
 
 	}
 

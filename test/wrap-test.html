@@ -1,92 +1,85 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Document</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <script type="text/javascript">
-        ! function() {
-            function a() {
-                window.remFontSize = document.documentElement.clientWidth / 16;
-                document.documentElement.style.fontSize = document.documentElement.clientWidth / 16 + "px"
-            }
-            var b = null;
-            window.addEventListener("resize", function() {
-                clearTimeout(b), b = setTimeout(a, 300)
-            }, !1), a()
-        }(window);
-        </script>
+<meta charset="UTF-8">
+<title>Document</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<script type="text/javascript">
+! function() {
+    function a() {
+        window.remFontSize = document.documentElement.clientWidth / 16;
+        document.documentElement.style.fontSize = document.documentElement.clientWidth / 16 + "px"
+    }
+    var b = null;
+    window.addEventListener("resize", function() {
+        clearTimeout(b), b = setTimeout(a, 300)
+    }, !1), a()
+}(window);
+</script>
 </head>
 <body>
-    <style type="text/css">
-    *{
-        margin:0;padding: 0;
-    }
-    body{
-        position: absolute;
-        width: 100%;
-        height: 100%;
-    }
-    #J_Scroll{
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
+<style type="text/css">
+*{
+    margin:0;padding: 0;
+}
+body{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+#J_Scroll{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
 
-    #J_Scroll .xs-content{
-        width: 100%;
-        /*height: 100%;*/
-    }
-    .xs-container{
-        width: 100%;
-        /*height: 100%;*/
-    }
-    
+#J_Scroll .xs-content{
+    width: 100%;
+}
+.xs-container{
+    width: 100%;
+}
  #J_Scroll .xs-plugin-pulldown-container{
     text-align: center;
     line-height: 60px;
     font-size: .6rem;
  }
-    h1{
-        background: #f60;
-        color:#fff;
-        padding: .4rem 0;
-        text-align: center;
-        font-size: 1rem;
-    }
-
-
-    #J_Slider{
-        height: 5rem;
-        width: 100%;
-        position: relative;
-        overflow: hidden;
-        font-size: 0;
-        white-space: nowrap;
-    }
-    #J_Slider .xs-content,#J_Slider .xs-container{
-        position: absolute;
-        width:80rem;
-    }
-    #J_Slider ul
-    {
-        height: 100%;
-        position: absolute;
-    }
-    #J_Slider li{
-        width: 16rem;
-        list-style:none;
-        display: inline-block;
-         height: 100%;
-    }   
-    #J_Slider img{
-        width:100%;
-        height: 100%;
-        display: block;
-    }
-
-
+h1{
+    background: #f60;
+    color:#fff;
+    padding: .4rem 0;
+    text-align: center;
+    font-size: 1rem;
+}
+#J_Slider{
+    height: 5rem;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    font-size: 0;
+    white-space: nowrap;
+}
+#J_Slider .xs-content,#J_Slider .xs-container{
+    position: absolute;
+    width:80rem;
+}
+#J_Slider ul
+{
+    height: 100%;
+    position: absolute;
+}
+#J_Slider li{
+    width: 16rem;
+    list-style:none;
+    display: inline-block;
+     height: 100%;
+}   
+#J_Slider img{
+    width:100%;
+    height: 100%;
+    display: block;
+}
      #J_Tab{
         height: 2rem;
         width: 100%;

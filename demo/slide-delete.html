@@ -109,17 +109,12 @@
         var xlist = new XList({
             renderTo: "#J_Scroll",
             data: data,
-            itemHeight: 62 ,
+            itemHeight: 60 ,
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
                 el.innerHTML = '<div class="lbl">'+row.data.text+'</div>'+
                                 '<div class="control"><div class="btn btn-mark">mark</div>'+
                                 '<div class="btn btn-delete">delete</div></div>';
-                // var style = "";
-                // if(row.data.status == "delete"){
-                    // style = "-webkit-transform:translateX(-"+maxWidth+"px) translateZ(0)"
-                // }
-                // el.innerHTML = '<div class="lbl-ctn" style="'+style+'"><div class="lbl">'+row.data.text+'</div></div><div class="del">Delete</div>';
             }
         });
         
@@ -157,8 +152,6 @@
         })
 
        xlist.render();
-
-        window.xlist = xlist
 
     </script>
 </body>
