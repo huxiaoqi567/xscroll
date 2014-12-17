@@ -35,6 +35,9 @@
     var SCALE_ANIMATE = "scaleanimate";
     var SCALE = "scale";
     var SCALE_END = "scaleend";
+    var SNAP_START = "snapstart";
+    var SNAP = "snap";
+    var SNAP_END = "snapend";
     var AFTER_RENDER = "afterrender";
     var REFRESH = "refresh";
     //constant acceleration for scrolling
@@ -84,7 +87,7 @@
          */
 
     Util.extend(XScroll, Base, {
-        version: "2.3.0",
+        version: "2.3.1",
         init: function() {
             var self = this;
             var userConfig = self.userConfig = Util.mix({
@@ -168,24 +171,20 @@
         renderScrollBars: function() {
             var self = this;
             if (self.userConfig.scrollbarX) {
-                if (self.scrollbarX) {
-                    self.scrollbarX._update();
-                } else {
-                    self.scrollbarX = new ScrollBar({
-                        xscroll: self,
-                        type: "x"
-                    });
-                }
+                self.scrollbarX = self.scrollbarX || new ScrollBar({
+                    xscroll: self,
+                    type: "x"
+                });
+                self.scrollbarX._update();
+                self.scrollbarX.hide();
             }
             if (self.userConfig.scrollbarY) {
-                if (self.scrollbarY) {
-                    self.scrollbarY._update();
-                } else {
-                    self.scrollbarY = new ScrollBar({
-                        xscroll: self,
-                        type: "y"
-                    });
-                }
+                self.scrollbarY = self.scrollbarY || new ScrollBar({
+                    xscroll: self,
+                    type: "y"
+                });
+                self.scrollbarY._update();
+                self.scrollbarY.hide();
             }
         },
         _createContainer: function() {
@@ -332,7 +331,7 @@
         },
         _noTransition: function() {
             var self = this;
-            if (Util.isBadAndroid) {
+            if (Util.isBadAndroid()) {
                 self.content.style[transitionDuration] = "0.001s";
                 self.container.style[transitionDuration] = "0.001s";
             } else {
@@ -451,11 +450,21 @@
             var transitionStr = "none";
             var __scrollEndCallbackFn = function(e) {
                 self['isScrolling' + Type] = false;
+                var _offset = self.getOffset();
+                var boundryout;
+                if(_offset[e.type] == self.boundry.top  && Math.abs(self['_bounce'+type]) > 0){
+                    boundryout = type == "x" ? "left" : "top";
+                }else if(_offset[e.type] + self.containerHeight == self.boundry.bottom && Math.abs(self['_bounce'+type]) > 0){
+                    boundryout = type == "x" ? "right" : "bottom";
+                }
                 var params = {
-                    offset: self.getOffset(),
+                    offset: _offset,
                     zoomType: e.type,
                     type: SCROLL_END
                 };
+                if(boundryout){
+                    params.boundryout = boundryout;
+                }
                 params['direction' + e.type.toUpperCase()] = dest - offset[e.type] < 0 ? directions[1] : directions[0];
                 self.fire(SCROLL_END, params);
                 callback && callback(e);
@@ -883,6 +892,21 @@
                 self[boundryCheckFn]();
             }
         },
+        isBoundryOut:function(){
+            return this.isBoundryOutLeft() || this.isBoundryOutRight() || this.isBoundryOutTop() || this.isBoundryOutBottom() ;
+        },
+        isBoundryOutLeft:function(){
+            return -this.getOffsetLeft() < this.boundry.left;
+        },
+        isBoundryOutRight:function(){
+            return this.containerWidth+this.getOffsetLeft() < this.boundry.right;
+        },
+        isBoundryOutTop:function(){
+            return -this.getOffsetTop() < this.boundry.top;
+        },
+        isBoundryOutBottom:function(){
+            return this.containerHeight+this.getOffsetTop() < this.boundry.bottom;
+        },
         _bounce: function(type, v) {
             var self = this;
             var offset = self.getOffset()[type];
@@ -989,7 +1013,6 @@
                     return self.__subViews.splice(i, 1);
                 }
             }
-
         }
     });
 

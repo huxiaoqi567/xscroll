@@ -98,6 +98,12 @@ util = function (exports) {
     },
     guid: function () {
       return Math.round(Math.random() * 100000000);
+    },
+    isAndroid: function () {
+      return /Android /.test(window.navigator.appVersion);
+    },
+    isBadAndroid: function () {
+      return /Android /.test(window.navigator.appVersion) && !/Chrome\/\d/.test(window.navigator.appVersion);
     }
   };
   if (typeof module == 'object' && module.exports) {
@@ -843,6 +849,7 @@ scrollbar = function (exports) {
   //transition webkitTransition MozTransition OTransition msTtransition
   var transition = Util.prefixStyle('transition');
   var borderRadius = Util.prefixStyle('borderRadius');
+  var transitionDuration = Util.prefixStyle('transitionDuration');
   var ScrollBar = function (cfg) {
     this.userConfig = cfg;
     this.init(cfg.xscroll);
@@ -877,7 +884,7 @@ scrollbar = function (exports) {
       var xscroll = self.xscroll;
       var translateZ = xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       var transform = translateZ ? transformStr + ':' + translateZ + ';' : '';
-      var css = self.isY ? 'width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform : 'height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform;
+      var css = self.isY ? 'opacity:0;width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform : 'opacity:0;height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform;
       self.scrollbar = document.createElement('div');
       self.scrollbar.style.cssText = css;
       xscroll.renderTo.appendChild(self.scrollbar);
@@ -886,6 +893,8 @@ scrollbar = function (exports) {
       self.indicate.style.cssText = size + 'position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;';
       self.scrollbar.appendChild(self.indicate);
       self._update();
+      //default hide
+      self.hide();
     },
     _update: function (offset, duration, easing) {
       var self = this;
@@ -957,7 +966,11 @@ scrollbar = function (exports) {
       self.show();
       var translateZ = self.xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       self.isY ? self.indicate.style[transform] = 'translateY(' + offset.y + 'px) ' + translateZ : self.indicate.style[transform] = 'translateX(' + offset.x + 'px) ' + translateZ;
-      self.indicate.style[transition] = '';
+      if (Util.isBadAndroid()) {
+        self.indicate.style[transitionDuration] = '0.001s';
+      } else {
+        self.indicate.style[transition] = '';
+      }
     },
     _bindEvt: function () {
       var self = this;
@@ -965,6 +978,9 @@ scrollbar = function (exports) {
         return;
       self.__isEvtBind = true;
       var type = self.isY ? 'y' : 'x';
+      var isBoundryOut = function (type) {
+        return type == 'x' ? self.xscroll.isBoundryOutLeft() && self.xscroll.isBoundryOutRight() : self.xscroll.isBoundryOutTop() && self.xscroll.isBoundryOutBottom();
+      };
       if (self.xscroll.userConfig.useTransition) {
         self.xscroll.on('pan', function (e) {
           self._update(e.offset);
@@ -982,9 +998,17 @@ scrollbar = function (exports) {
           self._update(e.offset);
         });
       }
+      self.xscroll.on('panend', function (e) {
+        if (Math.abs(e.velocity == 0) && !isBoundryOut(type)) {
+          self.hide();
+        }
+      });
       self.xscroll.on('scrollend', function (e) {
         if (e.zoomType.indexOf(type) > -1) {
           self._update(e.offset);
+          if (!isBoundryOut(e.zoomType)) {
+            self.hide();
+          }
         }
       });
     },
@@ -999,11 +1023,16 @@ scrollbar = function (exports) {
     hide: function () {
       var self = this;
       self.scrollbar.style.opacity = 0;
-      self.scrollbar.style[transition] = 'opacity 0.3s ease-out';
+      self.scrollbar.style[transition] = 'opacity 0.3s ease-out .5s';
     },
     show: function () {
       var self = this;
       self.scrollbar.style.opacity = 1;
+      if (Util.isBadAndroid()) {
+        self.scrollbar.style[transitionDuration] = '0.001s';
+      } else {
+        self.scrollbar.style[transition] = '';
+      }
     }
   });
   if (typeof module == 'object' && module.exports) {
@@ -1437,6 +1466,9 @@ core = function (exports) {
   var SCALE_ANIMATE = 'scaleanimate';
   var SCALE = 'scale';
   var SCALE_END = 'scaleend';
+  var SNAP_START = 'snapstart';
+  var SNAP = 'snap';
+  var SNAP_END = 'snapend';
   var AFTER_RENDER = 'afterrender';
   var REFRESH = 'refresh';
   //constant acceleration for scrolling
@@ -1478,7 +1510,7 @@ core = function (exports) {
    * @extends Base
    */
   Util.extend(XScroll, Base, {
-    version: '2.3.0',
+    version: '2.3.1',
     init: function () {
       var self = this;
       var userConfig = self.userConfig = Util.mix({
@@ -1565,24 +1597,20 @@ core = function (exports) {
     renderScrollBars: function () {
       var self = this;
       if (self.userConfig.scrollbarX) {
-        if (self.scrollbarX) {
-          self.scrollbarX._update();
-        } else {
-          self.scrollbarX = new ScrollBar({
-            xscroll: self,
-            type: 'x'
-          });
-        }
+        self.scrollbarX = self.scrollbarX || new ScrollBar({
+          xscroll: self,
+          type: 'x'
+        });
+        self.scrollbarX._update();
+        self.scrollbarX.hide();
       }
       if (self.userConfig.scrollbarY) {
-        if (self.scrollbarY) {
-          self.scrollbarY._update();
-        } else {
-          self.scrollbarY = new ScrollBar({
-            xscroll: self,
-            type: 'y'
-          });
-        }
+        self.scrollbarY = self.scrollbarY || new ScrollBar({
+          xscroll: self,
+          type: 'y'
+        });
+        self.scrollbarY._update();
+        self.scrollbarY.hide();
       }
     },
     _createContainer: function () {
@@ -1733,7 +1761,7 @@ core = function (exports) {
     },
     _noTransition: function () {
       var self = this;
-      if (Util.isBadAndroid) {
+      if (Util.isBadAndroid()) {
         self.content.style[transitionDuration] = '0.001s';
         self.container.style[transitionDuration] = '0.001s';
       } else {
@@ -1863,11 +1891,21 @@ core = function (exports) {
       var transitionStr = 'none';
       var __scrollEndCallbackFn = function (e) {
         self['isScrolling' + Type] = false;
+        var _offset = self.getOffset();
+        var boundryout;
+        if (_offset[e.type] == self.boundry.top && Math.abs(self['_bounce' + type]) > 0) {
+          boundryout = type == 'x' ? 'left' : 'top';
+        } else if (_offset[e.type] + self.containerHeight == self.boundry.bottom && Math.abs(self['_bounce' + type]) > 0) {
+          boundryout = type == 'x' ? 'right' : 'bottom';
+        }
         var params = {
-          offset: self.getOffset(),
+          offset: _offset,
           zoomType: e.type,
           type: SCROLL_END
         };
+        if (boundryout) {
+          params.boundryout = boundryout;
+        }
         params['direction' + e.type.toUpperCase()] = dest - offset[e.type] < 0 ? directions[1] : directions[0];
         self.fire(SCROLL_END, params);
         callback && callback(e);
@@ -2298,6 +2336,21 @@ core = function (exports) {
       } else {
         self[boundryCheckFn]();
       }
+    },
+    isBoundryOut: function () {
+      return this.isBoundryOutLeft() || this.isBoundryOutRight() || this.isBoundryOutTop() || this.isBoundryOutBottom();
+    },
+    isBoundryOutLeft: function () {
+      return -this.getOffsetLeft() < this.boundry.left;
+    },
+    isBoundryOutRight: function () {
+      return this.containerWidth + this.getOffsetLeft() < this.boundry.right;
+    },
+    isBoundryOutTop: function () {
+      return -this.getOffsetTop() < this.boundry.top;
+    },
+    isBoundryOutBottom: function () {
+      return this.containerHeight + this.getOffsetTop() < this.boundry.bottom;
     },
     _bounce: function (type, v) {
       var self = this;

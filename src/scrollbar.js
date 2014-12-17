@@ -13,6 +13,7 @@
 
     var borderRadius = Util.prefixStyle("borderRadius");
 
+    var transitionDuration = Util.prefixStyle("transitionDuration");
 
 	var ScrollBar = function(cfg){
 		this.userConfig = cfg;
@@ -48,8 +49,8 @@
 			var xscroll = self.xscroll;
 			var translateZ = xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			var transform = translateZ ? transformStr+":"+translateZ +";": ""
-			var css = self.isY ? "width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform : 
-								"height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform;
+			var css = self.isY ? "opacity:0;width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform : 
+								"opacity:0;height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform;
 			self.scrollbar = document.createElement("div");
 			self.scrollbar.style.cssText = css;
 			xscroll.renderTo.appendChild(self.scrollbar);
@@ -58,6 +59,8 @@
 			self.indicate.style.cssText = size+"position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"
 			self.scrollbar.appendChild(self.indicate);
 			self._update();
+			//default hide
+			self.hide();
 		},
 		_update: function(offset,duration,easing) {
 			var self = this;
@@ -124,14 +127,20 @@
 			self.show();
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			self.isY ? self.indicate.style[transform] = "translateY(" + offset.y + "px) "+translateZ : self.indicate.style[transform] = "translateX(" + offset.x + "px) "+translateZ
-			self.indicate.style[transition] = "";
+			if(Util.isBadAndroid()){
+				self.indicate.style[transitionDuration] = "0.001s";
+			}else{
+				self.indicate.style[transition] = "";
+			}
 		},
 		_bindEvt: function() {
 			var self = this;
 			if (self.__isEvtBind) return;
 			self.__isEvtBind = true;
 			var type = self.isY ? "y" : "x";
-
+			var isBoundryOut = function(type){
+				return type == "x" ? (self.xscroll.isBoundryOutLeft() && self.xscroll.isBoundryOutRight()) : (self.xscroll.isBoundryOutTop() && self.xscroll.isBoundryOutBottom());
+			}
 			if(self.xscroll.userConfig.useTransition){
 				self.xscroll.on("pan",function(e){self._update(e.offset);})
 				self.xscroll.on("scrollanimate",function(e){
@@ -141,15 +150,21 @@
 				self.xscroll.on("scaleanimate",function(e){self._update(e.offset);})
 			}else{
 				self.xscroll.on("scroll",function(e){self._update(e.offset);});
-				
 			}
-
+			self.xscroll.on("panend",function(e){
+				if(Math.abs(e.velocity == 0) && !isBoundryOut(type)){
+					self.hide();
+				}
+			});
 			self.xscroll.on("scrollend",function(e){
 				if(e.zoomType.indexOf(type) > -1){
 					self._update(e.offset);
+					if(!isBoundryOut(e.zoomType)){
+						self.hide();
+					}
 				}
+				
 			})
-			
 		},
 		reset:function(){
 			var self = this;
@@ -159,11 +174,16 @@
 		hide: function() {
 			var self = this;
 			self.scrollbar.style.opacity= 0;
-			self.scrollbar.style[transition] = "opacity 0.3s ease-out"
+			self.scrollbar.style[transition] = "opacity 0.3s ease-out .5s"
 		},
 		show: function() {
 			var self = this;
 			self.scrollbar.style.opacity=1;
+			if(Util.isBadAndroid()){
+				self.scrollbar.style[transitionDuration] = "0.001s";
+			}else{
+				self.scrollbar.style[transition] = "";
+			}
 		}
 	});
 
