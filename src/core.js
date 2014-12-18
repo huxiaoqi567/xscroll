@@ -531,6 +531,7 @@
                     x: self.x,
                     y: self.y
                 },
+                type:SCROLL_ANIMATE,
                 duration: duration / 1000,
                 easing: Easing.format(easing),
                 zoomType: type
@@ -605,7 +606,14 @@
                 var self = this;
                 self._fireClick("click", e);
                 if (!self.isScrollingX && !self.isScrollingY) {
-                    simulateMouseEvent(e, "click");
+                    if(Util.isBadAndroid() && e.target.tagName.toLowerCase() == "a"){
+                        var href = e.target.getAttribute("href");
+                        if(href){
+                            location.href = href;
+                        }
+                    }else{
+                        simulateMouseEvent(e, "click");
+                    }
                 } else {
                     self.isScrollingX = false;
                     self.isScrollingY = false;
@@ -680,9 +688,9 @@
                 var self = this;
                 var offset = self.getOffset();
                 var boundry = self.boundry;
+                self._firePanEnd(e);
                 self.userConfig.snap ? self._snapAnimate(e):self._scrollAnimate(e);
                 delete self.offset;
-                self._firePanEnd(e);
             }
         },
         _bindEvt: function() {
@@ -694,6 +702,14 @@
             var content = self.content;
             var containerWidth = self.containerWidth;
             var containerHeight = self.containerHeight;
+            // touchstart can't prevent click
+            if(Util.isBadAndroid()){
+                Event.on(renderTo, "click",function(e){
+                    if(e.target.tagName.toLowerCase() == "a"){
+                        e.preventDefault();
+                    }
+                });
+            }
             Event.on(renderTo, "touchstart", function(e) {
                 self.__handlers.touchstart.call(self, e);
             }).on(renderTo, Tap.TAP, function(e) {
@@ -708,6 +724,7 @@
 
             if (self.userConfig.useTransition) {
                 Event.on(container, transitionEnd, function(e) {
+                    if(e.elapsedTime.toFixed(3) <= 0.001) return;
                     if (e.target == content && !self.isScaling) {
                         self.__scrollEndCallbackX && self.__scrollEndCallbackX({
                             type: "x"

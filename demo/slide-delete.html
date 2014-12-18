@@ -93,7 +93,9 @@
     <div id="footer">infinity-scroll</div>
  <script type="text/javascript" src="../build/xlist.js"></script>
     <script>
-        //mock data
+
+        (function(){
+            //mock data
         var data = (function() {
             var tmp = [];
             for (var i = 1; i <= 1000; i++) {
@@ -152,6 +154,9 @@
         })
 
        xlist.render();
+
+        })()
+        
 
     </script>
 </body>

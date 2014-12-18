@@ -23,18 +23,18 @@ define(function(require, exports, module) {
 			}
 		}, cfg);
 	};
-	Util.extend(SwipeEdit,Base, {
+	Util.extend(SwipeEdit, Base, {
 		pluginId: "xlist/plugin/swipeedit",
 		pluginInitializer: function(xlist) {
 			var self = this;
 			self.xlist = xlist;
 			self._bindEvt();
 		},
-		pluginDestructor:function(xlist){
-			
+		pluginDestructor: function(xlist) {
+
 		},
 		getTransformX: function(el) {
-			if(!el) return '';
+			if (!el) return '';
 			var trans = getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
 			return trans ? trans[4] / 1 : 0;
 		},
@@ -44,9 +44,9 @@ define(function(require, exports, module) {
 			var lbl = null;
 			xlist.on("panstart", function(e) {
 				hasSlided = false;
-				if(!e.cell || !e.cell.element) return;
+				if (!e.cell || !e.cell.element) return;
 				lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
-				if(!lbl) return;
+				if (!lbl) return;
 				startX = self.getTransformX(lbl);
 				lbl.style[transition] = "none";
 				if (Math.abs(startX) > 0 && !isSliding) {
@@ -55,7 +55,7 @@ define(function(require, exports, module) {
 			})
 
 			xlist.on("pan", function(e) {
-				if(!lbl) return;
+				if (!lbl) return;
 				if (e.touch.directionX == "left") {
 					self.slideAllExceptRow(e.cell._row);
 				}
@@ -64,7 +64,7 @@ define(function(require, exports, module) {
 		            2.大于20px （参考值可自定） buffer
 		            3.向左
 		            */
-				if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) / Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer ) {
+				if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) / Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer) {
 					isLocked = true;
 					xlist.userConfig.lockY = true;
 					var left = startX + e.deltaX + buffer;
@@ -79,7 +79,7 @@ define(function(require, exports, module) {
 			})
 
 			xlist.on("panend", function(e) {
-				if(!lbl) return;
+				if (!lbl) return;
 				isLocked = false;
 				var cpt = self.getTransformX(lbl);
 				if (e.touch.directionX == "left" && Math.abs(e.velocityX) > acc) {
@@ -90,35 +90,37 @@ define(function(require, exports, module) {
 					self.slideLeftHandler(e)
 				}
 			})
-			
-			 document.body.addEventListener("webkitTransitionEnd",function(e){
-	           if(new RegExp(self.userConfig.labelSelector.replace(/\./,"")).test(e.target.className)){
-	               isSliding = false;
-	           }
-	       })
+
+			document.body.addEventListener("webkitTransitionEnd", function(e) {
+				if (new RegExp(self.userConfig.labelSelector.replace(/\./, "")).test(e.target.className)) {
+					isSliding = false;
+				}
+			})
 
 		},
 		slideLeft: function(row) {
 			var self = this;
+			var xlist = self.xlist;
 			var cell = xlist.getCellByRowOrCol(row);
 			if (!cell || !cell.element) return;
 			var el = cell.element.querySelector(self.userConfig.labelSelector);
 			if (!el || !el.style) return;
 			el.style[transform] = "translateX(-" + self.userConfig.width + "px) ";
-			el.style[transition] = transformStr+" 0.15s ease";
+			el.style[transition] = transformStr + " 0.15s ease";
 			xlist.getData(0, row).data.status = "delete";
 		},
 		slideRight: function(row) {
 			var self = this;
+			var xlist = self.xlist;
 			var cell = xlist.getCellByRowOrCol(row);
 			if (!cell || !cell.element) return;
 			var el = cell.element.querySelector(self.userConfig.labelSelector);
 			if (!el || !el.style) return;
 			var matrix = window.getComputedStyle(el)[transform].match(/[-\d\.*\d*]+/g);
 			var transX = matrix ? Math.round(matrix[4]) : 0;
-			if(transX == 0) return;
+			if (transX == 0) return;
 			el.style[transform] = "translateX(0)";
-			el.style[transition] = transformStr+" 0.5s ease";
+			el.style[transition] = transformStr + " 0.5s ease";
 			xlist.getData(0, row).data.status = "";
 		},
 		slideLeftHandler: function(e) {
@@ -134,6 +136,7 @@ define(function(require, exports, module) {
 		},
 		slideAllExceptRow: function(row) {
 			var self = this;
+			var xlist = self.xlist;
 			for (var i in xlist.infiniteElementsCache) {
 				if (row != xlist.infiniteElementsCache[i]._row || undefined === row) {
 					self.slideRight(xlist.infiniteElementsCache[i]._row);
@@ -142,11 +145,8 @@ define(function(require, exports, module) {
 		}
 	});
 
-	if(typeof module == 'object' && module.exports){
+	if (typeof module == 'object' && module.exports) {
 		module.exports = SwipeEdit;
-	}else{
+	} else {
 		return SwipeEdit;
-	}
-
-	
-});
+	}});

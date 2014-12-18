@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="demo.css">
+</head>
+<body>
+    <style type="text/css">
+#J_Scroll li{
+    padding: 0 10px;
+
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #fff;
+    font-size: 16px;
+    display: block;
+    list-style: none;
+}
+
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li{
+        width: 100%;
+        height: 100px;
+    }
+    #J_Scroll ul li a{
+        display: block;
+        height: 100%;
+    }
+    .xs-container{
+        width: 100%;
+    }
+    </style>
+    <div id="header">XScroll</div>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+                <li><a href="http://www.baidu.com/">click Me</a></li>
+
+            </ul>
+        </div>
+    </div>
+    <div id="footer">scroll-y</div>
+    <script src="../lib/log.js"></script>
+    <script src="../lib/sea.js"></script>
+    <script>
+    seajs.config({
+      base: "../build/cmd/",
+       map: [
+        [".js", ".js?" + new Date().getTime()]
+      ]
+    })
+    seajs.use(["core","util"],function(XScroll,Util){
+        var xscroll = new XScroll({
+            renderTo:"#J_Scroll",
+            scrollbarX:false,
+            // gpuAcceleration:false,
+            // useTransition:false,
+            lockX:true
+        });
+        xscroll.render();
+        xscroll.on("scroll",function(e){
+            // console.log(e.offset)
+        })
+    });
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 ## HomePage
 
-[http://huxiaoqi567.github.io/](http://huxiaoqi567.github.io/)
+[http://xscroll.github.io/](http://xscroll.github.io/)
 
 ## Version
 
@@ -306,10 +306,11 @@ xlist.render();
 
 ### v2.3.1
 - DataSet guid重复问题
-- 修复安装下无法点停的问题
+- 修复部分安卓设备无法点停的问题
 - 修复执行stop()后定时器仍然执行的问题
 - 滚动条默认隐藏
 - 新增boundryout api
+- scrollanimate和panend触发顺序调整
 
 
 

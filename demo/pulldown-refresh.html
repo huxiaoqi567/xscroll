@@ -142,8 +142,11 @@
                     url:"./data.json",
                     dataType:"json",
                     success:function(data){
-                        pulldown.reset();
-                        xscroll.render()
+                        //scrollback to the top
+                        pulldown.reset(function(){
+                            //repaint
+                            xscroll.render()
+                        });
                     }
                 })
         })

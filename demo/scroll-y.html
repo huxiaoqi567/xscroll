@@ -123,7 +123,6 @@
         </div>
     </div>
     <div id="footer">scroll-y</div>
-    <!-- // <script type="text/javascript" src="../lib/log.js"></script> -->
     <script src="../lib/sea.js"></script>
     <script>
     seajs.config({
@@ -132,26 +131,13 @@
         [".js", ".js?" + new Date().getTime()]
       ]
     })
-    seajs.use(["core"],function(XScroll){
+    seajs.use(["core","util"],function(XScroll,Util){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
-            // useTransition:false,
             scrollbarX:false,
             lockX:true
         });
         xscroll.render();
-
-        window.xscroll = xscroll;
-
-        xscroll.on("scroll",function(){
-            // console.log(xscroll.isBoundryOutBottom())
-        })
-
-        // xscroll.scrollY(1000,100000);
-
-        // setTimeout(function(){
-        //     xscroll.stop()
-        // },3000)
     });
     </script>
 </body>
