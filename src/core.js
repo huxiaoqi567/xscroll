@@ -22,6 +22,12 @@
         PullDown: PullDown,
         PullUp: PullUp
     };
+    //namespace for gesture
+    XScroll.Gesture = {
+        Pan:Pan,
+        Tap:Tap,
+        Pinch:Pinch
+    }
     //event names
     var SCROLL_END = "scrollend";
     var SCROLL = "scroll";
