@@ -1470,7 +1470,6 @@ core = function (exports) {
   var SNAP = 'snap';
   var SNAP_END = 'snapend';
   var AFTER_RENDER = 'afterrender';
-  var REFRESH = 'refresh';
   //constant acceleration for scrolling
   var SROLL_ACCELERATION = 0.001;
   //boundry checked bounce effect
@@ -1554,18 +1553,6 @@ core = function (exports) {
       self.contentClsName = clsPrefix + 'content';
       self.boundry = new Boundry();
       self.boundry.refresh();
-    },
-    /*
-        render & scroll to top
-    */
-    refresh: function () {
-      var self = this;
-      self.render();
-      self.scrollTo({
-        x: 0,
-        y: 0
-      });
-      self.fire(REFRESH, { type: REFRESH });
     },
     render: function () {
       var self = this;
@@ -1803,8 +1790,8 @@ core = function (exports) {
       this.userConfig.gpuAcceleration = false;
     },
     _transform: function () {
-      var translateZ = this.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       var scale = this.userConfig.scalable ? ' scale(' + this.scale + ') ' : '';
+      var translateZ = this.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       this.content.style[transform] = 'translate(' + this.x + 'px,0px) ' + scale + translateZ;
       if (!this.userConfig.lockY) {
         this.container.style[transform] = 'translate(0px,' + this.y + 'px) ' + translateZ;
@@ -2236,7 +2223,10 @@ core = function (exports) {
         });
       }
       Event.on(window, 'resize', function (e) {
-        self.refresh();
+        setTimeout(function () {
+          self.render();
+          self.boundryCheck();
+        }, 100);
       });
     },
     initSnap: function () {
