@@ -108,6 +108,8 @@
 			var height = self.userConfig.height || 60;
 			var offsetTop = xscroll.getOffsetTop();
 			if (offsetTop > height) {
+				//prevent default bounce
+				e.preventDefault();
 				xscroll.boundry.resetTop();
 				xscroll.boundry.expandTop(height);
 				xscroll.bounce(true,function(){

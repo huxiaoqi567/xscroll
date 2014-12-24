@@ -130,11 +130,12 @@
     <script type="text/javascript">
         var data = (function() {
             var tmp = [];
-            for (var i = 1; i <= 1; i++) {
+            for (var i = 1; i <= 10; i++) {
                 tmp.push({
                     data:{num: i},
                     recycled:true,
                     style:{
+                        height:300,
                         background:"red"
                     }
                 })
@@ -144,7 +145,7 @@
         var xlist = new XList({
             renderTo: "#J_Scroll",
             data: data,
-            itemHeight: 840 ,
+            itemHeight:  300,
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,data){
                 el.innerText = data.data.num;

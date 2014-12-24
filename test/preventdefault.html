@@ -88,7 +88,6 @@
             scrollbarX:false,
             snap:true,
             snapDuration:300,
-            // preventDefault:false,
             snapEasing:"ease-out",
             snapWidth:remFontSize * 16,
             snapHeight:document.querySelector("#J_Slider").offsetHeight,
@@ -97,12 +96,12 @@
         slider.render();
 
         slider.on("pan",function(e){
-            // if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
-            //     e.stopPropagation();
-            // }
-            // if(Math.abs(e.deltaX) > 10){
-            //     e.stopPropagation();
-            // }
+            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
+            if(Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
         })
 </script>
 </body>
