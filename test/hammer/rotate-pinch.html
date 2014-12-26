@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<style type="text/css">
+*{
+	margin:0;padding: 0;
+}
+	#myElement {
+  background: silver;
+  height: 300px;
+  text-align: center;
+  height: 300px;
+  font: 30px/300px Helvetica, Arial, sans-serif;
+}
+</style>
+<body>
+	<div id="myElement"></div>
+</body>
+<script type="text/javascript" src="hammer.js"></script>
+<script type="text/javascript">
+	var myElement = document.getElementById('myElement');
+
+var mc = new Hammer.Manager(myElement);
+
+// create a pinch and rotate recognizer
+// these require 2 pointers
+var pinch = new Hammer.Pinch();
+var rotate = new Hammer.Rotate();
+var pan = new Hammer.Pan();
+
+// we want to detect both the same time
+pinch.recognizeWith(rotate);
+
+// add to the Manager
+mc.add([pan,pinch, rotate]);
+
+
+
+mc.on("pan pinch", function(e) {
+	console.log(e)
+	myElement.style.webkitTransform = "scale("+e.scale+") rotate("+e.rotation+"deg)";
+});
+
+
+
+
+
+</script>
+</html>
