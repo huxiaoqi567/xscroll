@@ -375,7 +375,10 @@ pan = function (exports) {
   var Pan = {
     PAN_START: PAN_START,
     PAN_END: PAN_END,
-    PAN: PAN
+    PAN: PAN,
+    reset: function () {
+      record = [];
+    }
   };
   if (typeof module == 'object' && module.exports) {
     exports = Pan;
@@ -884,7 +887,7 @@ scrollbar = function (exports) {
       var xscroll = self.xscroll;
       var translateZ = xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       var transform = translateZ ? transformStr + ':' + translateZ + ';' : '';
-      var css = self.isY ? 'opacity:0;width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform : 'opacity:0;height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform;
+      var css = self.isY ? 'opacity:0;width: 2px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform : 'opacity:0;height:2px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;' + transform;
       self.scrollbar = document.createElement('div');
       self.scrollbar.style.cssText = css;
       xscroll.renderTo.appendChild(self.scrollbar);
@@ -1482,7 +1485,7 @@ core = function (exports) {
   //constant acceleration for scrolling
   var SROLL_ACCELERATION = 0.001;
   //boundry checked bounce effect
-  var BOUNDRY_CHECK_DURATION = 400;
+  var BOUNDRY_CHECK_DURATION = 500;
   var BOUNDRY_CHECK_EASING = 'ease';
   var BOUNDRY_CHECK_ACCELERATION = 0.1;
   //reduced boundry pan distance
@@ -1968,12 +1971,19 @@ core = function (exports) {
         var containerHeight = self.containerHeight;
         var boundry = self.boundry;
         self.translate(offset);
+        self.__panstarted = true;
         self._firePanStart(Util.mix(e, { offset: offset }));
         return offset;
       },
       pan: function (e) {
         var self = this;
+        if (!self.__panstarted) {
+          //reset pan gesture
+          Pan.reset();
+          return;
+        }
         var boundry = self.boundry;
+        self.offset = self.offset || self.getOffset();
         var posY = self.userConfig.lockY ? Number(self.offset.y) : Number(self.offset.y) + e.deltaY;
         var posX = self.userConfig.lockX ? Number(self.offset.x) : Number(self.offset.x) + e.deltaX;
         //enable bounce
@@ -2029,6 +2039,7 @@ core = function (exports) {
         var self = this;
         var offset = self.getOffset();
         var boundry = self.boundry;
+        self.__panstarted = false;
         self._firePanEnd(e);
         if (e.defaultPrevented)
           return;
@@ -2272,23 +2283,65 @@ core = function (exports) {
     isBoundryOutBottom: function () {
       return this.containerHeight + this.getOffsetTop() < this.boundry.bottom;
     },
-    addView: function (view) {
+    addView: function (view, viewCfg) {
       var self = this;
+      //config for view
+      viewCfg = Util.mix({
+        captureBounce: false,
+        stopPropagation: true
+      }, viewCfg);
       if (!view || !view instanceof XScroll)
         return;
       if (!self.__subViews) {
         self.__subViews = [];
       }
       if (view.guid && !self.getViewById(view.guid)) {
+        view.__viewControllers = view.__viewControllers || {};
         //set parent scrollview
         view.parentView = { instance: self };
-        //bounce
-        view.on('boundryout', function (e) {
+        view.__viewControllers.boundryout = function (e) {
           self._scrollAnimate(e);
-        });
+        };
+        view.__viewControllers.panstart = function (e) {
+          if (!view.isBoundryOut()) {
+          }
+        };
+        view.__viewControllers.pan = function (e) {
+          if (!view.isBoundryOut()) {
+          }
+        };
+        view.__viewControllers.panend = function (e) {
+          if (!view.isBoundryOut()) {
+          }
+        };
+        //bounce
+        viewCfg.captureBounce && view.on('boundryout', view.__viewControllers.boundryout);
+        if (viewCfg.stopPropagation) {
+          view.on('panstart', view.__viewControllers.panstart);
+          view.on('pan', view.__viewControllers.pan);
+          view.on('panend', view.__viewControllers.panend);
+        }
         return self.__subViews.push(view);
       }
       return;
+    },
+    removeView: function (view) {
+      var self = this;
+      if (!view || !view.guid)
+        return;
+      for (var i = 0, l = self.__subViews.length; i < l; i++) {
+        if (view.guid == self.__subViews[i].guid) {
+          delete self.__subViews[i].parentView;
+          console.log(self.__subViews[i].__viewControllers);
+          for (var j in self.__subViews[i].__viewControllers) {
+            //remove events
+            self.__subViews[i].detach(j, self.__subViews[i].__viewControllers[j]);
+          }
+          //clear
+          self.__subViews[i].__viewControllers = {};
+          return self.__subViews.splice(i, 1);
+        }
+      }
     },
     getViewById: function (id) {
       var self = this;
@@ -2303,15 +2356,6 @@ core = function (exports) {
     },
     getViews: function () {
       return this.__subViews;
-    },
-    removeView: function (id) {
-      var self = this;
-      for (var i = 0, l = self.__subViews.length; i < l; i++) {
-        if (id && id == self.__subViews[i].guid) {
-          delete self.__subViews[i].parentView;
-          return self.__subViews.splice(i, 1);
-        }
-      }
     },
     _bounce: function (type, v) {
       var self = this;

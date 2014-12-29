@@ -171,5 +171,3 @@
     }else{
         return Tap;
     }
-
-

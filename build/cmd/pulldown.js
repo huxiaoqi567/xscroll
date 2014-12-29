@@ -139,6 +139,4 @@ define(function(require, exports, module) {
 		module.exports = PullDown;
 	}else{
 		return PullDown;
-	}
-	
-});
+	}});

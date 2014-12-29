@@ -28,4 +28,3 @@
 	}else{
 		return Gesture;
 	}
-	

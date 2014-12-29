@@ -49,6 +49,4 @@ define(function(require, exports, module) {
 	}else{
 		return DataSet;
 	}
-	
-
-});
+	});

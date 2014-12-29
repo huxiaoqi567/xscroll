@@ -139,4 +139,3 @@
 	}else{
 		return PullDown;
 	}
-	

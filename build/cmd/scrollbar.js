@@ -50,8 +50,8 @@ define(function(require, exports, module) {
 			var xscroll = self.xscroll;
 			var translateZ = xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			var transform = translateZ ? transformStr+":"+translateZ +";": ""
-			var css = self.isY ? "opacity:0;width: 3px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform : 
-								"opacity:0;height:3px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform;
+			var css = self.isY ? "opacity:0;width: 2px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform : 
+								"opacity:0;height:2px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+transform;
 			self.scrollbar = document.createElement("div");
 			self.scrollbar.style.cssText = css;
 			xscroll.renderTo.appendChild(self.scrollbar);

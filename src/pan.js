@@ -164,7 +164,10 @@
 	var Pan = {
 		PAN_START: PAN_START,
 		PAN_END: PAN_END,
-		PAN: PAN
+		PAN: PAN,
+		reset:function(){
+			record = [];
+		}
 	};
 
 	if (typeof module == 'object' && module.exports) {

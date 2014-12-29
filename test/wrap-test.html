@@ -159,9 +159,21 @@ h1{
     .footer{
         background: #000;
     }
+    
+    #block{
+        width: 100%;
+        height: 2rem;
+        background: red;
+        z-index: 9999;
+        position: absolute;
+        top:7rem;
+    }
 
     </style>
     <div id="J_Scroll">
+        <!-- <div id="block">
+            
+        </div> -->
         <div class="xs-container">
             <div class="xs-content">
                 <h1>XScroll</h1>
@@ -376,7 +388,7 @@ h1{
             scrollbarY:false
         });
 
-        xscroll.plug(new XScroll.Plugin.PullDown())
+       
 
         xscroll.render();
 
@@ -452,6 +464,8 @@ h1{
             snapColsNum:3
         })
 
+
+
         nav.render();
 
         nav.on("pan",function(e){
@@ -503,7 +517,11 @@ h1{
                     el.innerHTML = "<a href='http://www.taobao.com'>"+row.data.row+"</a>";
                 }
             });
+
+             xlist.plug(new XScroll.Plugin.PullDown())
             xlist.render();
+
+
 
             xlist.on("pan",function(e){
                  //判断如果未滚动至边界 则阻止默认事件
@@ -530,6 +548,17 @@ h1{
         xscroll.addView(tab);
         xscroll.addView(nav);
         window.xscroll = xscroll
+
+
+        // var block = document.querySelector("#block");
+        // xscroll.on("scroll",function(e){
+        //     if(e.offset.y >=-100){
+        //         block.style.webkitTransform ="translateY("+ e.offset.y +"px) translateZ(0)"
+        //     }
+            
+
+        // })
+
     });
 
 

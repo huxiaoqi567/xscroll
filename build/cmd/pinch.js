@@ -67,5 +67,4 @@ define(function(require, exports, module) {
 		module.exports = Pinch;
 	}else{
 		return Pinch;
-	}
-	});
+	}});

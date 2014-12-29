@@ -460,6 +460,4 @@ define(function(require, exports, module) {
 	// browser export
 	else {
 		window.XList = XList;
-	}
-
-});
+	}});

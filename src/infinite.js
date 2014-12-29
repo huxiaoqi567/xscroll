@@ -460,4 +460,3 @@
 	else {
 		window.XList = XList;
 	}
-

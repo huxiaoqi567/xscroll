@@ -171,7 +171,4 @@ define(function(require, exports, module) {
         module.exports = Tap;
     }else{
         return Tap;
-    }
-
-
-});
+    }});

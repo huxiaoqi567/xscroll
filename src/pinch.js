@@ -67,4 +67,3 @@
 	}else{
 		return Pinch;
 	}
-	
