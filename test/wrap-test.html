@@ -411,11 +411,14 @@ h1{
         slider.render();
 
         slider.on("pan",function(e){
-            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
-                e.stopPropagation();
-            }
-            if(Math.abs(e.deltaX) > 10){
-                e.stopPropagation();
+            // if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
+            //     e.stopPropagation();
+            // }
+            // if(Math.abs(e.deltaX) > 10){
+            //     e.stopPropagation();
+            // }
+            if(e.startDirectionX == "left" || e.startDirectionX == "right"){
+                // e.stopPropagation();
             }
         })
 

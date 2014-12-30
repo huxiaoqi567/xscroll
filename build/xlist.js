@@ -2283,80 +2283,6 @@ core = function (exports) {
     isBoundryOutBottom: function () {
       return this.containerHeight + this.getOffsetTop() < this.boundry.bottom;
     },
-    addView: function (view, viewCfg) {
-      var self = this;
-      //config for view
-      viewCfg = Util.mix({
-        captureBounce: false,
-        stopPropagation: true
-      }, viewCfg);
-      if (!view || !view instanceof XScroll)
-        return;
-      if (!self.__subViews) {
-        self.__subViews = [];
-      }
-      if (view.guid && !self.getViewById(view.guid)) {
-        view.__viewControllers = view.__viewControllers || {};
-        //set parent scrollview
-        view.parentView = { instance: self };
-        view.__viewControllers.boundryout = function (e) {
-          self._scrollAnimate(e);
-        };
-        view.__viewControllers.panstart = function (e) {
-          if (!view.isBoundryOut()) {
-          }
-        };
-        view.__viewControllers.pan = function (e) {
-          if (!view.isBoundryOut()) {
-          }
-        };
-        view.__viewControllers.panend = function (e) {
-          if (!view.isBoundryOut()) {
-          }
-        };
-        //bounce
-        viewCfg.captureBounce && view.on('boundryout', view.__viewControllers.boundryout);
-        if (viewCfg.stopPropagation) {
-          view.on('panstart', view.__viewControllers.panstart);
-          view.on('pan', view.__viewControllers.pan);
-          view.on('panend', view.__viewControllers.panend);
-        }
-        return self.__subViews.push(view);
-      }
-      return;
-    },
-    removeView: function (view) {
-      var self = this;
-      if (!view || !view.guid)
-        return;
-      for (var i = 0, l = self.__subViews.length; i < l; i++) {
-        if (view.guid == self.__subViews[i].guid) {
-          delete self.__subViews[i].parentView;
-          console.log(self.__subViews[i].__viewControllers);
-          for (var j in self.__subViews[i].__viewControllers) {
-            //remove events
-            self.__subViews[i].detach(j, self.__subViews[i].__viewControllers[j]);
-          }
-          //clear
-          self.__subViews[i].__viewControllers = {};
-          return self.__subViews.splice(i, 1);
-        }
-      }
-    },
-    getViewById: function (id) {
-      var self = this;
-      if (!self.__subViews)
-        return;
-      for (var i = 0, l = self.__subViews.length; i < l; i++) {
-        if (id && id == self.__subViews[i].guid) {
-          return self.__subViews[i];
-        }
-      }
-      return;
-    },
-    getViews: function () {
-      return this.__subViews;
-    },
     _bounce: function (type, v) {
       var self = this;
       var offset = self.getOffset()[type];
@@ -2524,6 +2450,72 @@ core = function (exports) {
         easing: Easing.format(easing),
         zoomType: type
       });
+    },
+    addView: function (view, viewCfg) {
+      var self = this;
+      //config for view
+      viewCfg = Util.mix({
+        captureBounce: false,
+        stopPropagation: true
+      }, viewCfg);
+      if (!view || !view instanceof XScroll)
+        return;
+      if (!self.__subViews) {
+        self.__subViews = {};
+      }
+      if (view.guid && !self.__subViews[view.guid]) {
+        view.__viewControllers = view.__viewControllers || {};
+        //set parent scrollview
+        view.parentView = { instance: self };
+        view.__viewControllers.boundryout = function (e) {
+          self._scrollAnimate(e);
+        };
+        // view.__viewControllers.panstart = function(e) {
+        // if (!view.isBoundryOut()) {
+        //     e.stopPropagation();
+        // }
+        // }
+        // view.__viewControllers.pan = function(e) {
+        // if (!view.isBoundryOut() ) {
+        //     e.stopPropagation();
+        // }
+        // }
+        // view.__viewControllers.panend = function(e) {
+        // if (!view.isBoundryOut()) {
+        //     e.stopPropagation();
+        // }
+        // }
+        viewCfg.captureBounce && view.on('boundryout', view.__viewControllers.boundryout);
+        // if (viewCfg.stopPropagation) {
+        // view.on("panstart", view.__viewControllers.panstart);
+        // view.on("pan", view.__viewControllers.pan);
+        // view.on("panend", view.__viewControllers.panend);
+        // }
+        return self.__subViews[view.guid] = view;
+      }
+      return;
+    },
+    removeView: function (view) {
+      var self = this;
+      if (!view || !view.guid)
+        return;
+      var subview = self.__subViews[view.guid];
+      if (subview) {
+        delete subview.parentView;
+        for (var i in subview.__viewControllers) {
+          //remove events
+          subview.detach(i, subview.__viewControllers[i]);
+        }
+        //clear
+        subview.__viewControllers = {};
+        delete subview;
+      }
+    },
+    getViews: function (guid) {
+      if (guid) {
+        return this.__subViews[guid];
+      }
+      return this.__subViews;
     }
   });
   if (typeof module == 'object' && module.exports) {

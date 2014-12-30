@@ -8,7 +8,7 @@
 
 ## Version
 
-2.3.2
+2.4.0
 
 ## Build
 
@@ -311,6 +311,12 @@ xlist.render();
 - 滚动条默认隐藏
 - 新增boundryout api
 - scrollanimate和panend触发顺序调整
+
+### v2.4.0
+- 新增addView、removeView、getViews 接口
+- 新增viewctrl模块进行多个view之间的管理
+- 修复pulldown无法加载的问题
+- 修复多个view嵌套时panstart滚动容器跳动的问题
 
 
 

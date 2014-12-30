@@ -24,11 +24,11 @@
     };
     //namespace for gesture
     XScroll.Gesture = {
-        Pan:Pan,
-        Tap:Tap,
-        Pinch:Pinch
-    }
-    //event names
+            Pan: Pan,
+            Tap: Tap,
+            Pinch: Pinch
+        }
+        //event names
     var SCROLL_END = "scrollend";
     var SCROLL = "scroll";
     var PAN_END = "panend";
@@ -97,16 +97,16 @@
         init: function() {
             var self = this;
             var userConfig = self.userConfig = Util.mix({
-                preventDefault:true,
-                snap:false,
-                snapWidth:100,
-                snapHeight:100,
-                snapRowIndex:0,
-                snapColIndex:0,
-                snapEasing:"ease",
-                snapDuration:500,
-                snapColsNum:1,
-                snapRowsNum:1,
+                preventDefault: true,
+                snap: false,
+                snapWidth: 100,
+                snapHeight: 100,
+                snapRowIndex: 0,
+                snapColIndex: 0,
+                snapEasing: "ease",
+                snapDuration: 500,
+                snapColsNum: 1,
+                snapRowsNum: 1,
                 bounce: true,
                 bounceDirections: ["top", "right", "bottom", "left"],
                 scalable: false,
@@ -269,7 +269,7 @@
             self.timer.scale.on("run", function(e) {
                 var _scale = (scale - scaleStart) * e.percent + scaleStart;
                 self.fire(SCALE, {
-                    type:SCALE,
+                    type: SCALE,
                     scale: _scale,
                     origin: {
                         x: originX,
@@ -283,10 +283,10 @@
             self.timer.scale.detach("end");
             self.timer.scale.on("end", function() {
                 self.isScaling = false;
-                self.fire(SCALE_END,{
-                    type:SCALE_END,
-                    scale:self.scale,
-                    origin:{
+                self.fire(SCALE_END, {
+                    type: SCALE_END,
+                    scale: self.scale,
+                    origin: {
                         x: originX,
                         y: originY
                     }
@@ -352,7 +352,7 @@
             self._bouncex = 0;
             self._bouncey = 0;
             self.fire(SCROLL_END, {
-                type:SCROLL_END,
+                type: SCROLL_END,
                 offset: offset,
                 scale: self.scale,
                 zoomType: "xy"
@@ -493,8 +493,8 @@
         __handlers: {
             touchstart: function(e) {
                 var self = this;
-                if(self.userConfig.preventDefault){
-                   e.preventDefault();
+                if (self.userConfig.preventDefault) {
+                    e.preventDefault();
                 }
                 self._fireTouchStart(e);
                 if (self.isScrollingX || self.isScrollingY) {
@@ -505,12 +505,12 @@
                 var self = this;
                 self._fireClick("click", e);
                 if (!self.isScrollingX && !self.isScrollingY) {
-                    if(Util.isBadAndroid() && e.target.tagName.toLowerCase() == "a"){
+                    if (Util.isBadAndroid() && e.target.tagName.toLowerCase() == "a") {
                         var href = e.target.getAttribute("href");
-                        if(href){
+                        if (href) {
                             location.href = href;
                         }
-                    }else{
+                    } else {
                         simulateMouseEvent(e, "click");
                     }
                 } else {
@@ -535,7 +535,7 @@
             },
             pan: function(e) {
                 var self = this;
-                if(!self.__panstarted){
+                if (!self.__panstarted) {
                     //reset pan gesture
                     Pan.reset();
                     return;
@@ -560,7 +560,7 @@
                 if (posX < boundry.right - containerWidth) { //overright
                     posX = bounce ? posX + (boundry.right - containerWidth - posX) * PAN_RATE : boundry.right - containerWidth;
                 }
-                
+
                 self.translate({
                     x: posX,
                     y: posY
@@ -596,8 +596,8 @@
                 var boundry = self.boundry;
                 self.__panstarted = false;
                 self._firePanEnd(e);
-                if(e.defaultPrevented) return;
-                self.userConfig.snap ? self._snapAnimate(e):self._scrollAnimate(e);
+                if (e.defaultPrevented) return;
+                self.userConfig.snap ? self._snapAnimate(e) : self._scrollAnimate(e);
                 delete self.offset;
             }
         },
@@ -611,9 +611,9 @@
             var containerWidth = self.containerWidth;
             var containerHeight = self.containerHeight;
             // touchstart can't prevent click
-            if(Util.isBadAndroid()){
-                Event.on(renderTo, "click",function(e){
-                    if(e.target.tagName.toLowerCase() == "a"){
+            if (Util.isBadAndroid()) {
+                Event.on(renderTo, "click", function(e) {
+                    if (e.target.tagName.toLowerCase() == "a") {
                         e.preventDefault();
                     }
                 });
@@ -633,7 +633,7 @@
             if (self.userConfig.useTransition) {
                 Event.on(container, transitionEnd, function(e) {
                     //prevent callback in bad android
-                    if(e.elapsedTime.toFixed(3) <= 0.001) return;
+                    if (e.elapsedTime.toFixed(3) <= 0.001) return;
                     if (e.target == content && !self.isScaling) {
                         self.__scrollEndCallbackX && self.__scrollEndCallbackX({
                             type: "x"
@@ -702,18 +702,18 @@
                 });
             }
             Event.on(window, "resize", function(e) {
-                setTimeout(function(){
+                setTimeout(function() {
                     self.render();
                     self.boundryCheck()
-                },100)
+                }, 100)
             })
         },
-        initSnap:function(){
+        initSnap: function() {
             var self = this;
             self.snapRowIndex = self.userConfig.snapRowIndex;
             self.snapColIndex = self.userConfig.snapColIndex;
         },
-        snapTo:function(col,row,callback){
+        snapTo: function(col, row, callback) {
             var self = this;
             var userConfig = self.userConfig;
             var snapWidth = userConfig.snapWidth;
@@ -726,28 +726,31 @@
             self.snapColIndex = col;
             var top = self.snapRowIndex * snapHeight;
             var left = self.snapColIndex * snapWidth;
-            self.scrollTo({x:left,y:top},userConfig.snapDuration,userConfig.snapEasing,callback);
+            self.scrollTo({
+                x: left,
+                y: top
+            }, userConfig.snapDuration, userConfig.snapEasing, callback);
         },
         //snap
-        _snapAnimate:function(e){
+        _snapAnimate: function(e) {
             var self = this;
             var userConfig = self.userConfig;
             var snapWidth = userConfig.snapWidth;
             var snapHeight = userConfig.snapHeight;
-            var cx = snapWidth/2;
-            var cy = snapHeight/2;
+            var cx = snapWidth / 2;
+            var cy = snapHeight / 2;
             var direction = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.touch.directionX : e.touch.directionY;
-            if(e.velocity > 0.5){
-                direction == "left" ? self.snapColIndex ++ : direction == "right" ? self.snapColIndex -- : undefined;
-                direction == "top" ? self.snapRowIndex ++ : direction == "bottom" ? self.snapRowIndex -- : undefined;
-            }else{
+            if (e.velocity > 0.5) {
+                direction == "left" ? self.snapColIndex++ : direction == "right" ? self.snapColIndex-- : undefined;
+                direction == "top" ? self.snapRowIndex++ : direction == "bottom" ? self.snapRowIndex-- : undefined;
+            } else {
                 var offset = self.getOffset();
                 var left = Math.abs(offset.x);
                 var top = Math.abs(offset.y);
-                self.snapColIndex = Math.round(left/snapWidth);
-                self.snapRowIndex = Math.round(top/snapHeight);
+                self.snapColIndex = Math.round(left / snapWidth);
+                self.snapRowIndex = Math.round(top / snapHeight);
             }
-            self.snapTo(self.snapColIndex,self.snapRowIndex)
+            self.snapTo(self.snapColIndex, self.snapRowIndex)
         },
         _scrollAnimate: function(e) {
             var self = this;
@@ -787,7 +790,7 @@
                     zoomType: type,
                     velocityX: 0,
                     velocityY: 0,
-                    type:BOUNDRY_OUT
+                    type: BOUNDRY_OUT
                 };
                 param["velocity" + TYPE] = self[_bounce];
                 self.fire(BOUNDRY_OUT, param);
@@ -822,98 +825,20 @@
                 self[boundryCheckFn]();
             }
         },
-        isBoundryOut:function(){
-            return this.isBoundryOutLeft() || this.isBoundryOutRight() || this.isBoundryOutTop() || this.isBoundryOutBottom() ;
+        isBoundryOut: function() {
+            return this.isBoundryOutLeft() || this.isBoundryOutRight() || this.isBoundryOutTop() || this.isBoundryOutBottom();
         },
-        isBoundryOutLeft:function(){
+        isBoundryOutLeft: function() {
             return -this.getOffsetLeft() < this.boundry.left;
         },
-        isBoundryOutRight:function(){
-            return this.containerWidth+this.getOffsetLeft() < this.boundry.right;
+        isBoundryOutRight: function() {
+            return this.containerWidth + this.getOffsetLeft() < this.boundry.right;
         },
-        isBoundryOutTop:function(){
+        isBoundryOutTop: function() {
             return -this.getOffsetTop() < this.boundry.top;
         },
-        isBoundryOutBottom:function(){
-            return this.containerHeight+this.getOffsetTop() < this.boundry.bottom;
-        },
-        addView: function(view,viewCfg) {
-            var self = this;
-            //config for view
-            viewCfg = Util.mix({
-                captureBounce:false,
-                stopPropagation:true
-            },viewCfg)
-            if (!view || !view instanceof XScroll) return;
-            if (!self.__subViews) {
-                self.__subViews = [];
-            }
-            if (view.guid && !self.getViewById(view.guid)) {
-                view.__viewControllers = view.__viewControllers || {};
-                //set parent scrollview
-                view.parentView = {
-                    instance: self
-                };
-                
-                view.__viewControllers.boundryout = function(e) {
-                    self._scrollAnimate(e);
-                }
-                view.__viewControllers.panstart = function(e){
-                    if(!view.isBoundryOut()){
-                        // e.stopPropagation();
-                    }
-                }
-                view.__viewControllers.pan = function(e){
-                    if(!view.isBoundryOut()){
-                        // e.stopPropagation();
-                    }
-                }
-                view.__viewControllers.panend = function(e){
-                    if(!view.isBoundryOut()){
-                        // e.stopPropagation();
-                    }
-                }
-                //bounce
-                viewCfg.captureBounce && view.on("boundryout", view.__viewControllers.boundryout);
-
-                if(viewCfg.stopPropagation){
-                    view.on("panstart",view.__viewControllers.panstart);
-                    view.on("pan",view.__viewControllers.pan);
-                    view.on("panend",view.__viewControllers.panend);
-                }
-                return self.__subViews.push(view);
-            }
-            return;
-        },
-        removeView: function(view) {
-            var self = this;
-            if(!view || !view.guid) return;
-            for (var i = 0, l = self.__subViews.length; i < l; i++) {
-                if (view.guid == self.__subViews[i].guid) {
-                    delete self.__subViews[i].parentView;
-                    console.log(self.__subViews[i].__viewControllers)
-                    for(var j in self.__subViews[i].__viewControllers){
-                        //remove events
-                        self.__subViews[i].detach(j,self.__subViews[i].__viewControllers[j]);
-                    }
-                    //clear
-                    self.__subViews[i].__viewControllers = {};
-                    return self.__subViews.splice(i, 1);
-                }
-            }
-        },
-        getViewById: function(id) {
-            var self = this;
-            if (!self.__subViews) return;
-            for (var i = 0, l = self.__subViews.length; i < l; i++) {
-                if (id && id == self.__subViews[i].guid) {
-                    return self.__subViews[i];
-                }
-            }
-            return;
-        },
-        getViews: function() {
-            return this.__subViews;
+        isBoundryOutBottom: function() {
+            return this.containerHeight + this.getOffsetTop() < this.boundry.bottom;
         },
         _bounce: function(type, v) {
             var self = this;
@@ -992,9 +917,9 @@
                 self['isScrolling' + Type] = false;
                 var _offset = self.getOffset();
                 var boundryout;
-                if(_offset[e.type] == self.boundry.top  && Math.abs(self['_bounce'+type]) > 0){
+                if (_offset[e.type] == self.boundry.top && Math.abs(self['_bounce' + type]) > 0) {
                     boundryout = type == "x" ? "left" : "top";
-                }else if(_offset[e.type] + self.containerHeight == self.boundry.bottom && Math.abs(self['_bounce'+type]) > 0){
+                } else if (_offset[e.type] + self.containerHeight == self.boundry.bottom && Math.abs(self['_bounce' + type]) > 0) {
                     boundryout = type == "x" ? "right" : "bottom";
                 }
                 var params = {
@@ -1002,7 +927,7 @@
                     zoomType: e.type,
                     type: SCROLL_END
                 };
-                if(boundryout){
+                if (boundryout) {
                     params.boundryout = boundryout;
                 }
                 params['direction' + e.type.toUpperCase()] = dest - offset[e.type] < 0 ? directions[1] : directions[0];
@@ -1071,11 +996,79 @@
                     x: self.x,
                     y: self.y
                 },
-                type:SCROLL_ANIMATE,
+                type: SCROLL_ANIMATE,
                 duration: duration / 1000,
                 easing: Easing.format(easing),
                 zoomType: type
             })
+        },
+        addView: function(view, viewCfg) {
+            var self = this;
+            //config for view
+            viewCfg = Util.mix({
+                captureBounce: false,
+                stopPropagation: true
+            }, viewCfg)
+            if (!view || !view instanceof XScroll) return;
+            if (!self.__subViews) {
+                self.__subViews = {};
+            }
+            if (view.guid && !self.__subViews[view.guid]) {
+                view.__viewControllers = view.__viewControllers || {};
+                //set parent scrollview
+                view.parentView = {
+                    instance: self
+                };
+                view.__viewControllers.boundryout = function(e) {
+                    self._scrollAnimate(e);
+                }
+                // view.__viewControllers.panstart = function(e) {
+                    // if (!view.isBoundryOut()) {
+                    //     e.stopPropagation();
+                    // }
+                // }
+                // view.__viewControllers.pan = function(e) {
+                    // if (!view.isBoundryOut() ) {
+                    //     e.stopPropagation();
+                    // }
+                // }
+                // view.__viewControllers.panend = function(e) {
+                    // if (!view.isBoundryOut()) {
+                    //     e.stopPropagation();
+                    // }
+                // }
+                    
+                viewCfg.captureBounce && view.on("boundryout", view.__viewControllers.boundryout);
+
+                // if (viewCfg.stopPropagation) {
+                    // view.on("panstart", view.__viewControllers.panstart);
+                    // view.on("pan", view.__viewControllers.pan);
+                    // view.on("panend", view.__viewControllers.panend);
+                // }
+                return self.__subViews[view.guid] = view;
+            }
+            return;
+        },
+        removeView: function(view) {
+            var self = this;
+            if (!view || !view.guid) return;
+            var subview = self.__subViews[view.guid];
+            if (subview) {
+                delete subview.parentView;
+                for (var i in subview.__viewControllers) {
+                    //remove events
+                    subview.detach(i, subview.__viewControllers[i]);
+                }
+                //clear
+                subview.__viewControllers = {};
+                delete subview;
+            }
+        },
+        getViews: function(guid) {
+            if (guid) {
+                return this.__subViews[guid];
+            }
+            return this.__subViews;
         }
     });
 
