@@ -131,9 +131,6 @@ h1{
         font-size: 0;
     }
 
-    #J_Nav2{
-        height: 15rem;
-    }
 
     #J_Nav .xs-container,#J_Nav2 .xs-container{
         position: relative;
@@ -411,14 +408,17 @@ h1{
         slider.render();
 
         slider.on("pan",function(e){
-            // if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
-            //     e.stopPropagation();
-            // }
-            // if(Math.abs(e.deltaX) > 10){
-            //     e.stopPropagation();
-            // }
+            if(Math.abs(e.deltaY) < 10){
+                 e.stopPropagation();
+            }
+            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
+            if(Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
             if(e.startDirectionX == "left" || e.startDirectionX == "right"){
-                // e.stopPropagation();
+                e.stopPropagation();
             }
         })
 
@@ -433,6 +433,9 @@ h1{
         tab.render();
 
         tab.on("pan",function(e){
+            if(Math.abs(e.deltaY) < 10){
+                 e.stopPropagation();
+            }
             if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
                 e.stopPropagation();
             }
@@ -472,25 +475,22 @@ h1{
         nav.render();
 
         nav.on("pan",function(e){
-            // if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
-            //     e.stopPropagation();
-            // }
-            // if(Math.abs(e.deltaX) > 10){
-            //     e.stopPropagation();
-            // }
+            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
+            if(Math.abs(e.deltaX) > 10){
+                e.stopPropagation();
+            }
             // if(Math.abs(e.deltaY) > 10){
             //     e.stopPropagation();
             // }
-            // if(e)
-
-
         })
 
-        // nav.on("panend",function(e){
-            // if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 30){
-                // e.stopPropagation();
-            // }
-        // })
+        nav.on("panend",function(e){
+            if(Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 30){
+                e.stopPropagation();
+            }
+        })
 
         var nav2 = new XScroll({
             renderTo:"#J_Nav2",
@@ -514,6 +514,8 @@ h1{
 
             var xlist = new XList({
                 renderTo:pageEls[i],
+                bounce:false,
+                // height:206,
                 infiniteElements:"ul li",
                 data:data,
                 renderHook:function(el,row){
@@ -521,7 +523,7 @@ h1{
                 }
             });
 
-             xlist.plug(new XScroll.Plugin.PullDown())
+             // xlist.plug(new XScroll.Plugin.PullDown())
             xlist.render();
 
 
@@ -534,6 +536,7 @@ h1{
             })
 
 
+
             xlist.on("panend",function(e){
                 var xlist =this;
                 var offset = xlist.getOffset();
@@ -543,13 +546,14 @@ h1{
             })
 
             
-            xscroll.addView(xlist)
+            xscroll.addView(xlist,{captureBounce:true})
         }
 
 
-        xscroll.addView(slider);
-        xscroll.addView(tab);
+        // xscroll.addView(slider);
+        // xscroll.addView(tab);
         xscroll.addView(nav);
+        xscroll.addView(nav2);
         window.xscroll = xscroll
 
 

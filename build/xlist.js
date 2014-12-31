@@ -1978,10 +1978,12 @@ core = function (exports) {
       pan: function (e) {
         var self = this;
         if (!self.__panstarted) {
+          console.log('xxx');
           //reset pan gesture
           Pan.reset();
           return;
         }
+        console.log(e.deltaY);
         var boundry = self.boundry;
         self.offset = self.offset || self.getOffset();
         var posY = self.userConfig.lockY ? Number(self.offset.y) : Number(self.offset.y) + e.deltaY;

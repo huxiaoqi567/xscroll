@@ -380,6 +380,10 @@ h1{
             });
             xlist.render();
 
+            xlist.on("panstart",function(e){
+                 e.stopPropagation();
+            })
+
             xlist.on("pan",function(e){
                  //判断如果未滚动至边界 则阻止默认事件
                 if(e.offset.y < xlist.boundry.top && e.offset.y > xlist.boundry.bottom - xlist.containerHeight){
@@ -401,8 +405,6 @@ h1{
         }
 
 
-        xscroll.addView(slider);
-        xscroll.addView(tab);
         xscroll.addView(nav);
         window.xscroll = xscroll
     });
