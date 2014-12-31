@@ -36,14 +36,14 @@ define(function(require, exports, module) {
 	// var SNAP_END = "snapend";
 	var AFTER_RENDER = "afterrender";
 	var BOUNDRY_OUT = "boundryout";
-	//constant acceleration for scrolling
+	// constant acceleration for scrolling
 	var SROLL_ACCELERATION = 0.001;
-	//boundry checked bounce effect
+	// boundry checked bounce effect
 	var BOUNDRY_CHECK_DURATION = 500;
 	var BOUNDRY_CHECK_EASING = "ease";
 	var BOUNDRY_CHECK_ACCELERATION = 0.1;
 	//reduced boundry pan distance
-	var PAN_RATE = 0.36;
+	// var PAN_RATE = 0.36;
 	// reduced scale rate
 	// var SCALE_RATE = 0.7;
 
@@ -162,13 +162,13 @@ define(function(require, exports, module) {
             self.containerHeight = containerHeight < self.height ? self.height : containerHeight;
             self.initialContainerWidth = self.containerWidth;
             self.initialContainerHeight = self.containerHeight;
-            var minScale = self.userConfig.minScale || Math.max(self.width / self.containerWidth, self.height / self.containerHeight);
-            var maxScale = self.userConfig.maxScale || 1;
-            self.minScale = minScale;
-            self.maxScale = maxScale;
+            // var minScale = self.userConfig.minScale || Math.max(self.width / self.containerWidth, self.height / self.containerHeight);
+            // var maxScale = self.userConfig.maxScale || 1;
+            // self.minScale = minScale;
+            // self.maxScale = maxScale;
             self.boundry.refresh({
-                width: self.scale * self.width,
-                height: self.scale * self.height
+                width:  self.width,
+                height:  self.height
             });
             self.trigger(AFTER_RENDER);
             // self.renderScrollBars();

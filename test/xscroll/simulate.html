@@ -10,7 +10,7 @@
 }
 li{
 	display: block;
-	line-height: 200px;
+	line-height: 100px;
 	border: 1px solid;
 }
 #scroll{
@@ -49,7 +49,9 @@ li{
     seajs.use(["simulate-scroll"],function(XScroll){
 
     	var xscroll = new XScroll({
-    		renderTo:"#scroll"
+    		renderTo:"#scroll",
+    		lockX:true
+    		// lockY:true
     	})
 
     	xscroll.render();
@@ -64,6 +66,8 @@ li{
     		// console.log(e.offset)
     	})
 
+
+    	window.xscroll = xscroll;
 
     	
 

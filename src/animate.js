@@ -74,16 +74,18 @@ define(function(require, exports, module) {
 
 	function Animate(el, cfg) {
 		if (!el || !cfg || !cfg.css) return;
+		var self = this;
 		this.cfg = cfg;
 		this.el = el;
 		var duration = cfg.duration || 1000,
 			easing = cfg.easing || "ease",
 			delay = cfg.delay || 0;
 		this.transitionEndHandler = function(e) {
-			if(this.__isend) return;
-			this.__isend = true;
+			if(self.__isend) return;
+			self.__isend = true;
 			if (e.currentTarget == el) {
-				cfg.end && cfg.end()
+				self.stop();
+				cfg.end && cfg.end();
 			}
 		};
 		//trigger run
