@@ -1,0 +1,175 @@
+define(function(require, exports, module) {
+
+	var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g,
+		EMPTY = '';
+
+	var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g,
+		trim = String.prototype.trim;
+
+	var RE_DASH = /-([a-z])/ig;
+
+	function upperCase() {
+		return arguments[1].toUpperCase();
+	}
+
+	function Empty() {}
+
+	function createObject(proto, constructor) {
+		var newProto;
+		if (Object.create) {
+			newProto = Object.create(proto);
+		} else {
+			Empty.prototype = proto;
+			newProto = new Empty();
+		}
+		newProto.constructor = constructor;
+		return newProto;
+	}
+
+	var Util = {
+		mix: function(to, from, deep) {
+			for (var i in from) {
+				to[i] = from[i];
+			}
+			return to;
+		},
+		extend: function(r, s, px, sx) {
+			if (!s || !r) {
+				return r;
+			}
+			var sp = s.prototype,
+				rp;
+			// add prototype chain
+			rp = createObject(sp, r);
+			r.prototype = this.mix(rp, r.prototype);
+			r.superclass = createObject(sp, s);
+			// add prototype overrides
+			if (px) {
+				this.mix(rp, px);
+			}
+			// add object overrides
+			if (sx) {
+				this.mix(r, sx);
+			}
+			return r;
+		},
+		/**
+		 * test whether a string start with a specified substring
+		 * @param {String} str the whole string
+		 * @param {String} prefix a specified substring
+		 * @return {Boolean} whether str start with prefix
+		 * @member util
+		 */
+		startsWith: function(str, prefix) {
+			return str.lastIndexOf(prefix, 0) === 0;
+		},
+
+		/**
+		 * test whether a string end with a specified substring
+		 * @param {String} str the whole string
+		 * @param {String} suffix a specified substring
+		 * @return {Boolean} whether str end with suffix
+		 * @member util
+		 */
+		endsWith: function(str, suffix) {
+			var ind = str.length - suffix.length;
+			return ind >= 0 && str.indexOf(suffix, ind) === ind;
+		},
+		/**
+		 * Removes the whitespace from the beginning and end of a string.
+		 * @method
+		 * @member util
+		 */
+		trim: trim ?
+			function(str) {
+				return str == null ? EMPTY : trim.call(str);
+			} : function(str) {
+				return str == null ? EMPTY : (str + '').replace(RE_TRIM, EMPTY);
+			},
+		/**
+		 * Substitutes keywords in a string using an object/array.
+		 * Removes undef keywords and ignores escaped keywords.
+		 * @param {String} str template string
+		 * @param {Object} o json data
+		 * @member util
+		 * @param {RegExp} [regexp] to match a piece of template string
+		 */
+		substitute: function(str, o, regexp) {
+			if (typeof str !== 'string' || !o) {
+				return str;
+			}
+
+			return str.replace(regexp || SUBSTITUTE_REG, function(match, name) {
+				if (match.charAt(0) === '\\') {
+					return match.slice(1);
+				}
+				return (o[name] === undefined) ? EMPTY : o[name];
+			});
+		},
+
+		/*
+        vendors
+        @example webkit|moz|ms|O 
+    	*/
+		vendor: (function() {
+			var el = document.createElement('div').style;
+			var vendors = ['t', 'webkitT', 'MozT', 'msT', 'OT'],
+				transform,
+				i = 0,
+				l = vendors.length;
+			for (; i < l; i++) {
+				transform = vendors[i] + 'ransform';
+				if (transform in el) return vendors[i].substr(0, vendors[i].length - 1);
+			}
+			return false;
+		})(),
+		/**
+		 *  attrs with vendor
+		 *  @return { String }
+		 **/
+		prefixStyle: function(style) {
+			if (this.vendor === false) return false;
+			if (this.vendor === '') return style;
+			return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
+		},
+		hasClass: function(el, className) {
+			return el && el.className && el.className.indexOf(className) != -1;
+		},
+		addClass: function(el, className) {
+			if (el && !this.hasClass(el, className)) {
+				el.className += " " + className;
+			}
+		},
+		removeClass: function(el, className) {
+			if (el && el.className) {
+				el.className = el.className.replace(className, "");
+			}
+		},
+		getOffsetTop: function(e) {
+			var offset = e.offsetTop;
+			if (e.offsetParent != null) offset += this.getOffsetTop(e.offsetParent);
+			return offset;
+		},
+		getOffsetLeft: function(e) {
+			var offset = e.offsetLeft;
+			if (e.offsetParent != null) offset += this.getOffsetLeft(e.offsetParent);
+			return offset;
+		},
+		guid: function() {
+			return Math.round(Math.random() * 100000000);
+		},
+		isAndroid: function() {
+			return /Android /.test(window.navigator.appVersion);
+		},
+		isBadAndroid: function() {
+			return /Android /.test(window.navigator.appVersion) && !(/Chrome\/\d/.test(window.navigator.appVersion))
+		}
+	}
+
+	if (typeof module == 'object' && module.exports) {
+		module.exports = Util;
+	} else {
+		return Util;
+	}
+
+});
