@@ -46,24 +46,29 @@ li{
 	seajs.config({
       base: "../../src/"
     })
-    seajs.use(["origin-scroll"],function(XScroll){
+    seajs.use(["simulate-scroll"],function(XScroll){
 
     	var xscroll = new XScroll({
-    		renderTo:"#scroll"
-    	});
+    		renderTo:"#scroll",
+    		lockX:true,
+    		scrollbarX:false
+    		// lockY:true
+    	})
 
     	xscroll.render();
 
     	// xscroll.scrollY(1000,1000)
 
     	xscroll.on("scroll",function(e){
-    		console.log(e.offset)
+    		// console.log(e.offset)
     	})
 
     	xscroll.on("scrollend",function(e){
-    		console.log(e.offset)
+    		console.log("end",e.offset)
     	})
 
+
+    	window.xscroll = xscroll;
 
     	
 

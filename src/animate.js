@@ -15,7 +15,7 @@ define(function(require, exports, module) {
 
 	var venderTransformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 
-	var translateTpl = 'translate3d({translateX}px,{translateY}px,0)';
+	var translateTpl = 'translateX({translateX}px) translateY({translateY}px) translateZ(0)';
 
 	function myParse(v) {
 		return Math.round(parseFloat(v) * 1e5) / 1e5;
@@ -128,6 +128,7 @@ define(function(require, exports, module) {
 				el[styleName] = val;
 				break;
 			case "transform":
+				el.style[vendorTransform] = val;
 			case "opacity":
 				el.style[styleName] = val;
 				break;
@@ -148,7 +149,7 @@ define(function(require, exports, module) {
 			if (cfg.useTransition) {
 				//transition
 				el.style[vendorTransition] = Util.substitute('all {duration}ms {easing} {delay}ms', {
-					duration: cfg.duration || 100,
+					duration: cfg.duration || 1000,
 					easing: Easing.format(easing),
 					delay: delay
 				});

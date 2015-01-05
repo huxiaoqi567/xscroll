@@ -55,6 +55,7 @@ define(function(require, exports, module) {
             self.__timers.y.run();
 		},
 		_bindEvt:function(){
+            var self = this;
             if (self.__isEvtBind) return;
             self.__isEvtBind = true;
             var renderTo = self.renderTo;
@@ -67,8 +68,15 @@ define(function(require, exports, module) {
 
             // var boundry = self.boundry;
             // var mc = new Hammer.Manager(renderTo);
+            renderTo.addEventListener("scroll",function(e){
+                self.trigger("scroll",{
+                    offset:self.getOffset()
+                })
+            },false)
 
-
+            renderTo.addEventListener("scrollend",function(e){
+               console.log("end")
+            },false)
 
 
 
