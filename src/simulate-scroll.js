@@ -40,8 +40,8 @@ define(function(require, exports, module) {
       var content = self.content = self.renderTo.querySelector("." + self.contentClsName);
       renderTo.style.overflow = "hidden";
       container.style.position = "absolute";
-      container.style.height = "100%";
-      container.style.width = "100%";
+      container.style.minHeight = "100%";
+      container.style.minWidth = "100%";
       container.style[transformOrigin] = "0 0";
       content.style.position = "absolute";
       content.style.minHeight = "100%";
@@ -251,22 +251,28 @@ define(function(require, exports, module) {
       var innerSize = type == "x" ? self.containerWidth : self.containerHeight;
       var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
       var size = boundryEnd - boundryStart;
-      var isBoundryOut = function() {
-        return type == "x" ? (self.isBoundryOutLeft() || self.isBoundryOutRight()) : (self.isBoundryOutTop() || self.isBoundryOutBottom());
-      }
-      var boundryCheck = function() {
-        return type == "x" ? self.boundryCheckX() : self.boundryCheckY();
-      }
+      // var isBoundryOut = function() {
+      //   return type == "x" ? (self.isBoundryOutLeft() || self.isBoundryOutRight()) : (self.isBoundryOutTop() || self.isBoundryOutBottom());
+      // }
+      // var boundryCheck = function() {
+      //   return type == "x" ? self.boundryCheckX() : self.boundryCheckY();
+      // }
 
       var transition = {};
-      if (isBoundryOut()) {
-        boundryCheck();
+      if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
+        self.boundryCheckX();
+        return;
+      }else if(type == "y" && (self.isBoundryOutTop() || self.isBoundryOutBottom())){
+        // console.log("checky")
+        self.boundryCheckY();
         return;
       }
+
       if (type == "x" && self.userConfig.lockX) return;
       if (type == "y" && self.userConfig.lockY) return;
 
       v = v > maxSpeed ? maxSpeed : v < -maxSpeed ? -maxSpeed : v;
+
       var a = self.SROLL_ACCELERATION * (v / Math.abs(v));
       var t = v / a;
       var s = Number(offset) + t * v / 2;
@@ -280,8 +286,8 @@ define(function(require, exports, module) {
         self["_bounce" + type] = v - a * _t;
         //     self._prevSpeed = 0;
         //over bottom boundry check bounce
-      } else if (s > innerSize - size) {
-        var _s = (size - innerSize) - offset;
+      } else if (s > innerSize - boundryEnd) {
+        var _s = (boundryEnd - innerSize) + offset;
         var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
         transition.offset = innerSize - size;
         transition.duration = _t;
@@ -323,6 +329,7 @@ define(function(require, exports, module) {
       };
       param["velocity" + TYPE] = self[_bounce];
       self.trigger(BOUNDRY_OUT, param);
+
       if (self.userConfig.bounce) {
         self[scrollFn](s, t, "linear", function() {
           self[_bounce] = 0;
@@ -376,7 +383,7 @@ define(function(require, exports, module) {
     render: function() {
       var self = this;
       SimuScroll.superclass.render.call(this);
-      self.renderScrollBars();
+      // self.renderScrollBars();
       return self;
     },
     renderScrollBars: function() {

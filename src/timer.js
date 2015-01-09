@@ -117,23 +117,20 @@ define(function(require, exports, module) {
 					self.percent = self._stop && self._stop.percent ? self._stop.percent : 1;
 					self.duration = self._stop && self._stop.duration ? self._stop.duration : self.duration;
 					var param = {
-						percent: self.percent,
-						duration: self.duration
+						percent: self.percent
 					};
 					self.trigger("run", param);
 					self.trigger("stop", param);
 					if (self.percent >= 1) {
 						self.isfinished = true;
 						self.trigger("end", {
-							percent: 1,
-							duration: self.duration
+							percent: 1
 						});
 					}
 					return;
 				}
 				self.trigger("run", {
-					percent: self.progress,
-					duration: self.duration
+					percent: self.progress
 				})
 				self._run();
 			})
@@ -142,7 +139,6 @@ define(function(require, exports, module) {
 			var self = this;
 			self._stop = {
 				percent: self.percent,
-				duration: self.duration,
 				now: self.now
 			};
 			cancelRAF(self._raf)

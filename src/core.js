@@ -213,12 +213,12 @@ define(function(require, exports, module) {
         },
         scrollByX: function(x, duration, easing, callback) {
             var self = this;
-            var left = -self.getOffsetLeft();
+            var left = self.getOffsetLeft();
             self.scrollX(Number(x) + Number(left), duration, easing, callback);
         },
         scrollByY: function(y, duration, easing, callback) {
             var self = this;
-            var top = -self.getOffsetTop();
+            var top = self.getOffsetTop();
             self.scrollY(Number(y) + Number(top), duration, easing, callback);
         },
         scrollX: function(x, duration, easing, callback) {},

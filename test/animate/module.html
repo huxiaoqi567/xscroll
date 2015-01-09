@@ -18,33 +18,16 @@ li{
 	/*-webkit-transform:translateZ(100px) scaleZ(150) scaleX(200) scaleY(300) translateX(123px) ;*/
 	/*-webkit-transform:matrix(1,0,0,1,0,0);*/
 }
-#scroll{
+#block{
 	position: absolute;
-	height: 100%;
-	width: 100%;
-	overflow: scroll;
+	height: 100px;
+	width: 100px;
+    background: red;
 }
 </style>
 </head>
 <body>
-<div id="scroll">
-	<div class="xs-container">
-		<div class="xs-content">
-			<ul>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-			</ul>
-		</div>
-	</div>
-</div>
+<div id="block"></div>
 <div style="position:relative;z-index:9999">
 <input type="button" id="run" value="run">
 <input type="button" id="stop" value="stop">
@@ -56,15 +39,13 @@ li{
       base: "../../src/"
     })
     seajs.use(["animate"],function(Animate){
-    	var scroll = document.querySelector("#scroll");
-    	// scroll.style.scrollTop = 120
-    	var container = scroll.querySelector(".xs-container");
-    	var anim = new Animate(container,{
-    		useTransition:true,
+    	var block = document.querySelector("#block");
+    	var anim = new Animate(block,{
+    		// useTransition:true,
     		css:{
-    			transform:"scale(0.8)",
-                // transform:"translateX(-100px)"
-    			// opacity:.5
+    			// transform:"scale(0.8)",
+                transform:"translateX(100px)",
+    			opacity:.5
     			// 'marginLeft':100
     			// 'marginLeft':100,
     			// scrollTop:100
@@ -75,7 +56,7 @@ li{
     			// console.log(e)
     		},
     		end:function(e){
-	    		// console.log(e,"finished")
+	    		console.log(e,"finished")
 	    	}
     	});
 
@@ -87,11 +68,15 @@ li{
     	var stop = document.querySelector("#stop");
 
     	run.addEventListener("click",function(){
+            // anim.stop();
     		anim.run();
     	})
 
     	reset.addEventListener("click",function(){
     		anim.reset({
+                css:{
+                    transform:"translateX(200px)"   
+                },
     			duration:200
     		});
     	})

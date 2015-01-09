@@ -16,6 +16,8 @@ define(function(require, exports, module) {
 	var venderTransformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 
 	var translateTpl = 'translateX({translateX}px) translateY({translateY}px) translateZ(0)';
+	//limit attrs
+	var limitAttrs = [vendorTransform, 'opacity', 'scrollTop', 'scrollLeft'];
 
 	function myParse(v) {
 		return Math.round(parseFloat(v) * 1e5) / 1e5;
@@ -30,6 +32,51 @@ define(function(require, exports, module) {
 			skewY: 0,
 			scaleX: 1,
 			scaleY: 1
+		};
+	}
+
+	function toMatrixArray(matrix) {
+		matrix = matrix.split(/,/);
+		matrix = Array.prototype.map.call(matrix, function(v) {
+			return myParse(v);
+		});
+		return matrix;
+	}
+
+	function decomposeMatrix(matrix) {
+		matrix = toMatrixArray(matrix);
+		var scaleX, scaleY, skew,
+			A = matrix[0],
+			B = matrix[1],
+			C = matrix[2],
+			D = matrix[3];
+
+		// Make sure matrix is not singular
+		if (A * D - B * C) {
+			scaleX = Math.sqrt(A * A + B * B);
+			skew = (A * C + B * D) / (A * D - C * B);
+			scaleY = (A * D - B * C) / scaleX;
+			// step (6)
+			if (A * D < B * C) {
+				skew = -skew;
+				scaleX = -scaleX;
+			}
+			// matrix is singular and cannot be interpolated
+		} else {
+			// In this case the elem shouldn't be rendered, hence scale == 0
+			scaleX = scaleY = skew = 0;
+		}
+
+		// The recomposition order is very important
+		// see http://hg.mozilla.org/mozilla-central/file/7cb3e9795d04/layout/style/nsStyleAnimation.cpp#l971
+		return {
+			translateX: myParse(matrix[4]),
+			translateY: myParse(matrix[5]),
+			rotate: myParse(Math.atan2(B, A) * 180 / Math.PI),
+			skewX: myParse(Math.atan(skew) * 180 / Math.PI),
+			skewY: 0,
+			scaleX: myParse(scaleX),
+			scaleY: myParse(scaleY)
 		};
 	}
 
@@ -65,6 +112,8 @@ define(function(require, exports, module) {
 					ret.scaleX = myParse(val[0]);
 					ret.scaleY = myParse(val[1] || val[0]);
 					break;
+				case 'matrix':
+					return decomposeMatrix(val);
 			}
 		}
 
@@ -80,19 +129,24 @@ define(function(require, exports, module) {
 		var duration = cfg.duration || 1000,
 			easing = cfg.easing || "ease",
 			delay = cfg.delay || 0;
+
 		this.transitionEndHandler = function(e) {
-			if(self.__isend) return;
-			self.__isend = true;
+			if (self.__isTransitionEnd) return;
+			self.__isTransitionEnd = true;
 			if (e.currentTarget == el) {
 				self.stop();
-				cfg.end && cfg.end();
+				cfg.end && cfg.end({
+					percent: 1
+				});
 			}
+
 		};
+
 		//trigger run
 		if (cfg.run) {
 			//frame animate
 			this.timer = this.timer || new Timer({
-				duration: duration,
+				duration: Math.round(duration),
 				easing: easing,
 			});
 			this.timer.on("run", cfg.run);
@@ -132,81 +186,113 @@ define(function(require, exports, module) {
 			case "opacity":
 				el.style[styleName] = val;
 				break;
+
 		}
 	}
 
-
 	Util.mix(Animate.prototype, {
 		run: function() {
-			this.__isend = false;
-			var cfg = this.cfg,
-				el = this.el,
+			var self = this;
+			self.__isTransitionEnd = false;
+			var cfg = self.cfg,
+				el = self.el,
 				duration = cfg.duration || 1000,
 				easing = cfg.easing || "ease",
 				delay = cfg.delay || 0;
-			this.stop();
-			this.timer && this.timer.run();
+			self.stop();
+			self.timer && self.timer.run();
+
 			if (cfg.useTransition) {
 				//transition
 				el.style[vendorTransition] = Util.substitute('all {duration}ms {easing} {delay}ms', {
-					duration: cfg.duration || 1000,
+					duration: Math.round(duration),
 					easing: Easing.format(easing),
 					delay: delay
 				});
-
 				for (var i in cfg.css) {
 					//set css
 					css(el, i, cfg.css[i]);
 				}
-				el.removeEventListener(venderTransitionEnd, this.transitionEndHandler);
-				el.addEventListener(venderTransitionEnd, this.transitionEndHandler, false);
+				el.removeEventListener(venderTransitionEnd, self.transitionEndHandler);
+				el.addEventListener(venderTransitionEnd, self.transitionEndHandler, false);
 			} else {
 				var computeStyle = window.getComputedStyle(el);
 				//transform
 				if (cfg.css.transform) {
-					var transmap = computeTransform(computeStyle[vendorTransform], cfg.css.transform);
-					var newTrans = {};
-					this.timer.on("run", function(e) {
-						for (var i in transmap) {
-							newTrans[i] = (transmap[i].newVal - transmap[i].prevVal) * e.percent + transmap[i].prevVal
-						}
-						var ret = Util.substitute(translateTpl + ' ' +
-							'scale({scaleX},{scaleY})', newTrans);
-						el.style[vendorTransform] = ret;
-					});
+					var transmap = self.transmap = computeTransform(computeStyle[vendorTransform], cfg.css.transform);
+					self.timer.off("run", self.__handlers.transRun);
+					self.timer.on("run", self.__handlers.transRun, self);
 				}
 
-				this.timer.on("run", function(e) {
+				var cssRun = function(e) {
 					for (var i in cfg.css) {
 						if (!/transform/.test(i)) {
 							setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
 						}
 					}
-				});
+				};
+				self.timer.off("run", self.__handlers.cssRun);
+				self.timer.on("run", self.__handlers.cssRun, self);
+
+				self.timer.off("stop", self.__handlers.stop);
+				self.timer.on("stop", self.__handlers.stop, self);
 			}
 
-
-			return this;
+			return self;
+		},
+		__handlers: {
+			transRun: function(e) {
+				var self = this;
+				var transmap = self.transmap;
+				var el = self.el;
+				var newTrans = {};
+				for (var i in transmap) {
+					newTrans[i] = (transmap[i].newVal - transmap[i].prevVal) * e.percent + transmap[i].prevVal
+				}
+				var ret = Util.substitute(translateTpl + ' ' +
+					'scale({scaleX},{scaleY})', newTrans);
+				el.style[vendorTransform] = ret;
+			},
+			cssRun: function(e) {
+				var self = this;
+				var cfg = self.cfg;
+				for (var i in cfg.css) {
+					if (!/transform/.test(i)) {
+						setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
+					}
+				}
+			},
+			stop: function(e) {
+				var self = this;
+				var cfg = self.cfg;
+				cfg.end && cfg.end({
+					percent: 1
+				});
+			}
 		},
 		stop: function() {
-			if(this.cfg.useTransition){
-				var transform = window.getComputedStyle(this.el)[vendorTransform];
-	            this.el.style[vendorTransform] = transform;
+			if (this.cfg.useTransition) {
+				var style = window.getComputedStyle(this.el);
+				for (var i in limitAttrs) {
+					if (style[limitAttrs[i]]) {
+						this.el.style[limitAttrs[i]] = style[limitAttrs[i]];
+					}
+				}
 				if (Util.isBadAndroid()) {
 					//can't stop by "none" or "" property
-	                this.el.style[transitionDuration] = "0.001s";
-	            } else {
-	                this.el.style[vendorTransition] = "none";
-	            }
+					this.el.style[transitionDuration] = "1ms";
+				} else {
+					this.el.style[vendorTransition] = "none";
+				}
 			}
 			this.timer && this.timer.stop() && this.timer.reset();
 			return this;
 		},
 		reset: function(cfg) {
-			Util.mix(this.cfg,cfg);
+			Util.mix(this.cfg, cfg);
 			this.timer && this.timer.reset({
-				duration:this.cfg.duration,
-				easing:this.cfg.easing
+				duration: Math.round(this.cfg.duration),
+				easing: this.cfg.easing
 			});
 		}
 	});
