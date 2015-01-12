@@ -1,4 +1,22 @@
 define(function(require, exports, module) {
+
+  var Util = require('./util');
+
+// Returns a function that will be executed at most one time, no matter how
+  // often you call it. Useful for lazy initialization.
+  var _once = function(func) {
+    var ran = false, memo;
+    return function() {
+      if (ran) return memo;
+      ran = true;
+      memo = func.apply(this, arguments);
+      func = null;
+      return memo;
+    };
+  };
+
+
+
 var Events = {
     // Bind an event to a `callback` function. Passing `"all"` will bind
     // the callback to all events fired.
@@ -10,12 +28,13 @@ var Events = {
       return this;
     },
 
+
     // Bind an event to only be triggered a single time. After the first time
     // the callback is invoked, it will be removed.
     once: function(name, callback, context) {
       if (!eventsApi(this, 'once', name, [callback, context]) || !callback) return this;
       var self = this;
-      var once = _.once(function() {
+      var once = _once(function() {
         self.off(name, once);
         callback.apply(this, arguments);
       });
@@ -36,7 +55,7 @@ var Events = {
         return this;
       }
 
-      var names = name ? [name] : _.keys(this._events);
+      var names = name ? [name] : Object.keys(this._events);
       for (var i = 0, length = names.length; i < length; i++) {
         name = names[i];
 
@@ -94,7 +113,7 @@ var Events = {
     // listening to.
     listenTo: function(obj, name, callback) {
       var listeningTo = this._listeningTo || (this._listeningTo = {});
-      var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
+      var id = obj._listenId || (obj._listenId = Util.guid('l'));
       listeningTo[id] = obj;
       if (!callback && typeof name === 'object') callback = this;
       obj.on(name, callback, this);
@@ -106,7 +125,7 @@ var Events = {
         for (var event in name) this.listenToOnce(obj, event, name[event]);
         return this;
       }
-      var cb = _.once(function() {
+      var cb = _once(function() {
         this.stopListening(obj, name, cb);
         callback.apply(this, arguments);
       });
@@ -125,7 +144,7 @@ var Events = {
       for (var id in listeningTo) {
         obj = listeningTo[id];
         obj.off(name, callback, this);
-        if (remove || _.isEmpty(obj._events)) delete this._listeningTo[id];
+        if (remove || Util.isEmpty(obj._events)) delete this._listeningTo[id];
       }
       return this;
     }

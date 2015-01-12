@@ -88,11 +88,12 @@ define(function(require, exports, module) {
       var duration = duration || 0;
       var easing = easing || self.userConfig.easing;
       var el = type == "y" ? self.container:self.content;
+      var transform =  type == "y" ? "translateY(" + offset + "px)" : "translateX(" + offset + "px)";
       //set this.x or this.y to dest value.
       this[type] = offset;
       var config = {
         css: {
-          transform: type == "y" ? "translateY(" + offset + "px)" : "translateX(" + offset + "px)"
+          transform:transform
         },
         duration: duration,
         easing: easing,
@@ -105,7 +106,9 @@ define(function(require, exports, module) {
         useTransition: self.userConfig.useTransition,
         end: function(){
           callback && callback();
+          self['isScrolling'+type.toUpperCase()] = false;
           self.trigger("scrollend",{
+            type:"scrollend",
             offset:self.getOffset(),
             zoomType:type
           });
@@ -150,6 +153,10 @@ define(function(require, exports, module) {
         self.stop();
       }, false)
 
+       renderTo.addEventListener("touchend", function(e) {
+        self.boundryCheck();
+      }, false)
+
       mc.on("panstart", function(e) {
         self._prevSpeed = 0;
         offset = self.getOffset();
@@ -170,9 +177,6 @@ define(function(require, exports, module) {
         //over right
         x = x + boundry.right > containerWidth ? (x + boundry.right - containerWidth) * PAN_RATE - boundry.right + containerWidth : x;
         self.translate(x, y);
-        // self._noTransition();
-        self.isScrollingX = false;
-        self.isScrollingY = false;
         //pan trigger the opposite direction
         self.directionX = e.type == 'panleft' ? 'right' : e.type == 'panright' ? 'left' : '';
         self.directionY = e.type == 'panup' ? 'bottom' : e.type == 'pandown' ? 'top' : '';
@@ -251,19 +255,12 @@ define(function(require, exports, module) {
       var innerSize = type == "x" ? self.containerWidth : self.containerHeight;
       var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
       var size = boundryEnd - boundryStart;
-      // var isBoundryOut = function() {
-      //   return type == "x" ? (self.isBoundryOutLeft() || self.isBoundryOutRight()) : (self.isBoundryOutTop() || self.isBoundryOutBottom());
-      // }
-      // var boundryCheck = function() {
-      //   return type == "x" ? self.boundryCheckX() : self.boundryCheckY();
-      // }
-
       var transition = {};
+
       if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
         self.boundryCheckX();
         return;
       }else if(type == "y" && (self.isBoundryOutTop() || self.isBoundryOutBottom())){
-        // console.log("checky")
         self.boundryCheckY();
         return;
       }
@@ -314,11 +311,11 @@ define(function(require, exports, module) {
       var scrollFn = "scroll" + TYPE;
       var boundryCheckFn = "boundryCheck" + TYPE;
       var _bounce = "_bounce" + type;
-      var boundry = self.boundry;
-      var bounceSize = self.userConfig.bounceSize || 0;
+      // var boundry = self.boundry;
+      // var bounceSize = self.userConfig.bounceSize || 0;
       var v = self[_bounce];
       if (!v) return;
-      var a = 0.01 * v / Math.abs(v);
+      var a = 0.02 * v / Math.abs(v);
       var t = v / a;
       var s = self.getOffset()[type] + t * v / 2;
       var param = {
@@ -371,14 +368,21 @@ define(function(require, exports, module) {
       this.boundryCheckY(callback);
     },
     stop: function() {
-      for(var i in this.__timers){
-        this.__timers[i] && this.__timers[i].stop();
-      }
-      var offset = this.getOffset();
-      this.trigger("scrollend",{
-        zoomType:"xy",
-        offset:offset
-      });
+      var self =this;
+      console.log(self.isScrollingX,self.isScrollingY)
+      //isscrolling 
+      // if(self.isScrollingX || self.isScrollingY){
+        for(var i in self.__timers){
+          self.__timers[i] && self.__timers[i].stop();
+        }
+        self.isScrollingX = false;
+        self.isScrollingY = false;
+        this.trigger("scrollend",{
+          type:"scrollend",
+          zoomType:"xy",
+          offset:self.getOffset()
+        });
+      // }
     },
     render: function() {
       var self = this;

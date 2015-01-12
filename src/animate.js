@@ -2,6 +2,7 @@ define(function(require, exports, module) {
 	var Util = require('./util');
 	var Timer = require('./timer');
 	var Easing = require('./easing');
+	var Base = require('./base');
 	//transform
 	var vendorTransform = Util.prefixStyle("transform");
 	//transition webkitTransition MozTransition OTransition msTtransition
@@ -17,7 +18,7 @@ define(function(require, exports, module) {
 
 	var translateTpl = 'translateX({translateX}px) translateY({translateY}px) translateZ(0)';
 	//limit attrs
-	var limitAttrs = [vendorTransform, 'opacity', 'scrollTop', 'scrollLeft'];
+	var animAttrs = ['transform', 'opacity', 'scrollTop', 'scrollLeft'];
 
 	function myParse(v) {
 		return Math.round(parseFloat(v) * 1e5) / 1e5;
@@ -134,12 +135,8 @@ define(function(require, exports, module) {
 			if (self.__isTransitionEnd) return;
 			self.__isTransitionEnd = true;
 			if (e.currentTarget == el) {
-				self.stop();
-				cfg.end && cfg.end({
-					percent: 1
-				});
+				self.__handlers.stop.call(self);
 			}
-
 		};
 
 		//trigger run
@@ -150,7 +147,7 @@ define(function(require, exports, module) {
 				easing: easing,
 			});
 			this.timer.on("run", cfg.run);
-			!cfg.useTransition && this.timer.on("stop", cfg.end);
+			// !cfg.useTransition && this.timer.on("stop", cfg.end);
 		}
 		return this;
 	}
@@ -190,7 +187,7 @@ define(function(require, exports, module) {
 		}
 	}
 
-	Util.mix(Animate.prototype, {
+	Util.extend(Animate, Base,{
 		run: function() {
 			var self = this;
 			self.__isTransitionEnd = false;
@@ -199,6 +196,7 @@ define(function(require, exports, module) {
 				duration = cfg.duration || 1000,
 				easing = cfg.easing || "ease",
 				delay = cfg.delay || 0;
+
 			self.stop();
 			self.timer && self.timer.run();
 
@@ -220,10 +218,9 @@ define(function(require, exports, module) {
 				//transform
 				if (cfg.css.transform) {
 					var transmap = self.transmap = computeTransform(computeStyle[vendorTransform], cfg.css.transform);
-					self.timer.off("run", self.__handlers.transRun);
+					self.timer.off("run",self.__handlers.transRun);
 					self.timer.on("run", self.__handlers.transRun, self);
 				}
-
 				var cssRun = function(e) {
 					for (var i in cfg.css) {
 						if (!/transform/.test(i)) {
@@ -231,8 +228,9 @@ define(function(require, exports, module) {
 						}
 					}
 				};
-				self.timer.off("run", self.__handlers.cssRun);
-				self.timer.on("run", self.__handlers.cssRun, self);
+
+				self.timer.off("run", cssRun);
+				self.timer.on("run", cssRun);
 
 				self.timer.off("stop", self.__handlers.stop);
 				self.timer.on("stop", self.__handlers.stop, self);
@@ -271,28 +269,30 @@ define(function(require, exports, module) {
 			}
 		},
 		stop: function() {
-			if (this.cfg.useTransition) {
-				var style = window.getComputedStyle(this.el);
-				for (var i in limitAttrs) {
-					if (style[limitAttrs[i]]) {
-						this.el.style[limitAttrs[i]] = style[limitAttrs[i]];
+			var self = this;
+			if (self.cfg.useTransition) {
+				var computeStyle = window.getComputedStyle(this.el);
+				for (var i in animAttrs) {
+					if (self.cfg.css[animAttrs[i]]) {
+						css(self.el,animAttrs[i],computeStyle[animAttrs[i]]);
 					}
 				}
 				if (Util.isBadAndroid()) {
 					//can't stop by "none" or "" property
-					this.el.style[transitionDuration] = "1ms";
+					self.el.style[transitionDuration] = "1ms";
 				} else {
-					this.el.style[vendorTransition] = "none";
+					self.el.style[vendorTransition] = "none";
 				}
 			}
-			this.timer && this.timer.stop() && this.timer.reset();
-			return this;
+			self.timer && self.timer.stop() && self.timer.reset();
+			return self;
 		},
 		reset: function(cfg) {
-			Util.mix(this.cfg, cfg);
-			this.timer && this.timer.reset({
-				duration: Math.round(this.cfg.duration),
-				easing: this.cfg.easing
+			var self = this;
+			Util.mix(self.cfg, cfg);
+			this.timer && self.timer.reset({
+				duration: Math.round(self.cfg.duration),
+				easing: self.cfg.easing
 			});
 		}
 	});

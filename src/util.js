@@ -26,7 +26,31 @@ define(function(require, exports, module) {
 		return newProto;
 	}
 
+	// Generate a unique integer id (unique within the entire client session).
+	// Useful for temporary DOM ids.
+	var idCounter = 0;
+	var guid = function(prefix) {
+		var id = ++idCounter + '';
+		return prefix ? prefix + id : id;
+	};
+
 	var Util = {
+		// Is a given variable an object?
+		isObject: function(obj) {
+			return obj === Object(obj);
+		},
+		isArray: Array.isArray || function(obj) {
+			return toString.call(obj) == '[object Array]';
+		},
+		// Is a given array, string, or object empty?
+		// An "empty" object has no enumerable own-properties.
+		isEmpty: function(obj) {
+			if (obj == null) return true;
+			if (this.isArray(obj) || this.isString(obj)) return obj.length === 0;
+			for (var key in obj)
+				if (this.has(obj, key)) return false;
+			return true;
+		},
 		mix: function(to, from, deep) {
 			for (var i in from) {
 				to[i] = from[i];
@@ -155,15 +179,22 @@ define(function(require, exports, module) {
 			if (e.offsetParent != null) offset += this.getOffsetLeft(e.offsetParent);
 			return offset;
 		},
-		guid: function() {
-			return Math.round(Math.random() * 100000000);
-		},
+		guid: guid,
 		isAndroid: function() {
 			return /Android /.test(window.navigator.appVersion);
 		},
 		isBadAndroid: function() {
 			return /Android /.test(window.navigator.appVersion) && !(/Chrome\/\d/.test(window.navigator.appVersion))
 		}
+	}
+
+
+	// Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
+	var names = ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'];
+	for(var i = 0 ;i < names.length;i++ ){
+		Util['is' + names[i]] = function(obj) {
+			return toString.call(obj) == '[object ' + names[i] + ']';
+		};
 	}
 
 	if (typeof module == 'object' && module.exports) {

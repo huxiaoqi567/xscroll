@@ -64,18 +64,19 @@
 
 
         window.xscroll = xscroll;
+        
 
-        //  xscroll.on("scroll",function(e){
-        //     console.log(e.type,e.offset)
-        // })
+         xscroll.on("scrollend",function(e){
+            // console.log(e.zoomType,e.type)
+        })
 
-        //  xscroll.on("scrollend",function(e){
-        //     console.log(e.type,e.offset)
-        // })
+          xscroll.on("scroll",function(e){
+            // console.log(e.type,e.offset)
+        })
 
-        //  xscroll.on("scale",function(e){
-        //   console.log(e.type,e.scale)
-        //  })
+         // xscroll.on("scale",function(e){
+         //  console.log(e.type,e.scale)
+         // })
 
         //  xscroll.on("scaleend",function(e){
         //   console.log(e.type,e.scale)

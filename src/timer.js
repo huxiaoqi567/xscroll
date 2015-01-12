@@ -21,8 +21,6 @@ define(function(require, exports, module) {
 	}
 	cancelRAF = cancelRAF || window.clearTimeout;
 
-
-
 	function Bezier(x1, y1, x2, y2, epsilon) {
 		var curveX = function(t) {
 			var v = 1 - t;
