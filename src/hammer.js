@@ -1665,6 +1665,7 @@ inherit(PanRecognizer, AttrRecognizer, {
     },
 
     emit: function(input) {
+        // console.log(input.deltaX,input.deltaY,this.options.threshold,input)
         this.pX = input.deltaX;
         this.pY = input.deltaY;
 

@@ -28,10 +28,11 @@ define(function(require, exports, module) {
 			self.xscroll = xscroll;
 			self.type = self.userConfig.type;
 			self.isY = self.type == "y" ? true : false;
+			self.scrollTopOrLeft = self.isY ? "scrollTop" : "scrollLeft";
 			var boundry = self.xscroll.boundry;
 			self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
 			self.indicateSize = self.isY ? self.xscroll.height : self.xscroll.width;
-			self.offset = self.xscroll.getOffset();
+			self.pos = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
 			self.render();
 			self._bindEvt();
 		},
@@ -50,9 +51,11 @@ define(function(require, exports, module) {
 			self.__isRender = true;
 			var xscroll = self.xscroll;
 			var translateZ = xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
-			var transform = translateZ ? transformStr + ":" + translateZ + ";" : ""
-			var css = self.isY ? "opacity:0;width: 2px;position:absolute;bottom:5px;top:5px;right:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;" + transform :
-				"opacity:0;height:2px;position:absolute;left:5px;right:5px;bottom:2px;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;" + transform;
+			var transform = translateZ ? transformStr + ":" + translateZ + ";" : "";
+			var commonCss = "opacity:0;position:absolute;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+ transform;
+			var css = self.isY ? 
+				"width: 2px;bottom:5px;top:5px;right:2px;" + commonCss :
+				"height:2px;left:5px;right:5px;bottom:2px;" + commonCss;
 			self.scrollbar = document.createElement("div");
 			self.scrollbar.style.cssText = css;
 			xscroll.renderTo.appendChild(self.scrollbar);
@@ -61,27 +64,25 @@ define(function(require, exports, module) {
 			self.indicate.style.cssText = size + "position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"
 			self.scrollbar.appendChild(self.indicate);
 			self._update();
-			//default hide
 			self.hide();
 		},
-		_update: function(offset, duration, easing) {
+		_update: function(pos, duration, easing) {
 			var self = this;
-			var offset = offset || self.xscroll.getOffset();
-			// console.log(offset.y,duration,easing)
-			var barInfo = self.computeScrollBar(offset);
+			var pos =undefined === pos ? (self.isY ? self.xscroll.getScrollTop() : self.xscroll.getScrollLeft()) : pos;
+			var barInfo = self.computeScrollBar(pos);
 			var size = self.isY ? "height" : "width";
 			self.indicate.style[size] = Math.round(barInfo.size) + "px";
 			if (duration && easing) {
-				self.scrollTo(barInfo.offset, duration, easing);
+				self.scrollTo(barInfo.pos, duration, easing);
 			} else {
-				self.moveTo(barInfo.offset);
+				self.moveTo(barInfo.pos);
 			}
 		},
 		//计算边界碰撞时的弹性
-		computeScrollBar: function(offset) {
+		computeScrollBar: function(pos) {
 			var self = this;
 			var type = self.isY ? "y" : "x";
-			var offset = Math.round(offset && offset[type]);
+			var pos = Math.round(pos);
 			var spacing = 10;
 			var boundry = self.xscroll.boundry;
 			self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
@@ -91,42 +92,39 @@ define(function(require, exports, module) {
 			//滚动条容器高度
 			var indicateSize = self.indicateSize;
 			var containerSize = self.containerSize;
-			//offset bottom/right
-			var offsetout = containerSize - self.size;
-			var ratio = offset / containerSize;
-			var barOffset = indicateSize * ratio;
+			//pos bottom/right
+			var posout = containerSize - self.size;
+			var ratio = pos / containerSize;
+			var barpos = indicateSize * ratio;
 			var barSize = Math.round(indicateSize * self.size / containerSize);
-			var _barOffset = barOffset * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize;
+			var _barpos = barpos * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize;
 			if (barSize < MIN_SCROLLBAR_SIZE) {
 				barSize = MIN_SCROLLBAR_SIZE;
-				barOffset = _barOffset;
+				barpos = _barpos;
 			}
-			if (barOffset < 0) {
-				barOffset = Math.abs(offset) * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE ? BAR_MIN_SIZE - barSize : offset * barSize / MIN_SCROLLBAR_SIZE;
-			} else if (barOffset + barSize > indicateSize && offset - offsetout > 0) {
-				var _offset = offset - containerSize + indicateSize + spacing;
-				if (_offset * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
-					barOffset = indicateSize + spacing - BAR_MIN_SIZE;
+			if (barpos < 0) {
+				barpos = Math.abs(pos) * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE ? BAR_MIN_SIZE - barSize : pos * barSize / MIN_SCROLLBAR_SIZE;
+			} else if (barpos + barSize > indicateSize && pos - posout > 0) {
+				var _pos = pos - containerSize + indicateSize + spacing;
+				if (_pos * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
+					barpos = indicateSize + spacing - BAR_MIN_SIZE;
 				} else {
-					barOffset = indicateSize + spacing - barSize + _offset * barSize / MIN_SCROLLBAR_SIZE;
+					barpos = indicateSize + spacing - barSize + _pos * barSize / MIN_SCROLLBAR_SIZE;
 				}
 			}
-			self.barOffset = Math.round(barOffset);
-			var result = {
-				size: Math.round(barSize)
+			self.barpos = Math.round(barpos);
+			return result = {
+				size: Math.round(barSize),
+				pos:self.barpos
 			};
-			var _offset = {};
-			_offset[type] = self.barOffset;
-			result.offset = _offset;
-			return result;
 		},
 
-		scrollTo: function(offset, duration, easing) {
+		scrollTo: function(pos, duration, easing) {
 			var self = this;
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			var config = {
 				css: {
-					transform: self.isY ? "translateY(" + offset.y + "px)" : "translateX(" + offset.x + "px)"
+					transform: self.isY ? "translateY(" + pos + "px)" : "translateX(" + pos + "px)"
 				},
 				duration: duration,
 				easing: easing,
@@ -138,11 +136,11 @@ define(function(require, exports, module) {
 			self.__timer.reset(config);
 			self.__timer.run();
 		},
-		moveTo: function(offset) {
+		moveTo: function(pos) {
 			var self = this;
 			self.show();
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
-			self.isY ? self.indicate.style[transform] = "translateY(" + offset.y + "px) " + translateZ : self.indicate.style[transform] = "translateX(" + offset.x + "px) " + translateZ
+			self.isY ? self.indicate.style[transform] = "translateY(" + pos + "px) " + translateZ : self.indicate.style[transform] = "translateX(" + pos + "px) " + translateZ
 			if (Util.isBadAndroid()) {
 				self.indicate.style[transitionDuration] = "0.001s";
 			} else {
@@ -155,44 +153,40 @@ define(function(require, exports, module) {
 			self.__isEvtBind = true;
 			var type = self.isY ? "y" : "x";
 			var isBoundryOut = function(type) {
-				return type == "x" ? (self.xscroll.isBoundryOutLeft() && self.xscroll.isBoundryOutRight()) : (self.xscroll.isBoundryOutTop() && self.xscroll.isBoundryOutBottom());
+				return type == "x" ? (self.xscroll.getBoundryOutLeft() >= 0 || self.xscroll.getBoundryOutRight() >= 0) : (self.xscroll.getBoundryOutTop() >= 0 || self.xscroll.getBoundryOutBottom() >= 0);
 			}
 			if (self.xscroll.userConfig.useTransition) {
 				self.xscroll.on("pan", function(e) {
-					self._update(e.offset);
-				})
+					self._update(e[self.scrollTopOrLeft]);
+				});
 				self.xscroll.on("scrollanimate", function(e) {
 					if (!e.zoomType || e.zoomType != type) return;
-					// console.log(param, e.duration, e.easing)
-					self._update(e.offset, e.duration, e.easing);
-				})
-					// self.xscroll.on("scaleanimate",function(e){self._update(e.offset);})
-					// self.xscroll.on("scroll",function(e){self._update(e.offset);});
-			} else {
-				self.xscroll.on("scroll", function(e) {
-					self._update(e.offset);
+					self._update(e[self.scrollTopOrLeft], e.duration, e.easing);
 				});
-			}
+				// self.xscroll.on("scaleanimate",function(e){self._update(e.pos);})
+			}else{
+				self.xscroll.on("scroll", function(e) {
+					self._update(e[self.scrollTopOrLeft]);
+				});
+			} 
+
+			
+
 			self.xscroll.on("panend", function(e) {
 				if (Math.abs(e.velocity == 0) && !isBoundryOut(type)) {
 					self.hide();
 				}
 			});
 			self.xscroll.on("scrollend", function(e) {
-				if (e.zoomType && e.zoomType.indexOf(type) > -1) {
-					self._update(e.offset);
-					if (!isBoundryOut(e.zoomType)) {
-						self.hide();
-					}
+				if (!isBoundryOut()) {
+					self._update(e[self.scrollTopOrLeft]);
+					self.hide();
 				}
-			})
+			});
 		},
 		reset: function() {
 			var self = this;
-			self.offset = {
-				x: 0,
-				y: 0
-			};
+			self.pos = 0;
 			self._update();
 		},
 		hide: function() {

@@ -60,7 +60,6 @@ define(function(require, exports, module) {
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.xscroll = xscroll;
-
 			if (self.userConfig.zoomType == "x") {
 				xscroll.userConfig.lockY = true;
 				xscroll.userConfig.scrollbarY = false;
@@ -68,7 +67,6 @@ define(function(require, exports, module) {
 				xscroll.userConfig.lockX = true;
 				xscroll.userConfig.scrollbarX = false;
 			}
-
 			self.isY = !!(self.userConfig.zoomType == "y");
 			self._nameTop = self.isY ? "_top" : "_left";
 			self._nameHeight = self.isY ? "_height" : "_width";
@@ -79,6 +77,7 @@ define(function(require, exports, module) {
 			self.nameY = self.isY ? "y" : "x";
 			self.nameTranslate = self.isY ? "translateY" : "translateX";
 			self.nameContainerHeight = self.isY ? "containerHeight" : "containerWidth";
+			self.nameScrollTop = self.isY ? "scrollTop":"scrollLeft";
 			self._initInfinite();
 			xscroll.on("afterrender", function() {
 				self.render();
@@ -88,7 +87,7 @@ define(function(require, exports, module) {
 			var self = this;
 			var xscroll = self.xscroll;
 			var el = self.userConfig.infiniteElements;
-			self.datasets = [];
+			self.datasets = self.datasets || [];
 			if (self.userConfig.data && self.userConfig.data.length) {
 				self.datasets.push(new DataSet({
 					data: self.userConfig.data
@@ -109,8 +108,9 @@ define(function(require, exports, module) {
 			})();
 			self.elementsPos = {};
 			xscroll.on("scroll", function(e) {
-				self._update(-e.offset[self.nameY]);
-				self._stickyHandler(e.offset[self.nameY]);
+				self._update(-e[self.nameScrollTop]);
+				self._stickyHandler(-e[self.nameScrollTop]);
+
 			});
 		},
 		_initSticky: function() {
@@ -122,7 +122,7 @@ define(function(require, exports, module) {
 				sticky.style.position = "absolute";
 				sticky.style[self.nameTop] = "0";
 				sticky.style.display = "none";
-				self.renderTo.appendChild(sticky);
+				self.xscroll.renderTo.appendChild(sticky);
 				self.stickyElement = sticky;
 				self._isStickyRendered = true;
 			}
@@ -149,7 +149,7 @@ define(function(require, exports, module) {
 			for (var i in self.domInfo) {
 				if (self.domInfo[i]['recycled'] === false) {
 					var el = self.domInfo[i].id && document.getElementById(self.domInfo[i].id.replace("#", "")) || document.createElement("div");
-					var randomId = "xs-row-" + Date.now()
+					var randomId = Util.guid("xs-row-");
 					el.id = self.domInfo[i].id || randomId;
 					self.domInfo[i].id = el.id;
 					self.content.appendChild(el);
@@ -187,20 +187,20 @@ define(function(require, exports, module) {
 			//渲染非回收元素
 			self._renderNoRecycledEl();
 			//强制刷新
-			self._update(self.isY ? xscroll.getOffsetTop() : xscroll.getOffsetLeft(), true);
+			self._update(self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft(), true);
 		},
-		_stickyHandler: function(_offset) {
+		_stickyHandler: function(_pos) {
 			var self = this;
 
 			if (!self.stickyDomInfoLength) return;
-			var offset = Math.abs(_offset);
+			var pos = Math.abs(_pos);
 			//视区上方的sticky索引
 			var index = [];
 			//所有sticky的top值
 			var allTops = [];
 			for (var i = 0; i < self.stickyDomInfoLength; i++) {
 				allTops.push(self.stickyDomInfo[i][self._nameTop]);
-				if (offset >= self.stickyDomInfo[i][self._nameTop]) {
+				if (pos >= self.stickyDomInfo[i][self._nameTop]) {
 					index.push(i);
 				}
 			}
@@ -224,7 +224,7 @@ define(function(require, exports, module) {
 			}
 
 			//如果超过第一个sticky则隐藏
-			if (-_offset < Math.min.apply(null, allTops)) {
+			if (-_pos < Math.min.apply(null, allTops)) {
 				self.stickyElement.style.display = "none";
 				self.curStickyIndex = undefined;
 				return;
@@ -261,15 +261,15 @@ define(function(require, exports, module) {
 			self.domInfo = domInfo;
 			return domInfo;
 		},
-		_getElementsPos: function(offset) {
+		_getElementsPos: function(pos) {
 			var self = this;
 			var xscroll = self.xscroll;
 			var data = self.domInfo;
-			var offset = -(offset || (self.isY ? xscroll.getOffsetTop() : xscroll.getOffsetLeft()));
+			var pos = -(pos || (self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft()));
 			var itemSize = self.isY ? self.userConfig.itemHeight : self.userConfig.itemWidth;
 			var elementsPerPage = self.isY ? Math.ceil(xscroll.height / itemSize) : Math.ceil(xscroll.width / itemSize);
 			var maxBufferedNum = self.userConfig.maxBufferedNum === undefined ? Math.max(Math.ceil(elementsPerPage / 3), 1) : self.userConfig.maxBufferedNum;
-			var pos = Math.max(offset - maxBufferedNum * itemSize, 0);
+			var pos = Math.max(pos - maxBufferedNum * itemSize, 0);
 			var tmp = {},
 				item;
 			for (var i = 0, len = data.length; i < len; i++) {
@@ -297,12 +297,12 @@ define(function(require, exports, module) {
 			self.elementsPos = newElementsPos;
 			return changedRows;
 		},
-		_update: function(offset, force) {
+		_update: function(pos, force) {
 			var self = this;
 			var xscroll = self.xscroll;
 			var translateZ = xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
-			var offset = offset === undefined ? (self.isY ? xscroll.getOffsetTop() : xscroll.getOffsetLeft()) : offset;
-			var elementsPos = self._getElementsPos(offset);
+			var pos = pos === undefined ? (self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft()) : pos;
+			var elementsPos = self._getElementsPos(pos);
 			var changedRows = self._getChangedRows(elementsPos, force);
 			var el = null;
 			//若强制刷新 则重新初始化dom
@@ -354,6 +354,25 @@ define(function(require, exports, module) {
 					}
 				}
 			}
+		},
+		appendDataSet: function(ds) {
+			var self = this;
+			if (!ds instanceof DataSet) return;
+			if(!self.datasets){
+				self.datasets = [];
+			}
+			self.datasets.push(ds);
+		},
+		removeDataSet: function(id) {
+			var self = this;
+			if (!id || !self.datasets) return;
+			var index;
+			for (var i = 0, l = self.datasets.length; i < l; i++) {
+				if (id == self.datasets[i].getId()) {
+					index = i;
+				}
+			}
+			self.datasets.splice(index, 1);
 		},
 		pluginDestructor: function() {
 

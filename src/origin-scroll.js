@@ -21,10 +21,10 @@ define(function(require, exports, module) {
             self.__isContainerInited = true;
             return self;
         },
-		getOffsetTop: function() {
+		getScrollTop: function() {
 			return this.renderTo.scrollTop;
         },
-        getOffsetLeft: function() {
+        getScrollLeft: function() {
         	return this.renderTo.scrollLeft;
         },
 		scrollY:function(y, duration, easing, callback){
@@ -42,7 +42,8 @@ define(function(require, exports, module) {
                run:function(e){
                     //trigger scroll event
                     self.trigger("scroll",{
-                        offset:self.getOffset()
+                        scrollTop:self.getScrollTop(),
+                        scrollLeft:self.getScrollLeft()
                     });
                },
                useTransition:false, //scrollTop 
@@ -70,7 +71,8 @@ define(function(require, exports, module) {
             // var mc = new Hammer.Manager(renderTo);
             renderTo.addEventListener("scroll",function(e){
                 self.trigger("scroll",{
-                    offset:self.getOffset()
+                    scrollTop:self.getScrollTop(),
+                    scrollLeft:self.getScrollLeft()
                 })
             },false)
 

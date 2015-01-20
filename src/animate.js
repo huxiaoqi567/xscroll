@@ -147,7 +147,6 @@ define(function(require, exports, module) {
 				easing: easing,
 			});
 			this.timer.on("run", cfg.run);
-			// !cfg.useTransition && this.timer.on("stop", cfg.end);
 		}
 		return this;
 	}
@@ -187,7 +186,7 @@ define(function(require, exports, module) {
 		}
 	}
 
-	Util.extend(Animate, Base,{
+	Util.extend(Animate, Base, {
 		run: function() {
 			var self = this;
 			self.__isTransitionEnd = false;
@@ -218,7 +217,7 @@ define(function(require, exports, module) {
 				//transform
 				if (cfg.css.transform) {
 					var transmap = self.transmap = computeTransform(computeStyle[vendorTransform], cfg.css.transform);
-					self.timer.off("run",self.__handlers.transRun);
+					self.timer.off("run", self.__handlers.transRun);
 					self.timer.on("run", self.__handlers.transRun, self);
 				}
 				var cssRun = function(e) {
@@ -272,11 +271,11 @@ define(function(require, exports, module) {
 			var self = this;
 			if (self.cfg.useTransition) {
 				var computeStyle = window.getComputedStyle(this.el);
-				for (var i in animAttrs) {
+				for (var i in animAttrs)
 					if (self.cfg.css[animAttrs[i]]) {
-						css(self.el,animAttrs[i],computeStyle[animAttrs[i]]);
+						var value = /transform/.test(animAttrs[i]) ? computeStyle[vendorTransform] : computeStyle[animAttrs[i]];
+						css(self.el, animAttrs[i], value);
 					}
-				}
 				if (Util.isBadAndroid()) {
 					//can't stop by "none" or "" property
 					self.el.style[transitionDuration] = "1ms";

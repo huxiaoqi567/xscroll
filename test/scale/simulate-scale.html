@@ -40,7 +40,7 @@
 
             <div class="xs-content">
 
-                    <img src="test.jpeg">
+                    <img src="../xscroll/test.jpeg">
             </div>
 
         </div>
@@ -51,28 +51,37 @@
       base: "../../src/"
     })
 
-    seajs.use(["simulate-scroll"],function(XScroll){
+    seajs.use(["simulate-scroll","plugins/scale"],function(XScroll,Scale){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
             // lockX:true,
-            // scalable:true,
-            // minScale:1,
-            // maxScale:2,
+            
             // useTransition:false
         });
-        xscroll.render();
+       
 
+
+        var scale = new Scale({
+            minScale:1,
+            maxScale:2
+        });
+
+        
+
+         xscroll.render();
+
+         xscroll.plug(scale);
 
         window.xscroll = xscroll;
         
 
          xscroll.on("scrollend",function(e){
-            // console.log("end",e.scrollLeft,e.scrollTop)
+            // console.log(e.zoomType,e.type)
         })
 
           xscroll.on("scroll",function(e){
-
-            // console.log(e.type,e.scrollLeft,e.scrollTop)
+            // console.log(xscroll.x,xscroll.y)
+            // console.log(e.scrollLeft,e.scrollTop)
         })
 
          // xscroll.on("scale",function(e){

@@ -28,32 +28,26 @@ li{
 </head>
 <body>
 <div id="block"></div>
-<div style="position:relative;z-index:9999">
-<input type="button" id="run" value="run">
-<input type="button" id="stop" value="stop">
-<input type="button" id="reset" value="reset">
-</div>
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
       base: "../../src/"
-    })
+    });
     seajs.use(["animate"],function(Animate){
     	var block = document.querySelector("#block");
     	var anim = new Animate(block,{
     		useTransition:true,
     		css:{
     			// transform:"scale(0.8)",
-                transform:"translateX(100px) scale(2)",
-    			opacity:.5
+                transform:"translateX(100px)"
     			// 'marginLeft':100
     			// 'marginLeft':100,
     			// scrollTop:100
     		},
-    		duration:5000,
-    		easing:"quadratic",
+    		duration:500,
+    		easing:"linear",
     		run:function(e){
-    			// console.log(e)
+    			console.log(e)
     		},
     		end:function(e){
 	    		console.log(e,"finished")
@@ -62,28 +56,21 @@ li{
 
     	anim.run();
 
-
-    	var run = document.querySelector("#run");
-    	var reset = document.querySelector("#reset");
-    	var stop = document.querySelector("#stop");
-
-    	run.addEventListener("click",function(){
-            // anim.stop();
-    		anim.run();
-    	})
-
-    	reset.addEventListener("click",function(){
-    		anim.reset({
+        setTimeout(function(){
+            console.log("reset")
+            anim.stop();
+            anim.reset({
                 css:{
-                    transform:"translateX(300px)"   
+                    transform:"translateX(0px)"
                 },
-    			duration:5000
-    		});
-    	})
+                duration:100
+            })
+            anim.run();
+        },500)
 
-    	stop.addEventListener("click",function(){
-    		anim.stop();
-    	})
+
+
+    	
 
 
     })

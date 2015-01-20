@@ -44,13 +44,12 @@ li{
     		useTransition:true,
     		css:{
     			// transform:"scale(0.8)",
-                transform:"translateX(100px) scale(2)",
-    			opacity:.5
+                transform:"translateX(100px)",
     			// 'marginLeft':100
     			// 'marginLeft':100,
     			// scrollTop:100
     		},
-    		duration:5000,
+    		duration:1000,
     		easing:"quadratic",
     		run:function(e){
     			// console.log(e)
@@ -60,7 +59,24 @@ li{
 	    	}
     	});
 
+        var anim2 = new Animate(block,{
+            useTransition:true,
+            css:{
+                opacity:.5,
+                transform:"translateY(100px)"
+            },
+            duration:1000,
+            easing:"quadratic",
+            run:function(e){
+                // console.log(e)
+            },
+            end:function(e){
+                console.log(e,"finished")
+            }
+        });
+
     	anim.run();
+        anim2.run();
 
 
     	var run = document.querySelector("#run");

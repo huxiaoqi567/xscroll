@@ -23,8 +23,6 @@
         top:0;
         bottom: 0;
         width:100%;
-        overflow: scroll;
-        -webkit-overflow-scrolling:touch;
      }
     #J_Scroll ul{
         width: 100%;
@@ -131,38 +129,81 @@
         </div>
     </div>
     <script src="../../lib/sea.js"></script>
+    <script src="../../lib/jquery.js"></script>
     <script>
     seajs.config({
       base: "../../src/"
     })
-    seajs.use(["origin-scroll","plugins/infinite"],function(XScroll,Infinite){
-        var data = (function() {
-            var tmp = [];
-            for (var i = 1; i <= 1000; i++) {
-                tmp.push({
-                    style:{},
-                    data:{num: i}
-                });
-            }
-            return tmp
-        })()
+    seajs.use(["simulate-scroll","plugins/infinite","plugins/pullup"],function(XScroll,Infinite,PullUp){
+
+        var page = 1;
+
+        var totalPage = 4;
+
+        var pageCache ={};
+        
         var xscroll = new XScroll({
             renderTo: "#J_Scroll"
         });
 
-        xscroll.plug(new Infinite({
-            data: data,
+       
+
+        var infinite = new Infinite({
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
                 el.innerText = row.data.num;
             }
-        }))
+        })
 
-    xscroll.on("scroll",function(e){
-        // console.log(e.offset)
-    })
+        var pullup = new PullUp({
+            upContent:"上拉加载更多",
+            downContent:"释放加载更多",
+            loadingContent:"加载中...",
+            bufferHeight:100,
+        });
+
+        xscroll.plug(pullup);
+
+        pullup.on("loading",function(){
+            getData();
+        });
+
+        getData();
+
+        //数据集合
+        var ds = new Infinite.DataSet();
+
+        infinite.appendDataSet(ds);
+
+         function getData(){
+            if(!pageCache[page]){
+                pageCache[page] = 1;
+                $.ajax({
+                    url:"./data.json",
+                    dataType:"json",
+                    success:function(data){
+                        if(page > totalPage) {
+                            //last page
+                            pullup.reset();
+                            //destroy plugin
+                            xscroll.unplug(pullup);
+                            return; 
+                        };
+                        ds.appendData(data);
+                        xscroll.render();
+                         //loading complete
+                        pullup.complete();
+                        page++;
+                    }
+                })
+            }
+        }
+
+        xscroll.plug(infinite);
         
         xscroll.render();
+
+        window.xscroll = xscroll
 
     });
 

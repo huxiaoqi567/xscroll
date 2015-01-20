@@ -136,13 +136,21 @@
       base: "../../src/"
     })
     seajs.use(["origin-scroll","plugins/infinite"],function(XScroll,Infinite){
-        var data = (function() {
+            var data = (function() {
             var tmp = [];
             for (var i = 1; i <= 1000; i++) {
-                tmp.push({
-                    style:{},
-                    data:{num: i}
-                });
+                if(i == 1){
+                    tmp.push({
+                        style:{position:"sticky",background:"red",width:"100%"},
+                        data:{num: i}
+                    });
+                }else{
+                    tmp.push({
+                        style:{background:"#fff"},
+                        data:{num: i}
+                    });
+                }
+                
             }
             return tmp
         })()
@@ -150,21 +158,18 @@
             renderTo: "#J_Scroll"
         });
 
-        xscroll.plug(new Infinite({
+        var infinite = new Infinite({
             data: data,
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
-                el.innerText = row.data.num;
+                el.innerHTML = row.data.num;
             }
-        }))
+        })
 
-    xscroll.on("scroll",function(e){
-        // console.log(e.offset)
-    })
+        xscroll.plug(infinite)
         
         xscroll.render();
-
-    });
+        })
 
     </script>
 </body>

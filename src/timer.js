@@ -117,7 +117,7 @@ define(function(require, exports, module) {
 					var param = {
 						percent: self.percent
 					};
-					self.trigger("run", param);
+					// self.trigger("run", param);
 					self.trigger("stop", param);
 					if (self.percent >= 1) {
 						self.isfinished = true;
@@ -129,7 +129,7 @@ define(function(require, exports, module) {
 				}
 				self.trigger("run", {
 					percent: self.progress
-				})
+				});
 				self._run();
 			})
 		},

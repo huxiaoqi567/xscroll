@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<style type="text/css">
+* {
+	margin:0;
+	padding: 0;
+}
+li{
+	display: block;
+	line-height: 200px;
+	border: 1px solid;
+}
+#scroll{
+	position: absolute;
+	width:100%;
+	height: 100%;
+	overflow: scroll;
+	-webkit-overflow-scrolling:touch;
+}
+</style>
+</head>
+<body>
+<div id="scroll">
+	<div class="xs-container">
+		<div class="xs-content">
+			<ul>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<script src="../../lib/sea.js"></script>
+<script>
+	seajs.config({
+      base: "../../src/"
+    })
+    seajs.use(["simulate-scroll"],function(XScroll){
+
+    	var xscroll = new XScroll({
+    		renderTo:"#scroll",
+    		lockX:true,
+    		scrollbarX:false,
+    		// useTransition:false
+    		// lockY:true
+    	})
+
+    	xscroll.render();
+
+    	xscroll.on("panend",function(e){
+    		console.log(e.velocityY)
+    	})
+
+    	 xscroll.on("scrollend",function(e){
+            // console.log("end",e.scrollLeft,e.scrollTop)
+        })
+
+          xscroll.on("scroll",function(e){
+
+            // console.log(e.type,e.scrollLeft,e.scrollTop)
+        })
+
+          xscroll.on("scrollanimate",function(e){
+          	// console.log(e)
+          })
+
+
+
+    	window.xscroll = xscroll;
+
+    	
+
+
+    })
+</script>

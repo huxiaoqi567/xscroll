@@ -66,27 +66,46 @@ li{
 	seajs.config({
       base: "../../src/"
     })
-    seajs.use(["simulate-scroll"],function(XScroll){
+    seajs.use(["simulate-scroll","plugins/pullup"],function(XScroll,PullUp){
 
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
     		lockX:true,
     		scrollbarX:false,
-    		useTransition:false
+    		// useTransition:false
     		// lockY:true
     	})
 
+    	var pullup = new PullUp({
+    		
+    	});
+
+    	
+
+    	xscroll.plug(pullup);
+
+    	// xscroll.unplug(pullup);
+
+
     	xscroll.render();
 
-    	// xscroll.scrollY(1000,1000)
-
-    	xscroll.on("scroll",function(e){
-    		// console.log(e.offset)
+    	xscroll.on("panend",function(e){
+    		console.log(e.velocityY)
     	})
 
-    	xscroll.on("scrollend",function(e){
-    		// console.log("end",e.offset)
-    	})
+    	 xscroll.on("scrollend",function(e){
+            // console.log("end",e.scrollLeft,e.scrollTop)
+        })
+
+          xscroll.on("scroll",function(e){
+
+            // console.log(e.type,e.scrollLeft,e.scrollTop)
+        })
+
+          xscroll.on("scrollanimate",function(e){
+          	// console.log(e)
+          })
+
 
 
 
