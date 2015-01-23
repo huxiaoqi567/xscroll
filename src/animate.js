@@ -127,7 +127,7 @@ define(function(require, exports, module) {
 		var self = this;
 		this.cfg = cfg;
 		this.el = el;
-		var duration = cfg.duration || 1000,
+		var duration = cfg.duration || 0,
 			easing = cfg.easing || "ease",
 			delay = cfg.delay || 0;
 
@@ -192,7 +192,7 @@ define(function(require, exports, module) {
 			self.__isTransitionEnd = false;
 			var cfg = self.cfg,
 				el = self.el,
-				duration = cfg.duration || 1000,
+				duration = cfg.duration || 0,
 				easing = cfg.easing || "ease",
 				delay = cfg.delay || 0;
 			self.stop();

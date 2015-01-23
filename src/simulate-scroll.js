@@ -159,6 +159,13 @@ define(function(require, exports, module) {
       });
 
       self.trigger("aftereventbind",{mc:mc});
+      //window resize
+      window.addEventListener("resize",function(e){
+        setTimeout(function(){
+          self.boundryCheck(0);
+          self.render();
+        },100);
+      },self);
 
       return this;
     },
@@ -357,34 +364,38 @@ define(function(require, exports, module) {
         });
       }
     },
-    boundryCheckX: function(callback) {
-      var self = this;
+    boundryCheckX: function(duration,easing,callback) {
+      var self = this,
+          duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
+          easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       if (!self.boundryCheckEnabled || self.userConfig.lockX) return;
       var pos = self.getScrollLeft();
       var containerWidth = self.containerWidth;
       var boundry = self.boundry;
       if (pos < boundry.left) {
-        self.scrollLeft(-boundry.left, self.userConfig.BOUNDRY_CHECK_DURATION, self.userConfig.BOUNDRY_CHECK_EASING, callback);
+        self.scrollLeft(-boundry.left, duration, easing, callback);
       } else if (pos > containerWidth - boundry.right) {
-        self.scrollLeft(containerWidth - boundry.right, self.userConfig.BOUNDRY_CHECK_DURATION, self.userConfig.BOUNDRY_CHECK_EASING, callback);
+        self.scrollLeft(containerWidth - boundry.right, duration, easing, callback);
       }
     },
-    boundryCheckY: function(callback) {
-      var self = this;
+    boundryCheckY: function(duration,easing,callback) {
+      var self = this,
+          duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
+          easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       if (!self.boundryCheckEnabled || self.userConfig.lockY) return;
       var pos = self.getScrollTop();
       var containerHeight = self.containerHeight;
       var boundry = self.boundry;
       if (pos < boundry.top) {
-        self.scrollTop(-boundry.top, BOUNDRY_CHECK_DURATION, BOUNDRY_CHECK_EASING, callback);
+        self.scrollTop(-boundry.top, duration, easing, callback);
       } else if (pos > containerHeight - boundry.bottom) {
-        self.scrollTop(containerHeight - boundry.bottom, BOUNDRY_CHECK_DURATION, BOUNDRY_CHECK_EASING, callback);
+        self.scrollTop(containerHeight - boundry.bottom, duration, easing, callback);
       }
     },
     //boundry back bounce
-    boundryCheck: function(callback) {
-      this.boundryCheckX(callback);
-      this.boundryCheckY(callback);
+    boundryCheck: function(duration,easing,callback) {
+      this.boundryCheckX(duration,easing,callback);
+      this.boundryCheckY(duration,easing,callback);
     },
     stop: function() {
       var self = this;
@@ -401,6 +412,7 @@ define(function(require, exports, module) {
       }
     },
     render: function() {
+      console.log("render")
       var self = this;
       SimuScroll.superclass.render.call(this);
       self.renderScrollBars();

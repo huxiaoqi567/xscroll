@@ -92,7 +92,14 @@ define(function(require, exports, module) {
 		run: function() {
 			var self = this;
 			var duration = self.cfg.duration;
-			if (duration <= 0 || self.isfinished) return;
+			if(duration <= 0){
+				self.isfinished = true;
+				self.trigger("end", {
+					percent: 1
+				});
+				return;
+			}
+			if(self.isfinished) return;
 			self._hasFinishedPercent = self._stop && self._stop.percent || 0;
 			delete self._stop;
 			self.start = Date.now();
