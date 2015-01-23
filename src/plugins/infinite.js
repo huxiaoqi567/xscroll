@@ -81,6 +81,7 @@ define(function(require, exports, module) {
 			self._initInfinite();
 			xscroll.on("afterrender", function() {
 				self.render();
+				self._bindEvt();
 			})
 		},
 		_initInfinite: function() {
@@ -374,7 +375,85 @@ define(function(require, exports, module) {
 			}
 			self.datasets.splice(index, 1);
 		},
+		getData:function(datasetIndex,rowIndex){
+			var self = this;
+			if(datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
+				return self.datasets[datasetIndex].getData(rowIndex);
+			}
+		},
+		updateData:function(datasetIndex,rowIndex,data){
+			var self = this;
+			var d = self.getData(datasetIndex,rowIndex);
+			return d.data = data;
+		},
+		removeData:function(datasetIndex,rowIndex){
+			var self = this;
+			if(datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
+				return self.datasets[datasetIndex].removeData(rowIndex);
+			}
+			return;
+		},
+		getCellByPagePos:function(pos){
+			var self = this;
+			var offset = self.isY ? pos - Util.getOffsetTop(self.renderTo) + Math.abs(self.getOffsetTop()) : pos - Util.getOffsetLeft(self.renderTo) + Math.abs(self.getOffsetLeft());
+			return self.getCellByOffset(offset);
+		},
+		getCellByRowOrCol:function(row){
+			var self = this,cell;
+			if(typeof row == "number" && row < self.domInfo.length){
+				for(var i = 0;i<self.infiniteLength;i++){
+					if(row == self.infiniteElementsCache[i][self._nameRow]){
+						cell = self.domInfo[self.infiniteElementsCache[i][self._nameRow]];
+						cell.element = self.infiniteElements[i];
+						return cell;
+					}
+				}
+			}
+		},
+		insertData:function(datasetIndex,rowIndex,data){
+			var self = this;
+			if(data && datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
+				return self.datasets[datasetIndex].data = self.datasets[datasetIndex].data.slice(0,rowIndex).concat(data).concat(self.datasets[datasetIndex].data.slice(rowIndex))
+			}
+			return;
+		},
+		getCellByOffset:function(offset){
+			var self = this;
+			var len = self.domInfo.length;
+			var cell;
+			if(offset < 0) return;
+			for(var i = 0;i<len;i++){
+				cell = self.domInfo[i];
+				if(cell[self._nameTop] < offset && cell[self._nameTop] + cell[self._nameHeight] > offset){
+					return self.getCellByRowOrCol(i);
+				}
+			}
+		},
+		getDataSets: function() {
+			var self = this;
+			return self.datasets;
+		},
+		getDataSetById: function(id) {
+			var self = this;
+			if (!id) return;
+			for (var i = 0, l = self.datasets.length; i < l; i++) {
+				if (self.datasets[i].getId() == id) {
+					return self.datasets[i];
+				}
+			}
+		},
 		pluginDestructor: function() {
+
+		},
+		_bindEvt:function(){
+			var self = this;
+			if(self._isEvtBinded) return;
+			self._isEvtBinded = true;
+
+			self.xscroll.on("panstart",function(e){
+				// console.log(e)
+				
+			})
 
 		}
 	});

@@ -1,17 +1,19 @@
+/*
+	滚动嵌套
+*/
 define(function(require, exports, module) {
 	var Util = require('../util'),
 		Base = require('../base');
 
-	var LazyLoad = function(cfg) {
-		LazyLoad.superclass.constructor.call(this, cfg);
+	var MultiView = function(cfg) {
+		MultiView.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
 
 		}, cfg);
 	}
 
-
-	Util.extend(LazyLoad, Base, {
-		pluginId: "lazyload",
+	Util.extend(MultiView, Base, {
+		pluginId: "multiview",
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.xscroll = xscroll;
@@ -24,8 +26,8 @@ define(function(require, exports, module) {
 	});
 
 	if (typeof module == 'object' && module.exports) {
-		module.exports = LazyLoad;
+		module.exports = MultiView;
 	} else {
-		return LazyLoad;
+		return MultiView;
 	}
 });

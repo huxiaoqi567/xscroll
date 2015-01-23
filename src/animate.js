@@ -8,13 +8,13 @@ define(function(require, exports, module) {
 	//transition webkitTransition MozTransition OTransition msTtransition
 	var vendorTransition = Util.prefixStyle("transition");
 
-	var venderTransitionDuration = Util.prefixStyle("transitionDuration");
+	var vendorTransitionDuration = Util.prefixStyle("transitionDuration");
 
-	var venderTransformOrigin = Util.prefixStyle("transformOrigin");
+	var vendorTransformOrigin = Util.prefixStyle("transformOrigin");
 
-	var venderTransitionEnd = Util.vendor ? Util.prefixStyle("transitionEnd") : "transitionend";
+	var vendorTransitionEnd = Util.vendor ? Util.prefixStyle("transitionEnd") : "transitionend";
 
-	var venderTransformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
+	var vendorTransformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 
 	var translateTpl = 'translateX({translateX}px) translateY({translateY}px) translateZ(0)';
 	//limit attrs
@@ -195,10 +195,8 @@ define(function(require, exports, module) {
 				duration = cfg.duration || 1000,
 				easing = cfg.easing || "ease",
 				delay = cfg.delay || 0;
-
 			self.stop();
 			self.timer && self.timer.run();
-
 			if (cfg.useTransition) {
 				//transition
 				el.style[vendorTransition] = Util.substitute('all {duration}ms {easing} {delay}ms', {
@@ -210,8 +208,8 @@ define(function(require, exports, module) {
 					//set css
 					css(el, i, cfg.css[i]);
 				}
-				el.removeEventListener(venderTransitionEnd, self.transitionEndHandler);
-				el.addEventListener(venderTransitionEnd, self.transitionEndHandler, false);
+				el.removeEventListener(vendorTransitionEnd, self.transitionEndHandler);
+				el.addEventListener(vendorTransitionEnd, self.transitionEndHandler, false);
 			} else {
 				var computeStyle = window.getComputedStyle(el);
 				//transform
@@ -278,7 +276,7 @@ define(function(require, exports, module) {
 					}
 				if (Util.isBadAndroid()) {
 					//can't stop by "none" or "" property
-					self.el.style[transitionDuration] = "1ms";
+					self.el.style[vendorTransitionDuration] = "1ms";
 				} else {
 					self.el.style[vendorTransition] = "none";
 				}

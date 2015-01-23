@@ -1,17 +1,20 @@
+/*
+	滚动加速
+*/
 define(function(require, exports, module) {
 	var Util = require('../util'),
 		Base = require('../base');
 
-	var LazyLoad = function(cfg) {
-		LazyLoad.superclass.constructor.call(this, cfg);
+	var FastScroll = function(cfg) {
+		FastScroll.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
 
 		}, cfg);
 	}
 
 
-	Util.extend(LazyLoad, Base, {
-		pluginId: "lazyload",
+	Util.extend(FastScroll, Base, {
+		pluginId: "fastscroll",
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.xscroll = xscroll;
@@ -24,8 +27,8 @@ define(function(require, exports, module) {
 	});
 
 	if (typeof module == 'object' && module.exports) {
-		module.exports = LazyLoad;
+		module.exports = FastScroll;
 	} else {
-		return LazyLoad;
+		return FastScroll;
 	}
 });
