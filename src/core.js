@@ -2,7 +2,6 @@ define(function(require, exports, module) {
     var Util = require('./util'),
         Base = require('./base'),
         Animate = require('./animate');
-
         require('./hammer');
 
     function Boundry(cfg) {
@@ -93,14 +92,7 @@ define(function(require, exports, module) {
     //namespace for plugins
     XScroll.Plugin = {};
     //event names
-    var SCROLL_END = "scrollend";
-    var SCROLL = "scroll";
-    var PAN_END = "panend";
-    var PAN_START = "panstart";
-    var PAN = "pan";
-    var SCROLL_ANIMATE = "scrollanimate";
     var AFTER_RENDER = "afterrender";
-    var BOUNDRY_OUT = "boundryout";
     // constant acceleration for scrolling
     var SROLL_ACCELERATION = 0.001;
     // boundry checked bounce effect
@@ -123,7 +115,6 @@ define(function(require, exports, module) {
                 bounce: true,
                 scrollbarX: true,
                 scrollbarY: true,
-                // bounceSize: 100,
                 useTransition: true,
                 gpuAcceleration: true,
                 BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
@@ -136,7 +127,6 @@ define(function(require, exports, module) {
             //generate guid
             self.guid = Util.guid();
             self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
-            // self.scale = userConfig.scale || 1;
             //timer for animtion
             self.__timers = {};
             self.SROLL_ACCELERATION = userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
@@ -202,7 +192,6 @@ define(function(require, exports, module) {
             var containerHeight = userConfig.containerHeight || self.content.offsetHeight;
             self.containerWidth = containerWidth < self.width ? self.width : containerWidth;
             self.containerHeight = containerHeight < self.height ? self.height : containerHeight;
-            
             self.boundry.refresh({
                 width: self.width,
                 height: self.height
@@ -219,6 +208,6 @@ define(function(require, exports, module) {
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
     } else {
-        return  window.XScroll = XScroll;
+        return  XScroll;
     }
 });

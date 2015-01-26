@@ -22,7 +22,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        overflow: scroll;
     }
     #J_Scroll ul{
         white-space: nowrap;
@@ -75,7 +75,7 @@
     seajs.config({
       base: "../../src/"
     })
-    seajs.use(["simulate-scroll"],function(XScroll){
+    seajs.use(["xscroll"],function(XScroll){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
             scrollbarY:false,
@@ -84,7 +84,7 @@
         xscroll.render();
         xscroll.on("scroll",function(e){
             // console.log(e.offset)
-        })
+        });
         window.xscroll = xscroll;
     });
     </script>

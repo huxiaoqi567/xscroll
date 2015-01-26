@@ -1,20 +1,12 @@
 define(function(require, exports, module) {
-
 	var Util = require('../util');
 	var Animate = require('../animate');
-	//最短滚动条高度
 	var MIN_SCROLLBAR_SIZE = 60;
-	//滚动条被卷去剩下的最小高度
 	var BAR_MIN_SIZE = 8;
-	//transform
 	var transform = Util.prefixStyle("transform");
-
 	var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
-	//transition webkitTransition MozTransition OTransition msTtransition
 	var transition = Util.prefixStyle("transition");
-
 	var borderRadius = Util.prefixStyle("borderRadius");
-
 	var transitionDuration = Util.prefixStyle("transitionDuration");
 
 	var ScrollBar = function(cfg) {
@@ -52,16 +44,16 @@ define(function(require, exports, module) {
 			var xscroll = self.xscroll;
 			var translateZ = xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			var transform = translateZ ? transformStr + ":" + translateZ + ";" : "";
-			var commonCss = "opacity:0;position:absolute;z-index:999;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"+ transform;
+			var commonCss = "opacity:0;position:absolute;z-index:999;overflow:hidden;-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;"+ transform;
 			var css = self.isY ? 
-				"width: 2px;bottom:5px;top:5px;right:2px;" + commonCss :
-				"height:2px;left:5px;right:5px;bottom:2px;" + commonCss;
+				"width: 3px;bottom:5px;top:5px;right:3px;" + commonCss :
+				"height:3px;left:5px;right:5px;bottom:3px;" + commonCss;
 			self.scrollbar = document.createElement("div");
 			self.scrollbar.style.cssText = css;
 			xscroll.renderTo.appendChild(self.scrollbar);
 			var size = self.isY ? "width:100%;" : "height:100%;";
 			self.indicate = document.createElement("div");
-			self.indicate.style.cssText = size + "position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:2px;-moz-border-radius:2px;-o-border-radius:2px;"
+			self.indicate.style.cssText = size + "position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;"
 			self.scrollbar.appendChild(self.indicate);
 			self._update();
 			self.hide();
