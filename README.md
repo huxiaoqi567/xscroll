@@ -8,7 +8,7 @@
 
 ## Version
 
-2.4.0
+2.3.2
 
 ## Build
 
@@ -314,11 +314,6 @@ xlist.render();
 
 ### v2.3.2
 - 修复bounce为false后报错的问题
-
-### v2.4.0
-- 新增addView、removeView、getViews 接口
-- 修复pulldown无法加载的问题
-- 修复多个view嵌套时滚动容器跳动的问题
 
 
 
