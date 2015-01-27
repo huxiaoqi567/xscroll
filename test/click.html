@@ -193,7 +193,7 @@ body {
         </div>
     </div>
     <div id="footer">Scroll-Vertical</div>
-     <!-- // <script src="../lib/log.js"></script> -->
+     <script src="../lib/log.js"></script>
      <script src="../lib/sea.js"></script>
     <script>
     seajs.config({
@@ -216,12 +216,16 @@ body {
         xscroll.plug(pulldown);
 
         xscroll.render();
-
         var i = 0;
-        document.body.addEventListener("click",function(e){
-            i++;
+        xscroll.on("click",function(){
+            i ++;
             console.log(i)
         })
+        // var i = 0;
+        // document.body.addEventListener("click",function(e){
+        //     i++;
+        //     console.log(i)
+        // })
    
         window.xscroll = xscroll
     })

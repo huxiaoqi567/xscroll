@@ -15,7 +15,6 @@
         this.userConfig = cfg;
         this.init();
     };
-
     XScroll.Util = Util;
     //namespace for plugins
     XScroll.Plugin = {
@@ -536,12 +535,10 @@
             pan: function(e) {
                 var self = this;
                 if (!self.__panstarted) {
-                    console.log("xxx")
                     //reset pan gesture
                     Pan.reset();
                     return;
                 }
-                console.log(e.deltaY)
                 var boundry = self.boundry;
                 self.offset = self.offset || self.getOffset();
                 var posY = self.userConfig.lockY ? Number(self.offset.y) : Number(self.offset.y) + e.deltaY;
@@ -1024,29 +1021,7 @@
                 view.__viewControllers.boundryout = function(e) {
                     self._scrollAnimate(e);
                 }
-                // view.__viewControllers.panstart = function(e) {
-                    // if (!view.isBoundryOut()) {
-                    //     e.stopPropagation();
-                    // }
-                // }
-                // view.__viewControllers.pan = function(e) {
-                    // if (!view.isBoundryOut() ) {
-                    //     e.stopPropagation();
-                    // }
-                // }
-                // view.__viewControllers.panend = function(e) {
-                    // if (!view.isBoundryOut()) {
-                    //     e.stopPropagation();
-                    // }
-                // }
-                    
                 viewCfg.captureBounce && view.on("boundryout", view.__viewControllers.boundryout);
-
-                // if (viewCfg.stopPropagation) {
-                    // view.on("panstart", view.__viewControllers.panstart);
-                    // view.on("pan", view.__viewControllers.pan);
-                    // view.on("panend", view.__viewControllers.panend);
-                // }
                 return self.__subViews[view.guid] = view;
             }
             return;
