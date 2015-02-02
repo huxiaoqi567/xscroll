@@ -1,0 +1,37 @@
+<div class="wrapper">
+	<div class="inner"></div>
+</div>
+<style type="text/css">
+	.wrapper,.inner{
+		border:1px solid ;
+		height:100px;
+		width: 100px;
+	}
+	.wrapper{
+		-webkit-transition:all 1s ease 0s;
+		-webkit-transform:translateX(0);
+	}
+	.inner{
+		-webkit-transition:all .5s ease 0s;
+		-webkit-transform:translateY(0);
+	}
+</style>
+<script type="text/javascript">
+	var  wrapper = document.querySelector(".wrapper")
+	var  inner = document.querySelector(".inner")
+
+	setTimeout(function(){
+		// wrapper.style.webkitTransition = "all 0.5s ease 0s";
+	wrapper.style.webkitTransform = "translateX(10px)";
+	// inner.style.webkitTransition = "all 1s ease 0s";
+	inner.style.webkitTransform = "translateY(10px)";
+
+	},500)
+	
+
+
+	wrapper.addEventListener("webkitTransitionEnd",function(e){
+		if(e.target !== e.currentTarget) return;
+		console.log(e.target)
+	},false)
+</script>

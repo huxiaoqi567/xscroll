@@ -56,7 +56,7 @@ define(function(require, exports, module) {
 			self.indicate.style.cssText = size + "position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;"
 			self.scrollbar.appendChild(self.indicate);
 			self._update();
-			self.hide();
+			// self.hide();
 		},
 		_update: function(pos, duration, easing) {
 			var self = this;
@@ -116,7 +116,7 @@ define(function(require, exports, module) {
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			var config = {
 				css: {
-					transform: self.isY ? "translateY(" + pos + "px)" : "translateX(" + pos + "px)"
+					transform: self.isY ? "translateY(" + pos + "px)" + translateZ : "translateX(" + pos + "px)"+translateZ
 				},
 				duration: duration,
 				easing: easing,
@@ -183,8 +183,8 @@ define(function(require, exports, module) {
 		},
 		hide: function() {
 			var self = this;
-			self.scrollbar.style.opacity = 0;
-			self.scrollbar.style[transition] = "opacity 0.3s ease-out .5s";
+			// self.scrollbar.style.opacity = 0;
+			// self.scrollbar.style[transition] = "opacity 0.3s ease-out 0.5s";
 		},
 		show: function() {
 			var self = this;

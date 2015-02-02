@@ -20,14 +20,81 @@ li{
 }
 #block{
 	position: absolute;
-	height: 100px;
-	width: 100px;
+	height: 200px;
+	width: 200px;
     background: red;
+    overflow: hidden;
+}
+#inner{
+    width:1000px;
+    display: block;
+    /*height:1000px;*/
+    overflow: hidden;
+}
+#inner li{
+    display: block;
+    font-size: 40px;
+    width:40px;height: 40px;float: left;
+    border:1px solid;
+    text-align: center;
 }
 </style>
 </head>
 <body>
-<div id="block"></div>
+<div id="block">
+    <ul id="inner">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</div>
 <div style="position:relative;z-index:9999">
 <input type="button" id="run" value="run">
 <input type="button" id="stop" value="stop">
@@ -40,38 +107,40 @@ li{
     })
     seajs.use(["animate"],function(Animate){
     	var block = document.querySelector("#block");
+        var inner = document.querySelector("#inner");
     	var anim = new Animate(block,{
     		useTransition:true,
     		css:{
     			// transform:"scale(0.8)",
+                // opacity:0,
                 transform:"translateX(100px)",
     			// 'marginLeft':100
     			// 'marginLeft':100,
     			// scrollTop:100
     		},
-    		duration:1000,
+    		duration:2000,
     		easing:"quadratic",
     		run:function(e){
     			// console.log(e)
     		},
     		end:function(e){
-	    		console.log(e,"finished")
+	    		console.log(block,"finished")
 	    	}
     	});
 
-        var anim2 = new Animate(block,{
+        var anim2 = new Animate(inner,{
             useTransition:true,
             css:{
-                opacity:.5,
-                transform:"translateY(100px)"
+                // opacity:0
+                transform:"translateX(-400px)",
             },
-            duration:1000,
+            duration:3000,
             easing:"quadratic",
             run:function(e){
                 // console.log(e)
             },
             end:function(e){
-                console.log(e,"finished")
+                console.log(inner,"finished")
             }
         });
 
@@ -88,14 +157,14 @@ li{
     		anim.run();
     	})
 
-    	reset.addEventListener("click",function(){
-    		anim.reset({
-                css:{
-                    transform:"translateX(300px)"   
-                },
-    			duration:5000
-    		});
-    	})
+    	// reset.addEventListener("click",function(){
+    	// 	anim.reset({
+     //            css:{
+     //                transform:"translateX(300px)"   
+     //            },
+    	// 		duration:5000
+    	// 	});
+    	// })
 
     	stop.addEventListener("click",function(){
     		anim.stop();

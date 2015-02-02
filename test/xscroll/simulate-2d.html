@@ -29,10 +29,16 @@
     .xs-container,.xs-content{
       float: left;
     }
-
-    img{
-      width: 1000px;
-      float: left;
+    
+    table{
+      width: 2000px;
+    }
+    td{
+      line-height: 200px;
+      font-size: 20px;
+      text-align: center;
+      border:1px solid;
+      background: #fff;
     }
     </style>
     <div id="J_Scroll">
@@ -40,7 +46,56 @@
 
             <div class="xs-content">
 
-                    <img src="test.jpeg">
+                    <table>
+                      <tr>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                      </tr>
+                      <tr>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                      </tr>
+                      <tr>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                      </tr>
+                      <tr>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                      </tr>
+                      <tr>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                      </tr>
+                      <tr>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                        <td>cell</td>
+                      </tr>
+                    </table>
             </div>
 
         </div>
@@ -64,7 +119,20 @@
 
 
         window.xscroll = xscroll;
-        
+
+        xscroll.scrollLeft(1800,300,"ease",function(){
+          xscroll.boundryCheckX()
+        });
+         xscroll.scrollTop(1000,1000,"ease",function(){
+          xscroll.boundryCheckY()
+        });
+
+        // xscroll.scrollLeft(1800,1000,"ease",function(){
+        //   xscroll.boundryCheckX();
+        // });
+        //  xscroll.scrollTop(1000,500,"ease",function(){
+        //   xscroll.boundryCheckY();
+        // });
 
          xscroll.on("scrollend",function(e){
             // console.log("end",e.scrollLeft,e.scrollTop)
@@ -74,7 +142,9 @@
 
             // console.log(e.type,e.scrollLeft,e.scrollTop)
         })
-
+          xscroll.on("scrollend",function(e){
+          console.log(e.type,e.zoomType)
+         })
          // xscroll.on("scale",function(e){
          //  console.log(e.type,e.scale)
          // })

@@ -2,7 +2,7 @@ define(function(require, exports, module) {
     var Util = require('./util'),
         Base = require('./base'),
         Animate = require('./animate');
-        require('./hammer');
+        // require('./hammer');
 
     function Boundry(cfg) {
         this.cfg = Util.mix({
@@ -173,10 +173,10 @@ define(function(require, exports, module) {
             this.scrollByY(scrollTop, duration, easing, callback);
         },
         scrollLeftBy: function(scrollLeft, duration, easing, callback) {
-            this.scrollX(Number(scrollLeft) + Number(this.getScrollLeft()), duration, easing, callback);
+            this.scrollLeft(Number(scrollLeft) + Number(this.getScrollLeft()), duration, easing, callback);
         },
         scrollTopBy: function(scrollTop, duration, easing, callback) {
-            this.scrollY(Number(scrollTop) + Number(this.getScrollTop()), duration, easing, callback);
+            this.scrollTop(Number(scrollTop) + Number(this.getScrollTop()), duration, easing, callback);
         },
         scrollLeft: function(scrollLeft, duration, easing, callback) {},
         scrollTop: function(scrollTop, duration, easing, callback) {},

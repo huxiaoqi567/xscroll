@@ -1,9 +1,11 @@
 define(function(require, exports, module) {
+  require('./hammer');
   var Util = require('./util'),
     Base = require('./base'),
     Core = require('./core'),
     Animate = require('./animate'),
     ScrollBar = require('./components/scrollbar');
+
 
   //reduced boundry pan distance
   var PAN_RATE = 0.36;
@@ -61,14 +63,16 @@ define(function(require, exports, module) {
     },
     scrollLeft: function(x, duration, easing, callback) {
       if (this.userConfig.lockX) return;
+      var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
       this.x = (undefined === x || isNaN(x) || 0 === x) ? 0 : -Math.round(x);
-      this._animate("x", "translateX(" + this.x + "px) scale(" + this.scale + ")", duration, easing, callback);
+      this._animate("x", "translateX(" + this.x + "px) scale(" + this.scale + ")"+translateZ, duration, easing, callback);
       return this;
     },
     scrollTop: function(y, duration, easing, callback) {
       if (this.userConfig.lockY) return;
+      var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
       this.y = (undefined === y || isNaN(y) || 0 === y) ? 0 : -Math.round(y);
-      this._animate("y", "translateY(" + this.y + "px)", duration, easing, callback);
+      this._animate("y", "translateY(" + this.y + "px) "+translateZ, duration, easing, callback);
       return this;
     },
     //translate a element 
@@ -100,7 +104,7 @@ define(function(require, exports, module) {
           });
         },
         useTransition: self.userConfig.useTransition,
-        end: function() {
+        end: function(e) {
           callback && callback();
           self['isScrolling' + type.toUpperCase()] = false;
           self.trigger("scrollend", {
@@ -300,12 +304,9 @@ define(function(require, exports, module) {
 
       if (type == "x" && self.userConfig.lockX) return;
       if (type == "y" && self.userConfig.lockY) return;
-
       v = v > maxSpeed ? maxSpeed : v < -maxSpeed ? -maxSpeed : v;
       var a = self.SROLL_ACCELERATION * (v / (Math.abs(v) || 1));
       var t = isNaN(v / a) ? 0 : v / a;
-
-
       var s = Number(pos) + t * v / 2;
       //over top boundry check bounce
       if (s < boundryStart) {
@@ -412,10 +413,9 @@ define(function(require, exports, module) {
       }
     },
     render: function() {
-      console.log("render")
       var self = this;
       SimuScroll.superclass.render.call(this);
-      self.renderScrollBars();
+      // self.renderScrollBars();
       return self;
     },
     renderScrollBars: function() {
