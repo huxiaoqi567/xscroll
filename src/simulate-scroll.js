@@ -190,8 +190,8 @@ define(function(require, exports, module) {
       var self = this;
       var scrollLeft = self.getScrollLeft();
       var scrollTop = self.getScrollTop();
-      // self.stop();
-      // self.translate(-scrollLeft, -scrollTop);
+      self.stop();
+      self.translate(-scrollLeft, -scrollTop);
       self.trigger("panstart", Util.mix(e, {
         scrollTop: scrollTop,
         scrollLeft: scrollLeft
