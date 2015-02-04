@@ -113,8 +113,6 @@ define(function(require, exports, module) {
             var userConfig = self.userConfig = Util.mix({
                 preventDefault: true,
                 bounce: true,
-                scrollbarX: true,
-                scrollbarY: true,
                 useTransition: true,
                 gpuAcceleration: true,
                 BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
@@ -123,7 +121,7 @@ define(function(require, exports, module) {
                 easing: "quadratic",
                 clsPrefix: "xs-",
                 simulateScroll: false
-            }, self.userConfig, undefined, undefined, true);
+            }, self.userConfig);
             //generate guid
             self.guid = Util.guid();
             self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
@@ -183,6 +181,7 @@ define(function(require, exports, module) {
         render: function() {
             var self = this;
             var userConfig = self.userConfig;
+            // console.log(userConfig)
             self._initContainer();
             var width = userConfig.width || self.renderTo.offsetWidth;
             var height = userConfig.height || self.renderTo.offsetHeight || 0;

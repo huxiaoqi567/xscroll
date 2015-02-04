@@ -24,13 +24,12 @@
              self.snapColIndex = self.userConfig.snapColIndex;
              self.snapRowIndex = self.userConfig.snapRowIndex;
              prefix = self.userConfig.prefix;
-             self.xscroll && self.xscroll.on("aftereventbind", function() {
+             self.xscroll && self.xscroll.on("afterrender", function() {
                  self.render();
-             })
+             }) 
          },
          pluginDestructor: function() {
              var self = this;
-
              delete self;
          },
 
@@ -47,6 +46,9 @@
              self.snapColIndex = col;
              var top = self.snapRowIndex * snapHeight;
              var left = self.snapColIndex * snapWidth;
+
+             console.log(arguments)
+
              self.xscroll.scrollTo(left, top, userConfig.snapDuration, userConfig.snapEasing, callback);
          },
          //snap
@@ -82,7 +84,7 @@
              self.userConfig.snapHeight = self.userConfig.snapHeight || xscroll.height || 100;
              self.userConfig.snapColsNum = self.userConfig.snapColsNum || Math.max(Math.round(xscroll.containerWidth / xscroll.width), 1);
              self.userConfig.snapRowsNum = self.userConfig.snapRowsNum || Math.max(Math.round(xscroll.containerHeight / xscroll.height), 1);
-             self.xscroll.mc.on("panend", function(e) {
+             self.xscroll.mc && self.xscroll.mc.on("panend", function(e) {
                  self._snapAnimate(e);
              });
          }

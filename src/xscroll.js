@@ -5,9 +5,7 @@ define(function(require, exports, module) {
 		OriginScroll = require('./origin-scroll');
 
 	var XScrollFactory = function(cfg) {
-
-		window.XScroll = (cfg && cfg.useOriginScroll ) ? OriginScroll:SimuScroll;
-
+		var XScroll = (cfg && cfg.useOriginScroll || Util.isAndroid()) ? OriginScroll:SimuScroll;
 		return new XScroll(cfg);
 	}
 

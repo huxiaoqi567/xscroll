@@ -28,6 +28,7 @@ define(function(require, exports, module) {
     init: function() {
       var self = this;
       SimuScroll.superclass.init.call(this);
+      self._getAttributes();
       self.defaltConfig = {
         lockY:self.userConfig.lockY,
         lockX:self.userConfig.lockX
@@ -38,6 +39,16 @@ define(function(require, exports, module) {
       var self = this;
       self.userConfig.lockX = self.defaltConfig.lockX;
       self.userConfig.lockY = self.defaltConfig.lockY;
+    },
+    //get attributes from dom
+    _getAttributes:function(){
+      var self =this;
+      var renderTo = self.renderTo;
+      var computeStyle = getComputedStyle(renderTo);
+      self.userConfig.lockX = undefined === self.userConfig.lockX ? (computeStyle['overflow-x'] == "hidden" ? true:false) : self.userConfig.lockX;
+      self.userConfig.lockY = undefined === self.userConfig.lockY ? (computeStyle['overflow-y'] == "hidden" ? true:false) : self.userConfig.lockY;
+      self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false:true) : self.userConfig.scrollbarX;
+      self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false:true) : self.userConfig.scrollbarY;
     },
     _initContainer: function() {
       var self = this;
