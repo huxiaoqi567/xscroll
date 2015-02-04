@@ -24,9 +24,8 @@
              self.snapColIndex = self.userConfig.snapColIndex;
              self.snapRowIndex = self.userConfig.snapRowIndex;
              prefix = self.userConfig.prefix;
-             self.xscroll && self.xscroll.on("afterrender", function() {
-                 self.render();
-             }) 
+                self.xscroll.render();
+                self.render();
          },
          pluginDestructor: function() {
              var self = this;
@@ -46,9 +45,6 @@
              self.snapColIndex = col;
              var top = self.snapRowIndex * snapHeight;
              var left = self.snapColIndex * snapWidth;
-
-             console.log(arguments)
-
              self.xscroll.scrollTo(left, top, userConfig.snapDuration, userConfig.snapEasing, callback);
          },
          //snap
