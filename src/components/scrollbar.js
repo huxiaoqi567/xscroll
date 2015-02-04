@@ -56,7 +56,7 @@ define(function(require, exports, module) {
 			self.indicate.style.cssText = size + "position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;"
 			self.scrollbar.appendChild(self.indicate);
 			self._update();
-			// self.hide();
+			self.hide(0);
 		},
 		_update: function(pos, duration, easing) {
 			var self = this;
@@ -133,11 +133,11 @@ define(function(require, exports, module) {
 			self.show();
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			self.isY ? self.indicate.style[transform] = "translateY(" + pos + "px) " + translateZ : self.indicate.style[transform] = "translateX(" + pos + "px) " + translateZ
-			if (Util.isBadAndroid()) {
-				self.indicate.style[transitionDuration] = "0.001s";
-			} else {
+			// if (Util.isBadAndroid()) {
+			// 	self.indicate.style[transitionDuration] = "0.001s";
+			// } else {
 				self.indicate.style[transition] = "";
-			}
+			// }
 		},
 		_bindEvt: function() {
 			var self = this;
@@ -145,7 +145,8 @@ define(function(require, exports, module) {
 			self.__isEvtBind = true;
 			var type = self.isY ? "y" : "x";
 			var isBoundryOut = function(type) {
-				return type == "x" ? (self.xscroll.getBoundryOutLeft() >= 0 || self.xscroll.getBoundryOutRight() >= 0) : (self.xscroll.getBoundryOutTop() >= 0 || self.xscroll.getBoundryOutBottom() >= 0);
+				return type == "x" ? (self.xscroll.isBoundryOutLeft() || self.xscroll.isBoundryOutRight()) : (self.xscroll.isBoundryOutTop() || self.xscroll.isBoundryOutBottom());
+				// return type == "x" ? (self.xscroll.getBoundryOutLeft() >= 0 || self.xscroll.getBoundryOutRight() >= 0) : (self.xscroll.getBoundryOutTop() >= 0 || self.xscroll.getBoundryOutBottom() >= 0);
 			}
 			if (self.xscroll.userConfig.useTransition) {
 				self.xscroll.on("pan", function(e) {
@@ -181,19 +182,22 @@ define(function(require, exports, module) {
 			self.pos = 0;
 			self._update();
 		},
-		hide: function() {
+		hide: function(duration,easing,delay) {
 			var self = this;
-			// self.scrollbar.style.opacity = 0;
-			// self.scrollbar.style[transition] = "opacity 0.3s ease-out 0.5s";
+			var duration = duration>=0 ? duration: 300;
+			var easing = easing || "ease-out";
+			var delay = delay >= 0 ? delay : 500;
+			self.scrollbar.style.opacity = 0;
+			self.scrollbar.style[transition] = ["opacity ",duration,"ms " ," ease-out " ,delay,"ms"].join("");
 		},
 		show: function() {
 			var self = this;
 			self.scrollbar.style.opacity = 1;
-			if (Util.isBadAndroid()) {
-				self.scrollbar.style[transitionDuration] = "0.001s";
-			} else {
+			// if (Util.isBadAndroid()) {
+			// 	self.scrollbar.style[transitionDuration] = "0.001s";
+			// } else {
 				self.scrollbar.style[transition] = "";
-			}
+			// }
 		}
 	});
 

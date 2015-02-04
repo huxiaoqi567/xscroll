@@ -67,13 +67,10 @@ li{
       base: "../../src/"
     })
     seajs.use(["simulate-scroll","plugins/pulldown"],function(XScroll,PullDown){
-
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
     		lockX:true,
-    		scrollbarX:false,
-    		// useTransition:false
-    		// lockY:true
+    		scrollbarX:false
     	})
 
     	var pulldown = new PullDown() ;
@@ -86,7 +83,7 @@ li{
     	xscroll.render();
 
     	xscroll.on("panend",function(e){
-    		console.log(e.velocityY)
+    		// console.log(e.velocityY)
     	})
 
     	 xscroll.on("scrollend",function(e){

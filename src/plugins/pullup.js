@@ -76,15 +76,10 @@ define(function(require, exports, module) {
 			})
 
 			xscroll.on("scroll", function(e) {
-				// console.log(xscroll.containerHeight - e.scrollTop,xscroll.height)
 				if (xscroll.containerHeight - e.scrollTop > xscroll.height + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
 					self.__isBoundryOut = false;
 				}
-				// console.log(self.__isBoundryOut)
 			});
-
-
-
 			//load width a buffer
 			if (self.userConfig.bufferHeight > 0) {
 				xscroll.on("scroll", function(e) {
@@ -143,7 +138,6 @@ define(function(require, exports, module) {
 		},
 		reset: function(callback) {
 			this.xscroll.boundry.resetBottom()
-				// this.xscroll.bounce(true, callback);
 			this.xscroll.boundryCheckY();
 			this._expanded = false;
 		},

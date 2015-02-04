@@ -1,0 +1,254 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<style type="text/css">
+* {
+	margin:0;
+	padding: 0;
+}
+li{
+	display: block;
+	line-height: 200px;
+	border: 1px solid;
+}
+#scroll{
+	position: absolute;
+	width:100%;
+	height: 100%;
+	overflow: scroll;
+	-webkit-overflow-scrolling:touch;
+}
+
+#slider{
+	width: 100%;
+	position: relative;
+	height: 200px;
+	font-size: 0;
+	overflow-x: scroll;
+	overflow-y:hidden;
+	-webkit-overflow-scrolling:touch;
+	white-space: nowrap;
+}
+
+#slider .item{
+	display: inline-block;
+	border:1px solid;
+	height: 200px;
+	font-size: 20px;
+	width: 320px;
+	background: red;
+}
+
+#slider .xs-container{
+	position: absolute;
+	width: 100%;
+}
+#slider .xs-content{
+	width: auto;
+	position: absolute;
+	/*width: 100%;*/
+}
+#inner{
+	height: 350px;
+	width: 200px;
+	margin:auto;
+	border:2px solid #ccc;
+	overflow: scroll;
+	-webkit-overflow-scrolling:touch;
+	position: relative;
+}
+
+
+</style>
+</head>
+<body>
+<div id="scroll">
+	<div class="xs-container">
+		<div class="xs-content">
+			<div id="slider">
+				<div class="xs-container">
+					<div class="xs-content">
+						<div class="item">1</div>
+						<div class="item">2</div>
+						<div class="item">3</div>
+						<div class="item">4</div>
+						<div class="item">5</div>
+					</div>
+				</div>
+			</div>
+			<ul>
+				<li>
+					
+					<div id="inner">
+						<div class='xs-container'>
+							<div class='xs-content'>
+								<div class="row">1</div>
+								<div class="row">2</div>
+								<div class="row">3</div>
+								<div class="row">4</div>
+								<div class="row">5</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<script src="../../lib/sea.js"></script>
+<script>
+	seajs.config({
+		base: "../../src/"
+	})
+	seajs.use(["xscroll"], function(XScroll) {
+
+		var bounce = true;
+
+		var useOriginScroll = /origin/.test(location.search);
+
+		var xscroll = new XScroll({
+			renderTo: "#scroll",
+			useOriginScroll: useOriginScroll,
+			lockX: true,
+			scrollbarX: false,
+			bounce: bounce
+		})
+
+		xscroll.render();
+
+		var slider = new XScroll({
+			renderTo: "#slider",
+			lockY: true,
+			scrollbarY: false,
+			useOriginScroll: useOriginScroll,
+			bounce: bounce
+		})
+
+		slider.render();
+
+
+		// xscroll.controller && xscroll.controller.add(slider);
+
+		// slider.renderTo.addEventListener("touchstart",function(){
+		// 	slider.mc.get("pan").set({enable:true});
+		// })
+
+		// slider.mc.on("panstart",function(e){
+		// 	// console.log(e.direction)
+		// 	if(e.direction == 2 || e.direction == 4){
+		// 		//disable	
+		// 		xscroll.mc.get("pan").set({enable:false})
+		// 	}else{
+		// 		slider.mc.get("pan").set({enable:false})
+
+		// 	}
+		// })
+
+		// slider.mc.on("panend",function(e){
+		// 	xscroll.mc.get("pan").set({enable:true})
+		// 	xscroll.mc.session.offsetDelta = {}
+		// 	console.log(xscroll.mc.session)
+		// })
+
+		var inner = new XScroll({
+			renderTo: "#inner",
+			lockX: true,
+			scrollbarX: false,
+			bounce: bounce,
+			useOriginScroll: useOriginScroll
+		})
+
+		inner.render();
+
+		// xscroll.controller && xscroll.controller.add(inner);
+
+
+
+		//   	xscroll.mc.on("pan",function(e){
+		//   		console.log(inner.getBoundryOutTop())
+		//   		if(inner.getBoundryOutTop() <= 0 && inner.getBoundryOutBottom() <= 0){
+		//   			console.log("enable")
+		//   			inner.mc.get("pan").set({enable:true})
+		//   		}
+		//   	});
+
+		// inner.mc.on("panstart",function(e){
+		// 	//down
+		// 	inner.boundryCheck(0);
+		// 	if(e.direction == 16 && inner.getBoundryOutTop() == 0){
+		// 		inner.mc.get("pan").set({enable:false})
+		// 	}
+
+		// 	if(e.direction == 8 && inner.getBoundryOutBottom() == 0){
+		// 		inner.mc.get("pan").set({enable:false})
+		// 	}
+		// });
+
+
+		//   	inner.mc.on("pan",function(e){
+		//   		//overtop
+		//   		if(inner.getBoundryOutTop() >= 0 ){
+		//   			inner.mc.get("pan").set({enable:false})
+		//   			xscroll.mc.get("pan").set({enable:true})
+		//   		}
+
+		//   		if(inner.getBoundryOutBottom() >= 0 ){
+		//   			inner.mc.get("pan").set({enable:false})
+		//   			xscroll.mc.get("pan").set({enable:true})
+		//   		}
+		//   		// console.log(inner.getBoundryOutTop())
+		//   		if(inner.getBoundryOutTop() <= 0 && inner.getBoundryOutBottom() <= 0){
+		//   			xscroll.mc.get("pan").set({enable:false})
+		//   		}
+		//   	});
+
+		//   	xscroll.renderTo.addEventListener("touchstart",function(){
+		//   		xscroll.mc.get("pan").set({enable:true})
+		//   	})
+
+		//   	inner.renderTo.addEventListener("touchstart",function(){
+		//   		inner.mc.get("pan").set({enable:true})
+		//   	})
+
+
+
+		// xscroll.on("scroll",function(e){
+		// console.log(e.scrollTop)
+		// })
+
+		window.slider = slider;
+		window.inner = inner;
+		window.xscroll = xscroll;
+	})
+</script>

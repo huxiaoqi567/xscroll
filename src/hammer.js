@@ -1665,7 +1665,6 @@ inherit(PanRecognizer, AttrRecognizer, {
     },
 
     emit: function(input) {
-        // console.log(input.deltaX,input.deltaY,this.options.threshold,input)
         this.pX = input.deltaX;
         this.pY = input.deltaY;
 
@@ -1675,6 +1674,11 @@ inherit(PanRecognizer, AttrRecognizer, {
         }
 
         this._super.emit.call(this, input);
+    },
+    reset:function(){
+        // console.log(this)
+
+        // console.log("panreset")
     }
 });
 
@@ -2132,7 +2136,6 @@ function Manager(element, options) {
 
     this.options = merge(options, Hammer.defaults);
     this.options.inputTarget = this.options.inputTarget || element;
-
     this.handlers = {};
     this.session = {};
     this.recognizers = [];

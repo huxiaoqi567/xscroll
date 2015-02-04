@@ -4,11 +4,10 @@ define(function(require, exports, module) {
     Base = require('./base'),
     Core = require('./core'),
     Animate = require('./animate'),
-    ScrollBar = require('./components/scrollbar');
-
-
+    ScrollBar = require('./components/scrollbar'),
+    Controller = require('./components/controller');
   //reduced boundry pan distance
-  var PAN_RATE = 0.36;
+  var PAN_RATE = 0.3;
   //constant acceleration for scrolling
   var SROLL_ACCELERATION = 0.001;
   //boundry checked bounce effect
@@ -29,7 +28,16 @@ define(function(require, exports, module) {
     init: function() {
       var self = this;
       SimuScroll.superclass.init.call(this);
+      self.defaltConfig = {
+        lockY:self.userConfig.lockY,
+        lockX:self.userConfig.lockX
+      }
       self.boundryCheckEnabled = true;
+    },
+    resetDefaultConfig:function(){
+      var self = this;
+      self.userConfig.lockX = self.defaltConfig.lockX;
+      self.userConfig.lockY = self.defaltConfig.lockY;
     },
     _initContainer: function() {
       var self = this;
@@ -52,12 +60,12 @@ define(function(require, exports, module) {
     },
 
     getScrollTop: function() {
-      if (this.lockY) return 0;
+      // if (this.userConfig.lockY) return 0;
       var transY = window.getComputedStyle(this.container)[transform].match(/[-\d\.*\d*]+/g);
       return transY ? Math.round(transY[5]) === 0 ? 0 : -Math.round(transY[5]) : 0;
     },
     getScrollLeft: function() {
-      if (this.lockX) return 0;
+      // if (this.userConfig.lockX) return 0;
       var transX = window.getComputedStyle(this.content)[transform].match(/[-\d\.*\d*]+/g);
       return transX ? Math.round(transX[4]) === 0 ? 0 : -Math.round(transX[4]) : 0;
     },
@@ -106,13 +114,17 @@ define(function(require, exports, module) {
         useTransition: self.userConfig.useTransition,
         end: function(e) {
           callback && callback();
-          self['isScrolling' + type.toUpperCase()] = false;
-          self.trigger("scrollend", {
-            type: "scrollend",
-            scrollTop: self.getScrollTop(),
-            scrollLeft: self.getScrollLeft(),
-            zoomType: type
-          });
+          if((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear"){
+            self['isScrolling' + type.toUpperCase()] = false;
+            self.trigger("scrollend", {
+              type: "scrollend",
+              scrollTop: self.getScrollTop(),
+              scrollLeft: self.getScrollLeft(),
+              zoomType: type,
+              duration:duration,
+              easing:easing
+            });
+          }
         }
       };
       var timer = self.__timers[type] = self.__timers[type] || new Animate(el, config);
@@ -178,12 +190,15 @@ define(function(require, exports, module) {
       var self = this;
       var scrollLeft = self.getScrollLeft();
       var scrollTop = self.getScrollTop();
-      self.stop();
-      self.translate(-scrollLeft, -scrollTop);
+      // self.stop();
+      // self.translate(-scrollLeft, -scrollTop);
       self.trigger("panstart", Util.mix(e, {
         scrollTop: scrollTop,
         scrollLeft: scrollLeft
       }));
+      var threshold = self.mc.get("pan").options.threshold;
+      self.thresholdY = e.direction == "8" ? threshold : e.direction == "16" ? -threshold : 0;
+      self.thresholdX = e.direction == "2" ? threshold : e.direction == "4" ? -threshold : 0;
       return self;
     },
 
@@ -192,11 +207,13 @@ define(function(require, exports, module) {
       var boundry = self.boundry;
       var scrollTop = self.__topstart || (self.__topstart = -self.getScrollTop());
       var scrollLeft = self.__leftstart || (self.__leftstart = -self.getScrollLeft());
-      var threshold = self.mc.get("pan").options.threshold || 0;
-      var y = self.userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + e.deltaY;
-      var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + e.deltaX;
+      var y = self.userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY+self.thresholdY);
+      var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX+self.thresholdX);
       var containerWidth = self.containerWidth;
       var containerHeight = self.containerHeight;
+
+      // var PAN_RATE = self.userConfig.bounce ? PAN_RATE : 0;
+
       //over top
       y = y > boundry.top ? (y - boundry.top) * PAN_RATE + boundry.top : y;
       //over bottom
@@ -293,7 +310,7 @@ define(function(require, exports, module) {
       var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
       var size = boundryEnd - boundryStart;
       var transition = {};
-
+      
       if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
         self.boundryCheckX();
         return;
@@ -366,9 +383,15 @@ define(function(require, exports, module) {
       }
     },
     boundryCheckX: function(duration,easing,callback) {
-      var self = this,
-          duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
-          easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
+      var self = this;
+       if(typeof arguments[0] == "function"){
+        callback = arguments[0];
+        duration = self.userConfig.BOUNDRY_CHECK_DURATION;
+        easing = self.userConfig.BOUNDRY_CHECK_EASING;
+      }else{
+        duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
+        easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
+      }
       if (!self.boundryCheckEnabled || self.userConfig.lockX) return;
       var pos = self.getScrollLeft();
       var containerWidth = self.containerWidth;
@@ -380,9 +403,15 @@ define(function(require, exports, module) {
       }
     },
     boundryCheckY: function(duration,easing,callback) {
-      var self = this,
-          duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
-          easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
+       var self = this;
+      if(typeof arguments[0] == "function"){
+        callback = arguments[0];
+        duration = self.userConfig.BOUNDRY_CHECK_DURATION;
+        easing = self.userConfig.BOUNDRY_CHECK_EASING;
+      }else{
+        duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
+        easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
+      }
       if (!self.boundryCheckEnabled || self.userConfig.lockY) return;
       var pos = self.getScrollTop();
       var containerHeight = self.containerHeight;
@@ -415,10 +444,11 @@ define(function(require, exports, module) {
     render: function() {
       var self = this;
       SimuScroll.superclass.render.call(this);
-      // self.renderScrollBars();
+      self.initScrollBars();
+      self.initController();
       return self;
     },
-    renderScrollBars: function() {
+    initScrollBars: function() {
       var self = this;
       if (self.userConfig.scrollbarX) {
         self.scrollbarX = self.scrollbarX || new ScrollBar({
@@ -436,6 +466,12 @@ define(function(require, exports, module) {
         self.scrollbarY._update();
         self.scrollbarY.hide();
       }
+    },
+    initController:function(){
+      var self = this;
+      self.controller = self.controller || new Controller({
+        xscroll:self
+      });
     }
   });
 

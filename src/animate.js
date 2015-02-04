@@ -278,12 +278,12 @@ define(function(require, exports, module) {
 						css(self.el, i, value);
 					}
 				}
-				if (Util.isBadAndroid()) {
+				// if (Util.isBadAndroid()) {
 					//can't stop by "none" or "" property
-					self.el.style[vendorTransitionDuration] = "1ms";
-				} else {
+					// self.el.style[vendorTransitionDuration] = "1ms";
+				// } else {
 					self.el.style[vendorTransition] = "none";
-				}
+				// }
 			}
 			self.timer && self.timer.stop() && self.timer.reset();
 			return self;
