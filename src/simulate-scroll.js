@@ -71,12 +71,10 @@ define(function(require, exports, module) {
     },
 
     getScrollTop: function() {
-      // if (this.userConfig.lockY) return 0;
       var transY = window.getComputedStyle(this.container)[transform].match(/[-\d\.*\d*]+/g);
       return transY ? Math.round(transY[5]) === 0 ? 0 : -Math.round(transY[5]) : 0;
     },
     getScrollLeft: function() {
-      // if (this.userConfig.lockX) return 0;
       var transX = window.getComputedStyle(this.content)[transform].match(/[-\d\.*\d*]+/g);
       return transX ? Math.round(transX[4]) === 0 ? 0 : -Math.round(transX[4]) : 0;
     },
@@ -107,7 +105,7 @@ define(function(require, exports, module) {
     _animate: function(type, transform, duration, easing, callback) {
       var self = this;
       var duration = duration || 0;
-      var easing = easing || self.userConfig.easing;
+      var easing = easing || "quadratic";
       var el = type == "y" ? self.container : self.content;
       var config = {
         css: {
@@ -225,8 +223,14 @@ define(function(require, exports, module) {
 
       // var PAN_RATE = self.userConfig.bounce ? PAN_RATE : 0;
 
+      // 1/2 * a * 2^(s/a)
+      // 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
       //over top
       y = y > boundry.top ? (y - boundry.top) * PAN_RATE + boundry.top : y;
+      // var xx = self.height*0.3;
+      // y = y > boundry.top ? 2 *  xx* Math.pow(0.5, xx / y) : y;
+
+
       //over bottom
       y = y < boundry.bottom - containerHeight ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : y;
       //over left
@@ -356,7 +360,7 @@ define(function(require, exports, module) {
       } else {
         transition.pos = s;
         transition.duration = t;
-        transition.easing = self.userConfig.easing;
+        transition.easing = Math.abs(v) > 2 ? "circular" : "quadratic";
         transition.status = "normal";
         self["_bounce" + type] = 0;
       }

@@ -1,0 +1,26 @@
+<script src="../../lib/sea.js"></script>
+<script>
+	seajs.config({
+      base: "../../src/"
+    })
+
+    seajs.use(["timer"],function(Timer){
+
+    	var timer = new Timer({
+    		duration:0.001
+
+    	});
+
+    	timer.on("end",function(){
+    		console.log('end')
+    	})
+
+    	timer.on("run",function(e){
+    		console.log(e.percent)
+    	})
+
+    	timer.run();
+
+
+    });
+ </script>

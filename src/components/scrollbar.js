@@ -133,11 +133,7 @@ define(function(require, exports, module) {
 			self.show();
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			self.isY ? self.indicate.style[transform] = "translateY(" + pos + "px) " + translateZ : self.indicate.style[transform] = "translateX(" + pos + "px) " + translateZ
-			// if (Util.isBadAndroid()) {
-			// 	self.indicate.style[transitionDuration] = "0.001s";
-			// } else {
-				self.indicate.style[transition] = "";
-			// }
+			self.indicate.style[transition] = "";
 		},
 		_bindEvt: function() {
 			var self = this;
@@ -166,7 +162,7 @@ define(function(require, exports, module) {
 			
 
 			self.xscroll.on("panend", function(e) {
-				if (Math.abs(e.velocity == 0) && !isBoundryOut(type)) {
+				if (Math.abs(e.velocity) == 0 && !isBoundryOut(type)) {
 					self.hide();
 				}
 			});
@@ -186,18 +182,14 @@ define(function(require, exports, module) {
 			var self = this;
 			var duration = duration>=0 ? duration: 300;
 			var easing = easing || "ease-out";
-			var delay = delay >= 0 ? delay : 500;
+			var delay = delay >= 0 ? delay : 100;
 			self.scrollbar.style.opacity = 0;
 			self.scrollbar.style[transition] = ["opacity ",duration,"ms " ," ease-out " ,delay,"ms"].join("");
 		},
 		show: function() {
 			var self = this;
 			self.scrollbar.style.opacity = 1;
-			// if (Util.isBadAndroid()) {
-			// 	self.scrollbar.style[transitionDuration] = "0.001s";
-			// } else {
-				self.scrollbar.style[transition] = "";
-			// }
+			self.scrollbar.style[transition] = "";
 		}
 	});
 

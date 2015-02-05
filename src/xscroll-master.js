@@ -20,7 +20,6 @@ define(function(require, exports, module) {
 			var self = this;
 			if(!id) return;
 			for(var i =0,l = self.__xscrolls.length;i<l;i++){
-				console.log(self.__xscrolls[i].renderTo.id)
 				if(self.__xscrolls[i].renderTo.id === id){
 					return self.__xscrolls[i];
 				}

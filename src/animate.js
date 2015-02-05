@@ -191,14 +191,22 @@ define(function(require, exports, module) {
 	Util.extend(Animate, Base, {
 		run: function() {
 			var self = this;
-			// self.__isTransitionEnd = false;
 			var cfg = self.cfg,
 				el = self.el,
 				duration = cfg.duration || 0,
 				easing = cfg.easing || "ease",
 				delay = cfg.delay || 0;
-			// self.stop();
+
 			self.timer && self.timer.run();
+			
+			if(duration <= Timer.MIN_DURATION){
+				for (var i in cfg.css) {
+					css(el,i,cfg.css[i]);
+				}
+				self.stop()
+				return;
+			}
+
 			if (cfg.useTransition) {
 				//transition
 				el.style[vendorTransition] = Util.substitute('all {duration}ms {easing} {delay}ms', {
@@ -230,7 +238,6 @@ define(function(require, exports, module) {
 
 				self.timer.off("run", cssRun);
 				self.timer.on("run", cssRun);
-
 				self.timer.off("stop", self.__handlers.stop);
 				self.timer.on("stop", self.__handlers.stop, self);
 			}
@@ -250,27 +257,26 @@ define(function(require, exports, module) {
 					'scale({scaleX},{scaleY})', newTrans);
 				el.style[vendorTransform] = ret;
 			},
-			cssRun: function(e) {
-				var self = this;
-				var cfg = self.cfg;
-				for (var i in cfg.css) {
-					if (!/transform/.test(i)) {
-						setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
-					}
-				}
-			},
+			// cssRun: function(e) {
+			// 	var self = this;
+			// 	var cfg = self.cfg;
+			// 	for (var i in cfg.css) {
+			// 		if (!/transform/.test(i)) {
+			// 			setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
+			// 		}
+			// 	}
+			// },
 			stop: function(e) {
 				var self = this;
 				var cfg = self.cfg;
 				cfg.end && cfg.end({
 					percent: 1
 				});
-				// self.stop();
 			}
 		},
 		stop: function() {
 			var self = this;
-			if (self.cfg.useTransition) {
+			if (self.cfg.useTransition && self.cfg.duration > Timer.MIN_DURATION) {
 				var computeStyle = window.getComputedStyle(this.el);
 				for (var i in self.cfg.css){
 					if (animAttrs[i]) {
@@ -278,12 +284,7 @@ define(function(require, exports, module) {
 						css(self.el, i, value);
 					}
 				}
-				// if (Util.isBadAndroid()) {
-					//can't stop by "none" or "" property
-					// self.el.style[vendorTransitionDuration] = "1ms";
-				// } else {
-					self.el.style[vendorTransition] = "none";
-				// }
+				self.el.style[vendorTransition] = "none";
 			}
 			self.timer && self.timer.stop() && self.timer.reset();
 			return self;

@@ -60,13 +60,6 @@ define(function(require, exports, module) {
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.xscroll = xscroll;
-			if (self.userConfig.zoomType == "x") {
-				xscroll.userConfig.lockY = true;
-				xscroll.userConfig.scrollbarY = false;
-			} else {
-				xscroll.userConfig.lockX = true;
-				xscroll.userConfig.scrollbarX = false;
-			}
 			self.isY = !!(self.userConfig.zoomType == "y");
 			self._nameTop = self.isY ? "_top" : "_left";
 			self._nameHeight = self.isY ? "_height" : "_width";
@@ -82,7 +75,7 @@ define(function(require, exports, module) {
 			xscroll.on("afterrender", function() {
 				self.render();
 				self._bindEvt();
-			})
+			});
 		},
 		_initInfinite: function() {
 			var self = this;
@@ -120,7 +113,7 @@ define(function(require, exports, module) {
 			//create sticky element
 			if (!self._isStickyRendered) {
 				var sticky = document.createElement("div");
-				sticky.style.position = "absolute";
+				sticky.style.position = "fixed";
 				sticky.style[self.nameTop] = "0";
 				sticky.style.display = "none";
 				self.xscroll.renderTo.appendChild(sticky);
@@ -184,20 +177,14 @@ define(function(require, exports, module) {
 			}
 			xscroll[self.nameContainerHeight] = containerSize;
 			xscroll.container.style[self.nameHeight] = containerSize + "px";
-			// self.renderScrollBars();
-			//渲染非回收元素
 			self._renderNoRecycledEl();
-			//强制刷新
 			self._update(self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft(), true);
 		},
 		_stickyHandler: function(_pos) {
 			var self = this;
-
 			if (!self.stickyDomInfoLength) return;
 			var pos = Math.abs(_pos);
-			//视区上方的sticky索引
 			var index = [];
-			//所有sticky的top值
 			var allTops = [];
 			for (var i = 0; i < self.stickyDomInfoLength; i++) {
 				allTops.push(self.stickyDomInfo[i][self._nameTop]);
@@ -224,7 +211,6 @@ define(function(require, exports, module) {
 				}
 			}
 
-			//如果超过第一个sticky则隐藏
 			if (-_pos < Math.min.apply(null, allTops)) {
 				self.stickyElement.style.display = "none";
 				self.curStickyIndex = undefined;
@@ -306,7 +292,6 @@ define(function(require, exports, module) {
 			var elementsPos = self._getElementsPos(pos);
 			var changedRows = self._getChangedRows(elementsPos, force);
 			var el = null;
-			//若强制刷新 则重新初始化dom
 			if (force) {
 				for (var i = 0; i < self.infiniteLength; i++) {
 					self.infiniteElementsCache[i]._visible = false;
@@ -314,7 +299,6 @@ define(function(require, exports, module) {
 					delete self.infiniteElementsCache[i][self._nameRow];
 				}
 			}
-			//获取可用的节点
 			var getElIndex = function() {
 					for (var i = 0; i < self.infiniteLength; i++) {
 						if (!self.infiniteElementsCache[i]._visible) {
@@ -323,7 +307,6 @@ define(function(require, exports, module) {
 						}
 					}
 				}
-				//回收已使用的节点
 			var setEl = function(row) {
 				for (var i = 0; i < self.infiniteLength; i++) {
 					if (self.infiniteElementsCache[i][self._nameRow] == row) {

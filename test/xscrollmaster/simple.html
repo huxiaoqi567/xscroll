@@ -266,5 +266,14 @@ li{
 
 		slider.render();
 
+
+		var pagewrapper = master.get("pagewrapper");
+		pagewrapper.plug(new Snap({
+			snapWidth:pagewrapper.width -4,
+			snapColsNum:4
+		}))
+
+		pagewrapper.render();
+
 	})
 </script>

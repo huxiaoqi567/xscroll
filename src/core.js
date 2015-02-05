@@ -118,7 +118,6 @@ define(function(require, exports, module) {
                 BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
                 BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,
                 BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
-                easing: "quadratic",
                 clsPrefix: "xs-",
                 simulateScroll: false
             }, self.userConfig);

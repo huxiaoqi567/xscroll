@@ -21,7 +21,6 @@ define(function(require, exports, module) {
 		}, cfg);
 	}
 
-
 	Util.extend(Scale, Base, {
 		pluginId: "scale",
 

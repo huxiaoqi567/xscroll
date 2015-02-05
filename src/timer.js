@@ -81,6 +81,8 @@ define(function(require, exports, module) {
 		}, cfg)
 	}
 
+	Timer.MIN_DURATION = 1;
+
 	Util.extend(Timer, Base, {
 		reset: function(cfg) {
 			var self = this;
@@ -92,12 +94,14 @@ define(function(require, exports, module) {
 		run: function() {
 			var self = this;
 			var duration = self.cfg.duration;
-			if(duration <= 0){
+			if(duration <= Timer.MIN_DURATION){
 				self.isfinished = true;
+				self.trigger("run", {
+					percent: 1
+				});
 				self.trigger("end", {
 					percent: 1
 				});
-				return;
 			}
 			if(self.isfinished) return;
 			self._hasFinishedPercent = self._stop && self._stop.percent || 0;
