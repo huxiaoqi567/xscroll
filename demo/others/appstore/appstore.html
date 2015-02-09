@@ -45,7 +45,7 @@
 	<div id="content" class="xscroll">
 	<div class="xs-container">
 		<div class="xs-content">
-	<div id="ppt" class="xscroll1" xs-cfg='{"scrollbarX":false}'>
+	<div id="ppt" class="xscroll" xs-cfg='{"scrollbarX":false}'>
 		<div class="xs-container">
 			<div class="xs-content">
 				<a href="#"><img src="http://a2.mzstatic.com/us/r30/Features3/v4/ea/04/0c/ea040c6c-bee1-a75a-9da8-d7ed64229db5/image-640x260ip.jpeg"  width="320"></a>
@@ -349,7 +349,7 @@
 
 	seajs.use(["xscroll-master","plugins/snap"], function(XScrollMaster,Snap) {
 		var master = new XScrollMaster({
-			selector:".xscroll1"
+			selector:".xscroll"
 		});
 		master.render();
 
