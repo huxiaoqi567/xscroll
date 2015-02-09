@@ -27,11 +27,8 @@ define(function(require, exports, module) {
   Util.extend(SimuScroll, Core, {
     init: function() {
       var self = this;
-
       SimuScroll.superclass.init.call(this);
-
       self._initContainer();
-
       self.resetSize();
       //set overflow behaviors
       self._setOverflowBehavior();
@@ -50,8 +47,6 @@ define(function(require, exports, module) {
       var computeStyle = getComputedStyle(renderTo);
       self.userConfig.lockX = undefined === self.userConfig.lockX ? ((computeStyle['overflow-x'] == "hidden" || self.width == self.containerWidth) ? true:false) : self.userConfig.lockX;
       self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == "hidden" || self.height == self.containerHeight) ? true:false) : self.userConfig.lockY;
-      
-      console.log(self.height ,self.containerHeight,self.userConfig.lockY)
       self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false:true) : self.userConfig.scrollbarX;
       self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false:true) : self.userConfig.scrollbarY;
     },
@@ -66,14 +61,7 @@ define(function(require, exports, module) {
       var renderTo = self.renderTo;
       var container = self.container = self.renderTo.querySelector("." + self.containerClsName);
       var content = self.content = self.renderTo.querySelector("." + self.contentClsName);
-      
-      // container.style.position = "absolute";
-      // container.style.minHeight = "100%";
-      // container.style.minWidth = "100%";
       container.style[transformOrigin] = "0 0";
-      // content.style.position = "absolute";
-      // content.style.minHeight = "100%";
-      // content.style.minWidth = "100%";
       content.style[transformOrigin] = "0 0";
       self.translate(0, 0);
       self.__isContainerInited = true;
@@ -197,6 +185,7 @@ define(function(require, exports, module) {
       //window resize
       window.addEventListener("resize",function(e){
         setTimeout(function(){
+          self.resetSize();
           self.boundryCheck(0);
           self.render();
         },100);
