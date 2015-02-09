@@ -88,7 +88,7 @@ define(function(require, exports, module) {
 						xscroll.userConfig.lockY = true;
 					}
 				}
-
+				//horizontal scroll enabled
 				if (!sub.userConfig.lockX && !xscroll.userConfig.lockX) {
 					if (sub.isBoundryOut()) {
 						xscroll.userConfig.lockX = true;

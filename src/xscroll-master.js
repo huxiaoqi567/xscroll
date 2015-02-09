@@ -41,9 +41,24 @@ define(function(require, exports, module) {
 			}
 			var els = document.querySelectorAll(self.userConfig.selector);
 			self.__xscrolls = [];
+			var elpos = []
+			for (var i = 0; i < els.length; i++) {
+				var content = els[i].querySelector('.xs-content');
+				elpos.push({
+					el:els[i],
+					containerWidth:content.offsetWidth,
+					containerHeight:content.offsetHeight,
+					width:els[i].offsetWidth,
+					height:els[i].offsetHeight
+				})
+			}
 			for (var i = 0; i < els.length; i++) {
 				self.__xscrolls.push(new XScroll({
-					renderTo: els[i]
+					renderTo: els[i],
+					containerWidth:elpos[i].containerWidth,
+					containerHeight:elpos[i].containerHeight,
+					width:elpos[i].width,
+					height:elpos[i].height
 				}).render());
 			}
 			for (var i = 0, l = self.__xscrolls.length; i < l; i++) {
@@ -54,7 +69,10 @@ define(function(require, exports, module) {
 						self.__xscrolls[i].controller.add(xscroll);
 					}
 				}
+				console.log(self.__xscrolls[i].userConfig)
 			}
+
+
 		}
 	});
 

@@ -108,7 +108,7 @@ li{
 </style>
 </head>
 <body>
-<div id="scroll" class="xscroll">
+<div id="scroll" class="xscroll" xs-cfg='{"useTransition":true}'>
 	<div class="xs-container">
 		<div class="xs-content">
 			<div id="slider" class="xscroll">
@@ -249,7 +249,10 @@ li{
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
-		base: "../../src/"
+		base: "../../src/",
+		 map: [
+        [".js", ".js?" + new Date().getTime()]
+      ]
 	})
 	seajs.use(["xscroll-master","plugins/snap"], function(XScrollMaster,Snap) {
 		var bounce = true;

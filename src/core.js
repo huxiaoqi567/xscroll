@@ -2,7 +2,6 @@ define(function(require, exports, module) {
     var Util = require('./util'),
         Base = require('./base'),
         Animate = require('./animate');
-        // require('./hammer');
 
     function Boundry(cfg) {
         this.cfg = Util.mix({
@@ -110,7 +109,7 @@ define(function(require, exports, module) {
         version: "3.0.0",
         init: function() {
             var self = this;
-            var userConfig = self.userConfig = Util.mix({
+            var defaultCfg = {
                 preventDefault: true,
                 bounce: true,
                 useTransition: true,
@@ -120,12 +119,13 @@ define(function(require, exports, module) {
                 BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
                 clsPrefix: "xs-",
                 simulateScroll: false
-            }, self.userConfig);
+            };
             //generate guid
             self.guid = Util.guid();
-            self.renderTo = userConfig.renderTo.nodeType ? userConfig.renderTo : document.querySelector(userConfig.renderTo);
-            //timer for animtion
-            self.__timers = {};
+            self.renderTo = self.userConfig.renderTo.nodeType ? self.userConfig.renderTo : document.querySelector(self.userConfig.renderTo);
+            //config attributes on element
+            var elCfg = JSON.parse(self.renderTo.getAttribute('xs-cfg'));
+            var userConfig = self.userConfig = Util.mix(Util.mix(defaultCfg,elCfg), self.userConfig);
             self.SROLL_ACCELERATION = userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
             self.containerClsName = userConfig.clsPrefix + "container";
             self.contentClsName = userConfig.clsPrefix + "content";
@@ -177,15 +177,11 @@ define(function(require, exports, module) {
         },
         scrollLeft: function(scrollLeft, duration, easing, callback) {},
         scrollTop: function(scrollTop, duration, easing, callback) {},
-        render: function() {
+        resetSize:function(){
             var self = this;
             var userConfig = self.userConfig;
-            // console.log(userConfig)
-            self._initContainer();
-            var width = userConfig.width || self.renderTo.offsetWidth;
-            var height = userConfig.height || self.renderTo.offsetHeight || 0;
-            self.width = width;
-            self.height = height;
+            var width = self.width = userConfig.width || self.renderTo.offsetWidth;
+            var height = self.height = userConfig.height || self.renderTo.offsetHeight || 0;
             var containerWidth = userConfig.containerWidth || self.content.offsetWidth;
             var containerHeight = userConfig.containerHeight || self.content.offsetHeight;
             self.containerWidth = containerWidth < self.width ? self.width : containerWidth;
@@ -194,6 +190,10 @@ define(function(require, exports, module) {
                 width: self.width,
                 height: self.height
             });
+            return self;
+        },
+        render: function() {
+            var self = this;
             self.trigger(AFTER_RENDER);
             self._bindEvt();
             return self;

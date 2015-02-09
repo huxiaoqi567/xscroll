@@ -27,28 +27,38 @@ define(function(require, exports, module) {
   Util.extend(SimuScroll, Core, {
     init: function() {
       var self = this;
+
       SimuScroll.superclass.init.call(this);
-      self._getAttributes();
+
+      self._initContainer();
+
+      self.resetSize();
+      //set overflow behaviors
+      self._setOverflowBehavior();
+      //timer for animtion
+      self.__timers = {};
       self.defaltConfig = {
         lockY:self.userConfig.lockY,
         lockX:self.userConfig.lockX
       }
       self.boundryCheckEnabled = true;
     },
+     //get attributes from dom
+    _setOverflowBehavior:function(){
+      var self =this;
+      var renderTo = self.renderTo;
+      var computeStyle = getComputedStyle(renderTo);
+      self.userConfig.lockX = undefined === self.userConfig.lockX ? ((computeStyle['overflow-x'] == "hidden" || self.width == self.containerWidth) ? true:false) : self.userConfig.lockX;
+      self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == "hidden" || self.height == self.containerHeight) ? true:false) : self.userConfig.lockY;
+      
+      console.log(self.height ,self.containerHeight,self.userConfig.lockY)
+      self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false:true) : self.userConfig.scrollbarX;
+      self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false:true) : self.userConfig.scrollbarY;
+    },
     resetDefaultConfig:function(){
       var self = this;
       self.userConfig.lockX = self.defaltConfig.lockX;
       self.userConfig.lockY = self.defaltConfig.lockY;
-    },
-    //get attributes from dom
-    _getAttributes:function(){
-      var self =this;
-      var renderTo = self.renderTo;
-      var computeStyle = getComputedStyle(renderTo);
-      self.userConfig.lockX = undefined === self.userConfig.lockX ? (computeStyle['overflow-x'] == "hidden" ? true:false) : self.userConfig.lockX;
-      self.userConfig.lockY = undefined === self.userConfig.lockY ? (computeStyle['overflow-y'] == "hidden" ? true:false) : self.userConfig.lockY;
-      self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false:true) : self.userConfig.scrollbarX;
-      self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false:true) : self.userConfig.scrollbarY;
     },
     _initContainer: function() {
       var self = this;
@@ -56,14 +66,14 @@ define(function(require, exports, module) {
       var renderTo = self.renderTo;
       var container = self.container = self.renderTo.querySelector("." + self.containerClsName);
       var content = self.content = self.renderTo.querySelector("." + self.contentClsName);
-      renderTo.style.overflow = "hidden";
-      container.style.position = "absolute";
-      container.style.minHeight = "100%";
-      container.style.minWidth = "100%";
+      
+      // container.style.position = "absolute";
+      // container.style.minHeight = "100%";
+      // container.style.minWidth = "100%";
       container.style[transformOrigin] = "0 0";
-      content.style.position = "absolute";
-      content.style.minHeight = "100%";
-      content.style.minWidth = "100%";
+      // content.style.position = "absolute";
+      // content.style.minHeight = "100%";
+      // content.style.minWidth = "100%";
       content.style[transformOrigin] = "0 0";
       self.translate(0, 0);
       self.__isContainerInited = true;
@@ -156,7 +166,7 @@ define(function(require, exports, module) {
       if (self.__isEvtBind) return;
       self.__isEvtBind = true;
       var renderTo = self.renderTo;
-      var mc = self.mc = new Hammer.Manager(renderTo);
+      var mc = self.mc = new Hammer(renderTo);
       var tap = new Hammer.Tap();
       var pan = new Hammer.Pan();
       var pinch = new Hammer.Pinch();
@@ -459,9 +469,29 @@ define(function(require, exports, module) {
     render: function() {
       var self = this;
       SimuScroll.superclass.render.call(this);
+      //fixed for scrollbars
+      if(getComputedStyle(self.renderTo).position == "static"){
+        self.renderTo.style.position = "relative";
+      }
+      self.renderTo.style.overflow = "hidden";
       self.initScrollBars();
       self.initController();
+      //update touch-action 
+      self.initTouchAction();
       return self;
+    },
+    
+    initTouchAction:function(){
+      var self = this;
+      var touchAction = 'none';
+      if(!self.userConfig.lockX && self.userConfig.lockY){
+        touchAction = 'pan-y';
+      }else if(!self.userConfig.lockY && self.userConfig.lockX){
+        touchAction = 'pan-x';
+      }else if(self.userConfig.lockX && self.userConfig.lockY){
+        touchAction = 'auto';
+      }
+      self.mc.set({touchAction:touchAction});
     },
     initScrollBars: function() {
       var self = this;
