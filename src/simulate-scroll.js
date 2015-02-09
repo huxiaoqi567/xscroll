@@ -156,9 +156,9 @@ define(function(require, exports, module) {
       var renderTo = self.renderTo;
       var mc = self.mc = new Hammer(renderTo);
       var tap = new Hammer.Tap();
+      window.tap = tap;
       var pan = new Hammer.Pan();
       var pinch = new Hammer.Pinch();
-
       mc.add([tap, pan, pinch]);
       renderTo.addEventListener("touchstart", function(e) {
         self.stop();

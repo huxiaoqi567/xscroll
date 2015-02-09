@@ -44,6 +44,7 @@ define(function(require, exports, module) {
 			var maxScale = self.userConfig.maxScale;
 			var originX, originY,scale;
 			mc.on("tap", function(e) {
+				console.log("tapCount",e.tapCount)
 				//double tap
 				if (e.tapCount == 2) {
 					originX = (e.center.x - xscroll.x) / xscroll.containerWidth;

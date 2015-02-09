@@ -206,6 +206,7 @@
       })
 
       mc.on("tap", function(e) {
+        console.log(mc.get("tap").options)
         if (e.tapCount == 1) {
           if (!self.isScrollingX && !self.isScrollingY) {
             // simulateMouseEvent(e, 'click');
