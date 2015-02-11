@@ -70,7 +70,7 @@ define(function(require, exports, module) {
 				self.moveTo(barInfo.pos);
 			}
 		},
-		//计算边界碰撞时的弹性
+		//compute the position and size of the scrollbar
 		computeScrollBar: function(pos) {
 			var self = this;
 			var type = self.isY ? "y" : "x";
@@ -78,10 +78,10 @@ define(function(require, exports, module) {
 			var spacing = 10;
 			var boundry = self.xscroll.boundry;
 			self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
-			//视区尺寸
+			//viewport size
 			self.size = self.isY ? self.xscroll.height : self.xscroll.width;
 			self.indicateSize = self.isY ? self.xscroll.height - spacing : self.xscroll.width - spacing;
-			//滚动条容器高度
+			//scrollbar size
 			var indicateSize = self.indicateSize;
 			var containerSize = self.containerSize;
 			//pos bottom/right
@@ -142,7 +142,6 @@ define(function(require, exports, module) {
 			var type = self.isY ? "y" : "x";
 			var isBoundryOut = function(type) {
 				return type == "x" ? (self.xscroll.isBoundryOutLeft() || self.xscroll.isBoundryOutRight()) : (self.xscroll.isBoundryOutTop() || self.xscroll.isBoundryOutBottom());
-				// return type == "x" ? (self.xscroll.getBoundryOutLeft() >= 0 || self.xscroll.getBoundryOutRight() >= 0) : (self.xscroll.getBoundryOutTop() >= 0 || self.xscroll.getBoundryOutBottom() >= 0);
 			}
 			if (self.xscroll.userConfig.useTransition) {
 				self.xscroll.on("pan", function(e) {
@@ -152,7 +151,6 @@ define(function(require, exports, module) {
 					if (!e.zoomType || e.zoomType != type) return;
 					self._update(e[self.scrollTopOrLeft], e.duration, e.easing);
 				});
-				// self.xscroll.on("scaleanimate",function(e){self._update(e.pos);})
 			}else{
 				self.xscroll.on("scroll", function(e) {
 					self._update(e[self.scrollTopOrLeft]);

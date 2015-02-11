@@ -20,6 +20,7 @@
 	}
 	.slide{
 		height: 134px;
+		font-size: 0;
 	}
 	.banner{
 		height: 74px;
@@ -30,6 +31,10 @@
 	}
 	#ppt .xs-container,.slide .xs-container,.banner .xs-container{
 		position: absolute;
+	}
+
+	#ppt{
+		font-size: 0;
 	}
 
 	</style>
@@ -132,11 +137,11 @@
 	<div class="section">
 
 		<h3>Hello Games  <a class="act" href="#">See All <span>></span></a></h3>
-		<div class="xscroll1 slide" xs-cfg='{"scrollbarX":false}'>
+		<div class="xscroll slide" xs-cfg='{"scrollbarX":false}'>
 		<div class="xs-container">
 		<ul class=" xs-content">
 			
-			<li>
+			<!-- <li>
 				<a href="https://itunes.apple.com/us/app/monument-valley/id728293409?mt=8">
 					<span class="img"><img src="http://a5.mzstatic.com/us/r30/Purple1/v4/83/45/86/83458677-c4f1-ab01-fd83-08f190e5885f/icon160x160.jpeg" width="80" height="80"/><span></span></span>
 					<span class="title">Monument Valley</span>
@@ -149,7 +154,7 @@
 					<span class="title">Tiny Thief</span>
 					<span class="cat">Games</span>
 				</a>
-			</li>
+			</li> -->
 			<li>
 				<a href="https://itunes.apple.com/us/app/pudding-monsters/id569185650?mt=8">
 					<span class="img"><img src="http://a4.mzstatic.com/us/r30/Purple1/v4/28/c5/1d/28c51d0a-dda9-94b7-e26b-6cdd81256fdb/icon160x160.jpeg" width="80" height="80"/><span></span></span>
@@ -353,14 +358,14 @@
 		});
 		master.render();
 
-		// var slider = master.get("slider");
+		var slider = master.get("ppt");
 
-		// slider.plug(new Snap({
-		// 	snapWidth:rem2px(16),
-		// 	snapColsNum:5
-		// }))
+		slider.plug(new Snap({
+			snapWidth:slider.width,
+			snapColsNum:5
+		}))
 
-		// slider.render();
+		slider.render();
 
 	});
 </script>

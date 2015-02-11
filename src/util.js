@@ -185,6 +185,9 @@ define(function(require, exports, module) {
 		},
 		isBadAndroid: function() {
 			return /Android /.test(window.navigator.appVersion) && !(/Chrome\/\d/.test(window.navigator.appVersion))
+		},
+		px2Num:function(px){
+			return Number(px.replace(/px/,''));
 		}
 	}
 

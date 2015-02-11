@@ -87,10 +87,14 @@ define(function(require, exports, module) {
 					var elpos = self.getElPos();
 					for (var i = 0, l = self.__xscrolls.length; i < l; i++) {
 						var xscroll = self.__xscrolls[i];
-						xscroll.userConfig.containerWidth = elpos.containerWidth;
-						xscroll.userConfig.containerHeight = elpos.containerHeight;
-						xscroll.userConfig.width = elpos.width;
-						xscroll.userConfig.height = elpos.height;
+						xscroll.userConfig.containerWidth = elpos[i].containerWidth;
+						xscroll.userConfig.containerHeight = elpos[i].containerHeight;
+						xscroll.userConfig.width = elpos[i].width;
+						xscroll.userConfig.height = elpos[i].height;
+						xscroll.boundry.refresh({
+			                width: xscroll.userConfig.width,
+			                height: xscroll.userConfig.height
+			            });
 						xscroll.boundryCheck(0);
 						xscroll.render();
 					}

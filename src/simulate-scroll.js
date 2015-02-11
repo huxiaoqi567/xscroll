@@ -7,9 +7,10 @@ define(function(require, exports, module) {
     ScrollBar = require('./components/scrollbar'),
     Controller = require('./components/controller');
   //reduced boundry pan distance
-  var PAN_RATE = 0.3;
+  var PAN_RATE = 1 - 0.618;
   //constant acceleration for scrolling
   var SROLL_ACCELERATION = 0.001;
+  var BOUNDRY_ACCELERATION = 0.03;
   //boundry checked bounce effect
   var BOUNDRY_CHECK_DURATION = 500;
   var BOUNDRY_CHECK_EASING = "ease";
@@ -28,6 +29,8 @@ define(function(require, exports, module) {
     init: function() {
       var self = this;
       SimuScroll.superclass.init.call(this);
+      self.SROLL_ACCELERATION = self.userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
+      self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
       self._initContainer();
       self.resetSize();
       //set overflow behaviors
@@ -154,7 +157,7 @@ define(function(require, exports, module) {
       if (self.__isEvtBind) return;
       self.__isEvtBind = true;
       var renderTo = self.renderTo;
-      var mc = self.mc = new Hammer(renderTo);
+      var mc = self.mc = new Hammer.Manager(renderTo);
       var tap = new Hammer.Tap();
       window.tap = tap;
       var pan = new Hammer.Pan();
@@ -228,8 +231,6 @@ define(function(require, exports, module) {
       y = y > boundry.top ? (y - boundry.top) * PAN_RATE + boundry.top : y;
       // var xx = self.height*0.3;
       // y = y > boundry.top ? 2 *  xx* Math.pow(0.5, xx / y) : y;
-
-
       //over bottom
       y = y < boundry.bottom - containerHeight ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : y;
       //over left
@@ -268,10 +269,10 @@ define(function(require, exports, module) {
         duration = Math.max(transX.duration, transY.duration);
       }
       transX && self.scrollLeft(scrollLeft, duration || transX.duration, transX.easing, function(e) {
-        self._scrollEndHandler("x");
+        self.boundryCheckX();
       });
       transY && self.scrollTop(scrollTop, duration || transY.duration, transY.easing, function(e) {
-        self._scrollEndHandler("y");
+        self.boundryCheckY();
       });
       //judge the direction
       self.directionX = e.velocityX < 0 ? "left" : "right";
@@ -321,7 +322,7 @@ define(function(require, exports, module) {
       var boundryStart = type == "x" ? boundry.left : boundry.top;
       var boundryEnd = type == "x" ? boundry.right : boundry.bottom;
       var innerSize = type == "x" ? self.containerWidth : self.containerHeight;
-      var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 3;
+      var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 2;
       var size = boundryEnd - boundryStart;
       var transition = {};
       
@@ -337,64 +338,33 @@ define(function(require, exports, module) {
       if (type == "y" && self.userConfig.lockY) return;
       v = v > maxSpeed ? maxSpeed : v < -maxSpeed ? -maxSpeed : v;
       var a = self.SROLL_ACCELERATION * (v / (Math.abs(v) || 1));
+      var a2 = self.BOUNDRY_ACCELERATION;
       var t = isNaN(v / a) ? 0 : v / a;
       var s = Number(pos) + t * v / 2;
+      // transition.easing = "quadratic";
       //over top boundry check bounce
       if (s < boundryStart) {
         var _s = boundryStart - pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
-        transition.pos = -boundryStart;
-        transition.duration = _t;
-        transition.easing = "linear";
-        self["_bounce" + type] = v - a * _t;
-        //over bottom boundry check bounce
-      } else if (s > innerSize - boundryEnd) {
+        var v0 = v - a * _t;
+        var _t2 = Math.abs(v0/a2);
+        var s2 = 0.5 * v0 * _t2;
+        t = _t + _t2;
+        s = boundryStart + s2;
+      }else if(s > innerSize - boundryEnd){
         var _s = (boundryEnd - innerSize) + pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
-        transition.pos = innerSize - size;
-        transition.duration = _t;
-        transition.easing = "linear";
-        self["_bounce" + type] = v - a * _t;
-        // normal
-      } else {
-        transition.pos = s;
-        transition.duration = t;
-        transition.easing = Math.abs(v) > 2 ? "circular" : "quadratic";
-        transition.status = "normal";
-        self["_bounce" + type] = 0;
+        var v0 = v - a * _t;
+        var _t2 = Math.abs(v0/a2);
+        var s2 = 0.5 * v0 * _t2;
+        t = _t + _t2;
+        s = innerSize - boundryEnd  + s2;
       }
+      transition.pos = s;
+      transition.duration = t;
+      transition.easing = Math.abs(v) > 2 ? "circular" : "quadratic";
       self['isScrolling' + type.toUpperCase()] = true;
       return transition;
-
-    },
-
-    _scrollEndHandler: function(type) {
-      var self = this;
-      var TYPE = type.toUpperCase();
-      var scrollFn = type == "x" ? "scrollLeft" : "scrollTop";
-      var boundryCheckFn = "boundryCheck" + TYPE;
-      var _bounce = "_bounce" + type;
-      var v = self[_bounce];
-      if (!v) return;
-      var a = 0.01 * v / Math.abs(v);
-      var t = v / a;
-      var pos = type == "x" ? self.getScrollLeft() : self.getScrollTop();
-      var s = pos + t * v / 2;
-      var param = {
-        zoomType: type,
-        velocityX: 0,
-        velocityY: 0,
-        type: BOUNDRY_OUT
-      };
-      param["velocity" + TYPE] = self[_bounce];
-      self.trigger(BOUNDRY_OUT, param);
-
-      if (self.userConfig.bounce) {
-        self[scrollFn](s, t, "linear", function() {
-          self[_bounce] = 0;
-          self[boundryCheckFn]()
-        });
-      }
     },
     boundryCheckX: function(duration,easing,callback) {
       var self = this;

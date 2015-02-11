@@ -126,7 +126,6 @@ define(function(require, exports, module) {
             //config attributes on element
             var elCfg = JSON.parse(self.renderTo.getAttribute('xs-cfg'));
             var userConfig = self.userConfig = Util.mix(Util.mix(defaultCfg,elCfg), self.userConfig);
-            self.SROLL_ACCELERATION = userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
             self.containerClsName = userConfig.clsPrefix + "container";
             self.contentClsName = userConfig.clsPrefix + "content";
             self.boundry = new Boundry();
@@ -180,8 +179,9 @@ define(function(require, exports, module) {
         resetSize:function(){
             var self = this;
             var userConfig = self.userConfig;
-            var width = self.width = userConfig.width || self.renderTo.offsetWidth;
-            var height = self.height = userConfig.height || self.renderTo.offsetHeight || 0;
+            var renderToStyle = getComputedStyle(self.renderTo);
+            var width = self.width = (userConfig.width || self.renderTo.offsetWidth) - Util.px2Num(renderToStyle['padding-left']) - Util.px2Num(renderToStyle['padding-right']);
+            var height = self.height = (userConfig.height || self.renderTo.offsetHeight) - Util.px2Num(renderToStyle['padding-top']) - Util.px2Num(renderToStyle['padding-bottom']);;
             var containerWidth = userConfig.containerWidth || self.content.offsetWidth;
             var containerHeight = userConfig.containerHeight || self.content.offsetHeight;
             self.containerWidth = containerWidth < self.width ? self.width : containerWidth;
