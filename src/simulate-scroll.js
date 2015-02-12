@@ -8,8 +8,9 @@ define(function(require, exports, module) {
     Controller = require('./components/controller');
   //reduced boundry pan distance
   var PAN_RATE = 1 - 0.618;
-  //constant acceleration for scrolling
+  //constant for scrolling acceleration
   var SROLL_ACCELERATION = 0.001;
+  //constant for outside of boundry acceleration
   var BOUNDRY_ACCELERATION = 0.03;
   //boundry checked bounce effect
   var BOUNDRY_CHECK_DURATION = 500;
@@ -52,6 +53,19 @@ define(function(require, exports, module) {
       self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == "hidden" || self.height == self.containerHeight) ? true:false) : self.userConfig.lockY;
       self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false:true) : self.userConfig.scrollbarX;
       self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false:true) : self.userConfig.scrollbarY;
+    },
+    _clickDisabled:function(){
+      var self = this;
+      if(document.getElementById('xs-pointer-events-none')) return;
+      self.__style = document.createElement('style');
+      self.__style.innerHTML = '.xs-container a{pointer-events:none;}';
+      self.__style.id = 'xs-pointer-events-none';
+      document.head.appendChild(self.__style);
+    }, 
+    _clickEnabled:function(){
+      if(!this.__style) return;
+      var style = document.getElementById("xs-pointer-events-none");
+      style && style.remove();
     },
     resetDefaultConfig:function(){
       var self = this;
@@ -151,7 +165,17 @@ define(function(require, exports, module) {
       })
       return this;
     },
-
+    _triggerClick:function(e){
+      var target = e.target;
+      if ( !(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName) ) {
+      var ev = document.createEvent('MouseEvents');
+        ev.initMouseEvent('click', true, true, e.view, 1,
+          target.screenX, target.screenY, target.clientX, target.clientY,
+          e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+          0, null);
+        target.dispatchEvent(ev);
+      }
+    },
     _bindEvt: function() {
       var self = this;
       if (self.__isEvtBind) return;
@@ -159,13 +183,31 @@ define(function(require, exports, module) {
       var renderTo = self.renderTo;
       var mc = self.mc = new Hammer.Manager(renderTo);
       var tap = new Hammer.Tap();
-      window.tap = tap;
       var pan = new Hammer.Pan();
       var pinch = new Hammer.Pinch();
       mc.add([tap, pan, pinch]);
+      var isScrolling = false;
       renderTo.addEventListener("touchstart", function(e) {
+        e.preventDefault();
+           // isScrolling = self.isScrollingY || self.isScrollingX;
         self.stop();
       }, false);
+
+      renderTo.addEventListener("touchend", function(e) {
+        self.boundryCheck();
+      });
+
+
+
+      mc.on("tap", function(e) {
+        e.preventDefault();
+          if(!isScrolling){
+          //   console.log("true")
+            // self._clickEnabled();
+            // self._triggerClick(e);
+          }
+          isScrolling = false;
+      });
 
       mc.on("panstart", function(e) {
         self._onpanstart(e);
@@ -176,13 +218,13 @@ define(function(require, exports, module) {
       });
 
       mc.on("panend", function(e) {
-        if(self.getPlugin("snap")) {
-          self.__topstart = null;
-          self.__leftstart = null;
-          return;
-        }
         self._onpanend(e);
       });
+
+      self.on("scrollanimate",function(){
+        // self._clickDisabled();
+      });
+
 
       self.trigger("aftereventbind",{mc:mc});
       //window resize
@@ -259,12 +301,12 @@ define(function(require, exports, module) {
     _onpanend: function(e) {
       var self = this;
       var userConfig = self.userConfig;
-      var transX = self._bounce("x", e.velocityX);
-      var transY = self._bounce("y", e.velocityY);
+      var transX = self.computeScroll("x", e.velocityX);
+      var transY = self.computeScroll("y", e.velocityY);
       var scrollLeft = transX ? transX.pos : 0;
       var scrollTop = transY ? transY.pos : 0;
       var duration;
-      if (transX && transY && transX.status && transY.status && transX.duration && transY.duration) {
+      if (transX && transY && transX.status == "inside" && transY.status == "inside" && transX.duration && transY.duration) {
         //ensure the same duration
         duration = Math.max(transX.duration, transY.duration);
       }
@@ -314,7 +356,7 @@ define(function(require, exports, module) {
     getBoundryOutRight: function() {
       return this.boundry.right - this.containerWidth + this.getScrollLeft();
     },
-    _bounce: function(type, v) {
+    computeScroll: function(type, v) {
       var self = this;
       var userConfig = self.userConfig;
       var pos = type == "x" ? self.getScrollLeft() : self.getScrollTop();
@@ -325,7 +367,7 @@ define(function(require, exports, module) {
       var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 2;
       var size = boundryEnd - boundryStart;
       var transition = {};
-      
+      var status = "inside";
       if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
         self.boundryCheckX();
         return;
@@ -341,28 +383,30 @@ define(function(require, exports, module) {
       var a2 = self.BOUNDRY_ACCELERATION;
       var t = isNaN(v / a) ? 0 : v / a;
       var s = Number(pos) + t * v / 2;
-      // transition.easing = "quadratic";
       //over top boundry check bounce
       if (s < boundryStart) {
         var _s = boundryStart - pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0/a2);
-        var s2 = 0.5 * v0 * _t2;
+        var s2 = v0/2 * _t2;
         t = _t + _t2;
         s = boundryStart + s2;
+        status = "outside";
       }else if(s > innerSize - boundryEnd){
         var _s = (boundryEnd - innerSize) + pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0/a2);
-        var s2 = 0.5 * v0 * _t2;
+        var s2 =  v0/2 * _t2;
         t = _t + _t2;
         s = innerSize - boundryEnd  + s2;
+        status = "outside";
       }
       transition.pos = s;
       transition.duration = t;
       transition.easing = Math.abs(v) > 2 ? "circular" : "quadratic";
+      transition.status = status;
       self['isScrolling' + type.toUpperCase()] = true;
       return transition;
     },
@@ -416,11 +460,18 @@ define(function(require, exports, module) {
       self.__timers.x && self.__timers.x.stop();
       self.__timers.y && self.__timers.y.stop();
       if (self.isScrollingX || self.isScrollingY) {
+        var scrollTop = self.getScrollTop(),
+            scrollLeft = self.getScrollLeft();
         self.trigger("scrollend", {
           type: "scrollend",
-          scrollTop: self.getScrollTop(),
-          scrollLeft: self.getScrollLeft()
+          scrollTop: scrollTop,
+          scrollLeft: scrollLeft
         });
+        self.trigger("stop",{
+          stype:"stop",
+          scrollTop: scrollTop,
+          scrollLeft: scrollLeft
+        })
         self.isScrollingX = false;
         self.isScrollingY = false;
       }
@@ -437,6 +488,7 @@ define(function(require, exports, module) {
       self.initController();
       //update touch-action 
       self.initTouchAction();
+      // self._clickEnabled();
       return self;
     },
     

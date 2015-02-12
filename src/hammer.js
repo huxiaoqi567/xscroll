@@ -650,7 +650,7 @@ function getDirection(x, y) {
     if (x === y) {
         return DIRECTION_NONE;
     }
-
+    
     if (abs(x) >= abs(y)) {
         return x > 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
     }

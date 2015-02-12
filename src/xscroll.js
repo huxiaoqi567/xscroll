@@ -5,7 +5,7 @@ define(function(require, exports, module) {
 		OriginScroll = require('./origin-scroll');
 
 	var XScrollFactory = function(cfg) {
-		var XScroll = SimuScroll;
+		var XScroll =SimuScroll;
 		return new XScroll(cfg);
 	}
 

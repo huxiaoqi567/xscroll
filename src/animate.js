@@ -137,6 +137,7 @@ define(function(require, exports, module) {
 			delay = cfg.delay || 0;
 
 		self.transitionEndHandler = function(e) {
+			self.__isTransitionEnd = true;
 			if(e.target !== e.currentTarget) return;
 			self.__handlers.stop.call(self);
 		};
@@ -196,8 +197,10 @@ define(function(require, exports, module) {
 				duration = cfg.duration || 0,
 				easing = cfg.easing || "ease",
 				delay = cfg.delay || 0;
-
+			self.__isTransitionEnd = false;
+			clearTimeout(self.__itv)
 			self.timer && self.timer.run();
+
 			
 			if(duration <= Timer.MIN_DURATION){
 				for (var i in cfg.css) {
@@ -220,6 +223,12 @@ define(function(require, exports, module) {
 				}
 				el.removeEventListener(vendorTransitionEnd, self.transitionEndHandler);
 				el.addEventListener(vendorTransitionEnd, self.transitionEndHandler, false);
+				self.__itv = setTimeout(function(){
+					if(!self.__isTransitionEnd){
+						self.__isTransitionEnd = true;
+						self.__handlers.stop.call(self);
+					}
+				},Number(duration) + 60)
 			} else {
 				var computeStyle = window.getComputedStyle(el);
 				//transform
@@ -257,15 +266,6 @@ define(function(require, exports, module) {
 					'scale({scaleX},{scaleY})', newTrans);
 				el.style[vendorTransform] = ret;
 			},
-			// cssRun: function(e) {
-			// 	var self = this;
-			// 	var cfg = self.cfg;
-			// 	for (var i in cfg.css) {
-			// 		if (!/transform/.test(i)) {
-			// 			setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
-			// 		}
-			// 	}
-			// },
 			stop: function(e) {
 				var self = this;
 				var cfg = self.cfg;
