@@ -137,12 +137,21 @@
     seajs.use(["simulate-scroll","plugins/infinite"],function(XScroll,Infinite){
         var data = (function() {
             var tmp = [];
+            tmp.push({
+                data:{
+                    num:"sticky"
+                },
+                style:{
+                    position:"sticky"
+                }
+            });
             for (var i = 1; i <= 100; i++) {
                 tmp.push({
                     data:{num: i},
-                    style:{height:50}
+                    style:{height:50,background:"#fff","color":"#000"}
                 });
             }
+
             return tmp
         })()
         var xscroll = new XScroll({
@@ -162,6 +171,12 @@
         infinite.append(0,data);
         
         xscroll.render();
+
+        infinite.replace(0,0,{data:{num:"1111"},style:{height:100,position:"sticky",width:"100%",background:"#fff","color":"#000"}});
+
+        infinite.insertAfter(0,2,{data:{num:22222},style:{height:100,width:"100%",background:"red",position:"sticky","color":"#000"}});
+
+        infinite.insertBefore(0,0,{recycled:false,data:{num:"slider"},style:{height:150,background:"#000",color:"#fff"}});
 
         // infinite.remove(0,0,3);
 

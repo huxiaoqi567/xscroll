@@ -1,5 +1,5 @@
 /*
-	滚动嵌套控制
+	wrapped scroll controller
 */
 define(function(require, exports, module) {
 	var Util = require('../util'),

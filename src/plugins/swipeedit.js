@@ -31,7 +31,6 @@ define(function(require, exports, module) {
 			self.xscroll.on("aftereventbind",function(){
 				self._bindEvt();
 			})
-			
 		},
 		pluginDestructor: function(xscroll) {
 
@@ -46,60 +45,61 @@ define(function(require, exports, module) {
 			var xscroll = self.xscroll;
 			var mc = self.xscroll.mc;
 			var lbl = null;
-			// mc.on("panstart", function(e) {
-			// 	hasSlided = false;
-			// 	if (!e.cell || !e.cell.element) return;
-			// 	lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
-			// 	if (!lbl) return;
-			// 	startX = self.getTransformX(lbl);
-			// 	lbl.style[transition] = "none";
-			// 	if (Math.abs(startX) > 0 && !isSliding) {
-			// 		self.slideRight(e)
-			// 	}
-			// })
+			mc.on("panstart", function(e) {
+				hasSlided = false;
+				if (!e.cell || !e.cell.element) return;
+				lbl = e.cell.element.querySelector(self.userConfig.labelSelector);
+				if (!lbl) return;
+				startX = self.getTransformX(lbl);
+				lbl.style[transition] = "none";
+				if (Math.abs(startX) > 0 && !isSliding) {
+					self.slideRight(e)
+				}
+			})
 
-			// mc.on("pan", function(e) {
-			// 	if (!lbl) return;
-			// 	if (e.touch.directionX == "left") {
-			// 		self.slideAllExceptRow(e.cell._row);
-			// 	}
-			// 	/*
-		 //            1.水平位移大于垂直位移
-		 //            2.大于20px （参考值可自定） buffer
-		 //            3.向左
-		 //            */
-			// 	if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) / Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer) {
-			// 		isLocked = true;
-			// 		xscroll.userConfig.lockY = true;
-			// 		var left = startX + e.deltaX + buffer;
-			// 		if (left > 0) {
-			// 			return;
-			// 		}
-			// 		lbl.style[transition] = "none";
-			// 		lbl.style[transform] = "translateX(" + left + "px)"
-			// 	} else if (!isLocked) {
-			// 		xscroll.userConfig.lockY = false;
-			// 	}
-			// })
+			mc.on("pan", function(e) {
+				if (!lbl) return;
 
-			// mc.on("panend", function(e) {
-			// 	if (!lbl) return;
-			// 	isLocked = false;
-			// 	var cpt = self.getTransformX(lbl);
-			// 	if (e.touch.directionX == "left" && Math.abs(e.velocityX) > acc) {
-			// 		self.slideLeftHandler(e)
-			// 	} else if (Math.abs(cpt) < self.userConfig.width / 2) {
-			// 		self.slideRightHandler(e)
-			// 	} else if (Math.abs(cpt) >= self.userConfig.width / 2) {
-			// 		self.slideLeftHandler(e)
-			// 	}
-			// })
+				if (e.touch.directionX == "left") {
+					self.slideAllExceptRow(e.cell._row);
+				}
+				/*
+		            1.水平位移大于垂直位移
+		            2.大于20px （参考值可自定） buffer
+		            3.向左
+		            */
+				if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) / Math.abs(e.deltaY) > 4 && Math.abs(e.deltaX) > buffer) {
+					isLocked = true;
+					xscroll.userConfig.lockY = true;
+					var left = startX + e.deltaX + buffer;
+					if (left > 0) {
+						return;
+					}
+					lbl.style[transition] = "none";
+					lbl.style[transform] = "translateX(" + left + "px)"
+				} else if (!isLocked) {
+					xscroll.userConfig.lockY = false;
+				}
+			})
 
-			// document.body.addEventListener("webkitTransitionEnd", function(e) {
-			// 	if (new RegExp(self.userConfig.labelSelector.replace(/\./, "")).test(e.target.className)) {
-			// 		isSliding = false;
-			// 	}
-			// })
+			mc.on("panend", function(e) {
+				if (!lbl) return;
+				isLocked = false;
+				var cpt = self.getTransformX(lbl);
+				if (e.touch.directionX == "left" && Math.abs(e.velocityX) > acc) {
+					self.slideLeftHandler(e)
+				} else if (Math.abs(cpt) < self.userConfig.width / 2) {
+					self.slideRightHandler(e)
+				} else if (Math.abs(cpt) >= self.userConfig.width / 2) {
+					self.slideLeftHandler(e)
+				}
+			})
+
+			document.body.addEventListener("webkitTransitionEnd", function(e) {
+				if (new RegExp(self.userConfig.labelSelector.replace(/\./, "")).test(e.target.className)) {
+					isSliding = false;
+				}
+			})
 
 		},
 		slideLeft: function(row) {

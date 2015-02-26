@@ -170,11 +170,6 @@
 
         getData();
 
-        //数据集合
-        var ds = new Infinite.DataSet();
-
-        infinite.appendDataSet(ds);
-
          function getData(){
             if(!pageCache[page]){
                 pageCache[page] = 1;
@@ -189,7 +184,7 @@
                             xscroll.unplug(pullup);
                             return; 
                         };
-                        ds.appendData(data);
+                        infinite.append(0,data);
                         xscroll.render();
                          //loading complete
                         pullup.complete();

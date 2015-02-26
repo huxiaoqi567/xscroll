@@ -54,73 +54,81 @@ define(function(require, exports, module) {
 			self.elementsPos = {};
 			xscroll.on("scroll", function(e) {
 				self._update(-e[self.nameScrollTop]);
-				// self._stickyHandler(-e[self.nameScrollTop]);
+				self._stickyHandler(-e[self.nameScrollTop]);
 			});
 		},
-		// _initSticky: function() {
-		// 	var self = this;
-		// 	if (!self.hasSticky) return;
-		// 	//create sticky element
-		// 	if (!self._isStickyRendered) {
-		// 		var sticky = document.createElement("div");
-		// 		sticky.style.position = "fixed";
-		// 		sticky.style[self.nameTop] = "0";
-		// 		sticky.style.display = "none";
-		// 		self.xscroll.renderTo.appendChild(sticky);
-		// 		self.stickyElement = sticky;
-		// 		self._isStickyRendered = true;
-		// 	}
-		// 	self.stickyDomInfo = [];
-		// 	for (var i = 0, l = self.domInfo.length; i < l; i++) {
-		// 		if (self.domInfo[i] && self.domInfo[i].style && "sticky" == self.domInfo[i].style.position) {
-		// 			self.stickyDomInfo.push(self.domInfo[i]);
-		// 		}
-		// 	}
-		// 	self.stickyDomInfoLength = self.stickyDomInfo.length;
-		// },
-		// _formatData: function() {
-		// 	var self = this;
-		// 	var data = [];
-		// 	for (var i in self.datasets) {
-		// 		data = data.concat(self.datasets[i].getData());
-		// 	}
-		// 	return data;
-		// },
-		// _renderNoRecycledEl: function() {
-		// 	var self = this;
-		// 	var translateZ = self.userConfig.gpuAcceleration ? " translateZ(0) " : "";
-		// 	for (var i in self.domInfo) {
-		// 		if (self.domInfo[i]['recycled'] === false) {
-		// 			var el = self.domInfo[i].id && document.getElementById(self.domInfo[i].id.replace("#", "")) || document.createElement("div");
-		// 			var randomId = Util.guid("xs-row-");
-		// 			el.id = self.domInfo[i].id || randomId;
-		// 			self.domInfo[i].id = el.id;
-		// 			self.content.appendChild(el);
-		// 			for (var attrName in self.domInfo[i].style) {
-		// 				if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {
-		// 					el.style[attrName] = self.domInfo[i].style[attrName];
-		// 				}
-		// 			}
-		// 			el.style[self.nameTop] = 0;
-		// 			el.style.position = "absolute";
-		// 			el.style.display = "block";
-		// 			el.style[self.nameHeight] = self.domInfo[i][self._nameHeight] + "px";
-		// 			el.style[transform] = self.nameTranslate + "(" + self.domInfo[i][self._nameTop] + "px) " + translateZ;
-		// 			if (self.domInfo[i].className) {
-		// 				el.className = self.domInfo[i].className;
-		// 			}
-		// 			self.userConfig.renderHook.call(self, el, self.domInfo[i]);
-		// 		}
-		// 	}
-		// },
+		_initSticky: function() {
+			var self = this;
+			self.stickyDomInfo = [];
+			self.stickyDomInfoLength = 0;
+			if (!self.hasSticky) {
+				return;
+			}
+			//create sticky element
+			if (!self._isStickyRendered) {
+				var sticky = document.createElement("div");
+				sticky.style.position = "fixed";
+				sticky.style[self.nameTop] = "0";
+				sticky.style.display = "none";
+				self.xscroll.renderTo.appendChild(sticky);
+				self.stickyElement = sticky;
+				self._isStickyRendered = true;
+			}
+			for (var i in self.__serializedData) {
+				var sticky = self.__serializedData[i];
+				if (sticky && sticky.style && "sticky" == sticky.style.position) {
+					self.stickyDomInfo.push(sticky);
+				}
+			}
+			self.stickyDomInfoLength = self.stickyDomInfo.length;
+			console.log(self.stickyDomInfo)
+		},
+		_formatData: function() {
+			var self = this;
+			var data = [];
+			for (var i in self.datasets) {
+				data = data.concat(self.datasets[i].getData());
+			}
+			return data;
+		},
+		_renderUnRecycledEl: function() {
+			var self = this;
+			var translateZ = self.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+			for (var i in self.__serializedData) {
+				var  unrecycledEl = self.__serializedData[i];
+				if (self.__serializedData[i]['recycled'] === false) {
+					var el = unrecycledEl.id && document.getElementById(unrecycledEl.id.replace("#", "")) || document.createElement("div");
+					var randomId = Util.guid("xs-row-");
+					el.id = unrecycledEl.id || randomId;
+					unrecycledEl.id = el.id;
+					self.xscroll.content.appendChild(el);
+					for (var attrName in unrecycledEl.style) {
+						if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {
+							el.style[attrName] = unrecycledEl.style[attrName];
+						}
+					}
+					el.style[self.nameTop] = 0;
+					el.style.position = "absolute";
+					el.style.display = "block";
+					el.style[self.nameHeight] = unrecycledEl[self._nameHeight] + "px";
+					el.style[transform] = self.nameTranslate + "(" + unrecycledEl[self._nameTop] + "px) " + translateZ;
+					if (unrecycledEl.className) {
+						el.className = unrecycledEl.className;
+					}
+					self.userConfig.renderHook.call(self, el, unrecycledEl);
+				}
+			}
+		},
 		render: function() {
 			var self = this;
 			var xscroll = self.xscroll;
 			var offset = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
 			self._getDomInfo();
-			// self._initSticky();
+			self._initSticky();
 			var size = xscroll[self.nameHeight];
-			var lastSection = self.sections[Object.keys(self.sections).length - 1];
+			var sectionsLength = Object.keys(self.sections).length;
+			if(!sectionsLength) return;
+			var lastSection = self.sections[sectionsLength - 1];
 			var lastItem = lastSection[lastSection.length - 1];
 			var containerSize = (lastItem && lastItem[self._nameTop] !== undefined) ? lastItem[self._nameTop] + lastItem[self._nameHeight] : xscroll[self.nameHeight];
 			if (containerSize < size) {
@@ -128,49 +136,49 @@ define(function(require, exports, module) {
 			}
 			xscroll[self.nameContainerHeight] = containerSize;
 			xscroll.container.style[self.nameHeight] = containerSize + "px";
-			// self._renderNoRecycledEl();
+			self._renderUnRecycledEl();
 			self._update(offset);
 			self.update(offset);
 		},
 
-		// _stickyHandler: function(_pos) {
-		// 	var self = this;
-		// 	if (!self.stickyDomInfoLength) return;
-		// 	var pos = Math.abs(_pos);
-		// 	var index = [];
-		// 	var allTops = [];
-		// 	for (var i = 0; i < self.stickyDomInfoLength; i++) {
-		// 		allTops.push(self.stickyDomInfo[i][self._nameTop]);
-		// 		if (pos >= self.stickyDomInfo[i][self._nameTop]) {
-		// 			index.push(i);
-		// 		}
-		// 	}
-		// 	if (!index.length) {
-		// 		self.stickyElement.style.display = "none";
-		// 		self.curStickyIndex = undefined;
-		// 		return;
-		// 	}
-		// 	var curStickyIndex = Math.max.apply(null, index);
-		// 	if (self.curStickyIndex !== curStickyIndex) {
-		// 		self.curStickyIndex = curStickyIndex;
-		// 		self.userConfig.renderHook.call(self, self.stickyElement, self.stickyDomInfo[self.curStickyIndex]);
-		// 		self.stickyElement.style.display = "block";
-		// 		self.stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + "px";
-		// 		self.stickyElement.className = self.stickyDomInfo[self.curStickyIndex].className || "";
-		// 		for (var attrName in self.stickyDomInfo[self.curStickyIndex].style) {
-		// 			if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {
-		// 				self.stickyElement.style[attrName] = self.stickyDomInfo[self.curStickyIndex].style[attrName];
-		// 			}
-		// 		}
-		// 	}
+		_stickyHandler: function(_pos) {
+			var self = this;
+			if (!self.stickyDomInfoLength) return;
+			var pos = Math.abs(_pos);
+			var index = [];
+			var allTops = [];
+			for (var i = 0; i < self.stickyDomInfoLength; i++) {
+				allTops.push(self.stickyDomInfo[i][self._nameTop]);
+				if (pos >= self.stickyDomInfo[i][self._nameTop]) {
+					index.push(i);
+				}
+			}
+			if (!index.length) {
+				self.stickyElement.style.display = "none";
+				self.curStickyIndex = undefined;
+				return;
+			}
+			var curStickyIndex = Math.max.apply(null, index);
+			if (self.curStickyIndex !== curStickyIndex) {
+				self.curStickyIndex = curStickyIndex;
+				self.userConfig.renderHook.call(self, self.stickyElement, self.stickyDomInfo[self.curStickyIndex]);
+				self.stickyElement.style.display = "block";
+				self.stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + "px";
+				self.stickyElement.className = self.stickyDomInfo[self.curStickyIndex].className || "";
+				for (var attrName in self.stickyDomInfo[self.curStickyIndex].style) {
+					if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {
+						self.stickyElement.style[attrName] = self.stickyDomInfo[self.curStickyIndex].style[attrName];
+					}
+				}
+			}
 
-		// 	if (-_pos < Math.min.apply(null, allTops)) {
-		// 		self.stickyElement.style.display = "none";
-		// 		self.curStickyIndex = undefined;
-		// 		return;
-		// 	}
+			if (-_pos < Math.min.apply(null, allTops)) {
+				self.stickyElement.style.display = "none";
+				self.curStickyIndex = undefined;
+				return;
+			}
 
-		// },
+		},
 		/**
 		 * get all element posInfo such as top,height,template,html
 		 * @return {Array}
@@ -355,24 +363,6 @@ define(function(require, exports, module) {
 			el.style[self.nameHeight] = elementObj[self._nameHeight] + "px";
 			el.style[transform] = self.nameTranslate + "(" + elementObj[self._nameTop] + "px) " + translateZ;
 		},
-		// getData:function(datasetIndex,rowIndex){
-		// 	var self = this;
-		// 	if(datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
-		// 		return self.datasets[datasetIndex].getData(rowIndex);
-		// 	}
-		// },
-		// updateData:function(datasetIndex,rowIndex,data){
-		// 	var self = this;
-		// 	var d = self.getData(datasetIndex,rowIndex);
-		// 	return d.data = data;
-		// },
-		// removeData:function(datasetIndex,rowIndex){
-		// 	var self = this;
-		// 	if(datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
-		// 		return self.datasets[datasetIndex].removeData(rowIndex);
-		// 	}
-		// 	return;
-		// },
 		// getCellByPagePos:function(pos){
 		// 	var self = this;
 		// 	var offset = self.isY ? pos - Util.getOffsetTop(self.renderTo) + Math.abs(self.getOffsetTop()) : pos - Util.getOffsetLeft(self.renderTo) + Math.abs(self.getOffsetLeft());
@@ -390,13 +380,6 @@ define(function(require, exports, module) {
 		// 		}
 		// 	}
 		// },
-		// insertData:function(datasetIndex,rowIndex,data){
-		// 	var self = this;
-		// 	if(data && datasetIndex >= 0 && self.datasets[datasetIndex] && rowIndex >= 0){
-		// 		return self.datasets[datasetIndex].data = self.datasets[datasetIndex].data.slice(0,rowIndex).concat(data).concat(self.datasets[datasetIndex].data.slice(rowIndex))
-		// 	}
-		// 	return;
-		// },
 		// getCellByOffset:function(offset){
 		// 	var self = this;
 		// 	var len = self.domInfo.length;
@@ -410,6 +393,8 @@ define(function(require, exports, module) {
 		// 	}
 		// },
 		pluginDestructor: function() {
+			var self = this;
+
 
 		},
 		_bindEvt: function() {

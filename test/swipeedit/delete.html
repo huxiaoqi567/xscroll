@@ -23,6 +23,8 @@
         top:0;
         bottom: 0;
         width:100%;
+        overflow-y:scroll;
+        overflow-x:hidden;
      }
     #J_Scroll ul{
         width: 100%;
@@ -103,7 +105,9 @@
                     data: {
                         text: 'Slide Left To DeleteMe! ' + i
                     },
-                    recycled: true
+                    style:{
+                        height:60
+                    }
                 })
             }
             return tmp
@@ -111,11 +115,11 @@
 
 
         var xscroll = new XScroll({
-            renderTo: "#J_Scroll"
+            renderTo: "#J_Scroll",
+            lockY:false
         });
 
         var infinite = new Infinite({
-            data: data,
             itemHeight: 60,
             infiniteElements: "#J_Scroll .xs-row",
             renderHook: function(el, row) {
@@ -125,10 +129,11 @@
             }
         })
 
+
+
         xscroll.plug(infinite);
 
-
-
+        infinite.append(0,data);
 
         var maxWidth = document.body.offsetWidth * 0.4;
 
@@ -143,25 +148,27 @@
 
         xscroll.plug(swipeEditPlugin)
             //delete 
-        xscroll.on("click", function(e) {
-            if (e.target.className.match("btn-delete")) {
-                xscroll.removeData(0, e.cell._row)
-                xscroll.render();
-            }
-            if (e.target.className.match("btn-mark") && !e.target.className.match("btn-marked")) {
-                var data = xscroll.getData(0, e.cell._row)
-                data.data.marked = true;
-                e.target.className += " btn-marked";
-            }
-        })
+        // xscroll.on("click", function(e) {
+        //     if (e.target.className.match("btn-delete")) {
+        //         xscroll.removeData(0, e.cell._row)
+        //         xscroll.render();
+        //     }
+        //     if (e.target.className.match("btn-mark") && !e.target.className.match("btn-marked")) {
+        //         var data = xscroll.getData(0, e.cell._row)
+        //         data.data.marked = true;
+        //         e.target.className += " btn-marked";
+        //     }
+        // })
 
-        xscroll.on("click", function(e) {
-            if (!e.target.parentNode.className.match('control')) {
-                swipeEditPlugin.slideAllExceptRow();
-            }
-        })
+        // xscroll.on("click", function(e) {
+        //     if (!e.target.parentNode.className.match('control')) {
+        //         swipeEditPlugin.slideAllExceptRow();
+        //     }
+        // })
 
         xscroll.render();
+
+        window.xscroll = xscroll
 
     });
     </script>

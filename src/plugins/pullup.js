@@ -130,10 +130,11 @@ define(function(require, exports, module) {
 			self._changeStatus("up");
 			if (!self.userConfig.bufferHeight) return;
 			if (!self.__isBoundryOut) {
-				var trans = xscroll._bounce("y", xscroll._bouncey);
-				trans && self.xscroll.scrollTop(trans.pos, trans.duration, trans.easing, function(e) {
-					xscroll._scrollEndHandler("y");
-				});
+				var trans = xscroll.computeScroll("y", xscroll._bouncey);
+				console.log(xscroll._bouncey)
+				// trans && self.xscroll.scrollTop(trans.pos, trans.duration, trans.easing, function(e) {
+				// 	xscroll._scrollEndHandler("y");
+				// });
 			}
 		},
 		reset: function(callback) {
