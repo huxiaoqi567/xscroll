@@ -31,6 +31,7 @@ define(function(require, exports, module) {
 	var idCounter = 0;
 	var guid = function(prefix) {
 		var id = ++idCounter + '';
+		// console.log(id)
 		return prefix ? prefix + id : id;
 	};
 
