@@ -37,9 +37,11 @@
         height: 100%;
         border-left:1px solid #ccc;
         border-right:1px solid #fff;
+        background: #fff;
     }
     .xs-container{
         width: 100%;
+        height: 100%;
     }
     </style>
     <div id="J_Scroll">
@@ -141,7 +143,7 @@
         var data = (function() {
             var tmp = [];
             for (var i = 1; i <= 100; i++) {
-                tmp.push({num: i});
+                tmp.push({data:{num: i},style:{width:100}});
             }
             return tmp
         })()
@@ -149,17 +151,61 @@
             renderTo: "#J_Scroll"
         });
 
-        xscroll.plug(new Infinite({
-            data: data,
+        var infinite = new Infinite({
             zoomType:"x",
-            itemWidth:100,
             infiniteElements:"#J_Scroll .xs-row",
-            renderHook:function(el,data){
-                el.innerText = data.num;
+            renderHook:function(el,row){
+                el.innerText = row.data.num;
             }
-        }))
-        
+        });
+
+
+
+        xscroll.plug(infinite)
+
+        infinite.append(0,data);
+
         xscroll.render();
+
+        setTimeout(function(){
+            infinite.get(0,0).style.width = 200;
+            xscroll.render();
+        },1000);
+
+
+        setTimeout(function(){
+            infinite.get(0,0).style.width = 100;
+            xscroll.render();
+        },2000);
+
+
+        setTimeout(function(){
+            infinite.get(0,0).style.background = "#000";
+            xscroll.render();
+        },3000);
+
+
+        setTimeout(function(){
+            infinite.remove(0,0);
+            xscroll.render();
+        },4000);
+
+        setTimeout(function(){
+            infinite.get(0,0).data.num = "scale";
+            infinite.get(0,0).style.fontSize = "24px";
+            infinite.get(0,0).style.color = "#fff";
+            infinite.get(0,0).style.background = "red";
+            infinite.get(0,0).style.width = 100;
+            xscroll.render();
+        },5000);
+
+        setTimeout(function(){
+            infinite.remove(0,0);
+            xscroll.render();
+        },6000);
+
+
+
 
     });
 

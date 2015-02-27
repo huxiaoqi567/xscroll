@@ -3,7 +3,7 @@ define(function(require, exports, module) {
 		Base = require('../base');
 
 	var transform = Util.prefixStyle("transform");
-
+	var transition = Util.prefixStyle("transition");
 	var Infinite = function(cfg) {
 		Infinite.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
@@ -81,7 +81,6 @@ define(function(require, exports, module) {
 				}
 			}
 			self.stickyDomInfoLength = self.stickyDomInfo.length;
-			console.log(self.stickyDomInfo)
 		},
 		_formatData: function() {
 			var self = this;
@@ -200,7 +199,7 @@ define(function(require, exports, module) {
 			self.userConfig.maxSpeed = 0.06 * 50;
 			for (var i = 0, l = data.length; i < l; i++) {
 				var item = data[i];
-				size = item.style && item.style.height >= 0 ? item.style.height : 100;
+				size = item.style && item.style[self.nameHeight] >= 0 ? item.style[self.nameHeight] : 100;
 				item.guid = item.guid || Util.guid();
 				item[self._nameRow] = i;
 				item[self._nameTop] = pos;
@@ -219,16 +218,15 @@ define(function(require, exports, module) {
 			var xscroll = self.xscroll;
 			var pos = -(pos || (self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft()));
 			var itemSize = 50;
-			var elementsPerPage = self.isY ? Math.ceil(xscroll.height / itemSize) : Math.ceil(xscroll.width / itemSize);
+			var elementsPerPage = Math.ceil(xscroll[self.nameHeight] / itemSize);
 			var maxBufferedNum = self.userConfig.maxBufferedNum === undefined ? Math.max(Math.ceil(elementsPerPage / 3), 1) : self.userConfig.maxBufferedNum;
-			var maxBufferedNum = 0;
 			var pos = Math.max(pos - maxBufferedNum * itemSize, 0);
 			var tmp = {},
 				item;
 
 			for (var i in self.__serializedData) {
 				item = self.__serializedData[i];
-				if (item[self._nameTop] >= pos - itemSize && item[self._nameTop] <= pos + 2 * maxBufferedNum * itemSize + (self.isY ? xscroll.height : xscroll.width)) {
+				if (item[self._nameTop] >= pos - itemSize && item[self._nameTop] <= pos + 2 * maxBufferedNum * itemSize + xscroll[self.nameHeight]) {
 					tmp[item[self._nameRow]] = item;
 				}
 			}
@@ -279,9 +277,9 @@ define(function(require, exports, module) {
 					var prevEl = prevElementsPos[j],
 						newEl = newElementsPos[i];
 					if (prevEl.guid === newEl.guid) {
-						console.log(prevEl._top, '->', newEl._top, " guid:", newEl.guid, "data:", JSON.stringify(newEl.data), "row:", prevEl._row, "->", newEl._row)
-						if (newEl.style != prevEl.style || newEl._top != prevEl._top || newEl._height != prevEl._height) {
-							self.renderStyle(self.infiniteElements[newEl.__infiniteIndex],newEl);
+						console.log(prevEl[self._nameTop], '->', newEl[self._nameTop], " guid:", newEl.guid, "data:", JSON.stringify(newEl.data), "row:", prevEl[self._nameRow], "->", newEl[self._nameRow])
+						if (newEl.style != prevEl.style || newEl[self._nameTop] != prevEl[self._nameTop] || newEl[self._nameHeight] != prevEl[self._nameHeight]) {
+							self.renderStyle(self.infiniteElements[newEl.__infiniteIndex],newEl,true);
 						}
 						if (newEl.data != prevEl.data) {
 							self.renderData(self.infiniteElements[newEl.__infiniteIndex],newEl);
@@ -350,7 +348,7 @@ define(function(require, exports, module) {
 			// self.__serializedData[elementObj[guid]]
 			self.userConfig.renderHook.call(self, el, elementObj);
 		},
-		renderStyle: function(el, elementObj) {
+		renderStyle: function(el, elementObj,useTransition) {
 			var self = this;
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			for (var attrName in elementObj.style) {
@@ -362,6 +360,9 @@ define(function(require, exports, module) {
 			el.style.visibility = "visible";
 			el.style[self.nameHeight] = elementObj[self._nameHeight] + "px";
 			el.style[transform] = self.nameTranslate + "(" + elementObj[self._nameTop] + "px) " + translateZ;
+			if(useTransition){
+				el.style[transition] = "all 0.5s ease";
+			}
 		},
 		// getCellByPagePos:function(pos){
 		// 	var self = this;
@@ -401,6 +402,11 @@ define(function(require, exports, module) {
 			var self = this;
 			if (self._isEvtBinded) return;
 			self._isEvtBinded = true;
+			self.xscroll.renderTo.addEventListener("webkitTransitionEnd",function(e){
+	            if(e.target.className.match(/xs-row/)){
+	                e.target.style.webkitTransition = "";
+	            }
+	        })
 			return self;
 		},
 		insertBefore: function(sectionId, index, data) {
@@ -431,6 +437,7 @@ define(function(require, exports, module) {
 		},
 		remove: function(sectionId, from, number) {
 			var self = this;
+			var number = number||1;
 			if (undefined === sectionId || !self.sections[sectionId]) return self;
 			if (undefined === from) {
 				delete self.sections[sectionId];
@@ -447,6 +454,11 @@ define(function(require, exports, module) {
 			if (undefined === sectionId || !self.sections[sectionId]) return self;
 			self.sections[sectionId][index] = data;
 			return self;
+		},
+		get:function(sectionId,index){
+			if(undefined === sectionId) return;
+			if(undefined === index) return this.sections[sectionId];
+			return this.sections[sectionId][index];
 		}
 	});
 
