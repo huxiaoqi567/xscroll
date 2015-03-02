@@ -6,7 +6,10 @@ define(function(require, exports, module) {
 		LazyLoad.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
 			imgsSelector: "img",
-			delay:200
+			delay:200,
+			formatter:function(src){
+				return src;
+			}
 		}, cfg);
 	}
 
@@ -27,7 +30,8 @@ define(function(require, exports, module) {
 		setImgSrc: function(img) {
 			if (!img) return;
 			var src = img.getAttribute("data-src");
-			img.setAttribute("src", src);
+			var formattedSrc = this.userConfig.formatter.call(self,src);
+			formattedSrc && img.setAttribute("src", formattedSrc);
 		},
 		filterItem: function(e) {
 			var self = this,

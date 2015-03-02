@@ -234,8 +234,8 @@ define(function(require, exports, module) {
 				//transform
 				if (cfg.css.transform) {
 					var transmap = self.transmap = computeTransform(computeStyle[vendorTransform], cfg.css.transform);
-					self.timer.off("run", self.__handlers.transRun);
-					self.timer.on("run", self.__handlers.transRun, self);
+					self.timer && self.timer.off("run", self.__handlers.transRun);
+					self.timer && self.timer.on("run", self.__handlers.transRun, self);
 				}
 				var cssRun = function(e) {
 					for (var i in cfg.css) {
@@ -245,10 +245,10 @@ define(function(require, exports, module) {
 					}
 				};
 
-				self.timer.off("run", cssRun);
-				self.timer.on("run", cssRun);
-				self.timer.off("stop", self.__handlers.stop);
-				self.timer.on("stop", self.__handlers.stop, self);
+				self.timer && self.timer.off("run", cssRun);
+				self.timer && self.timer.on("run", cssRun);
+				self.timer && self.timer.off("stop", self.__handlers.stop);
+				self.timer && self.timer.on("stop", self.__handlers.stop, self);
 			}
 
 			return self;

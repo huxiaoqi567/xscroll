@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>snap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+     <script type="text/javascript">
+        ! function() {
+            function a() {
+                window.remFontSize = document.documentElement.clientWidth / 16;
+                document.documentElement.style.fontSize = document.documentElement.clientWidth / 16 + "px"
+            }
+            var b = null;
+            window.addEventListener("resize", function() {
+                clearTimeout(b), b = setTimeout(a, 300)
+            }, !1), a()
+        }(window);
+        </script>
+</head>
+<body>
+    <style type="text/css">
+    *{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    #J_Scroll{
+        overflow-x: scroll;
+        overflow-y: hidden;
+         position: absolute;
+        width: 100%;
+        height: 100%;
+
+    }
+    #J_Scroll ul{
+        position: absolute;
+        height: 100%;
+        font-size: 0;
+        white-space: nowrap;
+        font-size: 0;
+    }
+    #J_Scroll ul li{
+        display: inline-block;
+        font-size: 12px;
+        width: 16rem;
+        height: 100%;
+    }
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row"><a href="#"><img data-src="http://a2.mzstatic.com/us/r30/Features3/v4/ea/04/0c/ea040c6c-bee1-a75a-9da8-d7ed64229db5/image-640x260ip.jpeg"  width="320"></a></li>
+                <li class="xs-row"><a href="#"><img data-src="http://a2.mzstatic.com/us/r30/Features3/v4/40/39/aa/4039aaa8-6256-4160-8cbc-c7f6340cf1da/image640x260.jpeg"  width="320"></a></li>
+                <li class="xs-row"><a href="#"><img data-src="http://a2.mzstatic.com/us/r30/Features4/v4/49/55/31/495531b4-46e5-82ea-263a-1256f48d32d3/image-640x260ip.jpeg" width="320"></a></li>
+                <li class="xs-row"><a href="#"><img data-src="http://a3.mzstatic.com/us/r30/Features5/v4/71/92/a7/7192a705-ba34-fc8c-dd03-e3e581195646/image640x260.jpeg"  width="320"></a></li>
+                <li class="xs-row"> <a href="#"><img data-src="http://a5.mzstatic.com/us/r30/Features5/v4/1e/92/fe/1e92fecc-c2c2-f175-836a-38fe38ab9ca7/image-640x260ip.jpeg"  width="320"></a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script>
+    seajs.config({
+        base: "../../src/"
+    });
+    seajs.use(["simulate-scroll", "plugins/snap","plugins/lazyload"], function(XScroll, Snap,LazyLoad) {
+        var xscroll = new XScroll({
+            renderTo: "#J_Scroll",
+            scrollbarX:false
+        });
+        var snap = new Snap({
+            snapWidth:remFontSize * 16,
+            snapColsNum:5,
+        });
+        xscroll.plug(snap)
+        xscroll.plug(new LazyLoad())
+        xscroll.render();
+        window.xscroll = xscroll;
+    });
+    </script>
+</body>
+</html>
