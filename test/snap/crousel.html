@@ -66,30 +66,6 @@
                 <li class="xs-row">3</li>
                 <li class="xs-row">4</li>
                 <li class="xs-row">5</li>
-
-                <li class="xs-row">6</li>
-                <li class="xs-row">7</li>
-                <li class="xs-row">8</li>
-                <li class="xs-row">9</li>
-                <li class="xs-row">10</li>
-
-                <li class="xs-row">11</li>
-                <li class="xs-row">12</li>
-                <li class="xs-row">13</li>
-                <li class="xs-row">14</li>
-                <li class="xs-row">15</li>
-
-                <li class="xs-row">16</li>
-                <li class="xs-row">17</li>
-                <li class="xs-row">18</li>
-                <li class="xs-row">19</li>
-                <li class="xs-row">20</li>
-
-                <li class="xs-row">21</li>
-                <li class="xs-row">22</li>
-                <li class="xs-row">23</li>
-                <li class="xs-row">24</li>
-                <li class="xs-row">25</li>
             </ul>
         </div>
     </div>
@@ -98,41 +74,22 @@
     seajs.config({
         base: "../../src/"
     });
-    seajs.use(["simulate-scroll", "plugins/snap","plugins/infinite"], function(XScroll, Snap,Infinite) {
-
-        var cols = 1000;
-
-        var data= [];
-        for(var i =0;i<cols;i++){
-            data.push({
-                data:{text:i}
-            })
-        }
-
+    seajs.use(["simulate-scroll", "plugins/snap"], function(XScroll, Snap) {
 
         var xscroll = new XScroll({
             renderTo: "#J_Scroll"
         });
 
-        
-
-        var infinite = new Infinite({
-            itemWidth:remFontSize * 16 +2,
-            data:data,
-            zoomType:"x",
-            infiniteElements:"#J_Scroll .xs-row",
-            renderHook:function(el,row){
-                el.innerHTML = '<li>'+row.data.text+'</li>';
-            }
-        });
-
-        xscroll.plug(infinite);
-
-        xscroll.plug(new Snap({
+        var snap = new Snap({
             snapWidth:remFontSize * 16 + 2,
-            snapColsNum:cols,
-        }))
+            snapColsNum:5,
+        });
+        xscroll.plug(snap)
         xscroll.render();
+
+        xscroll.on("scrollend",function(e){
+            console.log(snap.snapColIndex)
+        })
 
 
     });

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>simple</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+     #J_Scroll{
+        position: absolute;
+        top:0;
+        bottom: 0;
+        width:100%;
+     }
+    #J_Scroll ul{
+        white-space: nowrap;
+        position: absolute;
+        height: 100%;
+        font-size: 0;
+    }
+    #J_Scroll ul li{
+        display: inline-block;
+        font-size: 12px;
+        width: 100px;
+        height: 100%;
+        border-left:1px solid #ccc;
+        border-right:1px solid #fff;
+        background: #fff;
+    }
+    .xs-container{
+        width: 100%;
+        height: 100%;
+    }
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row">1</li>
+                <li class="xs-row">2</li>
+                <li class="xs-row">3</li>
+                <li class="xs-row">4</li>
+                <li class="xs-row">5</li>
+
+                <li class="xs-row">6</li>
+                <li class="xs-row">7</li>
+                <li class="xs-row">8</li>
+                <li class="xs-row">9</li>
+                <li class="xs-row">10</li>
+
+                <li class="xs-row">11</li>
+                <li class="xs-row">12</li>
+                <li class="xs-row">13</li>
+                <li class="xs-row">14</li>
+                <li class="xs-row">15</li>
+
+                <li class="xs-row">16</li>
+                <li class="xs-row">17</li>
+                <li class="xs-row">18</li>
+                <li class="xs-row">19</li>
+                <li class="xs-row">20</li>
+
+                <li class="xs-row">21</li>
+                <li class="xs-row">22</li>
+                <li class="xs-row">23</li>
+                <li class="xs-row">24</li>
+                <li class="xs-row">25</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script>
+    seajs.config({
+      base: "../../src/"
+    })
+    seajs.use(["simulate-scroll","plugins/infinite","plugins/lazyload"],function(XScroll,Infinite,LazyLoad){
+        var imgs = [
+        'http://a4.mzstatic.com/us/r30/Purple3/v4/05/ce/17/05ce171e-8518-8c5d-824d-4d5e2e1bbbdf/icon160x160.jpeg',
+        'http://a4.mzstatic.com/us/r30/Purple5/v4/92/e0/31/92e0313f-e65b-9c1e-cb1c-992a15059262/icon160x160.jpeg',
+        'http://a5.mzstatic.com/us/r30/Purple3/v4/a9/c4/7b/a9c47b92-ffab-8825-4eea-858ab41484be/icon160x160.jpeg',
+        'http://a5.mzstatic.com/us/r30/Purple1/v4/d3/69/3d/d3693d7c-8622-62f6-bfaf-305edac67945/icon160x160.jpeg',
+        'http://a1.mzstatic.com/us/r30/Purple1/v4/2c/02/5b/2c025b78-7dac-3dba-f1e1-18e8135d3ffa/icon160x160.jpeg',
+        'http://a4.mzstatic.com/us/r30/Purple5/v4/3c/8e/da/3c8edaf8-92b8-f1c0-d5cc-0b4babdbea62/icon160x160.jpeg',
+        'http://a3.mzstatic.com/us/r30/Purple4/v4/8f/4e/a1/8f4ea103-feb8-cd51-a294-8479b9fd2243/icon160x160.jpeg',
+        'http://a3.mzstatic.com/us/r30/Purple5/v4/d5/5d/2a/d55d2a51-f0d9-3888-3d57-95075c3a52db/icon160x160.jpeg',
+        'http://a5.mzstatic.com/us/r30/Purple1/v4/83/45/86/83458677-c4f1-ab01-fd83-08f190e5885f/icon160x160.jpeg',
+        'http://a4.mzstatic.com/us/r30/Purple5/v4/61/f5/56/61f556f7-486a-a4fc-6d63-7f875d115c67/icon160x160.jpeg',
+        'http://a4.mzstatic.com/us/r30/Purple1/v4/28/c5/1d/28c51d0a-dda9-94b7-e26b-6cdd81256fdb/icon160x160.jpeg',
+        'http://a1.mzstatic.com/us/r30/Purple5/v4/81/48/7b/81487be6-b951-668b-8599-bbaa43a681b8/icon160x160.jpeg',
+        'http://a2.mzstatic.com/us/r30/Purple5/v4/97/92/0f/97920f46-330e-9ec4-0cf2-1db7dc9e8e5d/icon160x160.jpeg',
+        'http://a5.mzstatic.com/us/r30/Purple3/v4/da/19/c3/da19c38d-4689-bc72-8846-1ee602ab7a1c/icon160x160.jpeg',
+        'http://a3.mzstatic.com/us/r30/Purple1/v4/b9/23/8a/b9238a72-2650-681c-ba46-56ee7b9c86a1/icon160x160.jpeg',
+        'http://a2.mzstatic.com/us/r30/Purple5/v4/43/76/95/43769592-891a-57bd-73aa-da12d327e241/icon160x160.jpeg',
+        'http://a5.mzstatic.com/us/r30/Purple5/v4/3c/ce/e4/3ccee423-03e6-9312-4c3f-eec8367de2d3/icon160x160.jpeg',
+        'http://a4.mzstatic.com/us/r30/Purple5/v4/a8/5c/d8/a85cd8cc-070d-b0ec-893b-711299619ad7/icon160x160.jpeg'
+        ];
+        var data = (function() {
+            var tmp = [];
+            for (var i = 0;i<imgs.length;i++) {
+                tmp.push({
+                    data:{num: i,src:imgs[i]},
+                    style:{height:200,background:"#fff","color":"#000"}
+                });
+            }
+
+            return tmp
+        })()
+        var xscroll = new XScroll({
+            renderTo: "#J_Scroll"
+        });
+
+        var infinite = new Infinite({
+            zoomType:"x",
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,row){
+            el.innerHTML = 
+'<a href="https://itunes.apple.com/us/app/bejeweled/id479536744?mt=8">'+
+'    <span class="img"><img data-src="'+row.data.src+'" width="80" height="80"/><span></span></span>'+
+'    <span class="title">Bejeweled</span>'+
+'    <span class="cat">Games</span>'+
+'</a>';
+                
+            }
+        });
+
+        xscroll.plug(infinite)
+
+        xscroll.plug(new LazyLoad())
+
+        infinite.append(0,data);
+
+        xscroll.render();
+
+    });
+
+    </script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 define(function(require, exports, module) {
-
 	var Util = require('./util'),
 		Base = require('./base'),
 		Core = require('./core'),
@@ -64,11 +63,6 @@ define(function(require, exports, module) {
             var content = self.content;
             var containerWidth = self.containerWidth;
             var containerHeight = self.containerHeight;
-
-            // self.
-
-            // var boundry = self.boundry;
-            // var mc = new Hammer.Manager(renderTo);
             renderTo.addEventListener("scroll",function(e){
                 self.trigger("scroll",{
                     scrollTop:self.getScrollTop(),
@@ -79,21 +73,14 @@ define(function(require, exports, module) {
             renderTo.addEventListener("scrollend",function(e){
                console.log("end")
             },false)
-
-
-
         }
 	});
-
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = OriginScroll;
 	} else {
 		return window.XScroll = OriginScroll;
 	}
-
-
-
 });
 
 

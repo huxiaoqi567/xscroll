@@ -23,7 +23,45 @@ define(function(require, exports, module) {
 		pluginDestructor: function() {
 
 		},
-		_bindEvt:function(){}
+		_bindEvt:function(){
+			var self = this,
+				xscroll = self.xscroll,
+				mc = xscroll.mc;
+			var speedRecords = [];
+
+			var defaultMaxSpeed = xscroll.userConfig.maxSpeed || 2;
+
+			var average = function(ary){
+				var l = ary.length;
+				if(l == 0) return;
+				var t = 0;
+				for(var i =0;i<l;i++){
+					t+=ary[i];
+				}
+				return t/l;
+			}
+
+
+			mc.on("panend",function(e){
+				// console.log(e.velocityY)
+				if(Math.abs(e.velocityY)>1.5 && (speedRecords.length == 0 || e.velocityY/speedRecords[speedRecords.length-1]>0)){
+					speedRecords.push(e.velocityY*Math.pow(1.2,speedRecords.length));
+				}else{
+					speedRecords = [];
+					xscroll.userConfig.maxSpeed = defaultMaxSpeed;
+				}
+				console.log(speedRecords)
+				if(speedRecords.length > 3){
+					var v = average(speedRecords);
+					console.log("acc"," v:",v)
+					//cancel limit speed
+					xscroll.userConfig.maxSpeed = Math.abs(v);
+					xscroll._onpanend({
+						velocityY:v
+					});
+				}
+			});
+		}
 	});
 
 	if (typeof module == 'object' && module.exports) {

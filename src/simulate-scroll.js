@@ -54,19 +54,6 @@ define(function(require, exports, module) {
       self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false:true) : self.userConfig.scrollbarX;
       self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false:true) : self.userConfig.scrollbarY;
     },
-    _clickDisabled:function(){
-      var self = this;
-      if(document.getElementById('xs-pointer-events-none')) return;
-      self.__style = document.createElement('style');
-      self.__style.innerHTML = '.xs-container a{pointer-events:none;}';
-      self.__style.id = 'xs-pointer-events-none';
-      document.head.appendChild(self.__style);
-    }, 
-    _clickEnabled:function(){
-      if(!this.__style) return;
-      var style = document.getElementById("xs-pointer-events-none");
-      style && style.remove();
-    },
     resetDefaultConfig:function(){
       var self = this;
       self.userConfig.lockX = self.defaltConfig.lockX;
@@ -186,27 +173,20 @@ define(function(require, exports, module) {
       var pan = new Hammer.Pan();
       var pinch = new Hammer.Pinch();
       mc.add([tap, pan, pinch]);
-      var isScrolling = false;
+
       renderTo.addEventListener("touchstart", function(e) {
-        e.preventDefault();
-           // isScrolling = self.isScrollingY || self.isScrollingX;
+        if(self.userConfig.preventDefault){
+          e.preventDefault();
+        }
         self.stop();
       }, false);
 
-      renderTo.addEventListener("touchend", function(e) {
-        self.boundryCheck();
+      renderTo.addEventListener("click",function(e){
+        e.preventDefault();
       });
-
-
 
       mc.on("tap", function(e) {
         e.preventDefault();
-          if(!isScrolling){
-          //   console.log("true")
-            // self._clickEnabled();
-            // self._triggerClick(e);
-          }
-          isScrolling = false;
       });
 
       mc.on("panstart", function(e) {
@@ -220,11 +200,6 @@ define(function(require, exports, module) {
       mc.on("panend", function(e) {
         self._onpanend(e);
       });
-
-      self.on("scrollanimate",function(){
-        // self._clickDisabled();
-      });
-
 
       self.trigger("aftereventbind",{mc:mc});
       //window resize
@@ -364,7 +339,7 @@ define(function(require, exports, module) {
       var boundryStart = type == "x" ? boundry.left : boundry.top;
       var boundryEnd = type == "x" ? boundry.right : boundry.bottom;
       var innerSize = type == "x" ? self.containerWidth : self.containerHeight;
-      var maxSpeed = userConfig.maxSpeed > 0 && userConfig.maxSpeed < 6 ? userConfig.maxSpeed : 2;
+      var maxSpeed = userConfig.maxSpeed || 2;
       var size = boundryEnd - boundryStart;
       var transition = {};
       var status = "inside";
@@ -488,7 +463,6 @@ define(function(require, exports, module) {
       self.initController();
       //update touch-action 
       self.initTouchAction();
-      // self._clickEnabled();
       return self;
     },
     

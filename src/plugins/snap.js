@@ -75,7 +75,7 @@
              var cx = snapWidth / 2;
              var cy = snapHeight / 2;
              var direction = e.direction;
-             if (Math.abs(e.velocity) <= 0.5) {
+             if (Math.abs(e.velocity) <= 0.2) {
                  var left = Math.abs(self.xscroll.getScrollLeft());
                  var top = Math.abs(self.xscroll.getScrollTop());
                  self.snapColIndex = Math.round(left / snapWidth);
