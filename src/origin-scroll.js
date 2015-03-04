@@ -11,6 +11,12 @@ define(function(require, exports, module) {
 	}
 
 	Util.extend(OriginScroll, Core, {
+        init:function(){
+            var self = this;
+            OriginScroll.superclass.init.call(this);
+            self._initContainer();
+            self.resetSize();
+        },
 		_initContainer: function() {
             var self = this;
             if (self.__isContainerInited) return;
@@ -26,12 +32,12 @@ define(function(require, exports, module) {
         getScrollLeft: function() {
         	return this.renderTo.scrollLeft;
         },
-		scrollY:function(y, duration, easing, callback){
+		scrollTop:function(y, duration, easing, callback){
 			var self = this;
             var y = Math.round(y);
             if (self.userConfig.lockY) return;
             var duration = duration || 0;
-            var easing = easing || self.userConfig.easing;
+            var easing = easing || "quadratic";
             var config = {
                css:{
                 scrollTop:y
@@ -58,20 +64,23 @@ define(function(require, exports, module) {
             var self = this;
             if (self.__isEvtBind) return;
             self.__isEvtBind = true;
-            var renderTo = self.renderTo;
-            var container = self.container;
-            var content = self.content;
-            var containerWidth = self.containerWidth;
-            var containerHeight = self.containerHeight;
-            renderTo.addEventListener("scroll",function(e){
+             var mc = self.mc = new Hammer.Manager(self.renderTo);
+            var tap = new Hammer.Tap();
+            mc.add([tap]);
+            self.mc.on("tap", function(e) {
+                e.preventDefault();
+                e.srcEvent.stopPropagation();
+                if(!self._isClickDisabled){
+                  self._triggerClick(e);
+                  self.trigger("click",e);
+                }
+              });
+
+            self.renderTo.addEventListener("scroll",function(e){
                 self.trigger("scroll",{
                     scrollTop:self.getScrollTop(),
                     scrollLeft:self.getScrollLeft()
                 })
-            },false)
-
-            renderTo.addEventListener("scrollend",function(e){
-               console.log("end")
             },false)
         }
 	});

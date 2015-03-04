@@ -3,6 +3,8 @@ define(function(require, exports, module) {
         Base = require('./base'),
         Animate = require('./animate');
 
+    require('./hammer');
+
     function Boundry(cfg) {
         this.cfg = Util.mix({
             width: 0,
@@ -110,7 +112,7 @@ define(function(require, exports, module) {
         init: function() {
             var self = this;
             var defaultCfg = {
-                preventDefault: true,
+                preventDefault: true, //prevent touchstart 
                 bounce: true,
                 useTransition: true,
                 gpuAcceleration: true,
@@ -123,11 +125,15 @@ define(function(require, exports, module) {
             //generate guid
             self.guid = Util.guid();
             self.renderTo = self.userConfig.renderTo.nodeType ? self.userConfig.renderTo : document.querySelector(self.userConfig.renderTo);
+            //timer for animtion
+            self.__timers = {};
             //config attributes on element
             var elCfg = JSON.parse(self.renderTo.getAttribute('xs-cfg'));
-            var userConfig = self.userConfig = Util.mix(Util.mix(defaultCfg,elCfg), self.userConfig);
+            var userConfig = self.userConfig = Util.mix(Util.mix(defaultCfg, elCfg), self.userConfig);
             self.containerClsName = userConfig.clsPrefix + "container";
             self.contentClsName = userConfig.clsPrefix + "content";
+            self.container = self.renderTo.querySelector("." + self.containerClsName);
+            self.content = self.renderTo.querySelector("." + self.contentClsName);
             self.boundry = new Boundry();
             self.boundry.refresh();
             return self;
@@ -145,7 +151,7 @@ define(function(require, exports, module) {
             var self = this;
             return {
                 scrollLeft: self.getScrollLeft(),
-                scrollTop:self.getScrollTop()
+                scrollTop: self.getScrollTop()
             }
         },
         getScrollTop: function() {},
@@ -157,14 +163,14 @@ define(function(require, exports, module) {
          * @param duration {Number} duration for animte
          * @param easing {Number} easing functio for animate : ease-in | ease-in-out | ease | bezier
          **/
-        scrollTo: function(scrollLeft,scrollTop, duration, easing, callback) {
+        scrollTo: function(scrollLeft, scrollTop, duration, easing, callback) {
             var self = this;
             var scrollLeft = (undefined === scrollLeft || isNaN(scrollLeft)) ? -self.getScrollLeft() : scrollLeft;
             var scrollTop = (undefined === scrollTop || isNaN(scrollTop)) ? -self.getScrollTop() : scrollTop;
             self.scrollLeft(scrollLeft, duration, easing, callback);
             self.scrollTop(scrollTop, duration, easing, callback);
         },
-        scrollBy: function(scrollLeft,scrollTop, duration, easing, callback) {
+        scrollBy: function(scrollLeft, scrollTop, duration, easing, callback) {
             this.scrollByX(scrollLeft, duration, easing, callback);
             this.scrollByY(scrollTop, duration, easing, callback);
         },
@@ -176,7 +182,7 @@ define(function(require, exports, module) {
         },
         scrollLeft: function(scrollLeft, duration, easing, callback) {},
         scrollTop: function(scrollTop, duration, easing, callback) {},
-        resetSize:function(){
+        resetSize: function() {
             var self = this;
             var userConfig = self.userConfig;
             var renderToStyle = getComputedStyle(self.renderTo);
@@ -198,7 +204,21 @@ define(function(require, exports, module) {
             self._bindEvt();
             return self;
         },
-        _bindEvt: function() {}
+        _triggerClick: function(e) {
+            var target = e.target;
+            if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
+                var ev = document.createEvent('MouseEvents');
+                ev.initMouseEvent('click', true, true, e.view, 1,
+                    target.screenX, target.screenY, target.clientX, target.clientY,
+                    e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+                    0, null);
+                target.dispatchEvent(ev);
+            }
+        },
+        boundryCheck:function(){return this;},
+        boundryCheckX:function(){return this;},
+        boundryCheckY:function(){return this;},
+        _bindEvt: function() {return this;}
     });
 
 
@@ -206,6 +226,6 @@ define(function(require, exports, module) {
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
     } else {
-        return  XScroll;
+        return XScroll;
     }
 });

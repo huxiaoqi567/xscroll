@@ -1,5 +1,4 @@
 define(function(require, exports, module) {
-  require('./hammer');
   var Util = require('./util'),
     Base = require('./base'),
     Core = require('./core'),
@@ -36,42 +35,37 @@ define(function(require, exports, module) {
       self.resetSize();
       //set overflow behaviors
       self._setOverflowBehavior();
-      //timer for animtion
-      self.__timers = {};
       self.defaltConfig = {
-        lockY:self.userConfig.lockY,
-        lockX:self.userConfig.lockX
+        lockY: self.userConfig.lockY,
+        lockX: self.userConfig.lockX
       }
       self.boundryCheckEnabled = true;
     },
-     //get attributes from dom
-    _setOverflowBehavior:function(){
-      var self =this;
+    //get attributes from dom
+    _setOverflowBehavior: function() {
+      var self = this;
       var renderTo = self.renderTo;
       var computeStyle = getComputedStyle(renderTo);
-      self.userConfig.lockX = undefined === self.userConfig.lockX ? ((computeStyle['overflow-x'] == "hidden" || self.width == self.containerWidth) ? true:false) : self.userConfig.lockX;
-      self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == "hidden" || self.height == self.containerHeight) ? true:false) : self.userConfig.lockY;
-      self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false:true) : self.userConfig.scrollbarX;
-      self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false:true) : self.userConfig.scrollbarY;
+      self.userConfig.lockX = undefined === self.userConfig.lockX ? ((computeStyle['overflow-x'] == "hidden" || self.width == self.containerWidth) ? true : false) : self.userConfig.lockX;
+      self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == "hidden" || self.height == self.containerHeight) ? true : false) : self.userConfig.lockY;
+      self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false : true) : self.userConfig.scrollbarX;
+      self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false : true) : self.userConfig.scrollbarY;
     },
-    resetDefaultConfig:function(){
+    resetDefaultConfig: function() {
       var self = this;
       self.userConfig.lockX = self.defaltConfig.lockX;
       self.userConfig.lockY = self.defaltConfig.lockY;
     },
     _initContainer: function() {
       var self = this;
+      SimuScroll.superclass._initContainer.call(self);
       if (self.__isContainerInited) return;
-      var renderTo = self.renderTo;
-      var container = self.container = self.renderTo.querySelector("." + self.containerClsName);
-      var content = self.content = self.renderTo.querySelector("." + self.contentClsName);
-      container.style[transformOrigin] = "0 0";
-      content.style[transformOrigin] = "0 0";
+      self.container.style[transformOrigin] = "0 0";
+      self.content.style[transformOrigin] = "0 0";
       self.translate(0, 0);
       self.__isContainerInited = true;
       return self;
     },
-
     getScrollTop: function() {
       var transY = window.getComputedStyle(this.container)[transform].match(/[-\d\.*\d*]+/g);
       return transY ? Math.round(transY[5]) === 0 ? 0 : -Math.round(transY[5]) : 0;
@@ -84,14 +78,14 @@ define(function(require, exports, module) {
       if (this.userConfig.lockX) return;
       var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
       this.x = (undefined === x || isNaN(x) || 0 === x) ? 0 : -Math.round(x);
-      this._animate("x", "translateX(" + this.x + "px) scale(" + this.scale + ")"+translateZ, duration, easing, callback);
+      this._animate("x", "translateX(" + this.x + "px) scale(" + this.scale + ")" + translateZ, duration, easing, callback);
       return this;
     },
     scrollTop: function(y, duration, easing, callback) {
       if (this.userConfig.lockY) return;
       var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
       this.y = (undefined === y || isNaN(y) || 0 === y) ? 0 : -Math.round(y);
-      this._animate("y", "translateY(" + this.y + "px) "+translateZ, duration, easing, callback);
+      this._animate("y", "translateY(" + this.y + "px) " + translateZ, duration, easing, callback);
       return this;
     },
     //translate a element 
@@ -125,15 +119,15 @@ define(function(require, exports, module) {
         useTransition: self.userConfig.useTransition,
         end: function(e) {
           callback && callback();
-          if((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear"){
+          if ((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear") {
             self['isScrolling' + type.toUpperCase()] = false;
             self.trigger("scrollend", {
               type: "scrollend",
               scrollTop: self.getScrollTop(),
               scrollLeft: self.getScrollLeft(),
               zoomType: type,
-              duration:duration,
-              easing:easing
+              duration: duration,
+              easing: easing
             });
           }
         }
@@ -152,41 +146,32 @@ define(function(require, exports, module) {
       })
       return this;
     },
-    _triggerClick:function(e){
-      var target = e.target;
-      if ( !(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName) ) {
-      var ev = document.createEvent('MouseEvents');
-        ev.initMouseEvent('click', true, true, e.view, 1,
-          target.screenX, target.screenY, target.clientX, target.clientY,
-          e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
-          0, null);
-        target.dispatchEvent(ev);
-      }
-    },
     _bindEvt: function() {
       var self = this;
       if (self.__isEvtBind) return;
       self.__isEvtBind = true;
       var renderTo = self.renderTo;
-      var mc = self.mc = new Hammer.Manager(renderTo);
+      var mc = self.mc = new Hammer.Manager(self.renderTo);
       var tap = new Hammer.Tap();
       var pan = new Hammer.Pan();
       var pinch = new Hammer.Pinch();
       mc.add([tap, pan, pinch]);
 
       renderTo.addEventListener("touchstart", function(e) {
-        if(self.userConfig.preventDefault){
+        if (self.userConfig.preventDefault) {
           e.preventDefault();
         }
         self.stop();
       }, false);
 
-      renderTo.addEventListener("click",function(e){
-        e.preventDefault();
-      });
-
       mc.on("tap", function(e) {
         e.preventDefault();
+        e.srcEvent.stopPropagation();
+        self.boundryCheck();
+        if (!self._isClickDisabled) {
+          self._triggerClick(e);
+          self.trigger("click", e);
+        }
       });
 
       mc.on("panstart", function(e) {
@@ -201,18 +186,22 @@ define(function(require, exports, module) {
         self._onpanend(e);
       });
 
-      self.trigger("aftereventbind",{mc:mc});
+      self.trigger("aftereventbind", {
+        mc: mc
+      });
       //window resize
-      window.addEventListener("resize",function(e){
-        setTimeout(function(){
+      window.addEventListener("resize", function(e) {
+        setTimeout(function() {
           self.resetSize();
           self.boundryCheck(0);
           self.render();
-        },100);
-      },self);
+        }, 100);
+      }, self);
 
       return this;
     },
+
+
 
     _onpanstart: function(e) {
       var self = this;
@@ -235,8 +224,8 @@ define(function(require, exports, module) {
       var boundry = self.boundry;
       var scrollTop = self.__topstart || (self.__topstart = -self.getScrollTop());
       var scrollLeft = self.__leftstart || (self.__leftstart = -self.getScrollLeft());
-      var y = self.userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY+self.thresholdY);
-      var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX+self.thresholdX);
+      var y = self.userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY + self.thresholdY);
+      var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
       var containerWidth = self.containerWidth;
       var containerHeight = self.containerHeight;
 
@@ -363,19 +352,19 @@ define(function(require, exports, module) {
         var _s = boundryStart - pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
         var v0 = v - a * _t;
-        var _t2 = Math.abs(v0/a2);
-        var s2 = v0/2 * _t2;
+        var _t2 = Math.abs(v0 / a2);
+        var s2 = v0 / 2 * _t2;
         t = _t + _t2;
         s = boundryStart + s2;
         status = "outside";
-      }else if(s > innerSize - boundryEnd){
+      } else if (s > innerSize - boundryEnd) {
         var _s = (boundryEnd - innerSize) + pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
         var v0 = v - a * _t;
-        var _t2 = Math.abs(v0/a2);
-        var s2 =  v0/2 * _t2;
+        var _t2 = Math.abs(v0 / a2);
+        var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = innerSize - boundryEnd  + s2;
+        s = innerSize - boundryEnd + s2;
         status = "outside";
       }
       transition.pos = s;
@@ -385,15 +374,15 @@ define(function(require, exports, module) {
       self['isScrolling' + type.toUpperCase()] = true;
       return transition;
     },
-    boundryCheckX: function(duration,easing,callback) {
+    boundryCheckX: function(duration, easing, callback) {
       var self = this;
-       if(typeof arguments[0] == "function"){
+      if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
         easing = self.userConfig.BOUNDRY_CHECK_EASING;
-      }else{
+      } else {
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
-        easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
+          easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
       if (!self.boundryCheckEnabled || self.userConfig.lockX) return;
       var pos = self.getScrollLeft();
@@ -405,15 +394,15 @@ define(function(require, exports, module) {
         self.scrollLeft(containerWidth - boundry.right, duration, easing, callback);
       }
     },
-    boundryCheckY: function(duration,easing,callback) {
-       var self = this;
-      if(typeof arguments[0] == "function"){
+    boundryCheckY: function(duration, easing, callback) {
+      var self = this;
+      if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
         easing = self.userConfig.BOUNDRY_CHECK_EASING;
-      }else{
+      } else {
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
-        easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
+          easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
       if (!self.boundryCheckEnabled || self.userConfig.lockY) return;
       var pos = self.getScrollTop();
@@ -426,9 +415,9 @@ define(function(require, exports, module) {
       }
     },
     //boundry back bounce
-    boundryCheck: function(duration,easing,callback) {
-      this.boundryCheckX(duration,easing,callback);
-      this.boundryCheckY(duration,easing,callback);
+    boundryCheck: function(duration, easing, callback) {
+      this.boundryCheckX(duration, easing, callback);
+      this.boundryCheckY(duration, easing, callback);
     },
     stop: function() {
       var self = this;
@@ -436,26 +425,30 @@ define(function(require, exports, module) {
       self.__timers.y && self.__timers.y.stop();
       if (self.isScrollingX || self.isScrollingY) {
         var scrollTop = self.getScrollTop(),
-            scrollLeft = self.getScrollLeft();
+          scrollLeft = self.getScrollLeft();
         self.trigger("scrollend", {
           type: "scrollend",
           scrollTop: scrollTop,
           scrollLeft: scrollLeft
         });
-        self.trigger("stop",{
-          stype:"stop",
+        self.trigger("stop", {
+          stype: "stop",
           scrollTop: scrollTop,
           scrollLeft: scrollLeft
         })
         self.isScrollingX = false;
         self.isScrollingY = false;
+        //disable click
+        self._isClickDisabled = true;
+      } else {
+        self._isClickDisabled = false;
       }
     },
     render: function() {
       var self = this;
       SimuScroll.superclass.render.call(this);
       //fixed for scrollbars
-      if(getComputedStyle(self.renderTo).position == "static"){
+      if (getComputedStyle(self.renderTo).position == "static") {
         self.renderTo.style.position = "relative";
       }
       self.renderTo.style.overflow = "hidden";
@@ -465,18 +458,20 @@ define(function(require, exports, module) {
       self.initTouchAction();
       return self;
     },
-    
-    initTouchAction:function(){
+
+    initTouchAction: function() {
       var self = this;
       var touchAction = 'none';
-      if(!self.userConfig.lockX && self.userConfig.lockY){
+      if (!self.userConfig.lockX && self.userConfig.lockY) {
         touchAction = 'pan-y';
-      }else if(!self.userConfig.lockY && self.userConfig.lockX){
+      } else if (!self.userConfig.lockY && self.userConfig.lockX) {
         touchAction = 'pan-x';
-      }else if(self.userConfig.lockX && self.userConfig.lockY){
+      } else if (self.userConfig.lockX && self.userConfig.lockY) {
         touchAction = 'auto';
       }
-      self.mc.set({touchAction:touchAction});
+      self.mc.set({
+        touchAction: touchAction
+      });
     },
     initScrollBars: function() {
       var self = this;
@@ -497,10 +492,10 @@ define(function(require, exports, module) {
         self.scrollbarY.hide();
       }
     },
-    initController:function(){
+    initController: function() {
       var self = this;
       self.controller = self.controller || new Controller({
-        xscroll:self
+        xscroll: self
       });
     }
   });
