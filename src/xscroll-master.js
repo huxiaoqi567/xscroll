@@ -72,11 +72,10 @@ define(function(require, exports, module) {
 				var innerEls = self.__xscrolls[i].renderTo.querySelectorAll(self.userConfig.selector);
 				for (var j = 0; j < innerEls.length; j++) {
 					var xscroll = findByEl(innerEls[j], self.__xscrolls);
-					if (xscroll) {
+					if (xscroll && self.__xscrolls[i].controller) {
 						self.__xscrolls[i].controller.add(xscroll);
 					}
 				}
-				console.log(self.__xscrolls[i].userConfig)
 			}
 			self._bindEvt();
 		},

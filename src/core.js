@@ -114,7 +114,7 @@ define(function(require, exports, module) {
             var defaultCfg = {
                 preventDefault: true, //prevent touchstart 
                 bounce: true,
-                useTransition: true,
+                useTransition: false,
                 gpuAcceleration: true,
                 BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
                 BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,

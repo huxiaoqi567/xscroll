@@ -304,7 +304,6 @@ define(function(require, exports, module) {
 			var itemSize = 50;
 			var elementsPerPage = Math.ceil(xscroll[self.nameHeight] / itemSize);
 			var maxBufferedNum = self.userConfig.maxBufferedNum === undefined ? Math.max(Math.ceil(elementsPerPage / 3), 1) : self.userConfig.maxBufferedNum;
-			maxBufferedNum = 0;
 			var pos = Math.max(pos - maxBufferedNum * itemSize, 0);
 			var tmp = {},
 				item;

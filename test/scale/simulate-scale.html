@@ -29,18 +29,126 @@
     .xs-container,.xs-content{
       float: left;
     }
-
-    img{
-      width: 1000px;
-      float: left;
+  ul{
+    width: 1000px;
+      /*height:1000px;*/
+      display: block;
+  }
+    .cell{
+        width:10%;
+        display: block;
+        -webkit-box-shadow: 0 0 1px 1px #000;
+        height: 100px;
+        float: left;
     }
     </style>
     <div id="J_Scroll">
         <div class="xs-container">
 
             <div class="xs-content">
-
-                    <img src="../xscroll/test.jpeg">
+                  <ul>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                    <li class="cell"></li>
+                  </ul>
+                    <img data-src="../xscroll/test.jpeg">
             </div>
 
         </div>
@@ -56,7 +164,7 @@
             renderTo:"#J_Scroll",
             // lockX:true,
             
-            // useTransition:false
+            useTransition:false
         });
        
 
@@ -76,11 +184,11 @@
         
 
          xscroll.on("scrollend",function(e){
-            console.log(e.type)
+            // console.log(e.type)
         })
 
           xscroll.on("scroll",function(e){
-            console.log(e.scrollLeft,e.scrollTop)
+            // console.log(e.scrollLeft,e.scrollTop)
         })
 
          // xscroll.on("scale",function(e){
