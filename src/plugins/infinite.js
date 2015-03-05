@@ -21,6 +21,7 @@ define(function(require, exports, module) {
 			self._nameHeight = self.isY ? "_height" : "_width";
 			self.nameTop = self.isY ? "top" : "left";
 			self.nameHeight = self.isY ? "height" : "width";
+			self.nameWidth = self.isY ? "width":"height";
 			self.nameY = self.isY ? "y" : "x";
 			self.nameTranslate = self.isY ? "translateY" : "translateX";
 			self.nameContainerHeight = self.isY ? "containerHeight" : "containerWidth";
@@ -64,7 +65,8 @@ define(function(require, exports, module) {
 			if (!self._isStickyRendered) {
 				var sticky = document.createElement("div");
 				sticky.style.position = "fixed";
-				sticky.style[self.nameTop] = "0";
+				sticky.style.left = 0;
+				sticky.style.top = 0;
 				sticky.style.display = "none";
 				self.xscroll.renderTo.appendChild(sticky);
 				self.stickyElement = sticky;
@@ -98,9 +100,7 @@ define(function(require, exports, module) {
 					el.style.display = "block";
 					el.style[self.nameHeight] = unrecycledEl[self._nameHeight] + "px";
 					el.style[transform] = self.nameTranslate + "(" + unrecycledEl[self._nameTop] + "px) " + translateZ;
-					if (unrecycledEl.className) {
-						el.className = unrecycledEl.className;
-					}
+					Util.addClass(el,unrecycledEl.className);
 					self.userConfig.renderHook.call(self, el, unrecycledEl);
 				}
 			}
@@ -110,14 +110,10 @@ define(function(require, exports, module) {
 			var xscroll = self.xscroll;
 			var offset = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
 			self.visibleElements = self.getVisibleElements(offset);
-			self._getDomInfo();
+			self.__serializedData = self._getDomInfo();
 			self._initSticky();
 			var size = xscroll[self.nameHeight];
-			var sectionsLength = Object.keys(self.sections).length;
-			if (!sectionsLength) return;
-			var lastSection = self.sections[sectionsLength - 1];
-			var lastItem = lastSection[lastSection.length - 1];
-			var containerSize = (lastItem && lastItem[self._nameTop] !== undefined) ? lastItem[self._nameTop] + lastItem[self._nameHeight] : xscroll[self.nameHeight];
+			var containerSize = self._containerSize; 
 			if (containerSize < size) {
 				containerSize = size;
 			}
@@ -183,8 +179,8 @@ define(function(require, exports, module) {
 				for (var j in prevElementsPos) {
 					prevEl = prevElementsPos[j];
 					if (prevEl.guid === newEl.guid) {
-						if (JSON.stringify(newEl.style) != JSON.stringify(prevEl.style) || newEl[self._nameTop] != prevEl[self._nameTop] || newEl[self._nameHeight] != prevEl[self._nameHeight]) {
-							console.log( "data:", JSON.stringify(newEl.data),prevEl[self._nameTop], '->', newEl[self._nameTop])
+						if (newEl.style != prevEl.style || newEl[self._nameTop] != prevEl[self._nameTop] || newEl[self._nameHeight] != prevEl[self._nameHeight]) {
+							// console.log( "data:", JSON.stringify(newEl.data),prevEl[self._nameTop], '->', newEl[self._nameTop])
 							self.renderStyle(self.infiniteElements[newEl.__infiniteIndex], newEl, true);
 						}
 						if (JSON.stringify(newEl.data) != JSON.stringify(prevEl.data)) {
@@ -206,7 +202,7 @@ define(function(require, exports, module) {
 		_stickyHandler: function(_pos) {
 			var self = this;
 			_pos = undefined === _pos 
-			? (self.zoomType == "y" ? 
+			? (self.isY ? 
 			self.xscroll.getScrollTop()
 			:self.xscroll.getScrollLeft())
 			:_pos; 
@@ -220,7 +216,9 @@ define(function(require, exports, module) {
 				}
 			}
 			if (!index.length) {
-				self.stickyElement.style.display = "none";
+				if(self.stickyElement){
+					self.stickyElement.style.display = "none";
+				}
 				self.curStickyIndex = undefined;
 				return;
 			}
@@ -229,6 +227,7 @@ define(function(require, exports, module) {
 				self.curStickyIndex = curStickyIndex;
 				self.userConfig.renderHook.call(self, self.stickyElement, self.stickyDomInfo[self.curStickyIndex]);
 				self.stickyElement.style.display = "block";
+				self.stickyElement.style[self.nameWidth] = "100%";
 				self.stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + "px";
 				self.stickyElement.className = self.stickyDomInfo[self.curStickyIndex].className || "";
 				for (var attrName in self.stickyDomInfo[self.curStickyIndex].style) {
@@ -237,12 +236,25 @@ define(function(require, exports, module) {
 					}
 				}
 			}
-
+			var trans = 0;
+			if(self.stickyDomInfo[self.curStickyIndex+1]){
+				var cur = self.stickyDomInfo[self.curStickyIndex];
+				var next = self.stickyDomInfo[self.curStickyIndex+1];
+				if(_pos+cur[self._nameHeight]>next[self._nameTop] && _pos+cur[self._nameHeight]<next[self._nameTop]+cur[self._nameHeight]){
+					trans = cur[self._nameHeight] + pos -next[self._nameTop];
+				}else{
+					trans = 0;
+				}
+			}
+			self.stickyElement.style[transform] = self.isY ? "translateY(-"+(trans)+"px) translateZ(0)" :"translateX(-"+(trans)+"px) translateZ(0)";
+			//top
 			if (_pos < Math.min.apply(null, allTops)) {
 				self.stickyElement.style.display = "none";
 				self.curStickyIndex = undefined;
 				return;
 			}
+
+
 
 		},
 		/**
@@ -257,7 +269,7 @@ define(function(require, exports, module) {
 				section;
 			self.hasSticky = false;
 			var data = [];
-			self.__serializedData = {};
+			var serializedData = {};
 			for (var i in sections) {
 				for (var j = 0, len = sections[i].length; j < len; j++) {
 					section = sections[i][j];
@@ -266,6 +278,7 @@ define(function(require, exports, module) {
 					data.push(section);
 				}
 			}
+
 			//f = v/itemSize*1000 < 60 => v = 0.06 * itemSize
 			self.userConfig.maxSpeed = 0.06 * 50;
 			for (var i = 0, l = data.length; i < l; i++) {
@@ -279,9 +292,10 @@ define(function(require, exports, module) {
 				if (!self.hasSticky && item.style && item.style.position == "sticky") {
 					self.hasSticky = true;
 				}
-				self.__serializedData[item.guid] = item;
+				serializedData[item.guid] = item;
 			}
-			return sections;
+			self._containerSize = pos;
+			return serializedData;
 		},
 		getVisibleElements: function(pos) {
 			var self = this;
@@ -294,12 +308,14 @@ define(function(require, exports, module) {
 			var pos = Math.max(pos - maxBufferedNum * itemSize, 0);
 			var tmp = {},
 				item;
-			for (var i in self.__serializedData) {
-				item = self.__serializedData[i];
+			var data = self.__serializedData;
+			for (var i in data) {
+				item = data[i];
 				if (item[self._nameTop] >= pos - itemSize && item[self._nameTop] <= pos + 2 * maxBufferedNum * itemSize + xscroll[self.nameHeight]) {
 					tmp[item.guid] = item;
 				}
 			}
+			// return tmp;
 			return JSON.parse(JSON.stringify(tmp));
 		},
 		_popEl: function() {
@@ -333,8 +349,22 @@ define(function(require, exports, module) {
 			var self = this;
 			if (!el) return;
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+			//default style
+			var defaultStyle = {
+				color:"inherit",
+				background:"inherit",
+				margin:"inherit",
+				padding:"inherit",
+				opacity:"inherit",
+				textIndent:"inherit",
+				overflow:"inherit"
+			};
+
+			for(var attrName in defaultStyle){
+				el.style[attrName] = defaultStyle[attrName];
+			}
+			//update style
 			for (var attrName in elementObj.style) {
-				//update style
 				if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {
 					el.style[attrName] = elementObj.style[attrName];
 				}
@@ -441,7 +471,7 @@ define(function(require, exports, module) {
 		replace: function(sectionId, index, data) {
 			var self = this;
 			if (undefined === sectionId || !self.sections[sectionId]) return self;
-			self.sections[sectionId][index] = data;
+			 self.sections[sectionId][index] = data;
 			return self;
 		},
 		get: function(sectionId, index) {

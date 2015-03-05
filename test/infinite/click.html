@@ -84,16 +84,31 @@
             var tmp = [];
             tmp.push({
                 data:{
-                    num:"sticky"
+                    num:"sticky1"
                 },
                 style:{
-                    position:"sticky"
+                    background:"red",
+                    width:"100%",
+                    position:"sticky",
+                    height:50
                 }
             });
-            for (var i = 1; i <= 50; i++) {
+
+            tmp.push({
+                data:{
+                    num:"sticky2"
+                },
+                style:{
+                    background:"red",
+                    width:"100%",
+                    position:"sticky",
+                    height:50
+                }
+            });
+            for (var i = 1; i <= 100; i++) {
                 tmp.push({
                     data:{num: i},
-                    style:{height:50,background:"#fff","color":"#000"}
+                    style:{height:50,"color":"#000"}
                 });
             }
 
@@ -118,6 +133,7 @@
 
         xscroll.on("cellclick",function(e){
             infinite.remove(e.cell.sectionId,e.cell.index);
+            // infinite.sections[e.cell.sectionId][e.cell.index].style.height=150;
             xscroll.render();
         })
 

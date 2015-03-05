@@ -158,15 +158,15 @@ define(function(require, exports, module) {
 			return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
 		},
 		hasClass: function(el, className) {
-			return el && el.className && el.className.indexOf(className) != -1;
+			return el && el.className && className && el.className.indexOf(className) != -1;
 		},
 		addClass: function(el, className) {
-			if (el && !this.hasClass(el, className)) {
+			if (el && className && !this.hasClass(el, className)) {
 				el.className += " " + className;
 			}
 		},
 		removeClass: function(el, className) {
-			if (el && el.className) {
+			if (el && el.className && className) {
 				el.className = el.className.replace(className, "");
 			}
 		},

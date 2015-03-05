@@ -140,10 +140,21 @@
       base: "../../src/"
     })
     seajs.use(["simulate-scroll","plugins/infinite"],function(XScroll,Infinite){
-        var data = (function() {
+         var data = (function() {
             var tmp = [];
-            for (var i = 1; i <= 100; i++) {
-                tmp.push({data:{num: i},style:{width:100}});
+            for (var i = 1; i <= 1000; i++) {
+                if(i == 2 || i == 10 || i==20){
+                    tmp.push({
+                        style:{position:"sticky",background:"red",width:"100%",width:50},
+                        data:{num: i}
+                    });
+                }else{
+                    tmp.push({
+                        style:{background:"#fff"},
+                        data:{num: i}
+                    });
+                }
+                
             }
             return tmp
         })()
@@ -166,44 +177,6 @@
         infinite.append(0,data);
 
         xscroll.render();
-
-        setTimeout(function(){
-            infinite.get(0,0).style.width = 200;
-            xscroll.render();
-        },1000);
-
-
-        setTimeout(function(){
-            infinite.get(0,0).style.width = 100;
-            xscroll.render();
-        },2000);
-
-
-        setTimeout(function(){
-            infinite.get(0,0).style.background = "#000";
-            xscroll.render();
-        },3000);
-
-
-        setTimeout(function(){
-            infinite.remove(0,0);
-            xscroll.render();
-        },4000);
-
-        setTimeout(function(){
-            infinite.get(0,0).data.num = "scale";
-            infinite.get(0,0).style.fontSize = "24px";
-            infinite.get(0,0).style.color = "#fff";
-            infinite.get(0,0).style.background = "red";
-            infinite.get(0,0).style.width = 100;
-            xscroll.render();
-        },5000);
-
-        setTimeout(function(){
-            infinite.remove(0,0);
-            xscroll.render();
-        },6000);
-
 
 
 
