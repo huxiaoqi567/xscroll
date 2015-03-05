@@ -163,49 +163,33 @@
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
             // lockX:true,
-            
             useTransition:false
         });
-       
-
 
         var scale = new Scale({
             minScale:1,
             maxScale:2
         });
 
-        
-
          xscroll.render();
 
          xscroll.plug(scale);
-
-        window.xscroll = xscroll;
-        
 
          xscroll.on("scrollend",function(e){
             // console.log(e.type)
         })
 
-          xscroll.on("scroll",function(e){
-            // console.log(e.scrollLeft,e.scrollTop)
+        xscroll.on("scroll",function(e){
+            console.log(e.scrollLeft,e.scrollTop)
         })
 
-         // xscroll.on("scale",function(e){
-         //  console.log(e.type,e.scale)
-         // })
+        xscroll.on("scale",function(e){
+          // console.log(e.type,e.scale)
+         })
 
-        //  xscroll.on("scaleend",function(e){
-        //   console.log(e.type,e.scale)
-        //  })
-
-        //  xscroll.on("refresh",function(e){
-        //   console.log(e.type)
-        //  })
-
-        // xscroll.on("click",function(e){
-        //   console.log(e)
-        // })
+         xscroll.on("scaleend",function(e){
+          // console.log(e.type,e.scale)
+         })
 
       });
     </script>

@@ -109,11 +109,6 @@
     seajs.use(["simulate-scroll"],function(XScroll){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
-            // lockX:true,
-            // scalable:true,
-            // minScale:1,
-            // maxScale:2,
-            // useTransition:false
         });
         xscroll.render();
 
@@ -127,21 +122,6 @@
           xscroll.boundryCheckY()
         });
 
-        // xscroll.scrollLeft(1800,1000,"ease",function(){
-        //   xscroll.boundryCheckX();
-        // });
-        //  xscroll.scrollTop(1000,500,"ease",function(){
-        //   xscroll.boundryCheckY();
-        // });
-
-         xscroll.on("scrollend",function(e){
-            // console.log("end",e.scrollLeft,e.scrollTop)
-        })
-
-          xscroll.on("scroll",function(e){
-
-            // console.log(e.type,e.scrollLeft,e.scrollTop)
-        })
           xscroll.on("scrollend",function(e){
           console.log(e.type,e.zoomType)
          })

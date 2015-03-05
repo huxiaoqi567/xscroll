@@ -23,8 +23,6 @@
         top:0;
         bottom: 0;
         width:100%;
-        overflow-x: hidden;
-        overflow-y: scroll;
      }
     #J_Scroll ul{
         width: 100%;
@@ -32,8 +30,10 @@
     #J_Scroll ul li.xs-row{
         width: 100%;
         display: block;
-        height: 40px;
-        visibility: hidden;
+        height: 50px;
+        /*border-bottom:1px solid;*/
+        /*-webkit-transition:all 0.5s ease;*/
+        /*visibility: hidden;*/
     }
     .xs-container{
         width: 100%;
@@ -134,23 +134,16 @@
     seajs.config({
       base: "../../src/"
     })
-    seajs.use(["xscroll","plugins/infinite"],function(XScroll,Infinite){
+    seajs.use(["simulate-scroll","plugins/infinite"],function(XScroll,Infinite){
         var data = (function() {
             var tmp = [];
-            for (var i = 1; i <= 1000; i++) {
-                if(i == 2 || i == 10 || i==20){
-                    tmp.push({
-                        style:{position:"sticky",background:"red",width:"100%",height:50+i*5},
-                        data:{num: i}
-                    });
-                }else{
-                    tmp.push({
-                        style:{background:"#fff"},
-                        data:{num: i}
-                    });
-                }
-                
+            for (var i = 1; i <= 50; i++) {
+                tmp.push({
+                    data:{num: i},
+                    style:{height:50+i*50,background:"#fff","color":"#000"}
+                });
             }
+
             return tmp
         })()
         var xscroll = new XScroll({
@@ -160,15 +153,38 @@
         var infinite = new Infinite({
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
-                el.innerHTML = row.data.num;
+                el.innerText = row.data.num;
             }
-        })
+        });
 
-        xscroll.plug(infinite)
+        xscroll.plug(infinite);
 
         infinite.append(0,data);
         
         xscroll.render();
+
+        // infinite.replace(0,0,{data:{num:"1111"},style:{height:100,position:"sticky",width:"100%",background:"#fff","color":"#000"}});
+
+        // infinite.insertAfter(0,2,{data:{num:22222},style:{height:100,width:"100%",background:"red",position:"sticky","color":"#000"}});
+
+        // infinite.insertBefore(0,0,{recycled:false,data:{num:"slider"},style:{height:150,background:"#000",color:"#fff"}});
+
+        // infinite.remove(0,1,);
+
+        // infinite.replace(0,1,{data:{num:"1111"},style:{height:100}});
+
+        // infinite.insertBefore(0,0,{data:{num:123},style:{height:100}});
+
+        // infinite.insertAfter(0,1,{data:{num:123},style:{height:100}});
+
+        setTimeout(function(){
+            xscroll.render();
+        },500)
+
+        window.xscroll = xscroll;
+
+        window.infinite =infinite;
+
 
     });
 

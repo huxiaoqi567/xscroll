@@ -170,20 +170,23 @@ define(function(require, exports, module) {
         self.boundryCheck();
         if (!self._isClickDisabled) {
           self._triggerClick(e);
-          self.trigger("click", e);
+          self.trigger(e.type, e);
         }
       });
 
       mc.on("panstart", function(e) {
         self._onpanstart(e);
+        self.trigger(e.type,e);
       });
 
       mc.on("pan", function(e) {
         self._onpan(e);
+        self.trigger(e.type,e);
       });
 
       mc.on("panend", function(e) {
         self._onpanend(e);
+        self.trigger(e.type,e);
       });
 
       self.trigger("aftereventbind", {

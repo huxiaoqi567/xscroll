@@ -7,7 +7,8 @@ define(function(require, exports, module) {
 	var Infinite = function(cfg) {
 		Infinite.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
-			zoomType: "y"
+			zoomType: "y",
+			transition:'all 0.5s ease'
 		}, cfg);
 	}
 
@@ -68,6 +69,7 @@ define(function(require, exports, module) {
 				sticky.style.left = 0;
 				sticky.style.top = 0;
 				sticky.style.display = "none";
+				Util.addClass(sticky,"_xs_infinite_elements_");
 				self.xscroll.renderTo.appendChild(sticky);
 				self.stickyElement = sticky;
 				self._isStickyRendered = true;
@@ -120,6 +122,7 @@ define(function(require, exports, module) {
 			xscroll[self.nameContainerHeight] = containerSize;
 			xscroll.container.style[self.nameHeight] = containerSize + "px";
 			xscroll.content.style[self.nameHeight] = containerSize + "px";
+			self.curStickyIndex = undefined;
 			self._renderUnRecycledEl();
 			self._updateByScroll();
 			self._updateByRender(offset);
@@ -229,7 +232,8 @@ define(function(require, exports, module) {
 				self.stickyElement.style.display = "block";
 				self.stickyElement.style[self.nameWidth] = "100%";
 				self.stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + "px";
-				self.stickyElement.className = self.stickyDomInfo[self.curStickyIndex].className || "";
+				self.stickyElement.setAttribute("xs-guid",self.stickyDomInfo[self.curStickyIndex].guid);
+				Util.addClass(self.stickyElement,self.stickyDomInfo[self.curStickyIndex].className);
 				for (var attrName in self.stickyDomInfo[self.curStickyIndex].style) {
 					if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {
 						self.stickyElement.style[attrName] = self.stickyDomInfo[self.curStickyIndex].style[attrName];
@@ -374,7 +378,7 @@ define(function(require, exports, module) {
 			el.style.visibility = "visible";
 			el.style[self.nameHeight] = elementObj[self._nameHeight] + "px";
 			el.style[transform] = self.nameTranslate + "(" + elementObj[self._nameTop] + "px) " + translateZ;
-			el.style[transition] = useTransition ? "all 0.5s ease" : "none";
+			el.style[transition] = useTransition ? self.userConfig.transition : "none";
 		},
 		findParentEl: function(el, selector, rootNode) {
 			var rs = null;
@@ -417,14 +421,13 @@ define(function(require, exports, module) {
 					e.target.style.webkitTransition = "";
 				}
 			});
-
-			self.xscroll.on("click", function(e) {
+			//celltap cellpanstart cellpan cellpanend
+			self.xscroll.on("tap panstart pan panend",function(e){
 				e.cell = self.getCell(e);
 				if (e.cell) {
-					self.xscroll.trigger("cellclick", e);
+					self.xscroll.trigger("cell"+e.type, e);
 				}
-			})
-
+			});
 			return self;
 		},
 		insertBefore: function(sectionId, index, data) {

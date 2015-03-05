@@ -44,12 +44,12 @@ define(function(require, exports, module) {
 			var maxScale = self.userConfig.maxScale;
 			var originX, originY,scale;
 			mc.on("tap", function(e) {
-				console.log("tapCount",e.tapCount)
 				//double tap
 				if (e.tapCount == 2) {
 					originX = (e.center.x - xscroll.x) / xscroll.containerWidth;
 					originY = (e.center.y - xscroll.y) / xscroll.containerHeight;
 					xscroll.scale > self.minScale ? self.scaleTo(minScale, originX, originY, 200) : self.scaleTo(maxScale, originX, originY, 200);
+					xscroll.trigger("doubletap",e);
 				}
 			});
 
@@ -61,7 +61,7 @@ define(function(require, exports, module) {
 		        scale = xscroll.scale;
 		        originX = (e.center.x - xscroll.x) / xscroll.containerWidth;
 		        originY = (e.center.y - xscroll.y) / xscroll.containerHeight;
-		        self.trigger("pinchstart", {
+		        xscroll.trigger("pinchstart", {
 		          scale: scale,
 		          origin: {
 		            x: originX,
@@ -82,7 +82,7 @@ define(function(require, exports, module) {
 				}
 				self._scale(__scale, originX, originY);
 				xscroll.translate(xscroll.x,xscroll.y,__scale);
-				self.trigger("pinch", {
+				xscroll.trigger("pinch", {
 					scale: __scale,
 					origin: {
 						x: originX,
@@ -101,7 +101,7 @@ define(function(require, exports, module) {
 		        	pan.set({enable:true});
 		        }
 
-		        self.trigger("pinchend", {
+		        xscroll.trigger("pinchend", {
 		          scale: scale,
 		          origin: {
 		            x: originX,
@@ -169,13 +169,13 @@ define(function(require, exports, module) {
 			// transitionStr = [transformStr, " ", duration , "s ", easing, " 0s"].join("");
 			var scaleStart = xscroll.scale;
 			self._scale(scale, originX, originY);
-			self.xscroll._animate("x", "translateX(" + self.xscroll.x + "px) scale(" + scale + ")", duration, easing, callback);
-			self.xscroll._animate("y", "translateY(" + self.xscroll.y + "px)", duration, easing, callback);
+			xscroll._animate("x", "translateX(" + xscroll.x + "px) scale(" + scale + ")", duration, easing, callback);
+			xscroll._animate("y", "translateY(" + xscroll.y + "px)", duration, easing, callback);
 
 			self.scaleHandler = self.scaleHandler || function(e) {
 				var _scale = (scale - scaleStart) * e.percent + scaleStart;
 				//trigger scroll event
-				self.trigger("scale", {
+				xscroll.trigger("scale", {
 					scale: _scale,
 					origin: {
 						x: originX,
@@ -188,8 +188,7 @@ define(function(require, exports, module) {
 				self.isScaling = false;
 				//enable pan gesture
 				xscroll.mc.get("pan").set({enable:true});
-				console.log("scaleend")
-				self.trigger(SCALE_END, {
+				xscroll.trigger(SCALE_END, {
 					type: SCALE_END,
 					scale: self.scale,
 					origin: {
@@ -199,13 +198,11 @@ define(function(require, exports, module) {
 				})
 			}
 
-			self.xscroll.__timers.x.timer.off("run", self.scaleHandler);
-			self.xscroll.__timers.x.timer.on("run", self.scaleHandler);
-			self.xscroll.__timers.x.timer.off("stop", self.scaleendHandler);
-			self.xscroll.__timers.x.timer.on("stop", self.scaleendHandler);
-
-
-			self.trigger(SCALE_ANIMATE, {
+			xscroll.__timers.x.timer.off("run", self.scaleHandler);
+			xscroll.__timers.x.timer.on("run", self.scaleHandler);
+			xscroll.__timers.x.timer.off("stop", self.scaleendHandler);
+			xscroll.__timers.x.timer.on("stop", self.scaleendHandler);
+			xscroll.trigger(SCALE_ANIMATE, {
 				scale: xscroll.scale,
 				duration: duration,
 				easing: easing,

@@ -76,5 +76,9 @@ li{
 
     	xscroll.render();
 
+    	xscroll.mc.on("tap panstart panend pan",function(e){
+    		console.log(e.type)
+    	})
+
     })
 </script>

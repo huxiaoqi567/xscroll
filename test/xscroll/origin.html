@@ -60,6 +60,10 @@ li{
     		console.log(e.scrollTop)
     	})
 
+    	xscroll.on("tap panstart panend pan",function(e){
+    		console.log(e.preventDefault())
+    	})
+
     	// xscroll.on("scrollend",function(e){
     	// 	console.log(e.scrollTop)
     	// })

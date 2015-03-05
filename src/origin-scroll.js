@@ -60,21 +60,53 @@ define(function(require, exports, module) {
             self.__timers.y.reset(config);
             self.__timers.y.run();
 		},
+        scrollLeft:function(x, duration, easing, callback){
+            var self = this;
+            var x = Math.round(x);
+            if (self.userConfig.lockX) return;
+            var duration = duration || 0;
+            var easing = easing || "quadratic";
+            var config = {
+               css:{
+                scrollLeft:x
+               },
+               duration:duration,
+               easing:easing,
+               run:function(e){
+                    //trigger scroll event
+                    self.trigger("scroll",{
+                        scrollTop:self.getScrollTop(),
+                        scrollLeft:self.getScrollLeft()
+                    });
+               },
+               useTransition:false, //scrollTop 
+               end:callback
+            };
+            self.__timers.x = self.__timers.x || new Animate(self.renderTo,config);
+            //run
+            self.__timers.x.stop();
+            self.__timers.x.reset(config);
+            self.__timers.x.run();
+        },
 		_bindEvt:function(){
             var self = this;
             if (self.__isEvtBind) return;
             self.__isEvtBind = true;
              var mc = self.mc = new Hammer.Manager(self.renderTo);
             var tap = new Hammer.Tap();
-            mc.add([tap]);
+            mc.add([tap,new Hammer.Pan()]);
             self.mc.on("tap", function(e) {
                 e.preventDefault();
                 e.srcEvent.stopPropagation();
                 if(!self._isClickDisabled){
                   self._triggerClick(e);
-                  self.trigger("click",e);
+                  self.trigger(e.type,e);
                 }
-              });
+            });
+
+            self.mc.on("panstart pan panend",function(e){
+                self.trigger(e.type,e);
+            })
 
             self.renderTo.addEventListener("scroll",function(e){
                 self.trigger("scroll",{

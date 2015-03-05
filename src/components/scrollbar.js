@@ -31,7 +31,7 @@ define(function(require, exports, module) {
 		destroy: function() {
 			var self = this;
 			self.scrollbar && self.scrollbar.remove();
-			self.xscroll.off("scaleanimate", self._update, self);
+			// self.xscroll.off("scaleanimate", self._update, self);
 			self.xscroll.off("scrollend", self._update, self);
 			self.xscroll.off("scrollanimate", self._update, self);
 			!self.xscroll.userConfig.useTransition && self.xscroll.off("scroll", self._update, self);
