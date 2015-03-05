@@ -38,7 +38,7 @@ Backbone.Events
     - infinite.insertAfter(section,index,data);
     - infinite.replace(section,index,data);  // update
     - inifinite.append(section,data);
-    - infinite.delete(section,from,[number]);
+    - infinite.remove(section,from,[number]);
 - 支持局部更新渲染，dom重排可带动画
 
 ### 计划安排
