@@ -37,7 +37,7 @@
     .cell{
         width:10%;
         display: block;
-        border: 1px solid;
+        border:1px solid;
         height: 100px;
         float: left;
     }
@@ -162,6 +162,7 @@
     seajs.use(["simulate-scroll","plugins/scale"],function(XScroll,Scale){
         var xscroll = new XScroll({
             renderTo:"#J_Scroll",
+            // lockX:true,
             useTransition:true
         });
 
@@ -170,18 +171,16 @@
             maxScale:2
         });
 
-         xscroll.render();
+        xscroll.plug(scale);
+
+        xscroll.render();
+
+        xscroll.unplug(scale);
+
+        
 
 
-
-         xscroll.plug(scale);
-
-         scale.on("scale scaleanimate scaleend",function(e){
-            console.log(e)
-         });
-
-
-
+         
 
       });
     </script>

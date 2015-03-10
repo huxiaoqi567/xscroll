@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
 	var Util = require('../util');
 	var Base = require('../base');
-	var prefix;
+	var clsPrefix;
 	var containerCls;
 	var content = "Pull Down To Refresh";
 	var loadingContent = "Loading...";
@@ -9,6 +9,12 @@ define(function(require, exports, module) {
 	 * A pulldown to refresh plugin for xscroll.
 	 * @constructor
 	 * @param {object} cfg
+	 * @param {number} cfg.height 
+	 * @param {string} cfg.content default html for pulldown 
+	 * @param {string} cfg.downContent html for pulldown when scrollTop is smaller than cfg.height
+	 * @param {string} cfg.upContent html for pulldown when scrollTop is larger than cfg.height
+	 * @param {string} cfg.loadingContent html for pulldown when released
+	 * @param {string} cfg.clsPrefix  class prefix which default value is "xs-plugin-pulldown-"
 	 * @extends {Base}
 	 */
 	var PullDown = function(cfg) {
@@ -16,11 +22,11 @@ define(function(require, exports, module) {
 		this.userConfig = Util.mix({
 			content: content,
 			height: 60,
-			autoRefresh: true, //是否自动刷新页面
+			autoRefresh: true, 
 			downContent: "Pull Down To Refresh",
 			upContent: "Release To Refresh",
 			loadingContent: loadingContent,
-			prefix: "xs-plugin-pulldown-"
+			clsPrefix: "xs-plugin-pulldown-"
 		}, cfg);
 	}
 	Util.extend(PullDown,Base, {
@@ -38,13 +44,9 @@ define(function(require, exports, module) {
 		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
-			self.xscroll = xscroll;
-			prefix = self.userConfig.prefix;
-			if (self.xscroll) {
-				self.xscroll.on("afterrender", function() {
-					self.render()
-				})
-			}
+			self.xscroll = xscroll.render();
+			clsPrefix = self.userConfig.clsPrefix;
+			self.render();
 			return self;
 		},
 		/**
@@ -72,16 +74,18 @@ define(function(require, exports, module) {
 			var self = this;
 			if (self.__isRender) return;
 			self.__isRender = true;
-			var containerCls = prefix + "container";
+			var containerCls = clsPrefix + "container";
 			var height = self.userConfig.height || 60;
 			var pulldown = self.pulldown = document.createElement("div");
 			pulldown.className = containerCls;
 			pulldown.style.position = "absolute";
 			pulldown.style.width = "100%";
 			pulldown.style.height = height + "px";
+			pulldown.style.lineHeight = height + "px";
 			pulldown.style.top = -height + "px";
+			pulldown.style.textAlign = "center";
 			self.xscroll.container.appendChild(pulldown);
-			Util.addClass(pulldown, prefix + self.status);
+			Util.addClass(pulldown, clsPrefix + self.status);
 			pulldown.innerHTML = self.userConfig[self.status + "Content"] || self.userConfig.content;
 			self._bindEvt();
 			return self;
@@ -99,8 +103,8 @@ define(function(require, exports, module) {
 		_changeStatus: function(status) {
 			var prevVal = this.status;
 			this.status = status;
-			Util.removeClass(this.pulldown, prefix + prevVal)
-			Util.addClass(this.pulldown, prefix + status);
+			Util.removeClass(this.pulldown, clsPrefix + prevVal)
+			Util.addClass(this.pulldown, clsPrefix + status);
 			this.pulldown.innerHTML = this.userConfig[status + "Content"];
 			if(prevVal != status){
 				this.trigger("statuschange",{
@@ -129,9 +133,8 @@ define(function(require, exports, module) {
 		},
 		_panHandler: function(e) {
 			var self = this;
-			var height = self.userConfig.height || 60;
 			if (e.scrollTop > 0) return;
-			self._changeStatus(Math.abs(e.scrollTop) < height ? "down" : "up");
+			self._changeStatus(Math.abs(e.scrollTop) < self.userConfig.height ? "down" : "up");
 		},
 		_panEndHandler: function(e) {
 			var self = this;

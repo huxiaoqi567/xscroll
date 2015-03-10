@@ -146,6 +146,7 @@ define(function(require, exports, module) {
 			self.__isTransitionEnd = true;
 			if(e.target !== e.currentTarget) return;
 			self.__handlers.stop.call(self);
+			// self.stop();
 		};
 
 		//trigger run
@@ -236,6 +237,7 @@ define(function(require, exports, module) {
 					if(!self.__isTransitionEnd){
 						self.__isTransitionEnd = true;
 						self.__handlers.stop.call(self);
+						// self.stop();
 					}
 				},Number(duration) + 60)
 			} else {

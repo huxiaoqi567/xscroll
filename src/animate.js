@@ -145,6 +145,7 @@
 			self.__isTransitionEnd = true;
 			if(e.target !== e.currentTarget) return;
 			self.__handlers.stop.call(self);
+			// self.stop();
 		};
 
 		//trigger run
@@ -235,6 +236,7 @@
 					if(!self.__isTransitionEnd){
 						self.__isTransitionEnd = true;
 						self.__handlers.stop.call(self);
+						// self.stop();
 					}
 				},Number(duration) + 60)
 			} else {

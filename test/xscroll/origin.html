@@ -47,30 +47,12 @@ li{
       base: "../../build/"
     })
     seajs.use(["origin-scroll"],function(XScroll){
-
     	var xscroll = new XScroll({
     		renderTo:"#scroll"
     	});
-
     	xscroll.render();
-
-    	// xscroll.scrollY(1000,1000)
-
-    	xscroll.on("scroll",function(e){
-    		console.log(e.scrollTop)
+    	xscroll.on("tap doubletap panstart panend pan scroll scrollend",function(e){
+    		console.log(e,e.type)
     	})
-
-    	xscroll.on("tap panstart panend pan",function(e){
-    		console.log(e.preventDefault())
-    	})
-
-    	// xscroll.on("scrollend",function(e){
-    	// 	console.log(e.scrollTop)
-    	// })
-
-
-    	
-
-
     })
 </script>

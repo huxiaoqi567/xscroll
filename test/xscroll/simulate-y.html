@@ -76,7 +76,7 @@ li{
 
     	xscroll.render();
 
-    	xscroll.mc.on("tap panstart panend pan",function(e){
+    	xscroll.on("tap doubletap panstart panend pan scroll scrollend",function(e){
     		console.log(e.type)
     	})
 

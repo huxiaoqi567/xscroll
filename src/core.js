@@ -14,28 +14,28 @@
     var transition = Util.prefixStyle("transition");
     var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
     /** 
-   * @constructor
-   * @param {object} cfg config for scroll
-   * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
-   * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
-   * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
-   * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
-   * @param {boolean} cfg.lockX just like overflow-x:hidden
-   * @param {boolean} cfg.lockY just like overflow-y:hidden
-   * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
-   * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
-   * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
-   * @param {boolean} cfg.simulateScroll config if use animation or origin scroll
-   * @param {string}  cfg.clsPrefix config the class prefix wich default value is "xs-"
-   * @extends XScroll
-   * @example
-   * var xscroll = new XScroll({
-   *    renderTo:"#scroll",
-   *    lockX:false,
-   *    scrollbarX:true
-   * });
-   * xscroll.render();
-   */
+     * @constructor
+     * @param {object} cfg config for scroll
+     * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
+     * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
+     * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
+     * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
+     * @param {boolean} cfg.lockX just like overflow-x:hidden
+     * @param {boolean} cfg.lockY just like overflow-y:hidden
+     * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
+     * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
+     * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
+     * @param {boolean} cfg.simulateScroll config if use animation or origin scroll
+     * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
+     * @extends XScroll
+     * @example
+     * var xscroll = new XScroll({
+     *    renderTo:"#scroll",
+     *    lockX:false,
+     *    scrollbarX:true
+     * });
+     * xscroll.render();
+     */
     function XScroll(cfg) {
         XScroll.superclass.constructor.call(this);
         this.userConfig = cfg;
@@ -43,7 +43,7 @@
     }
 
     XScroll.Util = Util;
-    
+
     XScroll.Plugin = {};
 
     Util.extend(XScroll, Base, {
@@ -119,17 +119,17 @@
         /**
          * get scroll top value
          * @memberof XScroll
-         * @return {number} scrollTop 
+         * @return {number} scrollTop
          */
         getScrollTop: function() {},
         /**
          * get scroll left value
          * @memberof XScroll
-         * @return {number} scrollLeft 
+         * @return {number} scrollLeft
          */
         getScrollLeft: function() {},
         /**
-         * scroll absolute to the destination 
+         * scroll absolute to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param scrollTop {number} scrollTop
@@ -144,7 +144,7 @@
             self.scrollTop(scrollTop, duration, easing, callback);
         },
         /**
-         * scroll relative to the destination 
+         * scroll relative to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param scrollTop {number} scrollTop
@@ -156,7 +156,7 @@
             this.scrollByY(scrollTop, duration, easing, callback);
         },
         /**
-         * horizontal scroll relative to the destination 
+         * horizontal scroll relative to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param duration {number} duration for animte
@@ -166,7 +166,7 @@
             this.scrollLeft(Number(scrollLeft) + Number(this.getScrollLeft()), duration, easing, callback);
         },
         /**
-         * vertical scroll relative to the destination 
+         * vertical scroll relative to the destination
          * @memberof XScroll
          * @param scrollTop {number} scrollTop
          * @param duration {number} duration for animte
@@ -176,7 +176,7 @@
             this.scrollTop(Number(scrollTop) + Number(this.getScrollTop()), duration, easing, callback);
         },
         /**
-         * horizontal scroll absolute to the destination 
+         * horizontal scroll absolute to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param duration {number} duration for animte
@@ -184,7 +184,7 @@
          **/
         scrollLeft: function(scrollLeft, duration, easing, callback) {},
         /**
-         * vertical scroll absolute to the destination 
+         * vertical scroll absolute to the destination
          * @memberof XScroll
          * @param scrollTop {number} scrollTop
          * @param duration {number} duration for animte
@@ -194,7 +194,7 @@
         /**
          * reset the boundry size
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         resetSize: function() {
             var self = this;
@@ -215,7 +215,7 @@
         /**
          * render scroll
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         render: function() {
             var self = this;
@@ -238,7 +238,7 @@
         /**
          * bounce to the boundry vertical and horizontal
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         boundryCheck: function() {
             return this;
@@ -246,21 +246,40 @@
         /**
          * bounce to the boundry horizontal
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         boundryCheckX: function() {
             return this;
         },
         /**
-         * bounce to the boundry vertical 
+         * bounce to the boundry vertical
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         boundryCheckY: function() {
             return this;
         },
         _bindEvt: function() {
-            return this;
+            var self = this;
+            if(self.___isEvtBind) return;
+            self.___isEvtBind = true;
+            var mc = self.mc = new Hammer.Manager(self.renderTo);
+            var tap = new Hammer.Tap();
+            var pan = new Hammer.Pan();
+            mc.add([tap, pan]);
+            //trigger all events 
+            self.mc.on("panstart pan panend pinchstart pinch pinchend", function(e) {
+                self.trigger(e.type, e);
+            });
+            self.mc.on("tap",function(e){
+                if(e.tapCount == 1){
+                    e.type = "tap";
+                    self.trigger(e.type,e);
+                }else if(e.tapCount == 2){
+                    self.trigger("doubletap",e);
+                }
+            });
+            return self;
         }
     });
 

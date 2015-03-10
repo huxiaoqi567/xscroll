@@ -121,27 +121,13 @@
             self.__timers.x.run();
         },
         _bindEvt: function() {
+            OriginScroll.superclass._bindEvt.call(this);
             var self = this;
             if (self.__isEvtBind) return;
             self.__isEvtBind = true;
-            var mc = self.mc = new Hammer.Manager(self.renderTo);
-            var tap = new Hammer.Tap();
-            mc.add([tap, new Hammer.Pan()]);
-            self.mc.on("tap", function(e) {
-                e.preventDefault();
-                e.srcEvent.stopPropagation();
-                if (!self._isClickDisabled) {
-                    self._triggerClick(e);
-                    self.trigger(e.type, e);
-                }
-            });
-
-            self.mc.on("panstart pan panend", function(e) {
-                self.trigger(e.type, e);
-            })
-
             self.renderTo.addEventListener("scroll", function(e) {
                 self.trigger("scroll", {
+                    type:"scroll",
                     scrollTop: self.getScrollTop(),
                     scrollLeft: self.getScrollLeft()
                 })

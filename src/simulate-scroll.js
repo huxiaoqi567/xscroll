@@ -26,6 +26,7 @@
    * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
    * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
    * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
+   * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
    * @extends XScroll
    * @example
    * var xscroll = new SimuScroll({
@@ -178,7 +179,7 @@
           self.trigger("scroll", {
             scrollTop: self.getScrollTop(),
             scrollLeft: self.getScrollLeft(),
-            type: "scroll"
+            type:"scroll"
           });
         },
         useTransition: self.userConfig.useTransition,
@@ -187,7 +188,7 @@
           if ((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear") {
             self['isScrolling' + type.toUpperCase()] = false;
             self.trigger("scrollend", {
-              type: "scrollend",
+              type:"scrollend",
               scrollTop: self.getScrollTop(),
               scrollLeft: self.getScrollLeft(),
               zoomType: type,
@@ -202,26 +203,30 @@
       timer.reset(config);
       timer.run();
       self.trigger("scrollanimate", {
+        type:"scrollanimate",
         scrollTop: -self.y,
         scrollLeft: -self.x,
-        type: "scrollanimate",
         duration: duration,
         easing: easing,
         zoomType: type
       })
       return this;
     },
+    _ontap: function(e) {
+      var self = this;
+      e.preventDefault();
+      e.srcEvent.stopPropagation();
+      self.boundryCheck();
+      self._triggerClick(e);
+    },
     _bindEvt: function() {
+      SimuScroll.superclass._bindEvt.call(this);
       var self = this;
       if (self.__isEvtBind) return;
       self.__isEvtBind = true;
-      var renderTo = self.renderTo;
-      var mc = self.mc = new Hammer.Manager(self.renderTo);
-      var tap = new Hammer.Tap();
-      var pan = new Hammer.Pan();
       var pinch = new Hammer.Pinch();
-      mc.add([tap, pan, pinch]);
-
+      self.mc.add(pinch);
+      var renderTo = self.renderTo;
       renderTo.addEventListener("touchstart", function(e) {
         if (self.userConfig.preventDefault) {
           e.preventDefault();
@@ -229,34 +234,10 @@
         self.stop();
       }, false);
 
-      mc.on("tap", function(e) {
-        e.preventDefault();
-        e.srcEvent.stopPropagation();
-        self.boundryCheck();
-        if (!self._isClickDisabled) {
-          self._triggerClick(e);
-          self.trigger(e.type, e);
-        }
-      });
-
-      mc.on("panstart", function(e) {
-        self._onpanstart(e);
-        self.trigger(e.type, e);
-      });
-
-      mc.on("pan", function(e) {
-        self._onpan(e);
-        self.trigger(e.type, e);
-      });
-
-      mc.on("panend", function(e) {
-        self._onpanend(e);
-        self.trigger(e.type, e);
-      });
-
-      self.trigger("aftereventbind", {
-        mc: mc
-      });
+      self.on("tap", self._ontap, self);
+      self.on("panstart", self._onpanstart, self);
+      self.on("pan", self._onpan, self);
+      self.on("panend", self._onpanend, self);
       //window resize
       window.addEventListener("resize", function(e) {
         setTimeout(function() {
@@ -274,10 +255,6 @@
       var scrollTop = self.getScrollTop();
       self.stop();
       self.translate(-scrollLeft, -scrollTop);
-      self.trigger("panstart", Util.mix(e, {
-        scrollTop: scrollTop,
-        scrollLeft: scrollLeft
-      }));
       var threshold = self.mc.get("pan").options.threshold;
       self.thresholdY = e.direction == "8" ? threshold : e.direction == "16" ? -threshold : 0;
       self.thresholdX = e.direction == "2" ? threshold : e.direction == "4" ? -threshold : 0;
@@ -305,18 +282,12 @@
       //pan trigger the opposite direction
       self.directionX = e.type == 'panleft' ? 'right' : e.type == 'panright' ? 'left' : '';
       self.directionY = e.type == 'panup' ? 'down' : e.type == 'pandown' ? 'up' : '';
-      self.trigger("scroll", Util.mix(e, {
+      self.trigger("scroll",  {
         scrollTop: -y,
         scrollLeft: -x,
         triggerType: "pan",
-        type: "scroll"
-      }));
-
-      self.trigger("pan", Util.mix(e, {
-        scrollTop: -y,
-        scrollLeft: -x,
-        type: "pan"
-      }));
+        type:"scroll"
+      });
       return self;
     },
     _onpanend: function(e) {
@@ -556,12 +527,10 @@
         var scrollTop = self.getScrollTop(),
           scrollLeft = self.getScrollLeft();
         self.trigger("scrollend", {
-          type: "scrollend",
           scrollTop: scrollTop,
           scrollLeft: scrollLeft
         });
         self.trigger("stop", {
-          stype: "stop",
           scrollTop: scrollTop,
           scrollLeft: scrollLeft
         })

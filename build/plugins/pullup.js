@@ -1,18 +1,23 @@
 define(function(require, exports, module) {
 	var Util = require('../util');
 	var Base = require('../base');
-	var prefix;
+	var clsPrefix;
 	var containerCls;
 	var loadingContent = "Loading...";
 	var upContent = "Pull Up To Refresh";
 	var downContent = "Release To Refresh";
-	var pageEndContent = "Last Page";
 	var PULL_UP_HEIGHT = 60;
 	var HEIGHT = 40;
 	/**
 	 * A pullup to load plugin for xscroll.
 	 * @constructor
 	 * @param {object} cfg
+	 * @param {number} cfg.height 
+	 * @param {string} cfg.downContent 
+	 * @param {string} cfg.upContent 
+	 * @param {string} cfg.loadingContent 
+	 * @param {string} cfg.clsPrefix  class prefix which default value is "xs-plugin-pullup-"
+	 * @param {number} cfg.bufferHeight preload data before scrolling to the bottom of the boundry
 	 * @extends {Base}
 	 */
 	var PullUp = function(cfg) {
@@ -20,13 +25,11 @@ define(function(require, exports, module) {
 		this.userConfig = Util.mix({
 			upContent: upContent,
 			downContent: downContent,
-			pageEndContent: pageEndContent,
 			pullUpHeight: PULL_UP_HEIGHT,
 			height: HEIGHT,
-			autoRefresh: true, //是否自动刷新页面
 			loadingContent: loadingContent,
-			boundry: {},
-			prefix: "xs-plugin-pullup-"
+			bufferHeight:0,
+			clsPrefix: "xs-plugin-pullup-"
 		}, cfg);
 	}
 	Util.extend(PullUp, Base, {
@@ -44,11 +47,9 @@ define(function(require, exports, module) {
 		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
-			self.xscroll = xscroll;
-			prefix = self.userConfig.prefix;
-			if (self.xscroll) {
-				self.xscroll.on("afterrender", self.render, self)
-			}
+			self.xscroll = xscroll.render();
+			clsPrefix = self.userConfig.clsPrefix;
+			self.render();
 			return self;
 		},
 		/**
@@ -77,7 +78,7 @@ define(function(require, exports, module) {
 			var self = this;
 			if (self.__isRender) return;
 			self.__isRender = true;
-			var containerCls = prefix + "container";
+			var containerCls = clsPrefix + "container";
 			var height = self.userConfig.height;
 			var pullup = self.pullup = document.createElement("div");
 			pullup.className = containerCls;
@@ -87,7 +88,7 @@ define(function(require, exports, module) {
 			pullup.style.bottom = -height + "px";
 			self.xscroll.container.appendChild(pullup);
 			self.xscroll.boundry.expandBottom(self.userConfig.height);
-			Util.addClass(pullup, prefix + self.status);
+			Util.addClass(pullup, clsPrefix + self.status);
 			pullup.innerHTML = self.userConfig[self.status + "Content"] || self.userConfig.content;
 			self._bindEvt();
 			return self;
@@ -138,8 +139,8 @@ define(function(require, exports, module) {
 			if (status != "loading" && this.isLoading) return;
 			var prevVal = this.status;
 			this.status = status;
-			Util.removeClass(this.pullup, prefix + prevVal)
-			Util.addClass(this.pullup, prefix + status);
+			Util.removeClass(this.pullup, clsPrefix + prevVal)
+			Util.addClass(this.pullup, clsPrefix + status);
 			this.pullup.innerHTML = this.userConfig[status + "Content"];
 			if (prevVal != status) {
 				this.trigger("statuschange", {

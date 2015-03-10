@@ -3,18 +3,18 @@ define(function(require, exports, module) {
      var Base = require('../base');
 
      /**
-     * a snap plugin for xscroll,wich support vertical and horizontal snap.
-     * @constructor
-     * @param {object} cfg
-     * @param {number} cfg.snapColIndex initial col index
-     * @param {number} cfg.snapRowIndex initial row index
-     * @param {number} cfg.snapDuration duration for snap animation
-     * @param {string} cfg.snapEasing easing for snap animation
-     * @param {number} cfg.snapOffsetLeft an offset from left boundry for snap wich default value is 0
-     * @param {number} cfg.snapOffsetTop an offset from top boundry for snap wich default value is 0
-     * @param {boolean} cfg.autoStep which step is based on scroll velocity
-     * @extends {Base}
-     */
+      * a snap plugin for xscroll,wich support vertical and horizontal snap.
+      * @constructor
+      * @param {object} cfg
+      * @param {number} cfg.snapColIndex initial col index
+      * @param {number} cfg.snapRowIndex initial row index
+      * @param {number} cfg.snapDuration duration for snap animation
+      * @param {string} cfg.snapEasing easing for snap animation
+      * @param {number} cfg.snapOffsetLeft an offset from left boundry for snap wich default value is 0
+      * @param {number} cfg.snapOffsetTop an offset from top boundry for snap wich default value is 0
+      * @param {boolean} cfg.autoStep which step is based on scroll velocity
+      * @extends {Base}
+      */
      var Snap = function(cfg) {
          Snap.superclass.constructor.call(this, cfg);
          this.userConfig = Util.mix({
@@ -22,68 +22,69 @@ define(function(require, exports, module) {
              snapRowIndex: 0,
              snapDuration: 500,
              snapEasing: "ease",
-             snapOffsetLeft:0,
-             snapOffsetTop:0,
-             autoStep:false //autostep
+             snapOffsetLeft: 0,
+             snapOffsetTop: 0,
+             autoStep: false //autostep
          }, cfg);
      }
-     
+
      Util.extend(Snap, Base, {
-        /**
-         * a pluginId
-         * @memberOf Snap
-         * @type {string} 
-         */
+         /**
+          * a pluginId
+          * @memberOf Snap
+          * @type {string}
+          */
          pluginId: "snap",
          /**
-         * plugin initializer
-         * @memberOf Snap
-         * @override Base
-         * @return {Snap} 
-         */
+          * plugin initializer
+          * @memberOf Snap
+          * @override Base
+          * @return {Snap}
+          */
          pluginInitializer: function(xscroll) {
              var self = this;
-             self.xscroll = xscroll;
+             self.xscroll = xscroll.render();
              self.snapColIndex = self.userConfig.snapColIndex;
              self.snapRowIndex = self.userConfig.snapRowIndex;
              prefix = self.userConfig.prefix;
-             self.xscroll.render();
              self.render();
          },
          /**
-         * detroy the plugin
-         * @memberOf Snap
-         * @override Base
-         */
+          * detroy the plugin
+          * @memberOf Snap
+          * @override Base
+          */
          pluginDestructor: function() {
              var self = this;
-
+             var xscroll = self.xscroll;
+             xscroll.on("panend", xscroll._onpanend,xscroll);
+             xscroll.off("panend", self._snapAnimate, self);
              delete self;
          },
          /**
-         * scroll to a col and row with animation
-         * @memberOf Snap
-         * @param {number} col col-index
-         * @param {number} row row-index
-         * @param {number} duration duration for animation ms
-         * @param {string} easing easing for animation 
-         * @param {function} callback callback function after animation
-         * @return {Snap} 
-         */
+          * scroll to a col and row with animation
+          * @memberOf Snap
+          * @param {number} col col-index
+          * @param {number} row row-index
+          * @param {number} duration duration for animation ms
+          * @param {string} easing easing for animation
+          * @param {function} callback callback function after animation
+          * @return {Snap}
+          */
          snapTo: function(col, row, duration, easing, callback) {
              this.snapToCol(col, duration, easing, callback);
              this.snapToRow(row, duration, easing, callback);
              return this;
          },
          /**
-         * scroll to a col with animation
-         * @memberOf Snap
-         * @param {number} col col-index
-         * @param {number} duration duration for animation ms
-         * @param {string} easing easing for animation 
-         * @param {function} callback callback function after animation
-         * @return {Snap} 
-         */
+          * scroll to a col with animation
+          * @memberOf Snap
+          * @param {number} col col-index
+          * @param {number} duration duration for animation ms
+          * @param {string} easing easing for animation
+          * @param {function} callback callback function after animation
+          * @return {Snap}
+          */
          snapToCol: function(col, duration, easing, callback) {
              var self = this;
              var userConfig = self.userConfig;
@@ -99,14 +100,14 @@ define(function(require, exports, module) {
              return self;
          },
          /**
-         * scroll to a row with animation
-         * @memberOf Snap
-         * @param {number} row row-index
-         * @param {number} duration duration for animation ms
-         * @param {string} easing easing for animation 
-         * @param {function} callback callback function after animation
-         * @return {Snap} 
-         */
+          * scroll to a row with animation
+          * @memberOf Snap
+          * @param {number} row row-index
+          * @param {number} duration duration for animation ms
+          * @param {string} easing easing for animation
+          * @param {function} callback callback function after animation
+          * @return {Snap}
+          */
          snapToRow: function(row, duration, easing, callback) {
              var self = this;
              var userConfig = self.userConfig;
@@ -132,6 +133,8 @@ define(function(require, exports, module) {
              var userConfig = self.userConfig;
              var snapWidth = userConfig.snapWidth;
              var snapHeight = userConfig.snapHeight;
+             self.xscroll.__topstart = null;
+             self.xscroll.__leftstart = null;
              var cx = snapWidth / 2;
              var cy = snapHeight / 2;
              var direction = e.direction;
@@ -151,7 +154,7 @@ define(function(require, exports, module) {
                      self.snapToCol(snapColIndex, duration, transX && transX.easing, function() {
                          self.xscroll.boundryCheckX();
                      });
-                 } else if(transX){
+                 } else if (transX) {
                      self.xscroll.scrollLeft(transX.pos, transX.duration, transX.easing, function() {
                          self.xscroll.boundryCheckX();
                          self.snapColIndex = Math.round(Math.abs(self.xscroll.getScrollLeft()) / snapWidth);
@@ -161,7 +164,7 @@ define(function(require, exports, module) {
                      self.snapToRow(snapRowIndex, duration, transY && transY.easing, function() {
                          self.xscroll.boundryCheckY();
                      });
-                 } else if(transY){
+                 } else if (transY) {
                      self.xscroll.scrollTop(transY.pos, transY.duration, transY.easing, function() {
                          self.xscroll.boundryCheckY();
                          self.snapRowIndex = Math.round(Math.abs(self.xscroll.getScrollTop()) / snapHeight);
@@ -174,10 +177,10 @@ define(function(require, exports, module) {
              }
          },
          /**
-         * render snap plugin
-         * @memberOf Snap
-         * @return {Snap} 
-         */
+          * render snap plugin
+          * @memberOf Snap
+          * @return {Snap}
+          */
          render: function() {
              var self = this;
              var xscroll = self.xscroll;
@@ -186,17 +189,13 @@ define(function(require, exports, module) {
              self.userConfig.snapColsNum = self.userConfig.snapColsNum || Math.max(Math.round(xscroll.containerWidth / xscroll.width), 1);
              self.userConfig.snapRowsNum = self.userConfig.snapRowsNum || Math.max(Math.round(xscroll.containerHeight / xscroll.height), 1);
              //remove default listener
-             self.xscroll.mc.off("panend")
-             self.xscroll.mc && self.xscroll.mc.on("panend", function(e) {
-                 self.xscroll.__topstart = null;
-                 self.xscroll.__leftstart = null;
-                 self._snapAnimate(e);
-             });
+             xscroll.off("panend", xscroll._onpanend);
+             xscroll.on("panend", self._snapAnimate, self);
              return self;
          }
      });
 
      if (typeof module == 'object' && module.exports) {
          module.exports = Snap;
-     } 
+     }
 });
