@@ -174,6 +174,31 @@
             </ul>
         </li>
     
+        <li class="item" data-name="OriginScroll">
+            <span class="title">
+                <a href="OriginScroll.html">OriginScroll</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="OriginScroll.getScrollLeft"><a href="OriginScroll.html#getScrollLeft">getScrollLeft</a></li>
+            
+                <li data-name="OriginScroll.getScrollTop"><a href="OriginScroll.html#getScrollTop">getScrollTop</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="PullDown">
             <span class="title">
                 <a href="PullDown.html">PullDown</a>
@@ -328,6 +353,10 @@
             
                 <li data-name="SimuScroll.scrollLeft"><a href="SimuScroll.html#scrollLeft">scrollLeft</a></li>
             
+                <li data-name="SimuScroll.scrollLeft"><a href="SimuScroll.html#scrollLeft">scrollLeft</a></li>
+            
+                <li data-name="SimuScroll.scrollTop"><a href="SimuScroll.html#scrollTop">scrollTop</a></li>
+            
                 <li data-name="SimuScroll.scrollTop"><a href="SimuScroll.html#scrollTop">scrollTop</a></li>
             
                 <li data-name="SimuScroll.stop"><a href="SimuScroll.html#stop">stop</a></li>
@@ -347,11 +376,29 @@
             </span>
             <ul class="members itemMembers">
             
+            <span class="subtitle">Members</span>
+            
+                <li data-name="Snap.pluginId"><a href="Snap.html#pluginId">pluginId</a></li>
+            
             </ul>
             <ul class="typedefs itemMembers">
             
             </ul>
             <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Snap.pluginDestructor"><a href="Snap.html#pluginDestructor">pluginDestructor</a></li>
+            
+                <li data-name="Snap.pluginInitializer"><a href="Snap.html#pluginInitializer">pluginInitializer</a></li>
+            
+                <li data-name="Snap.render"><a href="Snap.html#render">render</a></li>
+            
+                <li data-name="Snap.snapTo"><a href="Snap.html#snapTo">snapTo</a></li>
+            
+                <li data-name="Snap.snapToCol"><a href="Snap.html#snapToCol">snapToCol</a></li>
+            
+                <li data-name="Snap.snapToRow"><a href="Snap.html#snapToRow">snapToRow</a></li>
             
             </ul>
             <ul class="events itemMembers">
@@ -469,7 +516,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line89">line 89</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line39">line 39</a>
         </div>
         
     </div>
@@ -523,7 +570,282 @@
             
             <td class="description last">
                 
-                config for scroll</td>
+                config for scroll
+                
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>SROLL_ACCELERATION</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                acceleration for scroll, min value make the scrolling smoothly</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>BOUNDRY_CHECK_DURATION</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                duration for boundry bounce</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>BOUNDRY_CHECK_EASING</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                easing for boundry bounce</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>BOUNDRY_CHECK_ACCELERATION</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                acceleration for boundry bounce</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>lockX</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                just like overflow-x:hidden</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>lockY</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                just like overflow-y:hidden</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>scrollbarX</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config if the scrollbar-x is visible</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>scrollbarY</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config if the scrollbar-y is visible</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>useTransition</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config if use css3 transition or raf for scroll animation</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>simulateScroll</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config if use animation or origin scroll</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>clsPrefix</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config the class prefix wich default value is "xs-"</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+            </td>
         </tr>
 	
 	
@@ -568,6 +890,19 @@
     
     
     
+        <h5>Example</h5>
+        
+
+    
+    <pre class="prettyprint"><code>var xscroll = new XScroll({
+   renderTo:"#scroll",
+   lockX:false,
+   scrollbarX:true
+});
+xscroll.render();</code></pre>
+    
+
+    
 </dd>
 
     
@@ -577,7 +912,7 @@
         <h3 class="subsection-title">Extends</h3>
         
         <ul>
-            <li><a href="Base.html">Base</a></li>
+            <li><a href="XScroll.html">XScroll</a></li>
         </ul>
     
     
@@ -654,7 +989,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line307">line 307</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line243">line 243</a>
         </div>
         
     </div>
@@ -730,7 +1065,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line315">line 315</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line251">line 251</a>
         </div>
         
     </div>
@@ -806,7 +1141,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line323">line 323</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line259">line 259</a>
         </div>
         
     </div>
@@ -882,7 +1217,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line167">line 167</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line103">line 103</a>
         </div>
         
     </div>
@@ -954,7 +1289,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line159">line 159</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line95">line 95</a>
         </div>
         
     </div>
@@ -1026,7 +1361,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line194">line 194</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line130">line 130</a>
         </div>
         
     </div>
@@ -1102,7 +1437,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line176">line 176</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line112">line 112</a>
         </div>
         
     </div>
@@ -1178,7 +1513,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line188">line 188</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line124">line 124</a>
         </div>
         
     </div>
@@ -1254,7 +1589,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line125">line 125</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line61">line 61</a>
         </div>
         
     </div>
@@ -1330,7 +1665,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line284">line 284</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line220">line 220</a>
         </div>
         
     </div>
@@ -1406,7 +1741,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line263">line 263</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line199">line 199</a>
         </div>
         
     </div>
@@ -1482,7 +1817,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line218">line 218</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line154">line 154</a>
         </div>
         
     </div>
@@ -1667,7 +2002,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line249">line 249</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line185">line 185</a>
         </div>
         
     </div>
@@ -1829,7 +2164,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line229">line 229</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line165">line 165</a>
         </div>
         
     </div>
@@ -1991,7 +2326,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line203">line 203</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line139">line 139</a>
         </div>
         
     </div>
@@ -2176,7 +2511,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line257">line 257</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line193">line 193</a>
         </div>
         
     </div>
@@ -2338,7 +2673,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line239">line 239</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line175">line 175</a>
         </div>
         
     </div>
@@ -2506,7 +2841,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 10:23:23 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 13:06:55 GMT+0800 (CST)
         </footer>
     </div>
 </div>

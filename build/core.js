@@ -1,92 +1,42 @@
 define(function(require, exports, module) {
     var Util = require('./util'),
         Base = require('./base'),
-        Animate = require('./animate');
+        Animate = require('./animate'),
+        Boundry = require('./boundry');
 
     require('./hammer');
-
-    function Boundry(cfg) {
-        this.cfg = Util.mix({
-            width: 0,
-            height: 0
-        }, cfg)
-        this.init();
-    }
-    Util.mix(Boundry.prototype, {
-        init: function() {
-            var self = this;
-            self._xtop = 0;
-            self._xright = 0;
-            self._xleft = 0;
-            self._xbottom = 0;
-            self.refresh({
-                width: self.cfg.width,
-                height: self.cfg.height
-            });
-        },
-        reset: function() {
-            this.resetTop();
-            this.resetLeft();
-            this.resetBottom();
-            this.resetRight();
-            return this;
-        },
-        resetTop: function() {
-            this._xtop = 0;
-            this.refresh();
-            return this;
-        },
-        resetLeft: function() {
-            this._xleft = 0;
-            this.refresh();
-            return this;
-        },
-        resetBottom: function() {
-            this._xbottom = 0;
-            this.refresh();
-            return this;
-        },
-        resetRight: function() {
-            this._xright = 0;
-            this.refresh();
-            return this;
-        },
-        expandTop: function(top) {
-            this._xtop = top;
-            this.refresh();
-            return this;
-        },
-        expandLeft: function(left) {
-            this._xleft = left;
-            this.refresh();
-            return this;
-        },
-        expandRight: function(right) {
-            this._xright = right;
-            this.refresh();
-            return this;
-        },
-        expandBottom: function(bottom) {
-            this._xbottom = bottom;
-            this.refresh();
-            return this;
-        },
-        refresh: function(cfg) {
-            Util.mix(this.cfg, cfg);
-            this.top = this._xtop;
-            this.left = this._xleft;
-            this.bottom = (cfg && cfg.height || this.cfg.height || 0) - this._xbottom;
-            this.right = (cfg && cfg.width || this.cfg.width || 0) - this._xright;
-            return this;
-        }
-    });
-
-
+    // boundry checked bounce effect
+    var BOUNDRY_CHECK_DURATION = 500;
+    var BOUNDRY_CHECK_EASING = "ease";
+    var BOUNDRY_CHECK_ACCELERATION = 0.1;
+    //transform
+    var transform = Util.prefixStyle("transform");
+    //transition webkitTransition MozTransition OTransition msTtransition
+    var transition = Util.prefixStyle("transition");
+    var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
     /** 
-      @constructor
-      @param {object} cfg - config for scroll
-      @extends Base
-      */
+   * @constructor
+   * @param {object} cfg config for scroll
+   * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
+   * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
+   * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
+   * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
+   * @param {boolean} cfg.lockX just like overflow-x:hidden
+   * @param {boolean} cfg.lockY just like overflow-y:hidden
+   * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
+   * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
+   * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
+   * @param {boolean} cfg.simulateScroll config if use animation or origin scroll
+   * @param {string}  cfg.clsPrefix config the class prefix wich default value is "xs-"
+   * @extends XScroll
+   * @example
+   * var xscroll = new XScroll({
+   *    renderTo:"#scroll",
+   *    lockX:false,
+   *    scrollbarX:true
+   * });
+   * xscroll.render();
+   */
     function XScroll(cfg) {
         XScroll.superclass.constructor.call(this);
         this.userConfig = cfg;
@@ -96,20 +46,6 @@ define(function(require, exports, module) {
     XScroll.Util = Util;
     
     XScroll.Plugin = {};
-    //event names
-    var AFTER_RENDER = "afterrender";
-    // constant acceleration for scrolling
-    var SROLL_ACCELERATION = 0.001;
-    // boundry checked bounce effect
-    var BOUNDRY_CHECK_DURATION = 500;
-    var BOUNDRY_CHECK_EASING = "ease";
-    var BOUNDRY_CHECK_ACCELERATION = 0.1;
-    //transform
-    var transform = Util.prefixStyle("transform");
-    //transition webkitTransition MozTransition OTransition msTtransition
-    var transition = Util.prefixStyle("transition");
-
-    var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 
     Util.extend(XScroll, Base, {
         /**
@@ -285,7 +221,7 @@ define(function(require, exports, module) {
         render: function() {
             var self = this;
             self.resetSize();
-            self.trigger(AFTER_RENDER);
+            self.trigger("afterrender");
             self._bindEvt();
             return self;
         },
@@ -328,8 +264,6 @@ define(function(require, exports, module) {
             return this;
         }
     });
-
-
 
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;

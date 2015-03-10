@@ -9,6 +9,10 @@ define(function(require, exports, module) {
 	 * An infinity dom-recycled list plugin for xscroll.
 	 * @constructor
 	 * @param {object} cfg
+	 * @param {string} cfg.zoomType choose scroll vertically or horizontally
+	 * @param {string} cfg.transition recomposition cell with a transition 
+	 * @param {string} cfg.infiniteElements dom-selector for reused elements
+	 * @param {function} cfg.renderHook render function for cell by per col or per row duration scrolling
 	 * @extends {Base}
 	 */
 	var Infinite = function(cfg) {

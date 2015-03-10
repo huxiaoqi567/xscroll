@@ -10,20 +10,31 @@
   var SROLL_ACCELERATION = 0.001;
   //constant for outside of boundry acceleration
   var BOUNDRY_ACCELERATION = 0.03;
-  //boundry checked bounce effect
-  var BOUNDRY_CHECK_DURATION = 500;
-  var BOUNDRY_CHECK_EASING = "ease";
-  var BOUNDRY_CHECK_ACCELERATION = 0.1;
-  var BOUNDRY_OUT = "boundryout";
-  var SCROLL_ANIMATE = "scrollanimate";
+  //transform-origin
   var transformOrigin = Util.prefixStyle("transformOrigin");
   //transform
   var transform = Util.prefixStyle("transform");
   /** 
-  @constructor
-  @param {object} cfg - config for scroll.
-  @extends XScroll
-  */
+   * @constructor
+   * @param {object} cfg config for scroll
+   * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
+   * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
+   * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
+   * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
+   * @param {boolean} cfg.lockX just like overflow-x:hidden
+   * @param {boolean} cfg.lockY just like overflow-y:hidden
+   * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
+   * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
+   * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
+   * @extends XScroll
+   * @example
+   * var xscroll = new SimuScroll({
+   *    renderTo:"#scroll",
+   *    lockX:false,
+   *    scrollbarX:true
+   * });
+   * xscroll.render();
+   */
   function SimuScroll(cfg) {
     SimuScroll.superclass.constructor.call(this, cfg);
   }
@@ -190,10 +201,10 @@
       timer.stop();
       timer.reset(config);
       timer.run();
-      self.trigger(SCROLL_ANIMATE, {
+      self.trigger("scrollanimate", {
         scrollTop: -self.y,
         scrollLeft: -self.x,
-        type: SCROLL_ANIMATE,
+        type: "scrollanimate",
         duration: duration,
         easing: easing,
         zoomType: type
@@ -332,12 +343,6 @@
       //clear start
       self.__topstart = null;
       self.__leftstart = null;
-
-      self.trigger("panend", Util.mix(e, {
-        scrollTop: self.getScrollTop(),
-        scrollLeft: self.getScrollLeft(),
-        type: "panend"
-      }));
       return self;
     },
     /**
