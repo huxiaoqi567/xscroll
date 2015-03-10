@@ -1,12 +1,19 @@
-define(function(require, exports, module) {
 	var Util = require('./util');
 	var Events = require('./events');
+	/** 
+      @constructor 
+      @mixes Events
+      */
 	var Base = function() {}
 
 	Util.mix(Base.prototype, Events);
-
+	
 	Util.mix(Base.prototype, {
-		plug: function(plugin) {
+		/**
+		 * @memberof Base
+		 * @param  {object} plugin plug a plugin
+		 */
+		plug :function(plugin) {
 			var self = this;
 			if (!plugin || !plugin.pluginId) return;
 			if (!self.__plugins) {
@@ -15,6 +22,10 @@ define(function(require, exports, module) {
 			plugin.pluginInitializer(self);
 			self.__plugins.push(plugin);
 		},
+		/**
+		 * @memberof Base
+		 * @param  {object|string} plugin unplug a plugin by pluginId or plugin instance
+		 */
 		unplug: function(plugin) {
 			var self = this;
 			if (!plugin) return;
@@ -26,6 +37,10 @@ define(function(require, exports, module) {
 				}
 			}
 		},
+		/**
+		 * @memberof Base
+		 * @param  {object|string} plugin get plugin by pluginId
+		 */
 		getPlugin: function(pluginId) {
 			var self = this;
 			var plugins = [];
@@ -40,7 +55,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Base;
-	} else {
-		return Base;
-	}
-});
+	} 

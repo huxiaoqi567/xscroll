@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 	var Util = require('./util');
 	var Timer = require('./timer');
 	var Easing = require('./easing');
@@ -126,7 +125,13 @@ define(function(require, exports, module) {
 		return ret;
 	}
 
-
+	/**
+	 * animate function
+	 * @constructor
+	 * @param {HTMLElement} el element to animate
+	 * @param {object} config config for animate
+	 * @extends {Base}
+	 */
 	function Animate(el, cfg) {
 		if (!el || !cfg || !cfg.css) return;
 		var self = this;
@@ -190,6 +195,11 @@ define(function(require, exports, module) {
 	}
 
 	Util.extend(Animate, Base, {
+		/**
+		 * to start the animation
+		 * @memberof Animate
+		 * @return {Animate} 
+		 */
 		run: function() {
 			var self = this;
 			var cfg = self.cfg,
@@ -200,8 +210,6 @@ define(function(require, exports, module) {
 			self.__isTransitionEnd = false;
 			clearTimeout(self.__itv)
 			self.timer && self.timer.run();
-
-			
 			if(duration <= Timer.MIN_DURATION){
 				for (var i in cfg.css) {
 					css(el,i,cfg.css[i]);
@@ -244,13 +252,11 @@ define(function(require, exports, module) {
 						}
 					}
 				};
-
 				self.timer && self.timer.off("run", cssRun);
 				self.timer && self.timer.on("run", cssRun);
 				self.timer && self.timer.off("stop", self.__handlers.stop);
 				self.timer && self.timer.on("stop", self.__handlers.stop, self);
 			}
-
 			return self;
 		},
 		__handlers: {
@@ -274,6 +280,11 @@ define(function(require, exports, module) {
 				});
 			}
 		},
+		/**
+		 * to stop the animation
+		 * @memberof Animate
+		 * @return {Animate} 
+		 */
 		stop: function() {
 			var self = this;
 			if (self.cfg.useTransition && self.cfg.duration > Timer.MIN_DURATION) {
@@ -289,6 +300,12 @@ define(function(require, exports, module) {
 			self.timer && self.timer.stop() && self.timer.reset();
 			return self;
 		},
+		/**
+		 * to reset the animation to a new state
+		 * @memberof Animate
+		 * @param {object} cfg cfg for new animation
+		 * @return {Animate} 
+		 */
 		reset: function(cfg) {
 			var self = this;
 			Util.mix(self.cfg, cfg);
@@ -296,15 +313,11 @@ define(function(require, exports, module) {
 				duration: Math.round(self.cfg.duration),
 				easing: self.cfg.easing
 			});
+			return self;
 		}
 	});
 
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Animate;
-	} else {
-		return Animate;
-	}
-
-
-});
+	} 

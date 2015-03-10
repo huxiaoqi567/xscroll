@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 	var Util = require('./util');
 	var Base = require('./base');
 	var Easing = require('./easing');
@@ -157,7 +156,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Timer;
-	} else {
-		return Timer;
-	}
-});
+	} 

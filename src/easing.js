@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 var Easing = {
 		"linear": [0, 0, 1, 1],
 		"ease": [.25, .1, .25, 1],
@@ -21,7 +20,4 @@ var Easing = {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Easing;
-	} else {
-		return Easing;
 	}
-});

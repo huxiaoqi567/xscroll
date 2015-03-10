@@ -1,7 +1,12 @@
- define(function(require, exports, module) {
      var Util = require('../util');
      var Base = require('../base');
 
+     /**
+     * a snap plugin for xscroll,wich support vertical and horizontal snap.
+     * @constructor
+     * @param {object} cfg
+     * @extends {Base}
+     */
      var Snap = function(cfg) {
          Snap.superclass.constructor.call(this, cfg);
          this.userConfig = Util.mix({
@@ -14,7 +19,7 @@
              autoStep:false //autostep
          }, cfg);
      }
-
+     
      Util.extend(Snap, Base, {
          pluginId: "snap",
          pluginInitializer: function(xscroll) {
@@ -132,8 +137,4 @@
 
      if (typeof module == 'object' && module.exports) {
          module.exports = Snap;
-     } else {
-         return Snap;
-     }
-
- });
+     } 

@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 
   var Util = require('./util');
 
@@ -16,7 +15,10 @@ define(function(require, exports, module) {
   };
 
 
-
+/**
+ * @discription events
+ * @mixin
+ */
 var Events = {
     // Bind an event to a `callback` function. Passing `"all"` will bind
     // the callback to all events fired.
@@ -199,7 +201,4 @@ var Events = {
 
   if (typeof module == 'object' && module.exports) {
     module.exports = Events;
-  } else {
-    return Events;
-  }
-});
+  } 

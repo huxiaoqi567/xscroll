@@ -64,56 +64,33 @@ li{
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
-      base: "../../src/"
+      base: "../../build/"
     })
     seajs.use(["simulate-scroll","plugins/pullup"],function(XScroll,PullUp){
 
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
     		lockX:true,
-    		scrollbarX:false,
-    		// useTransition:false
-    		// lockY:true
+    		scrollbarX:false
     	})
 
-    	var pullup = new PullUp({
-    		
-    	});
-
-    	
+    	var pullup = new PullUp({});
 
     	xscroll.plug(pullup);
 
-    	// xscroll.unplug(pullup);
-
-
     	xscroll.render();
 
-    	xscroll.on("panend",function(e){
-    		console.log(e.velocityY)
-    	})
+    	var ul = xscroll.renderTo.querySelector("ul");
 
-    	 xscroll.on("scrollend",function(e){
-            // console.log("end",e.scrollLeft,e.scrollTop)
-        })
-
-          xscroll.on("scroll",function(e){
-
-            // console.log(e.type,e.scrollLeft,e.scrollTop)
-        })
-
-          xscroll.on("scrollanimate",function(e){
-          	// console.log(e)
-          })
-
-
-
-
-
-    	window.xscroll = xscroll;
-
-    	
-
+    	pullup.on("loading",function(){
+    		for(var i = 0;i<10;i++){
+    			var li = document.createElement("li");
+    			li.innerHTML = i;
+    			ul.appendChild(li);
+    		}
+    		xscroll.render();
+    		pullup.complete();
+        });
 
     })
 </script>

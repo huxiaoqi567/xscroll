@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 	var Util = require('../util');
 	var Base = require('../base');
 	var prefix;
@@ -9,7 +8,12 @@ define(function(require, exports, module) {
 	var pageEndContent = "Last Page";
 	var PULL_UP_HEIGHT = 60;
 	var HEIGHT = 40;
-
+	/**
+	 * A pullup to load plugin for xscroll.
+	 * @constructor
+	 * @param {object} cfg
+	 * @extends {Base}
+	 */
 	var PullUp = function(cfg) {
 		PullUp.superclass.constructor.call(this);
 		this.userConfig = Util.mix({
@@ -25,23 +29,49 @@ define(function(require, exports, module) {
 		}, cfg);
 	}
 	Util.extend(PullUp, Base, {
-		pluginId: "xscroll/plugin/pullup",
+		/**
+		 * a pluginId
+		 * @memberOf PullUp
+		 * @type {string}
+		 */
+		pluginId: "pullup",
+		/**
+		 * plugin initializer
+		 * @memberOf PullUp
+		 * @override Base
+		 * @return {PullUp}
+		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.xscroll = xscroll;
 			prefix = self.userConfig.prefix;
 			if (self.xscroll) {
-				self.xscroll.on("afterrender", function() {
-					self.render()
-				})
+				self.xscroll.on("afterrender", self.render, self)
 			}
+			return self;
 		},
+		/**
+		 * detroy the plugin
+		 * @memberOf PullUp
+		 * @override Base
+		 * @return {PullUp}
+		 */
 		pluginDestructor: function() {
 			var self = this;
 			self.pullup && self.pullup.remove();
-			self.xscroll.off("scroll", self._scrollHandler);
+			self.xscroll.off("scrollend", self._scrollEndHandler, self);
+			self.xscroll.off("scroll", self._scrollHandler, self);
+			self.xscroll.off("pan", self._panHandler, self);
+			self.xscroll.boundry.resetBottom();
+			self.__isRender = false;
+			self._evtBinded = false;
 			delete self;
 		},
+		/**
+		 * render pullup plugin
+		 * @memberOf PullUp
+		 * @return {PullUp}
+		 */
 		render: function() {
 			var self = this;
 			if (self.__isRender) return;
@@ -55,10 +85,11 @@ define(function(require, exports, module) {
 			pullup.style.height = height + "px";
 			pullup.style.bottom = -height + "px";
 			self.xscroll.container.appendChild(pullup);
-			self.xscroll.boundry.expandBottom(40);
+			self.xscroll.boundry.expandBottom(self.userConfig.height);
 			Util.addClass(pullup, prefix + self.status);
 			pullup.innerHTML = self.userConfig[self.status + "Content"] || self.userConfig.content;
 			self._bindEvt();
+			return self;
 		},
 		_bindEvt: function() {
 			var self = this;
@@ -66,36 +97,32 @@ define(function(require, exports, module) {
 			self._evtBinded = true;
 			var pullup = self.pullup;
 			var xscroll = self.xscroll;
-			xscroll.on("pan", function(e) {
-				self._scrollHandler(e);
-			});
-
-			self.__isBoundryOut = false;
-			xscroll.on("boundryout", function() {
-				self.__isBoundryOut = true;
-			})
-
-			xscroll.on("scroll", function(e) {
-				if (xscroll.containerHeight - e.scrollTop > xscroll.height + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
-					self.__isBoundryOut = false;
-				}
-			});
+			xscroll.on("pan", self._panHandler, self);
 			//load width a buffer
 			if (self.userConfig.bufferHeight > 0) {
-				xscroll.on("scroll", function(e) {
-					if (!self.isLoading && Math.abs(e.scrollTop) + xscroll.height + self.userConfig.height + self.userConfig.bufferHeight >= xscroll.containerHeight + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
-						self._changeStatus("loading");
-					}
-				});
+				xscroll.on("scroll", self._scrollHandler, self);
 			}
 			//bounce bottom
-			xscroll.on("scrollend", function(e) {
-				if (e.directionY == "top" && e.offset.y == xscroll.height - xscroll.containerHeight - self.userConfig.height) {
-					self._changeStatus("loading");
-				}
-			})
+			xscroll.on("scrollend", self._scrollEndHandler, self);
+			return self;
+		},
+		_scrollEndHandler: function(e) {
+			var self = this,
+				xscroll = self.xscroll;
+			if (e.scrollTop == xscroll.containerHeight - xscroll.height + self.userConfig.height) {
+				self._changeStatus("loading");
+			}
+			return self;
 		},
 		_scrollHandler: function(e) {
+			var self = this,
+				xscroll = self.xscroll;
+			if (!self.isLoading && Math.abs(e.scrollTop) + xscroll.height + self.userConfig.height + self.userConfig.bufferHeight >= xscroll.containerHeight + xscroll.boundry._xtop + xscroll.boundry._xbottom) {
+				self._changeStatus("loading");
+			}
+			return self;
+		},
+		_panHandler: function(e) {
 			var self = this;
 			var xscroll = self.xscroll;
 			var offsetTop = -xscroll.getScrollTop();
@@ -104,6 +131,7 @@ define(function(require, exports, module) {
 			} else {
 				self._changeStatus("up");
 			}
+			return self;
 		},
 		_changeStatus: function(status) {
 			if (status != "loading" && this.isLoading) return;
@@ -111,7 +139,7 @@ define(function(require, exports, module) {
 			this.status = status;
 			Util.removeClass(this.pullup, prefix + prevVal)
 			Util.addClass(this.pullup, prefix + status);
-			this.setContent(this.userConfig[status + "Content"]);
+			this.pullup.innerHTML = this.userConfig[status + "Content"];
 			if (prevVal != status) {
 				this.trigger("statuschange", {
 					prevVal: prevVal,
@@ -122,37 +150,22 @@ define(function(require, exports, module) {
 					this.trigger("loading");
 				}
 			}
+			return this;
 		},
+		/**
+		 * notify pullup plugin to complete state after a remote data request
+		 * @memberOf PullUp
+		 * @return {PullUp}
+		 */
 		complete: function() {
 			var self = this;
 			var xscroll = self.xscroll;
 			self.isLoading = false;
 			self._changeStatus("up");
-			if (!self.userConfig.bufferHeight) return;
-			if (!self.__isBoundryOut) {
-				var trans = xscroll.computeScroll("y", xscroll._bouncey);
-				console.log(xscroll._bouncey)
-				// trans && self.xscroll.scrollTop(trans.pos, trans.duration, trans.easing, function(e) {
-				// 	xscroll._scrollEndHandler("y");
-				// });
-			}
-		},
-		reset: function(callback) {
-			this.xscroll.boundry.resetBottom()
-			this.xscroll.boundryCheckY();
-			this._expanded = false;
-		},
-		setContent: function(content) {
-			var self = this;
-			if (content) {
-				self.pullup.innerHTML = content;
-			}
+			return self;
 		}
 	})
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = PullUp;
-	} else {
-		return PullUp;
 	}
-});

@@ -1,8 +1,12 @@
-define(function(require, exports, module) {
 	var Util = require('./util'),
 		Base = require('./base'),
 		XScroll = require('./xscroll');
-
+	/** 
+	 * A master for multi-scrollers. 
+	 * @constructor
+	 * @param {object} cfg - config for master.
+	 * @extends Base
+	 */
 	var XScrollMaster = function(cfg) {
 		XScrollMaster.superclass.constructor.call(this, cfg);
 		this.init(cfg);
@@ -106,7 +110,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = XScrollMaster;
-	} else {
-		return XScrollMaster;
-	}
-});
+	} 

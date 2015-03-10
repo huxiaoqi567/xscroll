@@ -64,7 +64,7 @@ li{
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
-      base: "../../src/"
+      base: "../../build/"
     })
     seajs.use(["simulate-scroll","plugins/pulldown"],function(XScroll,PullDown){
     	var xscroll = new XScroll({
@@ -77,36 +77,7 @@ li{
 
     	xscroll.plug(pulldown);
 
-    	xscroll.unplug(pulldown);
-
-
     	xscroll.render();
-
-    	xscroll.on("panend",function(e){
-    		// console.log(e.velocityY)
-    	})
-
-    	 xscroll.on("scrollend",function(e){
-            // console.log("end",e.scrollLeft,e.scrollTop)
-        })
-
-          xscroll.on("scroll",function(e){
-
-            // console.log(e.type,e.scrollLeft,e.scrollTop)
-        })
-
-          xscroll.on("scrollanimate",function(e){
-          	// console.log(e)
-          })
-
-
-
-
-
-    	window.xscroll = xscroll;
-
-    	
-
 
     })
 </script>

@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
   var Util = require('./util'),
     Base = require('./base'),
     Core = require('./core'),
@@ -20,12 +19,20 @@ define(function(require, exports, module) {
   var transformOrigin = Util.prefixStyle("transformOrigin");
   //transform
   var transform = Util.prefixStyle("transform");
-
+  /** 
+  @constructor
+  @param {object} cfg - config for scroll.
+  @extends XScroll
+  */
   function SimuScroll(cfg) {
     SimuScroll.superclass.constructor.call(this, cfg);
   }
 
   Util.extend(SimuScroll, Core, {
+    /** 
+     * @memberof SimuScroll
+     * @override
+     */
     init: function() {
       var self = this;
       SimuScroll.superclass.init.call(this);
@@ -40,8 +47,12 @@ define(function(require, exports, module) {
         lockX: self.userConfig.lockX
       }
       self.boundryCheckEnabled = true;
+      return self;
     },
-    //get attributes from dom
+    /**
+     * set overflow behavior
+     * @return {boolean} [description]
+     */
     _setOverflowBehavior: function() {
       var self = this;
       var renderTo = self.renderTo;
@@ -50,12 +61,22 @@ define(function(require, exports, module) {
       self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == "hidden" || self.height == self.containerHeight) ? true : false) : self.userConfig.lockY;
       self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false : true) : self.userConfig.scrollbarX;
       self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false : true) : self.userConfig.scrollbarY;
+      return self;
     },
-    resetDefaultConfig: function() {
+    /**
+     * reset lockX or lockY config to the default value
+     */
+    _resetLockConfig: function() {
       var self = this;
       self.userConfig.lockX = self.defaltConfig.lockX;
       self.userConfig.lockY = self.defaltConfig.lockY;
+      return self;
     },
+    /**
+     * init container
+     * @override
+     * @return {SimuScroll}
+     */
     _initContainer: function() {
       var self = this;
       SimuScroll.superclass._initContainer.call(self);
@@ -66,14 +87,31 @@ define(function(require, exports, module) {
       self.__isContainerInited = true;
       return self;
     },
+    /**
+     * get scroll top value
+     * @memberof SimuScroll
+     * @return {number} scrollTop
+     */
     getScrollTop: function() {
       var transY = window.getComputedStyle(this.container)[transform].match(/[-\d\.*\d*]+/g);
       return transY ? Math.round(transY[5]) === 0 ? 0 : -Math.round(transY[5]) : 0;
     },
+    /**
+     * get scroll left value
+     * @memberof SimuScroll
+     * @return {number} scrollLeft
+     */
     getScrollLeft: function() {
       var transX = window.getComputedStyle(this.content)[transform].match(/[-\d\.*\d*]+/g);
       return transX ? Math.round(transX[4]) === 0 ? 0 : -Math.round(transX[4]) : 0;
     },
+    /**
+     * horizontal scroll absolute to the destination
+     * @memberof SimuScroll
+     * @param scrollLeft {number} scrollLeft
+     * @param duration {number} duration for animte
+     * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
+     **/
     scrollLeft: function(x, duration, easing, callback) {
       if (this.userConfig.lockX) return;
       var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
@@ -81,6 +119,13 @@ define(function(require, exports, module) {
       this._animate("x", "translateX(" + this.x + "px) scale(" + this.scale + ")" + translateZ, duration, easing, callback);
       return this;
     },
+    /**
+     * vertical scroll absolute to the destination
+     * @memberof SimuScroll
+     * @param scrollTop {number} scrollTop
+     * @param duration {number} duration for animte
+     * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
+     **/
     scrollTop: function(y, duration, easing, callback) {
       if (this.userConfig.lockY) return;
       var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
@@ -88,7 +133,13 @@ define(function(require, exports, module) {
       this._animate("y", "translateY(" + this.y + "px) " + translateZ, duration, easing, callback);
       return this;
     },
-    //translate a element 
+    /**
+     * translate the scroller to a new destination includes x , y , scale
+     * @memberof SimuScroll
+     * @param x {number} x
+     * @param y {number} y
+     * @param scale {number} scale
+     **/
     translate: function(x, y, scale) {
       var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
       this.x = x || this.x || 0;
@@ -110,6 +161,9 @@ define(function(require, exports, module) {
         duration: duration,
         easing: easing,
         run: function(e) {
+          /**
+           * @event {@link SimuScroll#"scroll"}
+           */
           self.trigger("scroll", {
             scrollTop: self.getScrollTop(),
             scrollLeft: self.getScrollLeft(),
@@ -176,17 +230,17 @@ define(function(require, exports, module) {
 
       mc.on("panstart", function(e) {
         self._onpanstart(e);
-        self.trigger(e.type,e);
+        self.trigger(e.type, e);
       });
 
       mc.on("pan", function(e) {
         self._onpan(e);
-        self.trigger(e.type,e);
+        self.trigger(e.type, e);
       });
 
       mc.on("panend", function(e) {
         self._onpanend(e);
-        self.trigger(e.type,e);
+        self.trigger(e.type, e);
       });
 
       self.trigger("aftereventbind", {
@@ -203,9 +257,6 @@ define(function(require, exports, module) {
 
       return this;
     },
-
-
-
     _onpanstart: function(e) {
       var self = this;
       var scrollLeft = self.getScrollLeft();
@@ -221,7 +272,6 @@ define(function(require, exports, module) {
       self.thresholdX = e.direction == "2" ? threshold : e.direction == "4" ? -threshold : 0;
       return self;
     },
-
     _onpan: function(e) {
       var self = this;
       var boundry = self.boundry;
@@ -231,21 +281,15 @@ define(function(require, exports, module) {
       var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
       var containerWidth = self.containerWidth;
       var containerHeight = self.containerHeight;
-
-      // var PAN_RATE = self.userConfig.bounce ? PAN_RATE : 0;
-
-      // 1/2 * a * 2^(s/a)
-      // 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
       //over top
       y = y > boundry.top ? (y - boundry.top) * PAN_RATE + boundry.top : y;
-      // var xx = self.height*0.3;
-      // y = y > boundry.top ? 2 *  xx* Math.pow(0.5, xx / y) : y;
       //over bottom
       y = y < boundry.bottom - containerHeight ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : y;
       //over left
       x = x > boundry.left ? (x - boundry.left) * PAN_RATE + boundry.left : x;
       //over right
       x = x < boundry.right - containerWidth ? x + (boundry.right - containerWidth - x) * PAN_RATE : x;
+      //move to x,y
       self.translate(x, y);
       //pan trigger the opposite direction
       self.directionX = e.type == 'panleft' ? 'right' : e.type == 'panright' ? 'left' : '';
@@ -262,9 +306,8 @@ define(function(require, exports, module) {
         scrollLeft: -x,
         type: "pan"
       }));
-
+      return self;
     },
-
     _onpanend: function(e) {
       var self = this;
       var userConfig = self.userConfig;
@@ -295,34 +338,90 @@ define(function(require, exports, module) {
         scrollLeft: self.getScrollLeft(),
         type: "panend"
       }));
+      return self;
     },
+    /**
+     * judge the scroller is out of boundry horizontally and vertically
+     * @memberof SimuScroll
+     * @return {boolean} isBoundryOut
+     **/
     isBoundryOut: function() {
       return this.isBoundryOutLeft() || this.isBoundryOutRight() || this.isBoundryOutTop() || this.isBoundryOutBottom();
     },
+    /**
+     * judge if the scroller is outsideof left
+     * @memberof SimuScroll
+     * @return {boolean} isBoundryOut
+     **/
     isBoundryOutLeft: function() {
       return this.getBoundryOutLeft() > 0 ? true : false;
     },
+    /**
+     * judge if the scroller is outsideof right
+     * @memberof SimuScroll
+     * @return {boolean} isBoundryOut
+     **/
     isBoundryOutRight: function() {
       return this.getBoundryOutRight() > 0 ? true : false;
     },
+    /**
+     * judge if the scroller is outsideof top
+     * @memberof SimuScroll
+     * @return {boolean} isBoundryOut
+     **/
     isBoundryOutTop: function() {
       return this.getBoundryOutTop() > 0 ? true : false;
     },
+    /**
+     * judge if the scroller is outsideof bottom
+     * @memberof SimuScroll
+     * @return {boolean} isBoundryOut
+     **/
     isBoundryOutBottom: function() {
       return this.getBoundryOutBottom() > 0 ? true : false;
     },
+    /**
+     * get the offset value outsideof top
+     * @memberof SimuScroll
+     * @return {number} offset
+     **/
     getBoundryOutTop: function() {
       return this.boundry.top - this.getScrollTop();
     },
+    /**
+     * get the offset value outsideof left
+     * @memberof SimuScroll
+     * @return {number} offset
+     **/
     getBoundryOutLeft: function() {
       return this.boundry.left - this.getScrollLeft();
     },
+    /**
+     * get the offset value outsideof bottom
+     * @memberof SimuScroll
+     * @return {number} offset
+     **/
     getBoundryOutBottom: function() {
       return this.boundry.bottom - this.containerHeight + this.getScrollTop();
     },
+    /**
+     * get the offset value outsideof right
+     * @memberof SimuScroll
+     * @return {number} offset
+     **/
     getBoundryOutRight: function() {
       return this.boundry.right - this.containerWidth + this.getScrollLeft();
     },
+    /**
+     * compute scroll transition by zoomType and velocity
+     * @memberof SimuScroll
+     * @param {string} zoomType zoomType of scrolling
+     * @param {number} velocity velocity after panend
+     * @example
+     * var info = xscroll.computeScroll("x",2);
+     * // return {pos:90,easing:"easing",status:"inside",duration:500}
+     * @return {Object}
+     **/
     computeScroll: function(type, v) {
       var self = this;
       var userConfig = self.userConfig;
@@ -377,6 +476,11 @@ define(function(require, exports, module) {
       self['isScrolling' + type.toUpperCase()] = true;
       return transition;
     },
+    /**
+     * bounce to the boundry horizontal
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     **/
     boundryCheckX: function(duration, easing, callback) {
       var self = this;
       if (typeof arguments[0] == "function") {
@@ -396,7 +500,13 @@ define(function(require, exports, module) {
       } else if (pos > containerWidth - boundry.right) {
         self.scrollLeft(containerWidth - boundry.right, duration, easing, callback);
       }
+      return self;
     },
+    /**
+     * bounce to the boundry vertical
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     **/
     boundryCheckY: function(duration, easing, callback) {
       var self = this;
       if (typeof arguments[0] == "function") {
@@ -416,12 +526,23 @@ define(function(require, exports, module) {
       } else if (pos > containerHeight - boundry.bottom) {
         self.scrollTop(containerHeight - boundry.bottom, duration, easing, callback);
       }
+      return self;
     },
-    //boundry back bounce
+    /**
+     * bounce to the boundry vertical and horizontal
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     **/
     boundryCheck: function(duration, easing, callback) {
       this.boundryCheckX(duration, easing, callback);
       this.boundryCheckY(duration, easing, callback);
+      return this;
     },
+    /**
+     * stop scrolling immediatelly
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     **/
     stop: function() {
       var self = this;
       self.__timers.x && self.__timers.x.stop();
@@ -446,7 +567,13 @@ define(function(require, exports, module) {
       } else {
         self._isClickDisabled = false;
       }
+      return self;
     },
+    /**
+     * render scroll
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     **/
     render: function() {
       var self = this;
       SimuScroll.superclass.render.call(this);
@@ -461,7 +588,11 @@ define(function(require, exports, module) {
       self.initTouchAction();
       return self;
     },
-
+    /**
+     * init touch action
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     */
     initTouchAction: function() {
       var self = this;
       var touchAction = 'none';
@@ -475,7 +606,13 @@ define(function(require, exports, module) {
       self.mc.set({
         touchAction: touchAction
       });
+      return self;
     },
+    /**
+     * init scrollbars
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     */
     initScrollBars: function() {
       var self = this;
       if (self.userConfig.scrollbarX) {
@@ -494,19 +631,22 @@ define(function(require, exports, module) {
         self.scrollbarY._update();
         self.scrollbarY.hide();
       }
+      return self;
     },
+    /**
+     * init controller for multi-scrollers
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     */
     initController: function() {
       var self = this;
       self.controller = self.controller || new Controller({
         xscroll: self
       });
+      return self;
     }
   });
 
   if (typeof module == 'object' && module.exports) {
     module.exports = SimuScroll;
-  } else {
-    return window.XScroll = SimuScroll;
   }
-
-});

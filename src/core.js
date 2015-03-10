@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
     var Util = require('./util'),
         Base = require('./base'),
         Animate = require('./animate');
@@ -82,7 +81,11 @@ define(function(require, exports, module) {
     });
 
 
-
+    /** 
+      @constructor
+      @param {object} cfg - config for scroll
+      @extends Base
+      */
     function XScroll(cfg) {
         XScroll.superclass.constructor.call(this);
         this.userConfig = cfg;
@@ -90,7 +93,7 @@ define(function(require, exports, module) {
     }
 
     XScroll.Util = Util;
-    //namespace for plugins
+    
     XScroll.Plugin = {};
     //event names
     var AFTER_RENDER = "afterrender";
@@ -108,7 +111,17 @@ define(function(require, exports, module) {
     var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 
     Util.extend(XScroll, Base, {
+        /**
+         * version
+         * @memberof XScroll
+         * @type {string}
+         */
         version: "3.0.0",
+        /**
+         * init scroll
+         * @memberof XScroll
+         * @return {XScroll}
+         */
         init: function() {
             var self = this;
             var defaultCfg = {
@@ -139,14 +152,27 @@ define(function(require, exports, module) {
             return self;
         },
         _initContainer: function() {},
+        /**
+         * @memberof XScroll
+         * @return {XScroll}
+         */
         enableGPUAcceleration: function() {
             this.userConfig.gpuAcceleration = true;
             return this;
         },
+        /**
+         * @memberof XScroll
+         * @return {XScroll}
+         */
         disableGPUAcceleration: function() {
             this.userConfig.gpuAcceleration = false;
             return this;
         },
+        /**
+         * get scroll offset
+         * @memberof XScroll
+         * @return {Object} {scrollTop:scrollTop,scrollLeft:scrollLeft}
+         */
         getScrollPos: function() {
             var self = this;
             return {
@@ -154,14 +180,25 @@ define(function(require, exports, module) {
                 scrollTop: self.getScrollTop()
             }
         },
+        /**
+         * get scroll top value
+         * @memberof XScroll
+         * @return {number} scrollTop 
+         */
         getScrollTop: function() {},
+        /**
+         * get scroll left value
+         * @memberof XScroll
+         * @return {number} scrollLeft 
+         */
         getScrollLeft: function() {},
         /**
-         * scroll the root element with an animate
-         * @param scrollLeft {Object} scrollLeft
-         * @param scrollTop {Object} scrollTop
-         * @param duration {Number} duration for animte
-         * @param easing {Number} easing functio for animate : ease-in | ease-in-out | ease | bezier
+         * scroll absolute to the destination 
+         * @memberof XScroll
+         * @param scrollLeft {number} scrollLeft
+         * @param scrollTop {number} scrollTop
+         * @param duration {number} duration for animte
+         * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
          **/
         scrollTo: function(scrollLeft, scrollTop, duration, easing, callback) {
             var self = this;
@@ -170,18 +207,59 @@ define(function(require, exports, module) {
             self.scrollLeft(scrollLeft, duration, easing, callback);
             self.scrollTop(scrollTop, duration, easing, callback);
         },
+        /**
+         * scroll relative to the destination 
+         * @memberof XScroll
+         * @param scrollLeft {number} scrollLeft
+         * @param scrollTop {number} scrollTop
+         * @param duration {number} duration for animte
+         * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
+         **/
         scrollBy: function(scrollLeft, scrollTop, duration, easing, callback) {
             this.scrollByX(scrollLeft, duration, easing, callback);
             this.scrollByY(scrollTop, duration, easing, callback);
         },
+        /**
+         * horizontal scroll relative to the destination 
+         * @memberof XScroll
+         * @param scrollLeft {number} scrollLeft
+         * @param duration {number} duration for animte
+         * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
+         **/
         scrollLeftBy: function(scrollLeft, duration, easing, callback) {
             this.scrollLeft(Number(scrollLeft) + Number(this.getScrollLeft()), duration, easing, callback);
         },
+        /**
+         * vertical scroll relative to the destination 
+         * @memberof XScroll
+         * @param scrollTop {number} scrollTop
+         * @param duration {number} duration for animte
+         * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
+         **/
         scrollTopBy: function(scrollTop, duration, easing, callback) {
             this.scrollTop(Number(scrollTop) + Number(this.getScrollTop()), duration, easing, callback);
         },
+        /**
+         * horizontal scroll absolute to the destination 
+         * @memberof XScroll
+         * @param scrollLeft {number} scrollLeft
+         * @param duration {number} duration for animte
+         * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
+         **/
         scrollLeft: function(scrollLeft, duration, easing, callback) {},
+        /**
+         * vertical scroll absolute to the destination 
+         * @memberof XScroll
+         * @param scrollTop {number} scrollTop
+         * @param duration {number} duration for animte
+         * @param easing {string} easing functio for animate : ease-in | ease-in-out | ease | bezier(n,n,n,n)
+         **/
         scrollTop: function(scrollTop, duration, easing, callback) {},
+        /**
+         * reset the boundry size
+         * @memberof XScroll
+         * @return {XScroll} 
+         **/
         resetSize: function() {
             var self = this;
             var userConfig = self.userConfig;
@@ -198,8 +276,14 @@ define(function(require, exports, module) {
             });
             return self;
         },
+        /**
+         * render scroll
+         * @memberof XScroll
+         * @return {XScroll} 
+         **/
         render: function() {
             var self = this;
+            self.resetSize();
             self.trigger(AFTER_RENDER);
             self._bindEvt();
             return self;
@@ -215,17 +299,37 @@ define(function(require, exports, module) {
                 target.dispatchEvent(ev);
             }
         },
-        boundryCheck:function(){return this;},
-        boundryCheckX:function(){return this;},
-        boundryCheckY:function(){return this;},
-        _bindEvt: function() {return this;}
+        /**
+         * bounce to the boundry vertical and horizontal
+         * @memberof XScroll
+         * @return {XScroll} 
+         **/
+        boundryCheck: function() {
+            return this;
+        },
+        /**
+         * bounce to the boundry horizontal
+         * @memberof XScroll
+         * @return {XScroll} 
+         **/
+        boundryCheckX: function() {
+            return this;
+        },
+        /**
+         * bounce to the boundry vertical 
+         * @memberof XScroll
+         * @return {XScroll} 
+         **/
+        boundryCheckY: function() {
+            return this;
+        },
+        _bindEvt: function() {
+            return this;
+        }
     });
 
 
 
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
-    } else {
-        return XScroll;
     }
-});

@@ -1,10 +1,15 @@
-define(function(require, exports, module) {
 	var Util = require('../util');
 	var Base = require('../base');
 	var prefix;
 	var containerCls;
 	var content = "Pull Down To Refresh";
 	var loadingContent = "Loading...";
+	/**
+	 * A pulldown to refresh plugin for xscroll.
+	 * @constructor
+	 * @param {object} cfg
+	 * @extends {Base}
+	 */
 	var PullDown = function(cfg) {
 		PullDown.superclass.constructor.call(this,cfg);
 		this.userConfig = Util.mix({
@@ -18,7 +23,18 @@ define(function(require, exports, module) {
 		}, cfg);
 	}
 	Util.extend(PullDown,Base, {
-		pluginId: "xscroll/plugin/pulldown",
+		/**
+		 * a pluginId
+		 * @memberOf PullDown
+		 * @type {string} 
+		 */
+		pluginId: "pulldown",
+		/**
+		 * plugin initializer
+		 * @memberOf PullDown
+		 * @override Base
+		 * @return {PullDown} 
+		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.xscroll = xscroll;
@@ -28,15 +44,29 @@ define(function(require, exports, module) {
 					self.render()
 				})
 			}
+			return self;
 		},
+		/**
+		 * detroy the plugin
+		 * @memberOf PullDown
+		 * @override Base
+		 * @return {PullDown} 
+		 */
 		pluginDestructor: function() {
 			var self = this;
 			self.pulldown && self.pulldown.remove();
 			self.xscroll.off("panstart", self._panStartHandler, self);
 			self.xscroll.off("pan", self._panHandler, self);
 			self.xscroll.off("panend", self._panEndHandler, self);
+			self.__isRender = false;
+			self._evtBinded = false;
 			delete self;
 		},
+		/**
+		 * render pulldown plugin
+		 * @memberOf PullDown
+		 * @return {PullDown} 
+		 */
 		render: function() {
 			var self = this;
 			if (self.__isRender) return;
@@ -53,6 +83,7 @@ define(function(require, exports, module) {
 			Util.addClass(pulldown, prefix + self.status);
 			pulldown.innerHTML = self.userConfig[self.status + "Content"] || self.userConfig.content;
 			self._bindEvt();
+			return self;
 		},
 		_bindEvt: function() {
 			var self = this;
@@ -60,24 +91,16 @@ define(function(require, exports, module) {
 			self._evtBinded = true;
 			var pulldown = self.pulldown;
 			var xscroll = self.xscroll;
-			xscroll.on("pan", function(e) {
-				self._panHandler(e);
-			})
-
-			xscroll.on("panstart", function(e) {
-				self._panStartHandler(e);
-			})
-			xscroll.on("panend", function(e) {
-				self._panEndHandler(e)
-			})
-
+			xscroll.on("pan", self._panHandler,self);
+			xscroll.on("panstart", self._panStartHandler,self);
+			xscroll.on("panend",self._panEndHandler,self);
 		},
 		_changeStatus: function(status) {
 			var prevVal = this.status;
 			this.status = status;
 			Util.removeClass(this.pulldown, prefix + prevVal)
 			Util.addClass(this.pulldown, prefix + status);
-			this.setContent(this.userConfig[status + "Content"]);
+			this.pulldown.innerHTML = this.userConfig[status + "Content"];
 			if(prevVal != status){
 				this.trigger("statuschange",{
 					prevVal:prevVal,
@@ -88,10 +111,17 @@ define(function(require, exports, module) {
 				}
 			}
 		},
+		/**
+		 * reset the pulldown plugin
+		 * @memberOf PullDown
+		 * @param {function} callback 
+		 * @return {PullDown} 
+		 */
         reset:function(callback){
         	this.xscroll.boundry.resetTop()
 			this.xscroll.bounce(true, callback);
 			this._expanded = false;
+			return this;
         },
 		_panStartHandler: function(e) {
 			clearTimeout(this.loadingItv);
@@ -125,18 +155,9 @@ define(function(require, exports, module) {
 					}, 800);
 				}
 			}
-		},
-		setContent: function(content) {
-			var self = this;
-			if (content) {
-				self.pulldown.innerHTML = content;
-			}
 		}
 	});
 
 	if(typeof module == 'object' && module.exports){
 		module.exports = PullDown;
-	}else{
-		return PullDown;
 	}
-});

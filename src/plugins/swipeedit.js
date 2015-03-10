@@ -1,4 +1,3 @@
-define(function(require, exports, module) {	
 	var Util = require('../util');
 	var Base = require('../base');
 	//transform
@@ -151,7 +150,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = SwipeEdit;
-	} else {
-		return SwipeEdit;
-	}
-});
+	} 

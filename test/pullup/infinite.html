@@ -132,7 +132,7 @@
     <script src="../../lib/jquery.js"></script>
     <script>
     seajs.config({
-      base: "../../src/"
+      base: "../../build/"
     })
     seajs.use(["simulate-scroll","plugins/infinite","plugins/pullup"],function(XScroll,Infinite,PullUp){
 
@@ -146,7 +146,6 @@
             renderTo: "#J_Scroll"
         });
 
-       
 
         var infinite = new Infinite({
             infiniteElements:"#J_Scroll .xs-row",
@@ -159,7 +158,7 @@
             upContent:"上拉加载更多",
             downContent:"释放加载更多",
             loadingContent:"加载中...",
-            bufferHeight:100,
+            bufferHeight:100
         });
 
         xscroll.plug(pullup);
@@ -178,8 +177,6 @@
                     dataType:"json",
                     success:function(data){
                         if(page > totalPage) {
-                            //last page
-                            pullup.reset();
                             //destroy plugin
                             xscroll.unplug(pullup);
                             return; 
@@ -197,8 +194,6 @@
         xscroll.plug(infinite);
         
         xscroll.render();
-
-        window.xscroll = xscroll
 
     });
 

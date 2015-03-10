@@ -1,7 +1,3 @@
-/*
-	滚动加速
-*/
-define(function(require, exports, module) {
 	var Util = require('../util'),
 		Base = require('../base');
 
@@ -50,7 +46,6 @@ define(function(require, exports, module) {
 					speedRecords = [];
 					xscroll.userConfig.maxSpeed = defaultMaxSpeed;
 				}
-				console.log(speedRecords)
 				if(speedRecords.length > 3){
 					var v = average(speedRecords);
 					console.log("acc"," v:",v)
@@ -66,7 +61,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = FastScroll;
-	} else {
-		return FastScroll;
-	}
-});
+	} 

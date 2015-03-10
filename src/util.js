@@ -1,5 +1,3 @@
-define(function(require, exports, module) {
-
 	var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g,
 		EMPTY = '';
 
@@ -180,6 +178,25 @@ define(function(require, exports, module) {
 			if (e.offsetParent != null) offset += this.getOffsetLeft(e.offsetParent);
 			return offset;
 		},
+		findParentEl: function(el, selector, rootNode) {
+			var rs = null;
+			rootNode = rootNode || document.body;
+			if (!el || !selector) return;
+			if (el.className.match(selector.replace(/\.|#/g, ""))) {
+				return el;
+			}
+			while (!rs) {
+				rs = el.parentNode;
+				if (el == rootNode) break;
+				if (rs) {
+					return rs;
+					break;
+				} else {
+					el = el.parentNode;
+				}
+			}
+			return null;
+		},
 		guid: guid,
 		isAndroid: function() {
 			return /Android /.test(window.navigator.appVersion);
@@ -192,7 +209,6 @@ define(function(require, exports, module) {
 		}
 	}
 
-
 	// Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
 	var names = ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'];
 	for(var i = 0 ;i < names.length;i++ ){
@@ -203,8 +219,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Util;
-	} else {
-		return Util;
-	}
-
-});
+	} 

@@ -1,9 +1,15 @@
-define(function(require, exports, module) {
 	var Util = require('../util'),
 		Base = require('../base');
 
 	var transform = Util.prefixStyle("transform");
 	var transition = Util.prefixStyle("transition");
+
+	/**
+	 * An infinity dom-recycled list plugin for xscroll.
+	 * @constructor
+	 * @param {object} cfg
+	 * @extends {Base}
+	 */
 	var Infinite = function(cfg) {
 		Infinite.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
@@ -13,7 +19,24 @@ define(function(require, exports, module) {
 	}
 
 	Util.extend(Infinite, Base, {
+		/**
+		 * a pluginId
+		 * @memberOf Infinite
+		 * @type {string} 
+		 */
 		pluginId: "infinite",
+		/**
+		 * store the visible elements inside of view.
+		 * @memberOf Infinite
+		 * @type {object} 
+		 */
+		visibleElements:{},
+		/**
+		 * plugin initializer
+		 * @memberOf Infinite
+		 * @override Base
+		 * @return {Infinite} 
+		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.xscroll = xscroll;
@@ -32,6 +55,27 @@ define(function(require, exports, module) {
 				self.render();
 				self._bindEvt();
 			});
+			return self;
+		},
+		/**
+		 * detroy the plugin
+		 * @memberOf Infinite
+		 * @override Base
+		 * @return {Infinite} 
+		 */
+		pluginDestructor: function() {
+			var self = this;
+			self.xscroll.off("scroll", self._updateByScroll,self);
+			for (var i = 0; i < self.infiniteLength; i++) {
+				self.infiniteElements[i].style.position = "inherit";
+				self.infiniteElements[i].style.visibility = "inherit";
+				self.infiniteElements[i].style.display = "inherit";
+				self.infiniteElements[i].style[self.nameTop] = "auto";
+				self.infiniteElements[i].style[transform] = "none";
+			}
+			self.xscroll.off("tap panstart pan panend",self._cellEventsHandler,self);
+			self._destroySticky();
+			return self;
 		},
 		_initInfinite: function() {
 			var self = this;
@@ -52,9 +96,8 @@ define(function(require, exports, module) {
 				return tmp;
 			})();
 			self.elementsPos = {};
-			xscroll.on("scroll", function(e) {
-				self._updateByScroll(e[self.nameScrollTop]);
-			});
+			xscroll.on("scroll", self._updateByScroll,self);
+			return self;
 		},
 		_initSticky: function() {
 			var self = this;
@@ -80,6 +123,14 @@ define(function(require, exports, module) {
 					self.stickyDomInfo.push(sticky);
 				}
 			}
+			return self;
+		},
+		_destroySticky:function(){
+			var self = this;
+			self.hasSticky = false;
+			self.stickyElement && self.stickyElement.remove();
+			self._isStickyRendered = false;
+			return self;
 		},
 		_renderUnRecycledEl: function() {
 			var self = this;
@@ -107,12 +158,17 @@ define(function(require, exports, module) {
 				}
 			}
 		},
+		/**
+		 * render or update the scroll contents
+		 * @memberOf Infinite
+		 * @return {Infinite} 
+		 */
 		render: function() {
 			var self = this;
 			var xscroll = self.xscroll;
 			var offset = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
 			self.visibleElements = self.getVisibleElements(offset);
-			self.__serializedData = self._getDomInfo();
+			self.__serializedData = self._computeDomPositions();
 			self._initSticky();
 			var size = xscroll[self.nameHeight];
 			var containerSize = self._containerSize; 
@@ -127,6 +183,7 @@ define(function(require, exports, module) {
 			self._updateByScroll();
 			self._updateByRender(offset);
 			self.xscroll.boundryCheck();
+			return self;
 		},
 		_getChangedRows: function(newElementsPos) {
 			var self = this;
@@ -144,10 +201,11 @@ define(function(require, exports, module) {
 			self.elementsPos = newElementsPos;
 			return changedRows;
 		},
-		_updateByScroll: function(pos) {
+		_updateByScroll: function(e) {
 			var self = this;
 			var xscroll = self.xscroll;
-			var pos = pos === undefined ? (self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft()) : pos;
+			var _pos = e && e[self.nameScrollTop];
+			var pos = _pos === undefined ? (self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft()) : _pos;
 			var elementsPos = self.getVisibleElements(pos);
 			var changedRows = self._getChangedRows(elementsPos);
 			for (var i in changedRows) {
@@ -161,8 +219,8 @@ define(function(require, exports, module) {
 					if (el) {
 						self.infiniteElementsCache[index].guid = elementsPos[i].guid;
 						self.__serializedData[elementsPos[i].guid].__infiniteIndex = index;
-						self.renderData(el, elementsPos[i]);
-						self.renderStyle(el, elementsPos[i]);
+						self._renderData(el, elementsPos[i]);
+						self._renderStyle(el, elementsPos[i]);
 					}
 				}
 			}
@@ -184,18 +242,18 @@ define(function(require, exports, module) {
 					if (prevEl.guid === newEl.guid) {
 						if (newEl.style != prevEl.style || newEl[self._nameTop] != prevEl[self._nameTop] || newEl[self._nameHeight] != prevEl[self._nameHeight]) {
 							// console.log( "data:", JSON.stringify(newEl.data),prevEl[self._nameTop], '->', newEl[self._nameTop])
-							self.renderStyle(self.infiniteElements[newEl.__infiniteIndex], newEl, true);
+							self._renderStyle(self.infiniteElements[newEl.__infiniteIndex], newEl, true);
 						}
 						if (JSON.stringify(newEl.data) != JSON.stringify(prevEl.data)) {
-							self.renderData(self.infiniteElements[newEl.__infiniteIndex], newEl);
+							self._renderData(self.infiniteElements[newEl.__infiniteIndex], newEl);
 						}
 					} else {
 						// paint
 						if (self.__serializedData[newEl.guid].__infiniteIndex === undefined) {
 							var elObj = self._popEl();
 							self.__serializedData[newEl.guid].__infiniteIndex = elObj.index;
-							self.renderData(elObj.el, newEl);
-							self.renderStyle(elObj.el, newEl);
+							self._renderData(elObj.el, newEl);
+							self._renderStyle(elObj.el, newEl);
 						}
 					}
 				}
@@ -257,15 +315,12 @@ define(function(require, exports, module) {
 				self.curStickyIndex = undefined;
 				return;
 			}
-
-
-
 		},
 		/**
 		 * get all element posInfo such as top,height,template,html
 		 * @return {Array}
 		 **/
-		_getDomInfo: function() {
+		_computeDomPositions: function() {
 			var self = this;
 			var pos = 0,
 				size = 0,
@@ -301,6 +356,12 @@ define(function(require, exports, module) {
 			self._containerSize = pos;
 			return serializedData;
 		},
+		/**
+		 * get all elements inside of the view. 
+		 * @memberOf Infinite
+		 * @param {number} pos scrollLeft or scrollTop
+		 * @return {object} visibleElements 
+		 */
 		getVisibleElements: function(pos) {
 			var self = this;
 			var xscroll = self.xscroll;
@@ -343,12 +404,12 @@ define(function(require, exports, module) {
 				}
 			}
 		},
-		renderData: function(el, elementObj) {
+		_renderData: function(el, elementObj) {
 			var self = this;
 			if (!el) return;
 			self.userConfig.renderHook.call(self, el, elementObj);
 		},
-		renderStyle: function(el, elementObj, useTransition) {
+		_renderStyle: function(el, elementObj, useTransition) {
 			var self = this;
 			if (!el) return;
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
@@ -380,38 +441,15 @@ define(function(require, exports, module) {
 			el.style[transform] = self.nameTranslate + "(" + elementObj[self._nameTop] + "px) " + translateZ;
 			el.style[transition] = useTransition ? self.userConfig.transition : "none";
 		},
-		findParentEl: function(el, selector, rootNode) {
-			var rs = null;
-			rootNode = rootNode || document.body;
-			if (!el || !selector) return;
-			if (el.className.match(selector.replace(/\.|#/g, ""))) {
-				return el;
-			}
-			while (!rs) {
-				rs = el.parentNode;
-				if (el == rootNode) break;
-				if (rs) {
-					return rs;
-					break;
-				} else {
-					el = el.parentNode;
-				}
-			}
-			return null;
-		},
 		getCell: function(e) {
 			var self = this,
 				cell;
-			var el = self.findParentEl(e.target, "._xs_infinite_elements_", self.xscroll.renderTo);
+			var el = Util.findParentEl(e.target, "._xs_infinite_elements_", self.xscroll.renderTo);
 			var guid = el.getAttribute("xs-guid");
 			if (undefined === guid) return;
 			return self.__serializedData[guid];
 		},
-		pluginDestructor: function() {
-			var self = this;
 
-
-		},
 		_bindEvt: function() {
 			var self = this;
 			if (self._isEvtBinded) return;
@@ -421,15 +459,62 @@ define(function(require, exports, module) {
 					e.target.style.webkitTransition = "";
 				}
 			});
-			//celltap cellpanstart cellpan cellpanend
-			self.xscroll.on("tap panstart pan panend",function(e){
-				e.cell = self.getCell(e);
-				if (e.cell) {
-					self.xscroll.trigger("cell"+e.type, e);
-				}
-			});
+			self.xscroll.on("tap panstart pan panend",self._cellEventsHandler,self);
 			return self;
 		},
+		_cellEventsHandler:function(e){
+			var self = this;
+				e.cell = self.getCell(e);
+				e.cell && self[e.type].call(self,e);
+		},
+		/**
+		 * tap event
+		 * @memberOf Infinite
+		 * @param {object} e events data include cell object
+		 * @event
+		 */
+		tap:function(e){
+			this.trigger("tap",e);
+			return this;
+		},
+		/**
+		 * panstart event
+		 * @memberOf Infinite
+		 * @param {object} e events data include cell object
+		 * @event
+		 */
+		panstart:function(e){
+			this.trigger("panstart",e);
+			return this;
+		},
+		/**
+		 * pan event
+		 * @memberOf Infinite
+		 * @param {object} e events data include cell object
+		 * @event
+		 */
+		pan:function(e){
+			this.trigger("pan",e);
+			return this;
+		},
+		/**
+		 * panend event
+		 * @memberOf Infinite
+		 * @param {object} e events data include cell object
+		 * @event
+		 */
+		panend:function(e){
+			this.trigger("panend",e);
+			return this;
+		},
+		/**
+		 * insert data before a position
+		 * @memberOf Infinite
+		 * @param {string} sectionId sectionId of the target cell
+		 * @param {number} index index of the target cell
+		 * @param {object} data data to insert
+		 * @return {Infinite} 
+		 */
 		insertBefore: function(sectionId, index, data) {
 			var self = this;
 			if (sectionId === undefined || index === undefined || data === undefined) return self;
@@ -439,6 +524,14 @@ define(function(require, exports, module) {
 			self.sections[sectionId].splice(index, 0, data);
 			return self;
 		},
+		/**
+		 * insert data after a position
+		 * @memberOf Infinite
+		 * @param {string} sectionId sectionId of the target cell
+		 * @param {number} index index of the target cell
+		 * @param {object} data data to insert
+		 * @return {Infinite} 
+		 */
 		insertAfter: function(sectionId, index, data) {
 			var self = this;
 			if (sectionId === undefined || index === undefined || data === undefined) return self;
@@ -448,6 +541,13 @@ define(function(require, exports, module) {
 			self.sections[sectionId].splice(Number(index) + 1, 0, data);
 			return self;
 		},
+		/**
+		 * append data after a section
+		 * @memberOf Infinite
+		 * @param {string} sectionId sectionId for the append cell
+		 * @param {object} data data to append
+		 * @return {Infinite} 
+		 */
 		append: function(sectionId, data) {
 			var self = this;
 			if (!self.sections[sectionId]) {
@@ -456,26 +556,51 @@ define(function(require, exports, module) {
 			self.sections[sectionId] = self.sections[sectionId].concat(data);
 			return self;
 		},
+		/**
+		 * remove some data by sectionId,from,number
+		 * @memberOf Infinite
+		 * @param {string} sectionId sectionId for the append cell
+		 * @param {number} from removed index from
+		 * @param {number} number removed data number
+		 * @return {Infinite} 
+		 */
 		remove: function(sectionId, from, number) {
 			var self = this;
 			var number = number || 1;
 			if (undefined === sectionId || !self.sections[sectionId]) return self;
+			//remove a section
 			if (undefined === from) {
 				delete self.sections[sectionId];
 				return self;
 			}
+			//remove some data in section
 			if (self.sections[sectionId] && self.sections[sectionId][from]) {
 				self.sections[sectionId].splice(from, number);
 				return self;
 			}
 			return self;
 		},
+		/**
+		 * replace some data by sectionId and index
+		 * @memberOf Infinite
+		 * @param {string} sectionId sectionId to replace
+		 * @param {number} index removed index from
+		 * @param {object} data new data to replace
+		 * @return {Infinite} 
+		 */
 		replace: function(sectionId, index, data) {
 			var self = this;
 			if (undefined === sectionId || !self.sections[sectionId]) return self;
 			 self.sections[sectionId][index] = data;
 			return self;
 		},
+		/**
+		 * get data by sectionId and index
+		 * @memberOf Infinite
+		 * @param {string} sectionId sectionId 
+		 * @param {number} index index in the section
+		 * @return {object} data data 
+		 */
 		get: function(sectionId, index) {
 			if (undefined === sectionId) return;
 			if (undefined === index) return this.sections[sectionId];
@@ -486,7 +611,9 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Infinite;
-	} else {
-		return Infinite;
+	} else{
+		if(window.XScroll && !XScroll.Plugins){
+			XScroll.Plugins = {};
+		}
+		XScroll.Plugins.Infinite = Infinite;
 	}
-});

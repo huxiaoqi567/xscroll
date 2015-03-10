@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 	var Util = require('./util'),
 		Base = require('./base'),
 		Core = require('./core'),
@@ -119,9 +118,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = OriginScroll;
-	} else {
-		return window.XScroll = OriginScroll;
-	}
-});
-
-
+	} 

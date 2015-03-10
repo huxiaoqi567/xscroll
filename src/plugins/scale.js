@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 	var Util = require('../util'),
 		Base = require('../base'),
 		Animate = require('../animate');
@@ -11,7 +10,12 @@ define(function(require, exports, module) {
 	// reduced scale rate
 	var SCALE_RATE = 0.7;
 	var SCALE_TO_DURATION = 300;
-
+	/**
+	 * A scalable plugin for xscroll.
+	 * @constructor
+	 * @param {object} cfg
+	 * @extends {Base}
+	 */
 	var Scale = function(cfg) {
 		Scale.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
@@ -22,8 +26,18 @@ define(function(require, exports, module) {
 	}
 
 	Util.extend(Scale, Base, {
+		/**
+		 * a pluginId
+		 * @memberOf Scale
+		 * @type {string} 
+		 */
 		pluginId: "scale",
-
+		/**
+		 * plugin initializer
+		 * @memberOf Scale
+		 * @override Scale
+		 * @return {Infinite} 
+		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.scale = 1;
@@ -33,8 +47,8 @@ define(function(require, exports, module) {
 			self.minScale = self.userConfig.minScale || Math.max(xscroll.width / xscroll.containerWidth, xscroll.height / xscroll.containerHeight);
 			self.maxScale = self.userConfig.maxScale || 1;
 			self._bindEvt();
+			return self;
 		},
-
 		_bindEvt: function() {
 			var self = this;
 			var xscroll = self.xscroll;
@@ -109,9 +123,9 @@ define(function(require, exports, module) {
 		          }
 		        });
 		      })
+			return self;
 
 		},
-
 		_scale: function(scale, originX, originY) {
 			var self = this;
 			var xscroll = self.xscroll;
@@ -151,14 +165,16 @@ define(function(require, exports, module) {
 			xscroll.x = x;
 			xscroll.y = y;
 		},
-		/*
-            scale(0.5,0.5,0.5,500,"ease-out")
-            @param {Number} scale 
-            @param {Float} 0~1 originX
-            @param {Fload} 0~1 originY
-            @param {Number} duration
-            @param {String} callback
-        */
+		/**
+		 * scale with an animation
+		 * @memberOf Scale
+		 * @param {number} scale 
+		 * @param {number} originX 0~1
+		 * @param {number} originY 0~1
+		 * @param {number} duration
+		 * @param {string} easing
+		 * @param {function} callback
+		*/
 		scaleTo: function(scale, originX, originY, duration, easing, callback) {
 			var self = this;
 			var xscroll = self.xscroll;
@@ -217,6 +233,12 @@ define(function(require, exports, module) {
 			});
 
 		},
+		/**
+		 * detroy the plugin
+		 * @memberOf Scale
+		 * @override Base
+		 * @return {Scale} 
+		 */
 		pluginDestructor: function() {
 
 		}
@@ -225,8 +247,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Scale;
-	} else {
-		return Scale;
-	}
-
-});
+	} 

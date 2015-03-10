@@ -1,3 +1,4 @@
+define(function(require, exports, module) {
 /*! Hammer.JS - v2.0.4 - 2014-09-28
  * http://hammerjs.github.io/
  *
@@ -650,7 +651,7 @@ function getDirection(x, y) {
     if (x === y) {
         return DIRECTION_NONE;
     }
-
+    
     if (abs(x) >= abs(y)) {
         return x > 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
     }
@@ -1674,6 +1675,11 @@ inherit(PanRecognizer, AttrRecognizer, {
         }
 
         this._super.emit.call(this, input);
+    },
+    reset:function(){
+        // console.log(this)
+
+        // console.log("panreset")
     }
 });
 
@@ -2131,7 +2137,6 @@ function Manager(element, options) {
 
     this.options = merge(options, Hammer.defaults);
     this.options.inputTarget = this.options.inputTarget || element;
-
     this.handlers = {};
     this.session = {};
     this.recognizers = [];
@@ -2450,14 +2455,15 @@ extend(Hammer, {
     prefixed: prefixed
 });
 
-if (typeof define == TYPE_FUNCTION && define.amd) {
-    define(function() {
-        return Hammer;
-    });
-} else if (typeof module != 'undefined' && module.exports) {
-    module.exports = Hammer;
-} else {
+// if (typeof define == TYPE_FUNCTION && define.amd) {
+//     define(function() {
+//         return Hammer;
+//     });
+// } else if (typeof module != 'undefined' && module.exports) {
+//     module.exports = Hammer;
+// } else {
     window[exportName] = Hammer;
-}
+// }
 
 })(window, document, 'Hammer');
+});

@@ -77,7 +77,7 @@
     <script src="../../lib/sea.js"></script>
     <script>
     seajs.config({
-      base: "../../src/"
+      base: "../../build/"
     })
     seajs.use(["xscroll","plugins/infinite"],function(XScroll,Infinite){
         var data = (function() {
@@ -132,34 +132,11 @@
         
         xscroll.render();
 
-        xscroll.on("celltap",function(e){
-            infinite.remove(e.cell.sectionId,e.cell.index);
-            // infinite.sections[e.cell.sectionId][e.cell.index].style.height=150;
+        infinite.on("tap",function(e){
+            // infinite.remove(e.cell.sectionId,e.cell.index);
+            infinite.sections[e.cell.sectionId][e.cell.index].style.height=150;
             xscroll.render();
         })
-
-        window.xscroll = xscroll;
-
-        window.infinite =infinite;
-
-        // xscroll.scrollTop(xscroll.containerHeight-xscroll.height,2000)
-
-        // setTimeout(function(){
-        //     infinite.remove(0,50)
-        //     xscroll.render();
-        // },3000)
-
-        // setTimeout(function(){
-        //     infinite.remove(0,45)
-        //     xscroll.render();
-        // },3500)
-
-        //  setTimeout(function(){
-        //     infinite.remove(0,48)
-        //     xscroll.render();
-        // },4000)
-    
-
 
 
     });

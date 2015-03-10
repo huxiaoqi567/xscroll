@@ -1,4 +1,3 @@
-define(function(require, exports, module) {
 	var Util = require('../util');
 	var Animate = require('../animate');
 	var MIN_SCROLLBAR_SIZE = 60;
@@ -193,8 +192,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = ScrollBar;
-	} else {
-		return ScrollBar;
-	}
-
-});
+	} 

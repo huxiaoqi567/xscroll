@@ -1,7 +1,6 @@
 /*
 	wrapped scroll controller
 */
-define(function(require, exports, module) {
 	var Util = require('../util'),
 		Base = require('../base');
 
@@ -59,11 +58,11 @@ define(function(require, exports, module) {
 				xscroll = self.xscroll;
 
 			xscroll.renderTo.addEventListener("touchstart", function() {
-				xscroll.resetDefaultConfig();
+				xscroll._resetLockConfig();
 			});
 
 			sub.renderTo.addEventListener("touchstart", function() {
-				sub.resetDefaultConfig();
+				sub._resetLockConfig();
 			});
 
 			sub.mc.on("panstart", function(e) {
@@ -137,7 +136,4 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Controller;
-	} else {
-		return Controller;
-	}
-});
+	} 
