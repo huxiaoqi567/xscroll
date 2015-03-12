@@ -1,6 +1,5 @@
 
   var Util = require('./util');
-
 // Returns a function that will be executed at most one time, no matter how
   // often you call it. Useful for lazy initialization.
   var _once = function(func) {
@@ -201,4 +200,6 @@ var Events = {
 
   if (typeof module == 'object' && module.exports) {
     module.exports = Events;
-  } 
+  } else{
+    return Events;
+  }

@@ -65,20 +65,27 @@ li{
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
-      base: "../../build/"
+      base: "../../build/cmd/",
+      map: [
+        [".js", ".js?" + new Date().getTime()]
+
+        ]
     })
     seajs.use(["xscroll"],function(XScroll){
 
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
-    		useTransition:false
+    		// BOUNDRY_CHECK_DURATION:2000
+    		// useTransition:false
     	})
 
     	xscroll.render();
 
     	xscroll.on("tap doubletap panstart panend pan scroll scrollend",function(e){
-    		console.log(e.type)
+    		// console.log(e.type)
     	})
+
+    	window.xscroll = xscroll
 
     })
 </script>

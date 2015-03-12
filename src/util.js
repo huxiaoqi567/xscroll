@@ -29,7 +29,6 @@
 	var idCounter = 0;
 	var guid = function(prefix) {
 		var id = ++idCounter + '';
-		// console.log(id)
 		return prefix ? prefix + id : id;
 	};
 
@@ -216,7 +215,9 @@
 			return toString.call(obj) == '[object ' + names[i] + ']';
 		};
 	}
-
+	
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Util;
-	} 
+	} else{
+		return Util;
+	}

@@ -211,10 +211,10 @@
 					}
 				})
 			}
-			xscroll.__timers.x.timer.off("run", self._scaleHandler,self);
-			xscroll.__timers.x.timer.on("run", self._scaleHandler,self);
-			xscroll.__timers.x.timer.off("stop", self.scaleendHandler,self);
-			xscroll.__timers.x.timer.on("stop", self.scaleendHandler,self);
+			xscroll.__timers.x.timer.off("run", self._scaleHandler, self);
+			xscroll.__timers.x.timer.on("run", self._scaleHandler, self);
+			xscroll.__timers.x.timer.off("stop", self.scaleendHandler, self);
+			xscroll.__timers.x.timer.on("stop", self.scaleendHandler, self);
 			self.trigger("scaleanimate", {
 				scale: xscroll.scale,
 				duration: duration,
@@ -233,4 +233,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Scale;
+	} else if (window.XScroll && window.XScroll.Plugins) {
+		XScroll.Plugins.Scale = Scale;
 	}

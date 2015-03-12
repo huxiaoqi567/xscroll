@@ -7,7 +7,7 @@
   //reduced boundry pan distance
   var PAN_RATE = 1 - 0.618;
   //constant for scrolling acceleration
-  var SROLL_ACCELERATION = 0.001;
+  var SROLL_ACCELERATION = 0.0005;
   //constant for outside of boundry acceleration
   var BOUNDRY_ACCELERATION = 0.03;
   //transform-origin
@@ -623,4 +623,6 @@
 
   if (typeof module == 'object' && module.exports) {
     module.exports = SimuScroll;
+  }else{
+    return SimuScroll;
   }

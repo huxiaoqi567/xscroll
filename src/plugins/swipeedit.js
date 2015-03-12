@@ -150,4 +150,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = SwipeEdit;
-	} 
+	} else if (window.XScroll && window.XScroll.Plugins) {
+       XScroll.Plugins.SwipeEdit = SwipeEdit;
+     }

@@ -18,10 +18,10 @@
 	var translateTpl = 'translateX({translateX}px) translateY({translateY}px) translateZ(0)';
 	//limit attrs
 	var animAttrs = {
-		'transform':true, 
-		'opacity':true, 
-		'scrollTop':true,
-		'scrollLeft':true
+		'transform': true,
+		'opacity': true,
+		'scrollTop': true,
+		'scrollLeft': true
 	};
 
 	function myParse(v) {
@@ -111,7 +111,6 @@
 					ret.translateX = myParse(val[0]);
 					ret.translateY = myParse(val[1] || 0);
 					break;
-
 				case 'scale':
 					val = val.split(',');
 					ret.scaleX = myParse(val[0]);
@@ -140,14 +139,6 @@
 		var duration = cfg.duration || 0,
 			easing = cfg.easing || "ease",
 			delay = cfg.delay || 0;
-
-		self.transitionEndHandler = function(e) {
-			self.__isTransitionEnd = true;
-			if(e.target !== e.currentTarget) return;
-			self.__handlers.stop.call(self);
-			// self.stop();
-		};
-
 		//trigger run
 		if (cfg.run) {
 			//frame animate
@@ -157,6 +148,7 @@
 			});
 			self.timer.on("run", cfg.run);
 		}
+		self._bindEvt();
 		return self;
 	}
 
@@ -199,7 +191,7 @@
 		/**
 		 * to start the animation
 		 * @memberof Animate
-		 * @return {Animate} 
+		 * @return {Animate}
 		 */
 		run: function() {
 			var self = this;
@@ -211,9 +203,9 @@
 			self.__isTransitionEnd = false;
 			clearTimeout(self.__itv)
 			self.timer && self.timer.run();
-			if(duration <= Timer.MIN_DURATION){
+			if (duration <= Timer.MIN_DURATION) {
 				for (var i in cfg.css) {
-					css(el,i,cfg.css[i]);
+					css(el, i, cfg.css[i]);
 				}
 				self.stop()
 				return;
@@ -230,15 +222,12 @@
 					//set css
 					css(el, i, cfg.css[i]);
 				}
-				el.removeEventListener(vendorTransitionEnd, self.transitionEndHandler);
-				el.addEventListener(vendorTransitionEnd, self.transitionEndHandler, false);
-				self.__itv = setTimeout(function(){
-					if(!self.__isTransitionEnd){
+				self.__itv = setTimeout(function() {
+					if (!self.__isTransitionEnd) {
 						self.__isTransitionEnd = true;
-						self.__handlers.stop.call(self);
-						// self.stop();
+						self.trigger("transitionend");
 					}
-				},Number(duration) + 60)
+				}, Number(duration) + 60);
 			} else {
 				var computeStyle = window.getComputedStyle(el);
 				//transform
@@ -247,19 +236,13 @@
 					self.timer && self.timer.off("run", self.__handlers.transRun);
 					self.timer && self.timer.on("run", self.__handlers.transRun, self);
 				}
-				var cssRun = function(e) {
-					for (var i in cfg.css) {
-						if (!/transform/.test(i)) {
-							setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
-						}
-					}
-				};
-				self.timer && self.timer.off("run", cssRun);
-				self.timer && self.timer.on("run", cssRun);
-				self.timer && self.timer.off("stop", self.__handlers.stop);
-				self.timer && self.timer.on("stop", self.__handlers.stop, self);
 			}
 			return self;
+		},
+		_transitionEndHandler: function(e) {
+			var self = this;
+			self.stop();
+			self.__handlers.stop.call(self);
 		},
 		__handlers: {
 			transRun: function(e) {
@@ -282,19 +265,38 @@
 				});
 			}
 		},
+		_bindEvt: function() {
+			var self = this;
+			var cfg = self.cfg;
+			self.el.addEventListener(vendorTransitionEnd,function(e){
+				self.__isTransitionEnd = true;
+				if(e.target !== e.currentTarget) return;
+				self.trigger("transitionend",e);
+			})
+			self.on("transitionend",self._transitionEndHandler,self);
+			var cssRun = function(e) {
+				for (var i in cfg.css) {
+					if (!/transform/.test(i)) {
+						setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
+					}
+				}
+			};
+			self.timer && self.timer.on("run", cssRun);
+			self.timer && self.timer.on("stop", self.__handlers.stop, self);
+		},
 		/**
 		 * to stop the animation
 		 * @memberof Animate
-		 * @return {Animate} 
+		 * @return {Animate}
 		 */
 		stop: function() {
 			var self = this;
 			if (self.cfg.useTransition && self.cfg.duration > Timer.MIN_DURATION) {
 				var computeStyle = window.getComputedStyle(this.el);
-				for (var i in self.cfg.css){
+				for (var i in self.cfg.css) {
 					if (animAttrs[i]) {
 						var value = /transform/.test(i) ? computeStyle[vendorTransform] : computeStyle[i];
-						css(self.el, i, value);
+						css(self.el, i, Util.substitute(translateTpl + ' ' + 'scale({scaleX},{scaleY})', getTransformInfo(value)));
 					}
 				}
 				self.el.style[vendorTransition] = "none";
@@ -306,7 +308,7 @@
 		 * to reset the animation to a new state
 		 * @memberof Animate
 		 * @param {object} cfg cfg for new animation
-		 * @return {Animate} 
+		 * @return {Animate}
 		 */
 		reset: function(cfg) {
 			var self = this;
@@ -322,4 +324,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Animate;
-	} 
+	}else{
+		return Animate;
+	}

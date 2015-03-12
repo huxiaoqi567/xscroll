@@ -165,8 +165,10 @@
 			self._changeStatus("up");
 			return self;
 		}
-	})
+	});
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = PullUp;
+	}else if(window.XScroll && window.XScroll.Plugins){
+		XScroll.Plugins.PullUp = PullUp;
 	}

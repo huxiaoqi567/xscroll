@@ -1,13 +1,26 @@
 	var Util = require('./util'),
 		SimuScroll = require('./simulate-scroll'),
 		OriginScroll = require('./origin-scroll');
-
-	var XScrollFactory = function(cfg) {
-		var XScroll = cfg && cfg.useOriginScroll ? OriginScroll : SimuScroll;
-		return new XScroll(cfg);
+	
+	var XScroll = function(cfg) {
+		var _ = cfg && cfg.useOriginScroll ? OriginScroll : SimuScroll;
+		return new _(cfg);
 	}
+	/**
+	 * util
+	 * @namespace Util
+	 * @type {Object}
+	 */
+	XScroll.Util = Util;
+	/**
+	 * plugins
+	 * @namespace Plugins
+	 * @type {Object}
+	 */
+	XScroll.Plugins = {};
+
 	if (typeof module == 'object' && module.exports) {
-		module.exports = XScrollFactory;
+		module.exports = XScroll;
 	} else {
-		window.XScroll = XScrollFactory;
+		window.XScroll = XScroll;
 	}

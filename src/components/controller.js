@@ -136,4 +136,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Controller;
-	} 
+	} else{
+		return Controller;
+	}

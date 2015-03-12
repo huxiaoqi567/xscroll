@@ -548,7 +548,6 @@ function computeIntervalInputData(session, input) {
     if (input.eventType != INPUT_CANCEL && (deltaTime > COMPUTE_INTERVAL || last.velocity === undefined)) {
         var deltaX = last.deltaX - input.deltaX;
         var deltaY = last.deltaY - input.deltaY;
-
         var v = getVelocity(deltaTime, deltaX, deltaY);
         velocityX = v.x;
         velocityY = v.y;

@@ -9,7 +9,7 @@
 	 * @constructor
 	 * @param {object} cfg
 	 * @param {string} cfg.zoomType choose scroll vertically or horizontally
-	 * @param {string} cfg.transition recomposition cell with a transition 
+	 * @param {string} cfg.transition recomposition cell with a transition
 	 * @param {string} cfg.infiniteElements dom-selector for reused elements
 	 * @param {function} cfg.renderHook render function for cell by per col or per row duration scrolling
 	 * @extends {Base}
@@ -18,7 +18,7 @@
 		Infinite.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
 			zoomType: "y",
-			transition:'all 0.5s ease'
+			transition: 'all 0.5s ease'
 		}, cfg);
 	}
 
@@ -26,20 +26,20 @@
 		/**
 		 * a pluginId
 		 * @memberOf Infinite
-		 * @type {string} 
+		 * @type {string}
 		 */
 		pluginId: "infinite",
 		/**
 		 * store the visible elements inside of view.
 		 * @memberOf Infinite
-		 * @type {object} 
+		 * @type {object}
 		 */
-		visibleElements:{},
+		visibleElements: {},
 		/**
 		 * plugin initializer
 		 * @memberOf Infinite
 		 * @override Base
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
@@ -49,7 +49,7 @@
 			self._nameHeight = self.isY ? "_height" : "_width";
 			self.nameTop = self.isY ? "top" : "left";
 			self.nameHeight = self.isY ? "height" : "width";
-			self.nameWidth = self.isY ? "width":"height";
+			self.nameWidth = self.isY ? "width" : "height";
 			self.nameY = self.isY ? "y" : "x";
 			self.nameTranslate = self.isY ? "translateY" : "translateX";
 			self.nameContainerHeight = self.isY ? "containerHeight" : "containerWidth";
@@ -65,11 +65,11 @@
 		 * detroy the plugin
 		 * @memberOf Infinite
 		 * @override Base
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		pluginDestructor: function() {
 			var self = this;
-			self.xscroll.off("scroll", self._updateByScroll,self);
+			self.xscroll.off("scroll", self._updateByScroll, self);
 			for (var i = 0; i < self.infiniteLength; i++) {
 				self.infiniteElements[i].style.position = "inherit";
 				self.infiniteElements[i].style.visibility = "inherit";
@@ -77,7 +77,7 @@
 				self.infiniteElements[i].style[self.nameTop] = "auto";
 				self.infiniteElements[i].style[transform] = "none";
 			}
-			self.xscroll.off("tap panstart pan panend",self._cellEventsHandler,self);
+			self.xscroll.off("tap panstart pan panend", self._cellEventsHandler, self);
 			self._destroySticky();
 			return self;
 		},
@@ -95,12 +95,12 @@
 					self.infiniteElements[i].style[self.nameTop] = 0;
 					self.infiniteElements[i].style.visibility = "hidden";
 					self.infiniteElements[i].style.display = "block";
-					Util.addClass(self.infiniteElements[i],"_xs_infinite_elements_");
+					Util.addClass(self.infiniteElements[i], "_xs_infinite_elements_");
 				}
 				return tmp;
 			})();
 			self.elementsPos = {};
-			xscroll.on("scroll", self._updateByScroll,self);
+			xscroll.on("scroll", self._updateByScroll, self);
 			return self;
 		},
 		_initSticky: function() {
@@ -116,7 +116,7 @@
 				sticky.style.left = 0;
 				sticky.style.top = 0;
 				sticky.style.display = "none";
-				Util.addClass(sticky,"_xs_infinite_elements_");
+				Util.addClass(sticky, "_xs_infinite_elements_");
 				self.xscroll.renderTo.appendChild(sticky);
 				self.stickyElement = sticky;
 				self._isStickyRendered = true;
@@ -129,7 +129,7 @@
 			}
 			return self;
 		},
-		_destroySticky:function(){
+		_destroySticky: function() {
 			var self = this;
 			self.hasSticky = false;
 			self.stickyElement && self.stickyElement.remove();
@@ -157,7 +157,7 @@
 					el.style.display = "block";
 					el.style[self.nameHeight] = unrecycledEl[self._nameHeight] + "px";
 					el.style[transform] = self.nameTranslate + "(" + unrecycledEl[self._nameTop] + "px) " + translateZ;
-					Util.addClass(el,unrecycledEl.className);
+					Util.addClass(el, unrecycledEl.className);
 					self.userConfig.renderHook.call(self, el, unrecycledEl);
 				}
 			}
@@ -165,7 +165,7 @@
 		/**
 		 * render or update the scroll contents
 		 * @memberOf Infinite
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		render: function() {
 			var self = this;
@@ -175,7 +175,7 @@
 			self.__serializedData = self._computeDomPositions();
 			self._initSticky();
 			var size = xscroll[self.nameHeight];
-			var containerSize = self._containerSize; 
+			var containerSize = self._containerSize;
 			if (containerSize < size) {
 				containerSize = size;
 			}
@@ -266,11 +266,8 @@
 		},
 		_stickyHandler: function(_pos) {
 			var self = this;
-			_pos = undefined === _pos 
-			? (self.isY ? 
-			self.xscroll.getScrollTop()
-			:self.xscroll.getScrollLeft())
-			:_pos; 
+			_pos = undefined === _pos ? (self.isY ?
+				self.xscroll.getScrollTop() : self.xscroll.getScrollLeft()) : _pos;
 			var pos = Math.abs(_pos);
 			var index = [];
 			var allTops = [];
@@ -281,7 +278,7 @@
 				}
 			}
 			if (!index.length) {
-				if(self.stickyElement){
+				if (self.stickyElement) {
 					self.stickyElement.style.display = "none";
 				}
 				self.curStickyIndex = undefined;
@@ -294,8 +291,8 @@
 				self.stickyElement.style.display = "block";
 				self.stickyElement.style[self.nameWidth] = "100%";
 				self.stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + "px";
-				self.stickyElement.setAttribute("xs-guid",self.stickyDomInfo[self.curStickyIndex].guid);
-				Util.addClass(self.stickyElement,self.stickyDomInfo[self.curStickyIndex].className);
+				self.stickyElement.setAttribute("xs-guid", self.stickyDomInfo[self.curStickyIndex].guid);
+				Util.addClass(self.stickyElement, self.stickyDomInfo[self.curStickyIndex].className);
 				for (var attrName in self.stickyDomInfo[self.curStickyIndex].style) {
 					if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {
 						self.stickyElement.style[attrName] = self.stickyDomInfo[self.curStickyIndex].style[attrName];
@@ -303,16 +300,16 @@
 				}
 			}
 			var trans = 0;
-			if(self.stickyDomInfo[self.curStickyIndex+1]){
+			if (self.stickyDomInfo[self.curStickyIndex + 1]) {
 				var cur = self.stickyDomInfo[self.curStickyIndex];
-				var next = self.stickyDomInfo[self.curStickyIndex+1];
-				if(_pos+cur[self._nameHeight]>next[self._nameTop] && _pos+cur[self._nameHeight]<next[self._nameTop]+cur[self._nameHeight]){
-					trans = cur[self._nameHeight] + pos -next[self._nameTop];
-				}else{
+				var next = self.stickyDomInfo[self.curStickyIndex + 1];
+				if (_pos + cur[self._nameHeight] > next[self._nameTop] && _pos + cur[self._nameHeight] < next[self._nameTop] + cur[self._nameHeight]) {
+					trans = cur[self._nameHeight] + pos - next[self._nameTop];
+				} else {
 					trans = 0;
 				}
 			}
-			self.stickyElement.style[transform] = self.isY ? "translateY(-"+(trans)+"px) translateZ(0)" :"translateX(-"+(trans)+"px) translateZ(0)";
+			self.stickyElement.style[transform] = self.isY ? "translateY(-" + (trans) + "px) translateZ(0)" : "translateX(-" + (trans) + "px) translateZ(0)";
 			//top
 			if (_pos < Math.min.apply(null, allTops)) {
 				self.stickyElement.style.display = "none";
@@ -361,10 +358,10 @@
 			return serializedData;
 		},
 		/**
-		 * get all elements inside of the view. 
+		 * get all elements inside of the view.
 		 * @memberOf Infinite
 		 * @param {number} pos scrollLeft or scrollTop
-		 * @return {object} visibleElements 
+		 * @return {object} visibleElements
 		 */
 		getVisibleElements: function(pos) {
 			var self = this;
@@ -419,16 +416,16 @@
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 			//default style
 			var defaultStyle = {
-				color:"inherit",
-				background:"inherit",
-				margin:"inherit",
-				padding:"inherit",
-				opacity:"inherit",
-				textIndent:"inherit",
-				overflow:"inherit"
+				color: "inherit",
+				background: "inherit",
+				margin: "inherit",
+				padding: "inherit",
+				opacity: "inherit",
+				textIndent: "inherit",
+				overflow: "inherit"
 			};
 
-			for(var attrName in defaultStyle){
+			for (var attrName in defaultStyle) {
 				el.style[attrName] = defaultStyle[attrName];
 			}
 			//update style
@@ -463,13 +460,13 @@
 					e.target.style.webkitTransition = "";
 				}
 			});
-			self.xscroll.on("tap panstart pan panend",self._cellEventsHandler,self);
+			self.xscroll.on("tap panstart pan panend", self._cellEventsHandler, self);
 			return self;
 		},
-		_cellEventsHandler:function(e){
+		_cellEventsHandler: function(e) {
 			var self = this;
-				e.cell = self.getCell(e);
-				e.cell && self[e.type].call(self,e);
+			e.cell = self.getCell(e);
+			e.cell && self[e.type].call(self, e);
 		},
 		/**
 		 * tap event
@@ -477,8 +474,8 @@
 		 * @param {object} e events data include cell object
 		 * @event
 		 */
-		tap:function(e){
-			this.trigger("tap",e);
+		tap: function(e) {
+			this.trigger("tap", e);
 			return this;
 		},
 		/**
@@ -487,8 +484,8 @@
 		 * @param {object} e events data include cell object
 		 * @event
 		 */
-		panstart:function(e){
-			this.trigger("panstart",e);
+		panstart: function(e) {
+			this.trigger("panstart", e);
 			return this;
 		},
 		/**
@@ -497,8 +494,8 @@
 		 * @param {object} e events data include cell object
 		 * @event
 		 */
-		pan:function(e){
-			this.trigger("pan",e);
+		pan: function(e) {
+			this.trigger("pan", e);
 			return this;
 		},
 		/**
@@ -507,8 +504,8 @@
 		 * @param {object} e events data include cell object
 		 * @event
 		 */
-		panend:function(e){
-			this.trigger("panend",e);
+		panend: function(e) {
+			this.trigger("panend", e);
 			return this;
 		},
 		/**
@@ -517,7 +514,7 @@
 		 * @param {string} sectionId sectionId of the target cell
 		 * @param {number} index index of the target cell
 		 * @param {object} data data to insert
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		insertBefore: function(sectionId, index, data) {
 			var self = this;
@@ -534,7 +531,7 @@
 		 * @param {string} sectionId sectionId of the target cell
 		 * @param {number} index index of the target cell
 		 * @param {object} data data to insert
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		insertAfter: function(sectionId, index, data) {
 			var self = this;
@@ -550,7 +547,7 @@
 		 * @memberOf Infinite
 		 * @param {string} sectionId sectionId for the append cell
 		 * @param {object} data data to append
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		append: function(sectionId, data) {
 			var self = this;
@@ -566,7 +563,7 @@
 		 * @param {string} sectionId sectionId for the append cell
 		 * @param {number} from removed index from
 		 * @param {number} number removed data number
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		remove: function(sectionId, from, number) {
 			var self = this;
@@ -590,20 +587,20 @@
 		 * @param {string} sectionId sectionId to replace
 		 * @param {number} index removed index from
 		 * @param {object} data new data to replace
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		replace: function(sectionId, index, data) {
 			var self = this;
 			if (undefined === sectionId || !self.sections[sectionId]) return self;
-			 self.sections[sectionId][index] = data;
+			self.sections[sectionId][index] = data;
 			return self;
 		},
 		/**
 		 * get data by sectionId and index
 		 * @memberOf Infinite
-		 * @param {string} sectionId sectionId 
+		 * @param {string} sectionId sectionId
 		 * @param {number} index index in the section
-		 * @return {object} data data 
+		 * @return {object} data data
 		 */
 		get: function(sectionId, index) {
 			if (undefined === sectionId) return;
@@ -612,12 +609,8 @@
 		}
 	});
 
-
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Infinite;
-	} else{
-		if(window.XScroll && !XScroll.Plugins){
-			XScroll.Plugins = {};
-		}
+	} else if (window.XScroll && window.XScroll.Plugins) {
 		XScroll.Plugins.Infinite = Infinite;
 	}

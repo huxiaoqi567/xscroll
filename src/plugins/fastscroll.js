@@ -8,7 +8,6 @@
 		}, cfg);
 	}
 
-
 	Util.extend(FastScroll, Base, {
 		pluginId: "fastscroll",
 		pluginInitializer: function(xscroll) {
@@ -24,9 +23,7 @@
 				xscroll = self.xscroll,
 				mc = xscroll.mc;
 			var speedRecords = [];
-
 			var defaultMaxSpeed = xscroll.userConfig.maxSpeed || 2;
-
 			var average = function(ary){
 				var l = ary.length;
 				if(l == 0) return;
@@ -36,8 +33,6 @@
 				}
 				return t/l;
 			}
-
-
 			mc.on("panend",function(e){
 				// console.log(e.velocityY)
 				if(Math.abs(e.velocityY)>1.5 && (speedRecords.length == 0 || e.velocityY/speedRecords[speedRecords.length-1]>0)){
@@ -61,4 +56,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = FastScroll;
+	} else if (window.XScroll && window.XScroll.Plugins) {
+		XScroll.Plugins.FastScroll = FastScroll;
 	} 

@@ -156,8 +156,6 @@
 				});
 			} 
 
-			
-
 			self.xscroll.on("panend", function(e) {
 				if (Math.abs(e.velocity) == 0 && !isBoundryOut(type)) {
 					self.hide();
@@ -192,4 +190,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = ScrollBar;
-	} 
+	} else{
+		return ScrollBar;
+	}

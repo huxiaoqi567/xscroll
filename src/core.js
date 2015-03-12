@@ -63,7 +63,7 @@
             var defaultCfg = {
                 preventDefault: true, //prevent touchstart 
                 bounce: true,
-                useTransition: false,
+                useTransition: true,
                 gpuAcceleration: true,
                 BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
                 BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,
@@ -276,6 +276,7 @@
                     e.type = "tap";
                     self.trigger(e.type,e);
                 }else if(e.tapCount == 2){
+                    e.type = "doubletap";
                     self.trigger("doubletap",e);
                 }
             });
@@ -285,4 +286,6 @@
 
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
+    }else{
+        return XScroll;
     }

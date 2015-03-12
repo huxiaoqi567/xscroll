@@ -10,8 +10,8 @@
 		LazyLoad.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
 			imgsSelector: "img",
-			delay:200,
-			formatter:function(src){
+			delay: 200,
+			formatter: function(src) {
 				return src;
 			}
 		}, cfg);
@@ -21,14 +21,14 @@
 		/**
 		 * a pluginId
 		 * @memberOf LazyLoad
-		 * @type {string} 
+		 * @type {string}
 		 */
 		pluginId: "lazyload",
 		/**
 		 * plugin initializer
 		 * @memberOf LazyLoad
 		 * @override Base
-		 * @return {LazyLoad} 
+		 * @return {LazyLoad}
 		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
@@ -46,7 +46,7 @@
 		_setImgSrc: function(img) {
 			if (!img) return;
 			var src = img.getAttribute("data-src");
-			var formattedSrc = this.userConfig.formatter.call(self,src);
+			var formattedSrc = this.userConfig.formatter.call(self, src);
 			formattedSrc && img.setAttribute("src", formattedSrc);
 		},
 		_filterItem: function(e) {
@@ -68,8 +68,8 @@
 			var self = this,
 				infinite = self.xscroll.getPlugin("infinite");
 			clearTimeout(self._timeout);
-			self._timeout = setTimeout(function(){
-				if(self.xscroll['isScrolling'+self.zoomType.toUpperCase()]) return;
+			self._timeout = setTimeout(function() {
+				if (self.xscroll['isScrolling' + self.zoomType.toUpperCase()]) return;
 				for (var i = 0; i < infinite.infiniteLength; i++) {
 					if (infinite.infiniteElementsCache[i]._visible && infinite.infiniteElements[i]) {
 						var imgs = infinite.infiniteElements[i].querySelectorAll(self.userConfig.imgsSelector);
@@ -78,13 +78,13 @@
 						}
 					}
 				}
-			},self.userConfig.delay);
+			}, self.userConfig.delay);
 		},
 		/**
-		 * reset the images 
+		 * reset the images
 		 * @memberOf LazyLoad
 		 * @override Base
-		 * @return {LazyLoad} 
+		 * @return {LazyLoad}
 		 */
 		reset: function() {
 			var self = this,
@@ -113,4 +113,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = LazyLoad;
-	} 
+	} else if (window.XScroll && window.XScroll.Plugins) {
+		XScroll.Plugins.LazyLoad = LazyLoad;
+	}
