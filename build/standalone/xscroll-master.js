@@ -4713,11 +4713,21 @@ xscroll_master = function (exports) {
     this.init(cfg);
   };
   Util.extend(XScrollMaster, Base, {
+    /**
+     * init the master
+     * @param {object} cfg config for master
+     * @param {string} selector xscroll root elements,it will be set to xscroll.renderTo
+     * @return {[type]}
+     */
     init: function (cfg) {
       var self = this;
       self.userConfig = Util.mix({ selector: '.xscroll' }, cfg);
     },
-    //find xscroll instance
+    /**
+     * find xscroll instance
+     * @param {string} id element id for xscroll instance
+     * @return {XScroll} xscroll instance
+     */
     get: function (id) {
       var self = this;
       if (!id)

@@ -34,7 +34,9 @@ function cleanModule(pathName) {
   });
 }
 
-var cleanModules = ['xscroll', 'xscroll-master', 'plugins/infinite', 'plugins/lazyload', 'plugins/pulldown', 'plugins/pullup', 'plugins/scale', 'plugins/snap'];
+var cleanModules = [
+  'xscroll', 'xscroll-master', 'plugins/infinite', 'plugins/lazyload', 'plugins/pulldown', 'plugins/pullup', 'plugins/scale', 'plugins/snap'
+];
 
 gulp.task('amd-clean', ['cmd'], function() {
   cleanModule('xscroll');
@@ -43,11 +45,11 @@ gulp.task('amd-clean', ['cmd'], function() {
   }
 })
 
-gulp.task('compress', ['amd-clean'],function() {
-  gulp.src(['./build/**/*.js','!./build/**/*.min.js'])
+gulp.task('compress', ['amd-clean'], function() {
+  gulp.src(['./build/**/*.js', '!./build/**/*.min.js'])
     .pipe(uglify())
     .pipe(rename({
-        suffix: ".min",
+      suffix: ".min",
     }))
     .pipe(gulp.dest('./build/'))
 });
