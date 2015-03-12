@@ -110,4 +110,6 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = XScrollMaster;
-	} 
+	}else{
+		return window.XScrollMaster = XScrollMaster;
+	}
