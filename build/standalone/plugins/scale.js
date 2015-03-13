@@ -701,7 +701,6 @@ timer = function (exports) {
           self.percent = self._stop && self._stop.percent ? self._stop.percent : 1;
           self.duration = self._stop && self._stop.duration ? self._stop.duration : self.duration;
           var param = { percent: self.percent };
-          // self.trigger("run", param);
           self.trigger('stop', param);
           if (self.percent >= 1) {
             self.isfinished = true;
@@ -910,6 +909,7 @@ animate = function (exports) {
           css(el, i, cfg.css[i]);
         }
         self.stop();
+        self.__handlers.stop.call(self);
         return;
       }
       if (cfg.useTransition) {
@@ -1111,6 +1111,7 @@ plugins_scale = function (exports) {
     _pinchHandler: function (e) {
       var self = this;
       var scale = self.scale;
+      var xscroll = self.xscroll;
       var originX = self.originX;
       var originY = self.originY;
       var __scale = scale * e.scale;
@@ -1129,6 +1130,7 @@ plugins_scale = function (exports) {
       var self = this;
       var originX = self.originX;
       var originY = self.originY;
+      var xscroll = self.xscroll;
       if (xscroll.scale < self.minScale) {
         self.scaleTo(self.minScale, originX, originY, SCALE_TO_DURATION, 'ease-out');
       } else if (xscroll.scale > self.maxScale) {

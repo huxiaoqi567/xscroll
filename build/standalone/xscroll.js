@@ -701,7 +701,6 @@ _timer_ = function (exports) {
           self.percent = self._stop && self._stop.percent ? self._stop.percent : 1;
           self.duration = self._stop && self._stop.duration ? self._stop.duration : self.duration;
           var param = { percent: self.percent };
-          // self.trigger("run", param);
           self.trigger('stop', param);
           if (self.percent >= 1) {
             self.isfinished = true;
@@ -910,6 +909,7 @@ animate = function (exports) {
           css(el, i, cfg.css[i]);
         }
         self.stop();
+        self.__handlers.stop.call(self);
         return;
       }
       if (cfg.useTransition) {
@@ -3620,10 +3620,8 @@ components_scrollbar = function (exports) {
     destroy: function () {
       var self = this;
       self.scrollbar && self.scrollbar.remove();
-      // self.xscroll.off("scaleanimate", self._update, self);
-      self.xscroll.off('scrollend', self._update, self);
-      self.xscroll.off('scrollanimate', self._update, self);
-      !self.xscroll.userConfig.useTransition && self.xscroll.off('scroll', self._update, self);
+      self.xscroll.off('scroll', self._scrollHandler, self);
+      self.xscroll.off('scrollend', self._scrollEndHandler, self);
       delete self;
     },
     render: function () {
@@ -3646,14 +3644,14 @@ components_scrollbar = function (exports) {
       self._update();
       self.hide(0);
     },
-    _update: function (pos, duration, easing) {
+    _update: function (pos, duration, easing, callback) {
       var self = this;
       var pos = undefined === pos ? self.isY ? self.xscroll.getScrollTop() : self.xscroll.getScrollLeft() : pos;
       var barInfo = self.computeScrollBar(pos);
       var size = self.isY ? 'height' : 'width';
       self.indicate.style[size] = Math.round(barInfo.size) + 'px';
       if (duration && easing) {
-        self.scrollTo(barInfo.pos, duration, easing);
+        self.scrollTo(barInfo.pos, duration, easing, callback);
       } else {
         self.moveTo(barInfo.pos);
       }
@@ -3683,9 +3681,13 @@ components_scrollbar = function (exports) {
         barpos = _barpos;
       }
       if (barpos < 0) {
-        barpos = Math.abs(pos) * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE ? BAR_MIN_SIZE - barSize : pos * barSize / MIN_SCROLLBAR_SIZE;
+        if (Math.abs(pos) * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
+          barpos = BAR_MIN_SIZE - barSize;
+        } else {
+          barpos = pos * barSize / MIN_SCROLLBAR_SIZE;
+        }
       } else if (barpos + barSize > indicateSize && pos - posout > 0) {
-        var _pos = pos - containerSize + indicateSize + spacing;
+        var _pos = pos - containerSize + indicateSize;
         if (_pos * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
           barpos = indicateSize + spacing - BAR_MIN_SIZE;
         } else {
@@ -3698,14 +3700,16 @@ components_scrollbar = function (exports) {
         pos: self.barpos
       };
     },
-    scrollTo: function (pos, duration, easing) {
+    scrollTo: function (pos, duration, easing, callback) {
       var self = this;
+      self.show();
       var translateZ = self.xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       var config = {
         css: { transform: self.isY ? 'translateY(' + pos + 'px)' + translateZ : 'translateX(' + pos + 'px)' + translateZ },
         duration: duration,
         easing: easing,
-        useTransition: self.xscroll.userConfig.useTransition
+        useTransition: self.xscroll.userConfig.useTransition,
+        end: callback
       };
       self.__timer = self.__timer || new Animate(self.indicate, config);
       //run
@@ -3720,40 +3724,30 @@ components_scrollbar = function (exports) {
       self.isY ? self.indicate.style[transform] = 'translateY(' + pos + 'px) ' + translateZ : self.indicate.style[transform] = 'translateX(' + pos + 'px) ' + translateZ;
       self.indicate.style[transition] = '';
     },
+    _scrollHandler: function (e) {
+      var self = this;
+      self._update(e[self.scrollTopOrLeft]);
+      return self;
+    },
+    isBoundryOut: function () {
+      var self = this;
+      return !self.isY ? self.xscroll.isBoundryOutLeft() || self.xscroll.isBoundryOutRight() : self.xscroll.isBoundryOutTop() || self.xscroll.isBoundryOutBottom();
+    },
+    _scrollEndHandler: function (e) {
+      var self = this;
+      if (!self.isBoundryOut()) {
+        self._update(e[self.scrollTopOrLeft]);
+        self.hide();
+      }
+      return self;
+    },
     _bindEvt: function () {
       var self = this;
       if (self.__isEvtBind)
         return;
       self.__isEvtBind = true;
-      var type = self.isY ? 'y' : 'x';
-      var isBoundryOut = function (type) {
-        return type == 'x' ? self.xscroll.isBoundryOutLeft() || self.xscroll.isBoundryOutRight() : self.xscroll.isBoundryOutTop() || self.xscroll.isBoundryOutBottom();
-      };
-      if (self.xscroll.userConfig.useTransition) {
-        self.xscroll.on('pan', function (e) {
-          self._update(e[self.scrollTopOrLeft]);
-        });
-        self.xscroll.on('scrollanimate', function (e) {
-          if (!e.zoomType || e.zoomType != type)
-            return;
-          self._update(e[self.scrollTopOrLeft], e.duration, e.easing);
-        });
-      } else {
-        self.xscroll.on('scroll', function (e) {
-          self._update(e[self.scrollTopOrLeft]);
-        });
-      }
-      self.xscroll.on('panend', function (e) {
-        if (Math.abs(e.velocity) == 0 && !isBoundryOut(type)) {
-          self.hide();
-        }
-      });
-      self.xscroll.on('scrollend', function (e) {
-        if (!isBoundryOut()) {
-          self._update(e[self.scrollTopOrLeft]);
-          self.hide();
-        }
-      });
+      self.xscroll.on('scroll', self._scrollHandler, self);
+      self.xscroll.on('scrollend', self._scrollEndHandler, self);
     },
     reset: function () {
       var self = this;

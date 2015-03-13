@@ -209,6 +209,7 @@ define(function(require, exports, module) {
 					css(el, i, cfg.css[i]);
 				}
 				self.stop()
+				self.__handlers.stop.call(self);
 				return;
 			}
 

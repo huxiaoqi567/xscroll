@@ -127,7 +127,6 @@
 					var param = {
 						percent: self.percent
 					};
-					// self.trigger("run", param);
 					self.trigger("stop", param);
 					if (self.percent >= 1) {
 						self.isfinished = true;

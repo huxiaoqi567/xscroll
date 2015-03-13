@@ -41,16 +41,11 @@ li{
     seajs.use(["animate"],function(Animate){
     	var block = document.querySelector("#block");
     	var anim = new Animate(block,{
-    		useTransition:true,
+    		useTransition:false,
     		css:{
-    			// transform:"scale(0.8)",
                 transform:"translateX(100px) scale(2)",
-    			// opacity:.5
-    			// 'marginLeft':100
-    			// 'marginLeft':100,
-    			// scrollTop:100
     		},
-    		duration:1000,
+    		duration:10,
     		easing:"quadratic",
     		run:function(e){
     			console.log(e)
@@ -75,9 +70,9 @@ li{
     	reset.addEventListener("click",function(){
     		anim.reset({
                 css:{
-                    transform:"translateX(300px)"   
+                    transform:"translateX(0px) scale(1)"   
                 },
-    			duration:5000
+    			duration:500
     		});
     	})
 

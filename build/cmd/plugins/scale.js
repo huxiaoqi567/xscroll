@@ -88,6 +88,7 @@ define(function(require, exports, module) {
 		_pinchHandler: function(e) {
 			var self = this;
 			var scale = self.scale;
+			var xscroll = self.xscroll;
 			var originX = self.originX;
 			var originY = self.originY;
 			var __scale = scale * e.scale;
@@ -106,6 +107,7 @@ define(function(require, exports, module) {
 			var self = this;
 			var originX = self.originX;
 			var originY = self.originY;
+			var xscroll = self.xscroll;
 			if (xscroll.scale < self.minScale) {
 				self.scaleTo(self.minScale, originX, originY, SCALE_TO_DURATION, "ease-out");
 			} else if (xscroll.scale > self.maxScale) {
