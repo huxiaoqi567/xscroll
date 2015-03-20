@@ -478,8 +478,11 @@ base = function (exports) {
       if (!self.__plugins) {
         self.__plugins = [];
       }
+      var __plugin = self.getPlugin(plugin.pluginId);
+      __plugin && self.unplug(plugin.pluginId);
       plugin.pluginInitializer(self);
       self.__plugins.push(plugin);
+      return self;
     },
     /**
      * @memberof Base
@@ -633,7 +636,7 @@ plugins_lazyload = function (exports) {
   if (typeof module == 'object' && module.exports) {
     exports = LazyLoad;
   } else if (window.XScroll && window.XScroll.Plugins) {
-    XScroll.Plugins.LazyLoad = LazyLoad;
+    return XScroll.Plugins.LazyLoad = LazyLoad;
   }
   return exports;
 }({});

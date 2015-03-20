@@ -164,5 +164,5 @@
 	if(typeof module == 'object' && module.exports){
 		module.exports = PullDown;
 	}else if(window.XScroll && window.XScroll.Plugins){
-		XScroll.Plugins.PullDown = PullDown;
+		return XScroll.Plugins.PullDown = PullDown;
 	}

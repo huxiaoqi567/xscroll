@@ -66,7 +66,7 @@ define(function(require, exports, module) {
 				sub._resetLockConfig();
 			});
 
-			sub.mc.on("panstart", function(e) {
+			sub.on("panstart", function(e) {
 				//vertical scroll enabled
 				if (!sub.userConfig.lockY && !xscroll.userConfig.lockY) {
 					//outside of boundry

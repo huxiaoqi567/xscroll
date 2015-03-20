@@ -7,7 +7,7 @@
   <meta name="author" content="TaobaoUED">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <meta content="telephone=no,email=no" name="format-detection" />
-<link rel="stylesheet" type="text/css" href="tab.css">
+<link rel="stylesheet" type="text/css" href="../tab/tab.css">
 </head>
 <body>
 <div class="container">
@@ -37,7 +37,6 @@
   </div>
   <div class="xtab-btn-slide"></div>
 </div>
-<div id="mask" style="display:none"></div>
 </div>
 <script type="text/javascript" src="../../../lib/sea.js"></script>
 <script type="text/javascript">
@@ -49,7 +48,10 @@
   })
 
   seajs.use(["biz-demo/widgets/tab/tab"], function(Tab) {
-
+    var tab = new Tab({
+      renderTo:"#J_Tab"
+    });
+    tab.render();
   });
 </script>
 </body>

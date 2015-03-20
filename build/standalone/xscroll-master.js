@@ -478,8 +478,11 @@ base = function (exports) {
       if (!self.__plugins) {
         self.__plugins = [];
       }
+      var __plugin = self.getPlugin(plugin.pluginId);
+      __plugin && self.unplug(plugin.pluginId);
       plugin.pluginInitializer(self);
       self.__plugins.push(plugin);
+      return self;
     },
     /**
      * @memberof Base
@@ -3840,7 +3843,7 @@ components_controller = function (exports) {
       sub.renderTo.addEventListener('touchstart', function () {
         sub._resetLockConfig();
       });
-      sub.mc.on('panstart', function (e) {
+      sub.on('panstart', function (e) {
         //vertical scroll enabled
         if (!sub.userConfig.lockY && !xscroll.userConfig.lockY) {
           //outside of boundry

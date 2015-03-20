@@ -37,6 +37,12 @@ define(function(require, exports, module) {
 		 */
 		visibleElements: {},
 		/**
+		 * store all elements data.
+		 * @memberOf Infinite
+		 * @type {object}
+		 */
+		sections:{},
+		/**
 		 * plugin initializer
 		 * @memberOf Infinite
 		 * @override Base
@@ -368,20 +374,16 @@ define(function(require, exports, module) {
 			var self = this;
 			var xscroll = self.xscroll;
 			var pos = pos === undefined ? (self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft()) : pos;
-			var itemSize = 50;
-			var elementsPerPage = Math.ceil(xscroll[self.nameHeight] / itemSize);
-			var maxBufferedNum = self.userConfig.maxBufferedNum === undefined ? Math.max(Math.ceil(elementsPerPage / 3), 1) : self.userConfig.maxBufferedNum;
-			var pos = Math.max(pos - maxBufferedNum * itemSize, 0);
+			var threshold = self.userConfig.threshold >= 0 ? self.userConfig.threshold : xscroll[self.nameHeight] / 3;
 			var tmp = {},
 				item;
 			var data = self.__serializedData;
 			for (var i in data) {
 				item = data[i];
-				if (item[self._nameTop] >= pos - itemSize && item[self._nameTop] <= pos + 2 * maxBufferedNum * itemSize + xscroll[self.nameHeight]) {
+				if (item[self._nameTop] >= pos - threshold && item[self._nameTop] <= pos + xscroll[self.nameHeight] + threshold) {
 					tmp[item.guid] = item;
 				}
 			}
-			// return tmp;
 			return JSON.parse(JSON.stringify(tmp));
 		},
 		_popEl: function() {
@@ -613,6 +615,6 @@ define(function(require, exports, module) {
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Infinite;
 	} else if (window.XScroll && window.XScroll.Plugins) {
-		XScroll.Plugins.Infinite = Infinite;
+		return XScroll.Plugins.Infinite = Infinite;
 	}
 });

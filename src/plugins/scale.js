@@ -236,5 +236,5 @@
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Scale;
 	} else if (window.XScroll && window.XScroll.Plugins) {
-		XScroll.Plugins.Scale = Scale;
+		return XScroll.Plugins.Scale = Scale;
 	}

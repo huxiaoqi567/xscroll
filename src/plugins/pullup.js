@@ -170,5 +170,5 @@
 	if (typeof module == 'object' && module.exports) {
 		module.exports = PullUp;
 	}else if(window.XScroll && window.XScroll.Plugins){
-		XScroll.Plugins.PullUp = PullUp;
+		return XScroll.Plugins.PullUp = PullUp;
 	}

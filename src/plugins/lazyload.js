@@ -114,5 +114,5 @@
 	if (typeof module == 'object' && module.exports) {
 		module.exports = LazyLoad;
 	} else if (window.XScroll && window.XScroll.Plugins) {
-		XScroll.Plugins.LazyLoad = LazyLoad;
+		return XScroll.Plugins.LazyLoad = LazyLoad;
 	}

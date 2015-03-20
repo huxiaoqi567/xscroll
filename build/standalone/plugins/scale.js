@@ -478,8 +478,11 @@ base = function (exports) {
       if (!self.__plugins) {
         self.__plugins = [];
       }
+      var __plugin = self.getPlugin(plugin.pluginId);
+      __plugin && self.unplug(plugin.pluginId);
       plugin.pluginInitializer(self);
       self.__plugins.push(plugin);
+      return self;
     },
     /**
      * @memberof Base
@@ -1256,7 +1259,7 @@ plugins_scale = function (exports) {
   if (typeof module == 'object' && module.exports) {
     exports = Scale;
   } else if (window.XScroll && window.XScroll.Plugins) {
-    XScroll.Plugins.Scale = Scale;
+    return XScroll.Plugins.Scale = Scale;
   }
   return exports;
 }({});

@@ -198,6 +198,6 @@ define(function(require, exports, module) {
      if (typeof module == 'object' && module.exports) {
        module.exports = Snap;
      } else if (window.XScroll && window.XScroll.Plugins) {
-       XScroll.Plugins.Snap = Snap;
+       return XScroll.Plugins.Snap = Snap;
      }
 });
