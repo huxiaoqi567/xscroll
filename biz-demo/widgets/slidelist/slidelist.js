@@ -115,7 +115,7 @@ define(function(require, exports, module) {
 						transition:'none',
 						infiniteElements:self.cfg.clsItemCell
 					}));
-					self.scroller.controller.add(xscroll)
+					// self.scroller.controller.add(xscroll)
 					self.xscrolls[i] = xscroll;
 				}
 			}	
@@ -133,7 +133,6 @@ define(function(require, exports, module) {
 				}
 			}
 			var xscroll = self.xscrolls[xscrollIndex];
-			
 			var infinite = xscroll.getPlugin("infinite");
 			xscroll.unplug(infinite);
 			xscroll.plug(infinite);
