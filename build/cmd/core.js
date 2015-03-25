@@ -26,7 +26,7 @@ define(function(require, exports, module) {
      * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
      * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
      * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
-     * @param {boolean} cfg.simulateScroll config if use animation or origin scroll
+     * @param {boolean} cfg.useOriginScroll config if use simulate or origin scroll
      * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
      * @extends XScroll
      * @example
@@ -70,7 +70,7 @@ define(function(require, exports, module) {
                 BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,
                 BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
                 clsPrefix: "xs-",
-                simulateScroll: false
+                useOriginScroll: false
             };
             //generate guid
             self.guid = Util.guid();

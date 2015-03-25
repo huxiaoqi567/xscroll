@@ -559,7 +559,7 @@
       self.initScrollBars();
       self.initController();
       //update touch-action 
-      self.initTouchAction();
+      // self.initTouchAction();
       return self;
     },
     /**

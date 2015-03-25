@@ -259,7 +259,7 @@
 						}
 					} else {
 						// paint
-						if (self.__serializedData[newEl.guid].__infiniteIndex === undefined) {
+						if (self.__serializedData[newEl.guid].recycled && self.__serializedData[newEl.guid].__infiniteIndex === undefined) {
 							var elObj = self._popEl();
 							self.__serializedData[newEl.guid].__infiniteIndex = elObj.index;
 							self._renderData(elObj.el, newEl);

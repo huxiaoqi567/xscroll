@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>simple</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+     #J_Scroll{
+        position: absolute;
+        top:0;
+        bottom: 0;
+        width:100%;
+        overflow-x: hidden;
+        overflow-y: scroll;
+     }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li.xs-row{
+        width: 100%;
+        display: block;
+        height: 40px;
+        visibility: hidden;
+    }
+    .xs-container{
+        width: 100%;
+    }
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row">1</li>
+                <li class="xs-row">2</li>
+                <li class="xs-row">3</li>
+                <li class="xs-row">4</li>
+                <li class="xs-row">5</li>
+
+                <li class="xs-row">6</li>
+                <li class="xs-row">7</li>
+                <li class="xs-row">8</li>
+                <li class="xs-row">9</li>
+                <li class="xs-row">10</li>
+
+                <li class="xs-row">11</li>
+                <li class="xs-row">12</li>
+                <li class="xs-row">13</li>
+                <li class="xs-row">14</li>
+                <li class="xs-row">15</li>
+
+                <li class="xs-row">16</li>
+                <li class="xs-row">17</li>
+                <li class="xs-row">18</li>
+                <li class="xs-row">19</li>
+                <li class="xs-row">20</li>
+
+                <li class="xs-row">21</li>
+                <li class="xs-row">22</li>
+                <li class="xs-row">23</li>
+                <li class="xs-row">24</li>
+                <li class="xs-row">25</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script>
+    seajs.config({
+      base: "../../build/cmd" 
+    })
+    seajs.use(["xscroll","plugins/infinite"],function(XScroll,Infinite){
+        var data = (function() {
+            var tmp = [];
+            for (var i = 1; i <= 50; i++) {
+                if(i == 2){
+                    tmp.push({
+                        style:{background:"red",width:"100%",height:100},
+                        data:{num: i},
+                        recycled:false
+                    });
+                }else{
+                    tmp.push({
+                        style:{background:"#fff"},
+                        data:{num: i}
+                    });
+                }
+                
+            }
+            return tmp
+        })()
+        var xscroll = new XScroll({
+            renderTo: "#J_Scroll"
+        });
+
+        var infinite = new Infinite({
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,row){
+                el.innerHTML = row.data.num;
+            }
+        })
+
+        xscroll.plug(infinite)
+
+        infinite.append(0,data);
+        
+        xscroll.render();
+
+        infinite.insertBefore(0,1,{
+                        style:{background:"#f60"},
+                        data:{num: '2333'},
+                        recycled:false
+                    });
+
+        xscroll.render();
+
+        window.xscroll = xscroll;
+
+        window.infinite = infinite;
+
+    });
+
+    </script>
+</body>
+</html>

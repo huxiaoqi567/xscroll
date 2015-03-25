@@ -111,10 +111,10 @@ define(function(require, exports, module) {
 						lockX:true,
 						lockY:false
 					});
-					xscroll.plug(new Infinite({
-						transition:'none',
-						infiniteElements:self.cfg.clsItemCell
-					}));
+					// xscroll.plug(new Infinite({
+					// 	transition:'none',
+					// 	infiniteElements:self.cfg.clsItemCell
+					// }));
 					// self.scroller.controller.add(xscroll)
 					self.xscrolls[i] = xscroll;
 				}
@@ -134,14 +134,14 @@ define(function(require, exports, module) {
 			}
 			var xscroll = self.xscrolls[xscrollIndex];
 			var infinite = xscroll.getPlugin("infinite");
-			xscroll.unplug(infinite);
-			xscroll.plug(infinite);
+			// xscroll.unplug(infinite);
+			// xscroll.plug(infinite);
 			// console.log(visibleEls,index*self.itemWidth,xscrollIndex,infinite)
-			infinite.userConfig.renderHook = function(el,row){
-				el.innerHTML = row.data.cat+":"+row.data.num;
-			}
-			infinite.sections = {};
-			infinite.append(0,data);
+			// infinite.userConfig.renderHook = function(el,row){
+			// 	el.innerHTML = row.data.cat+":"+row.data.num;
+			// }
+			// infinite.sections = {};
+			// infinite.append(0,data);
 			xscroll.render();
 		},
 		switchTo: function(index, trigger) {
