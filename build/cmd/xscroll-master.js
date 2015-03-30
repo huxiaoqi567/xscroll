@@ -58,7 +58,6 @@ define(function(require, exports, module) {
 					height: els[i].offsetHeight
 				})
 			}
-			console.log(elpos[0])
 			return elpos;
 		},
 		render: function() {
@@ -112,7 +111,6 @@ define(function(require, exports, module) {
 			            });
 						xscroll.boundryCheck(0);
 						xscroll.render();
-						console.log(elpos[i].containerHeight,xscroll.userConfig.containerHeight)
 					}
 				}, 0);
 			}, self);

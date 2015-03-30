@@ -17,11 +17,18 @@
 <link rel="stylesheet" type="text/css" href="../tab/tab.css">
 <style type="text/css">
   .slidelist-itemcell{
-    line-height: 3rem;
-    height: 3rem;
-    border:1px solid;
+    line-height: 6rem;
+    height: 6rem;
+    border-bottom:1px solid #ccc;
     width: 100%;
     font-size: 12px;
+    visibility: hidden;
+  }
+  .slidelist-itemcell img{
+    width: 5rem;
+    height: 5rem;
+    margin:.5rem;
+    float: left;
   }
   .slidelist-container{
     position: absolute;
@@ -52,7 +59,9 @@
     position: absolute;
     top:0;
     bottom: 0;
-    border:1px solid;
+    overflow-x:hidden;
+    overflow-y:scroll;
+    -webkit-overflow-scrolling:touch;
   }
 </style>
 </head>
@@ -61,23 +70,23 @@
   <div class="xtab-nav-container">
     <div class="xs-container">
       <ul class="xs-content">
-        <li class="xtab-item active">全部</li>
-        <li class="xtab-item">服装服饰</li>
-        <li class="xtab-item">箱包手袋</li>
-        <li class="xtab-item">时尚鞋履</li>
-        <li class="xtab-item">美妆护肤</li>
-        <li class="xtab-item">数码家电</li>
-        <li class="xtab-item">母婴家居</li>
-        <li class="xtab-item">食品保健</li>
-        <li class="xtab-item">珠宝手表</li>
-        <li class="xtab-item">服装服饰</li>
-        <li class="xtab-item">箱包手袋</li>
-        <li class="xtab-item">时尚鞋履</li>
-        <li class="xtab-item">美妆护肤</li>
-        <li class="xtab-item">数码家电</li>
-        <li class="xtab-item">母婴家居</li>
-        <li class="xtab-item">食品保健</li>
-        <li class="xtab-item">珠宝手表</li>
+        <li class="xtab-item active">group0</li>
+        <li class="xtab-item">group1</li>
+        <li class="xtab-item">group2</li>
+        <li class="xtab-item">group3</li>
+        <li class="xtab-item">group4</li>
+        <li class="xtab-item">group5</li>
+        <li class="xtab-item">group6</li>
+        <li class="xtab-item">group7</li>
+        <li class="xtab-item">group8</li>
+        <li class="xtab-item">group9</li>
+        <li class="xtab-item">group10</li>
+        <li class="xtab-item">group11</li>
+        <li class="xtab-item">group12</li>
+        <li class="xtab-item">group13</li>
+        <li class="xtab-item">group14</li>
+        <li class="xtab-item">group15</li>
+        <li class="xtab-item">group16</li>
       </ul>
     </div>
   </div>
@@ -88,51 +97,6 @@
 <div class="slidelist-container" id="J_SlideList">
   <div class="xs-container">
     <div class="xs-content">
-      <div class="slidelist-item">
-        <ul>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-        </ul>
-      </div>
-      <div class="slidelist-item">
-        <ul>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-        </ul>
-      </div>
-      <div class="slidelist-item">
-        <ul>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-          <li class="slidelist-itemcell">row</li>
-        </ul>
-      </div>
     </div>
   </div>
 </div>
@@ -145,7 +109,7 @@
   ]
 })
 
-seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist"], function(Tab, SlideList) {
+seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist","build/cmd/plugins/pulldown"], function(Tab, SlideList,PullDown) {
 
   function rem2px(rem){
     return document.documentElement.style.fontSize.replace("px","") * rem;
@@ -156,14 +120,15 @@ seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist"], 
     var len = document.querySelectorAll(".xtab-item").length;
     for (var i = 0; i < len; i++) {
       var pageData = [];
-      for (var j = 0; j < 100; j++) {
+      for (var j = 0; j < 40; j++) {
         pageData.push({
           data: {
-            num: j,
-            cat: i
+            index: j,
+            group: i,
+            imgsrc:'http://a4.mzstatic.com/us/r30/Purple3/v4/05/ce/17/05ce171e-8518-8c5d-824d-4d5e2e1bbbdf/icon160x160.jpeg'
           },
           style: {
-            height: rem2px(3)
+            height: rem2px(6)
           }
         })
       }
@@ -180,7 +145,10 @@ seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist"], 
 
   var list = window.list = new SlideList({
     renderTo: "#J_SlideList",
-    data: mockData()
+    data: mockData(),
+    renderHook:function(el,row){
+      el.innerHTML = '<img data-src="'+row.data.imgsrc+'"><h1>group:'+row.data.group+' index:'+row.data.index+'</h1>'
+    }
   });
   list.render();
   list.switchTo(0);
@@ -191,6 +159,13 @@ seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist"], 
   list.on("switchchange",function(e){
     tab.switchTo(e.index)
   })
+  //pulldown refresh
+  for(var i in list.xscrolls){
+    list.xscrolls[i].plug(new PullDown())
+  }
+
+
+
 });
 </script>
 </body>

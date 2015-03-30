@@ -39,8 +39,8 @@
 		},
 		pluginDestructor: function() {
 			var self = this;
-			self.xscroll.off("scroll", self._filterItem, self);
-			self.xscroll.off("afterrender", self._filterItem, self);
+			self.xscroll && self.xscroll.off("scroll", self._filterItem, self);
+			self.xscroll && self.xscroll.off("afterrender", self._filterItem, self);
 			delete self;
 		},
 		_setImgSrc: function(img) {
