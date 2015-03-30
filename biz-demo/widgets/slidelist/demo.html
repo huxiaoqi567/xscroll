@@ -7,6 +7,13 @@
   <meta name="author" content="TaobaoUED">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <meta content="telephone=no,email=no" name="format-detection" />
+  <script type="text/javascript">
+    function _rem(){
+       document.documentElement.style.fontSize = document.documentElement.offsetWidth/320*20+"px"
+    }
+    window.addEventListener("resize",_rem);
+    _rem();
+  </script>
 <link rel="stylesheet" type="text/css" href="../tab/tab.css">
 <style type="text/css">
   .slidelist-itemcell{
@@ -140,6 +147,10 @@
 
 seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist"], function(Tab, SlideList) {
 
+  function rem2px(rem){
+    return document.documentElement.style.fontSize.replace("px","") * rem;
+  }
+
   function mockData() {
     var data = [];
     var len = document.querySelectorAll(".xtab-item").length;
@@ -152,7 +163,7 @@ seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist"], 
             cat: i
           },
           style: {
-            height: 60
+            height: rem2px(3)
           }
         })
       }

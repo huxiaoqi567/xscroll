@@ -51,7 +51,9 @@ define(function(require, exports, module) {
 			
 			self.scroller = self.scroller || new XScroll({
 				renderTo:self.renderTo,
-				lockX:false
+				lockX:false,
+				lockY:true,
+				scrollbarX:false
 			});
 			var infinite = self.scroller.getPlugin("infinite") || new Infinite({transition:'none'});
 			
