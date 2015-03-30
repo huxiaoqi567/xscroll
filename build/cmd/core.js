@@ -223,6 +223,28 @@ define(function(require, exports, module) {
             self.resetSize();
             self.trigger("afterrender");
             self._bindEvt();
+            //update touch-action 
+            self.initTouchAction();
+            return self;
+        },
+        /**
+         * init touch action
+         * @memberof XScroll
+         * @return {XScroll}
+         */
+        initTouchAction: function() {
+            var self = this;
+            var touchAction = 'none';
+            if (!self.userConfig.lockX && self.userConfig.lockY) {
+                touchAction = 'pan-y';
+            } else if (!self.userConfig.lockY && self.userConfig.lockX) {
+                touchAction = 'pan-x';
+            } else if (self.userConfig.lockX && self.userConfig.lockY) {
+                touchAction = 'auto';
+            }
+            self.mc.set({
+                touchAction: touchAction
+            });
             return self;
         },
         _triggerClick: function(e) {
@@ -262,7 +284,7 @@ define(function(require, exports, module) {
         },
         _bindEvt: function() {
             var self = this;
-            if(self.___isEvtBind) return;
+            if (self.___isEvtBind) return;
             self.___isEvtBind = true;
             var mc = self.mc = new Hammer.Manager(self.renderTo);
             var tap = new Hammer.Tap();
@@ -272,22 +294,24 @@ define(function(require, exports, module) {
             self.mc.on("panstart pan panend pinchstart pinch pinchend", function(e) {
                 self.trigger(e.type, e);
             });
-            self.mc.on("tap",function(e){
-                if(e.tapCount == 1){
+            self.mc.on("tap", function(e) {
+                if (e.tapCount == 1) {
                     e.type = "tap";
-                    self.trigger(e.type,e);
-                }else if(e.tapCount == 2){
+                    self.trigger(e.type, e);
+                } else if (e.tapCount == 2) {
                     e.type = "doubletap";
-                    self.trigger("doubletap",e);
+                    self.trigger("doubletap", e);
                 }
             });
             return self;
-        }
+        },
+        _resetLockConfig: function() {},
+        stop: function() {}
     });
 
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
-    }else{
+    } else {
         return XScroll;
     }
 });

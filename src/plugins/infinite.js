@@ -75,15 +75,13 @@
 		 */
 		pluginDestructor: function() {
 			var self = this;
-			self.xscroll.off("scroll", self._updateByScroll, self);
+			
 			for (var i = 0; i < self.infiniteLength; i++) {
-				self.infiniteElements[i].style.position = "inherit";
-				self.infiniteElements[i].style.visibility = "inherit";
-				self.infiniteElements[i].style.display = "inherit";
 				self.infiniteElements[i].style[self.nameTop] = "auto";
 				self.infiniteElements[i].style[transform] = "none";
 			}
-			self.xscroll.off("tap panstart pan panend", self._cellEventsHandler, self);
+			self.xscroll && self.xscroll.off("scroll", self._updateByScroll, self);
+			self.xscroll && self.xscroll.off("tap panstart pan panend", self._cellEventsHandler, self);
 			self._destroySticky();
 			return self;
 		},
@@ -416,20 +414,6 @@
 			var self = this;
 			if (!el) return;
 			var translateZ = self.xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
-			//default style
-			var defaultStyle = {
-				color: "inherit",
-				background: "inherit",
-				margin: "inherit",
-				padding: "inherit",
-				opacity: "inherit",
-				textIndent: "inherit",
-				overflow: "inherit"
-			};
-
-			for (var attrName in defaultStyle) {
-				el.style[attrName] = defaultStyle[attrName];
-			}
 			//update style
 			for (var attrName in elementObj.style) {
 				if (attrName != self.nameHeight && attrName != "display" && attrName != "position") {

@@ -23,9 +23,8 @@
         top:0;
         bottom: 0;
         width:100%;
-        overflow-x:hidden;
-        overflow-y:auto;
-        -webkit-overflow-scrolling:touch;
+        overflow-x: hidden;
+        overflow-y: scroll;
      }
     #J_Scroll ul{
         width: 100%;
@@ -33,7 +32,8 @@
     #J_Scroll ul li.xs-row{
         width: 100%;
         display: block;
-        height: 50px;
+        height: 40px;
+        visibility: hidden;
     }
     .xs-container{
         width: 100%;
@@ -134,57 +134,40 @@
     seajs.config({
       base: "../../build/cmd" 
     })
-    seajs.use(["simulate-scroll","plugins/infinite"],function(XScroll,Infinite){
+    seajs.use(["xscroll","plugins/infinite"],function(XScroll,Infinite){
         var data = (function() {
             var tmp = [];
-            tmp.push({
-                data:{
-                    num:"sticky"
-                },
-                style:{
-                    position:"sticky"
+            for (var i = 1; i <= 1000; i++) {
+                if(i == 2 || i == 10 || i==20){
+                    tmp.push({
+                        style:{position:"sticky",background:"red",width:"100%",height:50+i*5},
+                        data:{num: i}
+                    });
+                }else{
+                    tmp.push({
+                        style:{background:"#fff"},
+                        data:{num: i}
+                    });
                 }
-            });
-            for (var i = 1; i <= 100; i++) {
-                tmp.push({
-                    data:{num: i},
-                    style:{height:50,background:"#fff","color":"#000"}
-                });
+                
             }
-
             return tmp
         })()
         var xscroll = new XScroll({
-            renderTo: "#J_Scroll",
-            useOriginScroll:true,
-            preventDefault:false
+            renderTo: "#J_Scroll"
         });
 
-        // var infinite = new Infinite({
-        //     infiniteElements:"#J_Scroll .xs-row",
-        //     renderHook:function(el,row){
-        //         el.innerText = row.data.num;
-        //     }
-        // });
-
-        // xscroll.plug(infinite);
-
-        // infinite.append(0,data);
-        
+        var infinite = new Infinite({
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,row){
+                el.innerHTML = row.data.num;
+            }
+        })
+        xscroll.unplug(infinite)
+        xscroll.plug(infinite)
+        infinite.append(0,data);
         xscroll.render();
-
-        // // xscroll.unplug(infinite);
-
-        // infinite.on("tap panstart pan panend",function(e){
-        //     console.log(e.type)
-        // })
-        // 
-
-
-        window.xscroll = xscroll;
-
-        // window.infinite =infinite;
-
+        
 
     });
 

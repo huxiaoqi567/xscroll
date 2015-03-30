@@ -57,7 +57,6 @@
 					height: els[i].offsetHeight
 				})
 			}
-			console.log(elpos[0])
 			return elpos;
 		},
 		render: function() {
@@ -111,7 +110,6 @@
 			            });
 						xscroll.boundryCheck(0);
 						xscroll.render();
-						console.log(elpos[i].containerHeight,xscroll.userConfig.containerHeight)
 					}
 				}, 0);
 			}, self);

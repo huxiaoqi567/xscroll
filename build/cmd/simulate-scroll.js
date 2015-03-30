@@ -559,28 +559,6 @@ define(function(require, exports, module) {
       self.renderTo.style.overflow = "hidden";
       self.initScrollBars();
       self.initController();
-      //update touch-action 
-      // self.initTouchAction();
-      return self;
-    },
-    /**
-     * init touch action
-     * @memberof SimuScroll
-     * @return {SimuScroll}
-     */
-    initTouchAction: function() {
-      var self = this;
-      var touchAction = 'none';
-      if (!self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'pan-y';
-      } else if (!self.userConfig.lockY && self.userConfig.lockX) {
-        touchAction = 'pan-x';
-      } else if (self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'auto';
-      }
-      self.mc.set({
-        touchAction: touchAction
-      });
       return self;
     },
     /**

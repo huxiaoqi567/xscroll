@@ -3519,6 +3519,26 @@ core = function (exports) {
       self.resetSize();
       self.trigger('afterrender');
       self._bindEvt();
+      //update touch-action 
+      self.initTouchAction();
+      return self;
+    },
+    /**
+     * init touch action
+     * @memberof XScroll
+     * @return {XScroll}
+     */
+    initTouchAction: function () {
+      var self = this;
+      var touchAction = 'none';
+      if (!self.userConfig.lockX && self.userConfig.lockY) {
+        touchAction = 'pan-y';
+      } else if (!self.userConfig.lockY && self.userConfig.lockX) {
+        touchAction = 'pan-x';
+      } else if (self.userConfig.lockX && self.userConfig.lockY) {
+        touchAction = 'auto';
+      }
+      self.mc.set({ touchAction: touchAction });
       return self;
     },
     _triggerClick: function (e) {
@@ -3579,6 +3599,10 @@ core = function (exports) {
         }
       });
       return self;
+    },
+    _resetLockConfig: function () {
+    },
+    stop: function () {
     }
   });
   if (typeof module == 'object' && module.exports) {
@@ -4472,26 +4496,6 @@ simulate_scroll = function (exports) {
       self.renderTo.style.overflow = 'hidden';
       self.initScrollBars();
       self.initController();
-      //update touch-action 
-      // self.initTouchAction();
-      return self;
-    },
-    /**
-     * init touch action
-     * @memberof SimuScroll
-     * @return {SimuScroll}
-     */
-    initTouchAction: function () {
-      var self = this;
-      var touchAction = 'none';
-      if (!self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'pan-y';
-      } else if (!self.userConfig.lockY && self.userConfig.lockX) {
-        touchAction = 'pan-x';
-      } else if (self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'auto';
-      }
-      self.mc.set({ touchAction: touchAction });
       return self;
     },
     /**
@@ -4759,7 +4763,6 @@ xscroll_master = function (exports) {
           height: els[i].offsetHeight
         });
       }
-      console.log(elpos[0]);
       return elpos;
     },
     render: function () {
@@ -4814,7 +4817,6 @@ xscroll_master = function (exports) {
             });
             xscroll.boundryCheck(0);
             xscroll.render();
-            console.log(elpos[i].containerHeight, xscroll.userConfig.containerHeight);
           }
         }, 0);
       }, self);
