@@ -61,7 +61,15 @@
 				xscroll._resetLockConfig();
 			});
 
+			xscroll.renderTo.addEventListener("touchend", function() {
+				xscroll._resetLockConfig();
+			});
+
 			sub.renderTo.addEventListener("touchstart", function() {
+				sub._resetLockConfig();
+			});
+
+			sub.renderTo.addEventListener("touchend", function() {
 				sub._resetLockConfig();
 			});
 

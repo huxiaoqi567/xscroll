@@ -63,7 +63,7 @@ define(function(require, exports, module) {
 				infiniteElements:self.cfg.clsItems,
 				threshold:itemWidth,
 				renderHook: function(el,row){
-					el.innerHTML = row.data.html;
+					el.querySelector(".xs-content").innerHTML = row.data.html;
 				}
 			});
 			if(!self.scroller.getPlugin("infinite")){
@@ -81,7 +81,7 @@ define(function(require, exports, module) {
 			for(var i = 0;i <itemNum;i++){
 				wrapperData.push({
 					data:{
-						html:'<div class="xs-container"><div class="xs-content">'+self.getInfiniteElsHtml(20,self.cfg.clsItemCell)+'</div></div>'
+						html:self.getInfiniteElsHtml(20,self.cfg.clsItemCell)
 					},
 					style:{
 						width:itemWidth,
@@ -132,7 +132,7 @@ define(function(require, exports, module) {
 					xscrollIndex = visibleEls[i].__infiniteIndex;
 				}
 			}
-			var xscroll = self.xscrolls[xscrollIndex];
+			var xscroll = self.curScroller = self.xscrolls[xscrollIndex];
 			var infinite = xscroll.getPlugin("infinite");
 			xscroll.unplug(infinite);
 			xscroll.plug(infinite);
@@ -146,6 +146,9 @@ define(function(require, exports, module) {
 		switchTo: function(index, trigger) {
 			var self = this;
 			index = index || 0;
+			for(var i in self.xscrolls){
+				self.xscrolls[i].stop();
+			}
 			self.scroller.getPlugin("snap").snapTo(index);
 		},
 		_bindEvt:function(){
