@@ -562,8 +562,11 @@ plugins_lazyload = function (exports) {
     },
     pluginDestructor: function () {
       var self = this;
-      self.xscroll && self.xscroll.off('scroll', self._filterItem, self);
-      self.xscroll && self.xscroll.off('afterrender', self._filterItem, self);
+      if (self.xscroll) {
+        self.xscroll.off('scroll scrollend afterrender', self._filterItem, self);
+        self.xscroll.off('scroll scrollend afterrender', self._filterItemByInfinite, self);
+      }
+      self._isEvtBinded = false;
       delete self;
     },
     _setImgSrc: function (img) {
@@ -625,11 +628,13 @@ plugins_lazyload = function (exports) {
       if (self._isEvtBinded)
         return;
       self._isEvtBinded = true;
-      self.xscroll.on('scroll', self._filterItem, self);
+      var eventType = self.xscroll.userConfig.useOriginScroll ? 'scroll' : 'scrollend';
       self.xscroll.on('afterrender', self.xscroll.getPlugin('infinite') ? self._filterItemByInfinite : self._filterItem, self);
       //judge infinite mode
       if (self.xscroll.getPlugin('infinite')) {
-        self.xscroll.on('scrollend', self._filterItemByInfinite, self);
+        self.xscroll.on(eventType, self._filterItemByInfinite, self);
+      } else {
+        self.xscroll.on(eventType, self._filterItem, self);
       }
     }
   });

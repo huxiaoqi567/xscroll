@@ -933,10 +933,10 @@ animate = function (exports) {
           }
         }, Number(duration) + 60);
       } else {
-        var computeStyle = window.getComputedStyle(el);
+        self.computeStyle = self.computeStyle || window.getComputedStyle(el);
         //transform
         if (cfg.css.transform) {
-          var transmap = self.transmap = computeTransform(computeStyle[vendorTransform], cfg.css.transform);
+          var transmap = self.transmap = computeTransform(self.computeStyle[vendorTransform], cfg.css.transform);
           self.timer && self.timer.off('run', self.__handlers.transRun);
           self.timer && self.timer.on('run', self.__handlers.transRun, self);
         }
@@ -969,6 +969,7 @@ animate = function (exports) {
     _bindEvt: function () {
       var self = this;
       var cfg = self.cfg;
+      var el = self.el;
       self.el.addEventListener(vendorTransitionEnd, function (e) {
         self.__isTransitionEnd = true;
         if (e.target !== e.currentTarget)
@@ -977,9 +978,10 @@ animate = function (exports) {
       });
       self.on('transitionend', self._transitionEndHandler, self);
       var cssRun = function (e) {
+        self.computeStyle = self.computeStyle || window.getComputedStyle(el);
         for (var i in cfg.css) {
           if (!/transform/.test(i)) {
-            setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
+            setStyle(self.el, i, self.computeStyle[i], cfg.css[i], e.percent);
           }
         }
       };
@@ -1004,6 +1006,7 @@ animate = function (exports) {
         self.el.style[vendorTransition] = 'none';
       }
       self.timer && self.timer.stop() && self.timer.reset();
+      self.computeStyle = null;
       return self;
     },
     /**
@@ -1014,6 +1017,7 @@ animate = function (exports) {
      */
     reset: function (cfg) {
       var self = this;
+      self.computeStyle = null;
       Util.mix(self.cfg, cfg);
       this.timer && self.timer.reset({
         duration: Math.round(self.cfg.duration),
