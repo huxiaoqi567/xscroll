@@ -231,7 +231,7 @@ define(function(require, exports, module) {
 					}
 				}, Number(duration) + 60);
 			} else {
-				// self.computeStyle = window.getComputedStyle(el);
+				self.computeStyle = self.computeStyle || window.getComputedStyle(el);
 				//transform
 				if (cfg.css.transform) {
 					var transmap = self.transmap = computeTransform(self.computeStyle[vendorTransform], cfg.css.transform);

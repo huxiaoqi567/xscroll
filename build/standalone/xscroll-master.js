@@ -933,7 +933,7 @@ animate = function (exports) {
           }
         }, Number(duration) + 60);
       } else {
-        // self.computeStyle = window.getComputedStyle(el);
+        self.computeStyle = self.computeStyle || window.getComputedStyle(el);
         //transform
         if (cfg.css.transform) {
           var transmap = self.transmap = computeTransform(self.computeStyle[vendorTransform], cfg.css.transform);
@@ -3868,15 +3868,11 @@ components_controller = function (exports) {
       xscroll.renderTo.addEventListener('touchstart', function () {
         xscroll._resetLockConfig();
       });
-      xscroll.renderTo.addEventListener('touchend', function () {
-        xscroll._resetLockConfig();
-      });
       sub.renderTo.addEventListener('touchstart', function () {
         sub._resetLockConfig();
       });
-      sub.renderTo.addEventListener('touchend', function () {
-        sub._resetLockConfig();
-      });
+      xscroll.on('panend', xscroll._resetLockConfig);
+      sub.on('panend', sub._resetLockConfig);
       sub.on('panstart', function (e) {
         //vertical scroll enabled
         if (!sub.userConfig.lockY && !xscroll.userConfig.lockY) {

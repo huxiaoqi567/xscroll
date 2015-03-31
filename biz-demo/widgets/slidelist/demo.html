@@ -146,7 +146,7 @@
     var list = window.list = new SlideList({
       renderTo: "#J_SlideList",
       data: mockData(),
-      useOriginScroll:true,
+      // useOriginScroll:true,
       renderHook: function(el, row) {
         el.innerHTML = '<img data-src="' + row.data.imgsrc + '"><h1>group:' + row.data.group + ' index:' + row.data.index + '</h1>'
       }

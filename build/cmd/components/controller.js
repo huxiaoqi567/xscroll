@@ -57,23 +57,14 @@ define(function(require, exports, module) {
 		_bind: function(sub) {
 			var self = this,
 				xscroll = self.xscroll;
-
 			xscroll.renderTo.addEventListener("touchstart", function() {
 				xscroll._resetLockConfig();
 			});
-
-			xscroll.renderTo.addEventListener("touchend", function() {
-				xscroll._resetLockConfig();
-			});
-
 			sub.renderTo.addEventListener("touchstart", function() {
 				sub._resetLockConfig();
 			});
-
-			sub.renderTo.addEventListener("touchend", function() {
-				sub._resetLockConfig();
-			});
-
+			xscroll.on("panend",xscroll._resetLockConfig);
+			sub.on("panend",sub._resetLockConfig);
 			sub.on("panstart", function(e) {
 				//vertical scroll enabled
 				if (!sub.userConfig.lockY && !xscroll.userConfig.lockY) {
@@ -135,11 +126,7 @@ define(function(require, exports, module) {
 						sub.userConfig.lockY = true;
 					}
 				}
-
 			});
-
-
-
 		}
 	});
 

@@ -14,7 +14,8 @@ define(function(require, exports, module) {
 			preload:true,
 			clsItems: ".slidelist-item",
 			clsItemCell: ".slidelist-itemcell",
-			useOriginScroll:false
+			useOriginScroll:false,
+			useTransition:true
 		}, userConfig);
 		self.init();
 	}
@@ -59,7 +60,8 @@ define(function(require, exports, module) {
 				lockX: false,
 				lockY: true,
 				scrollbarX: false,
-				preventDefault: false
+				preventDefault: self.userConfig.useOriginScroll ? false : true,
+				useTransition:self.userConfig.useTransition
 			});
 			var infinite = self.scroller.getPlugin("infinite") || new Infinite({
 				transition: 'none'
@@ -82,7 +84,8 @@ define(function(require, exports, module) {
 			var snap = self.scroller.getPlugin("snap") || new Snap();
 			snap.userConfig = Util.mix(snap.userConfig, {
 				snapColsNum: itemNum,
-				snapWidth: itemWidth
+				snapWidth: itemWidth,
+				snapDuration:300
 			})
 			if (!self.scroller.getPlugin("snap")) {
 				self.scroller.plug(snap);
@@ -130,6 +133,7 @@ define(function(require, exports, module) {
 					self.items[i].setAttribute("data-xscroll-index", i);
 					var xscroll = new XScroll({
 						renderTo: self.items[i],
+						useTransition:self.userConfig.useTransition,
 						useOriginScroll:self.userConfig.useOriginScroll,
 						lockX: true,
 						lockY: false
@@ -177,10 +181,12 @@ define(function(require, exports, module) {
 			//set render status
 			curpage.isRender = true;
 			xscroll.render();
+			xscroll.mc.get("pan").set({
+				threshold: 10
+			});
 		},
 		destroyItem:function(index){
 			var self = this;
-			// var visibleEls = self.scroller.getPlugin("infinite").getVisibleElements();
 			self.pages[index].isRender = false;
 
 		},
