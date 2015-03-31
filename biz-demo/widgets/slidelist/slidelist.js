@@ -13,7 +13,8 @@ define(function(require, exports, module) {
 		self.userConfig = Util.mix({
 			preload:true,
 			clsItems: ".slidelist-item",
-			clsItemCell: ".slidelist-itemcell"
+			clsItemCell: ".slidelist-itemcell",
+			useOriginScroll:false
 		}, userConfig);
 		self.init();
 	}
@@ -70,7 +71,7 @@ define(function(require, exports, module) {
 			infinite.userConfig = Util.mix(infinite.userConfig, {
 				zoomType: "x",
 				infiniteElements: self.userConfig.clsItems,
-				threshold: itemWidth,
+				threshold: itemWidth * 2,
 				renderHook: function(el, row) {
 					el.querySelector(".xs-content").innerHTML = row.data.html;
 				}
@@ -129,7 +130,7 @@ define(function(require, exports, module) {
 					self.items[i].setAttribute("data-xscroll-index", i);
 					var xscroll = new XScroll({
 						renderTo: self.items[i],
-						// useOriginScroll:true,
+						useOriginScroll:self.userConfig.useOriginScroll,
 						lockX: true,
 						lockY: false
 					});
@@ -177,6 +178,12 @@ define(function(require, exports, module) {
 			curpage.isRender = true;
 			xscroll.render();
 		},
+		destroyItem:function(index){
+			var self = this;
+			// var visibleEls = self.scroller.getPlugin("infinite").getVisibleElements();
+			self.pages[index].isRender = false;
+
+		},
 		switchTo: function(index, trigger) {
 			var self = this;
 			index = index || 0;
@@ -187,10 +194,29 @@ define(function(require, exports, module) {
 		},
 		renderItems:function(index){
 			var self = this;
-			self.renderItem(index);
+			var renderedIndexes = {};
+			if(self.pages[index]){
+				renderedIndexes[index] = true;
+			}
+
 			if(self.userConfig.preload){
-				self.renderItem(index - 1);
-				self.renderItem(index + 1);
+				if(self.pages[index - 1]){
+					renderedIndexes[index - 1] = true;
+				}
+				if(self.pages[index + 1]){
+					renderedIndexes[index + 1] = true;
+				}
+			}
+
+			for(var i in self.pages){
+				if(!(i in renderedIndexes)){
+					//destroy page
+					self.destroyItem(i);
+				}
+			}
+
+			for(var i in renderedIndexes){
+				self.renderItem(i);
 			}
 		},	
 		_bindEvt: function() {

@@ -103,70 +103,69 @@
 <script type="text/javascript" src="../../../lib/sea.js"></script>
 <script type="text/javascript">
   seajs.config({
-  base: "../../../",
-  map: [
-    [".js", ".js?" + new Date().getTime()]
-  ]
-})
+    base: "../../../",
+    map: [
+      [".js", ".js?" + new Date().getTime()]
+    ]
+  })
 
-seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist","build/cmd/plugins/pulldown"], function(Tab, SlideList,PullDown) {
+  seajs.use(["biz-demo/widgets/tab/tab", "biz-demo/widgets/slidelist/slidelist", "build/cmd/plugins/pulldown"], function(Tab, SlideList, PullDown) {
 
-  function rem2px(rem){
-    return document.documentElement.style.fontSize.replace("px","") * rem;
-  }
+    function rem2px(rem) {
+      return document.documentElement.style.fontSize.replace("px", "") * rem;
+    }
 
-  function mockData() {
-    var data = [];
-    var len = document.querySelectorAll(".xtab-item").length;
-    for (var i = 0; i < len; i++) {
-      var pageData = [];
-      for (var j = 0; j < 40; j++) {
-        pageData.push({
-          data: {
-            index: j,
-            group: i,
-            imgsrc:'http://a4.mzstatic.com/us/r30/Purple3/v4/05/ce/17/05ce171e-8518-8c5d-824d-4d5e2e1bbbdf/icon160x160.jpeg'
-          },
-          style: {
-            height: rem2px(6)
-          }
-        })
+    function mockData() {
+      var data = [];
+      var len = document.querySelectorAll(".xtab-item").length;
+      for (var i = 0; i < len; i++) {
+        var pageData = [];
+        for (var j = 0; j < 40; j++) {
+          pageData.push({
+            data: {
+              index: j,
+              group: i,
+              imgsrc: 'http://a4.mzstatic.com/us/r30/Purple3/v4/05/ce/17/05ce171e-8518-8c5d-824d-4d5e2e1bbbdf/icon160x160.jpeg'
+            },
+            style: {
+              height: rem2px(6)
+            }
+          })
+        }
+        data.push(pageData);
       }
-      data.push(pageData);
+      return data;
     }
-    return data;
-  }
-  var tab = new Tab({
-    renderTo: "#J_Tab"
-  });
-  tab.render();
+    var tab = new Tab({
+      renderTo: "#J_Tab"
+    });
+    tab.render();
 
 
 
-  var list = window.list = new SlideList({
-    renderTo: "#J_SlideList",
-    data: mockData(),
-    renderHook:function(el,row){
-      el.innerHTML = '<img data-src="'+row.data.imgsrc+'"><h1>group:'+row.data.group+' index:'+row.data.index+'</h1>'
+    var list = window.list = new SlideList({
+      renderTo: "#J_SlideList",
+      data: mockData(),
+      useOriginScroll:true,
+      renderHook: function(el, row) {
+        el.innerHTML = '<img data-src="' + row.data.imgsrc + '"><h1>group:' + row.data.group + ' index:' + row.data.index + '</h1>'
+      }
+    });
+    list.render();
+    list.switchTo(0);
+    tab.on("switchchange", function(e) {
+      list.switchTo(e.curIndex);
+    })
+
+    list.on("switchchange", function(e) {
+        tab.switchTo(e.index)
+      })
+      //pulldown refresh
+    for (var i in list.xscrolls) {
+      list.xscrolls[i].plug(new PullDown())
     }
+
   });
-  list.render();
-  list.switchTo(0);
-  tab.on("switchchange",function(e){
-    list.switchTo(e.curIndex);
-  })
-
-  list.on("switchchange",function(e){
-    tab.switchTo(e.index)
-  })
-  //pulldown refresh
-  for(var i in list.xscrolls){
-    list.xscrolls[i].plug(new PullDown())
-  }
-
-
-
-});
 </script>
 </body>
 </html>

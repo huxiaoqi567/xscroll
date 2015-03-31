@@ -103,11 +103,13 @@ define(function(require, exports, module) {
 			var self = this;
 			if (self._isEvtBinded) return;
 			self._isEvtBinded = true;
-			self.xscroll.on("scroll", self._filterItem, self);
+			var eventType = self.xscroll.userConfig.useOriginScroll ? "scroll" : "scrollend";
 			self.xscroll.on("afterrender", self.xscroll.getPlugin("infinite") ? self._filterItemByInfinite : self._filterItem, self);
 			//judge infinite mode
 			if (self.xscroll.getPlugin("infinite")) {
-				self.xscroll.on("scrollend", self._filterItemByInfinite, self);
+				self.xscroll.on(eventType, self._filterItemByInfinite, self);
+			}else{
+				self.xscroll.on(eventType, self._filterItem, self);
 			}
 		}
 	});
