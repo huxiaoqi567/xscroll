@@ -29,6 +29,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
+        background: #000;
     }
     #J_Scroll{
         overflow-x: visible;
@@ -37,7 +38,9 @@
         width: 100%;
         margin:auto;
         height: 5.5rem;
+        top:50%;
 
+        margin-top:-2.75rem;
     }
     #J_Scroll ul{
         position: absolute;
@@ -66,32 +69,53 @@
         <div class="xs-container">
             <ul class="xs-content">
                 <li class="ks-xslide-item current">
-             <a data-href="http://act.ju.taobao.com/go/act/sale/huijuydl.php?spm=5408.7195241.a24f4.1&push=1">
-                    <img src="http://gtms02.alicdn.com/tps/i2/T1YoGcFz0dXXbkkrTW-620-220.jpg_Q90.jpg">
-                </a>
+                    <div class="xs-container">
+                        <div class="xs-content">
+                        <a data-href="http://act.ju.taobao.com/go/act/sale/huijuydl.php?spm=5408.7195241.a24f4.1&push=1">
+                            <img src="http://gtms02.alicdn.com/tps/i2/T1YoGcFz0dXXbkkrTW-620-220.jpg_Q90.jpg">
+                        </a>
+                        </div>
+                    </div>
            </li>
            <li class="ks-xslide-item">
+            <div class="xs-container">
+                        <div class="xs-content">
              <a data-href="http://act.ju.taobao.com/go/act/juhuasuan/cjdpr2.php?spm=5408.7187453.a24dk.2&push=1">
               <img src="http://gtms02.alicdn.com/tps/i2/T19PGeFvdeXXaSN9Er-640-220.jpg_Q90.jpg"></a>
+            </div>
+                    </div>
            </li>
            <li class="ks-xslide-item">
+            <div class="xs-container">
+                        <div class="xs-content">
              <a data-href="http://act.ju.taobao.com/go/act/315/deco.php?spm=5408.7187453.a24dk.3&push=1">
               <img src="http://gtms02.alicdn.com/tps/i2/T1dcyAFuXdXXbkkrTW-620-220.jpg_Q90.jpg">
              </a>
+             </div>
+                    </div>
            </li>
            <li class="ks-xslide-item">
+            <div class="xs-container">
+                        <div class="xs-content">
              <a data-href="http://act.ju.taobao.com/go/act/juhuasuan/cnhktcq.php?spm=5408.7187453.a24dk.4&ad_id=&am_id=1301089667d407816fe7&cm_id=&pm_id=&push=1">
               <img src="http://gtms03.alicdn.com/tps/i3/T17G8UFB4rXXbkkrTW-620-220.jpg_Q90.jpg"></a>
+              </div>
+                    </div>
            </li>
            <li class="ks-xslide-item">
+            <div class="xs-container">
+                        <div class="xs-content">
              <a data-href="http://mingpin.taobao.com/?spm=5408.7187453.a24dk.5&push=1">
               <img src="http://gtms01.alicdn.com/tps/i1/T1HTRFFp8dXXXZmrTW-620-220.png_Q90.jpg"></a>
+              </div>
+                    </div>
            </li>
             </ul>
         </div>
     </div>
 <script src="../../../build/standalone/xscroll-master.min.js"></script>
 <script src="../../../build/standalone/plugins/snap.min.js"></script>
+<script src="../../../build/standalone/plugins/scale.min.js"></script>
     <script>
     (function(){
         var xscroll = new XScroll({
@@ -102,29 +126,41 @@
 
         var snap = new XScroll.Plugins.Snap({
             snapWidth:remFontSize * 16 + 2,
-            snapColsNum:5,
-            autoStep:true
+            snapColsNum:5
         });
         xscroll.plug(snap)
         xscroll.render();
 
 
+
+
         var snapIndex = 0;
         var els = document.querySelectorAll("#J_Scroll .ks-xslide-item");
         var el = els[snapIndex];
-        xscroll.on("scroll",function(e){
-            var _index = Math.floor(e.scrollLeft/snap.userConfig.snapWidth);
-            if(_index < 0){
-                _index = 0;
-            }
-            // var _index = snap.snapColIndex || 0;
-            if(snapIndex != _index){
-                snapIndex = _index;
-                el = els[snapIndex];
-            }
-            var percent = e.scrollLeft%snap.userConfig.snapWidth/snap.userConfig.snapWidth;
-            el.style.webkitTransform = "scale("+((1-percent)/2+0.5)+")";
-        })
+
+        var xscrolls =[]
+
+        for(var i =0;i<els.length;i++){
+            xscrolls.push(new XScroll({
+                renderTo:els[i],
+                lockX:false,
+                lockY:false
+            }));
+        }
+
+        for(var i in xscrolls){
+            var scroller = xscrolls[i];
+            xscroll.controller.add(scroller)
+            scroller.plug(new XScroll.Plugins.Scale({
+
+            }))
+            scroller.render();
+        }
+
+        window.xscrolls = xscrolls;
+        window.xscroll = xscroll
+
+
     })()
 
     </script>

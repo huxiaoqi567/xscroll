@@ -58,7 +58,6 @@
         lockY: self.userConfig.lockY,
         lockX: self.userConfig.lockX
       }
-      self.boundryCheckEnabled = true;
       return self;
     },
     /**
@@ -179,7 +178,7 @@
           self.trigger("scroll", {
             scrollTop: self.getScrollTop(),
             scrollLeft: self.getScrollLeft(),
-            type:"scroll"
+            type: "scroll"
           });
         },
         useTransition: self.userConfig.useTransition,
@@ -188,7 +187,7 @@
           if ((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear") {
             self['isScrolling' + type.toUpperCase()] = false;
             self.trigger("scrollend", {
-              type:"scrollend",
+              type: "scrollend",
               scrollTop: self.getScrollTop(),
               scrollLeft: self.getScrollLeft(),
               zoomType: type,
@@ -203,7 +202,7 @@
       timer.reset(config);
       timer.run();
       self.trigger("scrollanimate", {
-        type:"scrollanimate",
+        type: "scrollanimate",
         scrollTop: -self.y,
         scrollLeft: -self.x,
         duration: duration,
@@ -263,30 +262,35 @@
     _onpan: function(e) {
       var self = this;
       var boundry = self.boundry;
+      var userConfig = self.userConfig;
+      var boundryCheck = userConfig.boundryCheck;
+      var bounce = userConfig.bounce;
       var scrollTop = self.__topstart || (self.__topstart = -self.getScrollTop());
       var scrollLeft = self.__leftstart || (self.__leftstart = -self.getScrollLeft());
-      var y = self.userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY + self.thresholdY);
-      var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
+      var y = userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY + self.thresholdY);
+      var x = userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
       var containerWidth = self.containerWidth;
       var containerHeight = self.containerHeight;
-      //over top
-      y = y > boundry.top ? (y - boundry.top) * PAN_RATE + boundry.top : y;
-      //over bottom
-      y = y < boundry.bottom - containerHeight ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : y;
-      //over left
-      x = x > boundry.left ? (x - boundry.left) * PAN_RATE + boundry.left : x;
-      //over right
-      x = x < boundry.right - containerWidth ? x + (boundry.right - containerWidth - x) * PAN_RATE : x;
+      if (boundryCheck) {
+        //over top
+        y = y > boundry.top ? bounce ? (y - boundry.top) * PAN_RATE + boundry.top : boundry.top : y;
+        //over bottom
+        y = y < boundry.bottom - containerHeight ? bounce ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : boundry.bottom - containerHeight : y;
+        //over left
+        x = x > boundry.left ? bounce ? (x - boundry.left) * PAN_RATE + boundry.left : boundry.left : x;
+        //over right
+        x = x < boundry.right - containerWidth ? bounce ? x + (boundry.right - containerWidth - x) * PAN_RATE : boundry.right - containerWidth : x;
+      }
       //move to x,y
       self.translate(x, y);
       //pan trigger the opposite direction
       self.directionX = e.type == 'panleft' ? 'right' : e.type == 'panright' ? 'left' : '';
       self.directionY = e.type == 'panup' ? 'down' : e.type == 'pandown' ? 'up' : '';
-      self.trigger("scroll",  {
+      self.trigger("scroll", {
         scrollTop: -y,
         scrollLeft: -x,
         triggerType: "pan",
-        type:"scroll"
+        type: "scroll"
       });
       return self;
     },
@@ -407,17 +411,20 @@
       var boundryEnd = type == "x" ? boundry.right : boundry.bottom;
       var innerSize = type == "x" ? self.containerWidth : self.containerHeight;
       var maxSpeed = userConfig.maxSpeed || 2;
+      var boundryCheck = userConfig.boundryCheck;
+      var bounce = userConfig.bounce;
       var size = boundryEnd - boundryStart;
       var transition = {};
       var status = "inside";
-      if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
-        self.boundryCheckX();
-        return;
-      } else if (type == "y" && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
-        self.boundryCheckY();
-        return;
+      if (boundryCheck) {
+        if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
+          self.boundryCheckX();
+          return;
+        } else if (type == "y" && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
+          self.boundryCheckY();
+          return;
+        }
       }
-
       if (type == "x" && self.userConfig.lockX) return;
       if (type == "y" && self.userConfig.lockY) return;
       v = v > maxSpeed ? maxSpeed : v < -maxSpeed ? -maxSpeed : v;
@@ -426,23 +433,23 @@
       var t = isNaN(v / a) ? 0 : v / a;
       var s = Number(pos) + t * v / 2;
       //over top boundry check bounce
-      if (s < boundryStart) {
+      if (s < boundryStart && boundryCheck) {
         var _s = boundryStart - pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0 / a2);
         var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = boundryStart + s2;
+        s = bounce ? boundryStart + s2 : boundryStart;
         status = "outside";
-      } else if (s > innerSize - boundryEnd) {
+      } else if (s > innerSize - boundryEnd && boundryCheck) {
         var _s = (boundryEnd - innerSize) + pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0 / a2);
         var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = innerSize - boundryEnd + s2;
+        s = bounce ? innerSize - boundryEnd + s2 : innerSize - boundryEnd;
         status = "outside";
       }
       transition.pos = s;
@@ -467,7 +474,7 @@
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
           easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
-      if (!self.boundryCheckEnabled || self.userConfig.lockX) return;
+      if (!self.userConfig.bounce || self.userConfig.lockX) return;
       var pos = self.getScrollLeft();
       var containerWidth = self.containerWidth;
       var boundry = self.boundry;
@@ -493,7 +500,7 @@
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
           easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
-      if (!self.boundryCheckEnabled || self.userConfig.lockY) return;
+      if (!self.userConfig.boundryCheck || self.userConfig.lockY) return;
       var pos = self.getScrollTop();
       var containerHeight = self.containerHeight;
       var boundry = self.boundry;
@@ -567,6 +574,7 @@
      */
     initScrollBars: function() {
       var self = this;
+      if (!self.userConfig.boundryCheck) return;
       if (self.userConfig.scrollbarX) {
         self.scrollbarX = self.scrollbarX || new ScrollBar({
           xscroll: self,
@@ -601,6 +609,6 @@
 
   if (typeof module == 'object' && module.exports) {
     module.exports = SimuScroll;
-  }else{
+  } else {
     return SimuScroll;
   }

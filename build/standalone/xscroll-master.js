@@ -3324,6 +3324,9 @@ core = function (exports) {
    * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
    * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
    * @param {boolean} cfg.useOriginScroll config if use simulate or origin scroll
+   * @param {boolean} cfg.bounce config if use has the bounce effect when scrolling outside of the boundry
+   * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
+   * @param {boolean} cfg.preventDefault config if prevent the browser default behavior
    * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
    * @extends XScroll
    * @example
@@ -3357,8 +3360,8 @@ core = function (exports) {
       var self = this;
       var defaultCfg = {
         preventDefault: true,
-        //prevent touchstart 
         bounce: true,
+        boundryCheck: true,
         useTransition: true,
         gpuAcceleration: true,
         BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
@@ -3883,12 +3886,12 @@ components_controller = function (exports) {
           }
           if (e.direction == 16 && sub.getBoundryOutTop() >= 0) {
             sub.userConfig.lockY = true;
-          } else if (e.direction == 8 && sub.getBoundryOutTop() >= 0) {
+          } else if (e.direction == 8 && sub.getBoundryOutTop() >= 0 && sub.getBoundryOutBottom() < 0) {
             xscroll.userConfig.lockY = true;
           }
           if (e.direction == 8 && sub.getBoundryOutBottom() >= 0) {
             sub.userConfig.lockY = true;
-          } else if (e.direction == 16 && sub.getBoundryOutBottom() >= 0) {
+          } else if (e.direction == 16 && sub.getBoundryOutBottom() >= 0 && sub.getBoundryOutTop() < 0) {
             xscroll.userConfig.lockY = true;
           }
           if (sub.getBoundryOutTop() < 0 && sub.getBoundryOutBottom() < 0) {
@@ -3903,12 +3906,12 @@ components_controller = function (exports) {
           }
           if (e.direction == 4 && sub.getBoundryOutLeft() >= 0) {
             sub.userConfig.lockX = true;
-          } else if (e.direction == 2 && sub.getBoundryOutLeft() >= 0) {
+          } else if (e.direction == 2 && sub.getBoundryOutLeft() >= 0 && sub.getBoundryOutRight() < 0) {
             xscroll.userConfig.lockX = true;
           }
           if (e.direction == 2 && sub.getBoundryOutRight() >= 0) {
             sub.userConfig.lockX = true;
-          } else if (e.direction == 4 && sub.getBoundryOutRight() >= 0) {
+          } else if (e.direction == 4 && sub.getBoundryOutRight() >= 0 && sub.getBoundryOutLeft() < 0) {
             xscroll.userConfig.lockX = true;
           }
           if (sub.getBoundryOutLeft() < 0 && sub.getBoundryOutRight() < 0) {
@@ -3996,7 +3999,6 @@ simulate_scroll = function (exports) {
         lockY: self.userConfig.lockY,
         lockX: self.userConfig.lockX
       };
-      self.boundryCheckEnabled = true;
       return self;
     },
     /**
@@ -4201,20 +4203,25 @@ simulate_scroll = function (exports) {
     _onpan: function (e) {
       var self = this;
       var boundry = self.boundry;
+      var userConfig = self.userConfig;
+      var boundryCheck = userConfig.boundryCheck;
+      var bounce = userConfig.bounce;
       var scrollTop = self.__topstart || (self.__topstart = -self.getScrollTop());
       var scrollLeft = self.__leftstart || (self.__leftstart = -self.getScrollLeft());
-      var y = self.userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY + self.thresholdY);
-      var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
+      var y = userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY + self.thresholdY);
+      var x = userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
       var containerWidth = self.containerWidth;
       var containerHeight = self.containerHeight;
-      //over top
-      y = y > boundry.top ? (y - boundry.top) * PAN_RATE + boundry.top : y;
-      //over bottom
-      y = y < boundry.bottom - containerHeight ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : y;
-      //over left
-      x = x > boundry.left ? (x - boundry.left) * PAN_RATE + boundry.left : x;
-      //over right
-      x = x < boundry.right - containerWidth ? x + (boundry.right - containerWidth - x) * PAN_RATE : x;
+      if (boundryCheck) {
+        //over top
+        y = y > boundry.top ? bounce ? (y - boundry.top) * PAN_RATE + boundry.top : boundry.top : y;
+        //over bottom
+        y = y < boundry.bottom - containerHeight ? bounce ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : boundry.bottom - containerHeight : y;
+        //over left
+        x = x > boundry.left ? bounce ? (x - boundry.left) * PAN_RATE + boundry.left : boundry.left : x;
+        //over right
+        x = x < boundry.right - containerWidth ? bounce ? x + (boundry.right - containerWidth - x) * PAN_RATE : boundry.right - containerWidth : x;
+      }
       //move to x,y
       self.translate(x, y);
       //pan trigger the opposite direction
@@ -4345,15 +4352,19 @@ simulate_scroll = function (exports) {
       var boundryEnd = type == 'x' ? boundry.right : boundry.bottom;
       var innerSize = type == 'x' ? self.containerWidth : self.containerHeight;
       var maxSpeed = userConfig.maxSpeed || 2;
+      var boundryCheck = userConfig.boundryCheck;
+      var bounce = userConfig.bounce;
       var size = boundryEnd - boundryStart;
       var transition = {};
       var status = 'inside';
-      if (type == 'x' && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
-        self.boundryCheckX();
-        return;
-      } else if (type == 'y' && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
-        self.boundryCheckY();
-        return;
+      if (boundryCheck) {
+        if (type == 'x' && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
+          self.boundryCheckX();
+          return;
+        } else if (type == 'y' && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
+          self.boundryCheckY();
+          return;
+        }
       }
       if (type == 'x' && self.userConfig.lockX)
         return;
@@ -4365,23 +4376,23 @@ simulate_scroll = function (exports) {
       var t = isNaN(v / a) ? 0 : v / a;
       var s = Number(pos) + t * v / 2;
       //over top boundry check bounce
-      if (s < boundryStart) {
+      if (s < boundryStart && boundryCheck) {
         var _s = boundryStart - pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0 / a2);
         var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = boundryStart + s2;
+        s = bounce ? boundryStart + s2 : boundryStart;
         status = 'outside';
-      } else if (s > innerSize - boundryEnd) {
+      } else if (s > innerSize - boundryEnd && boundryCheck) {
         var _s = boundryEnd - innerSize + pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0 / a2);
         var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = innerSize - boundryEnd + s2;
+        s = bounce ? innerSize - boundryEnd + s2 : innerSize - boundryEnd;
         status = 'outside';
       }
       transition.pos = s;
@@ -4405,7 +4416,7 @@ simulate_scroll = function (exports) {
       } else {
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION, easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
-      if (!self.boundryCheckEnabled || self.userConfig.lockX)
+      if (!self.userConfig.bounce || self.userConfig.lockX)
         return;
       var pos = self.getScrollLeft();
       var containerWidth = self.containerWidth;
@@ -4431,7 +4442,7 @@ simulate_scroll = function (exports) {
       } else {
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION, easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
-      if (!self.boundryCheckEnabled || self.userConfig.lockY)
+      if (!self.userConfig.boundryCheck || self.userConfig.lockY)
         return;
       var pos = self.getScrollTop();
       var containerHeight = self.containerHeight;
@@ -4505,6 +4516,8 @@ simulate_scroll = function (exports) {
      */
     initScrollBars: function () {
       var self = this;
+      if (!self.userConfig.boundryCheck)
+        return;
       if (self.userConfig.scrollbarX) {
         self.scrollbarX = self.scrollbarX || new ScrollBar({
           xscroll: self,

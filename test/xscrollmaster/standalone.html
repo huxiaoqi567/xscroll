@@ -64,9 +64,9 @@ li{
 	font-size: 0;
 }
 
-#pagewrapper .xs-container{
-
-}
+#pagewrapper .xs-content{
+	position: absolute;
+}	
 
 #pagewrapper .inner{
 	height: 350px;
@@ -83,6 +83,10 @@ li{
 	border:1px solid;
 	height: 100px;
 	line-height: 100px;
+}
+
+#pagewrapper .inner .xs-content{
+	width: 100%;
 }
 
 #innerslider{
@@ -252,5 +256,10 @@ li{
 (function(){
 		var master = new XScrollMaster();
 		master.render();
+		var pagewrapper = master.get("pagewrapper");
+		pagewrapper.plug(new XScroll.Plugins.Snap({
+			snapWidth:200,
+			snapColsNum:4
+		}))
 })()
 </script>

@@ -26,6 +26,9 @@
      * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
      * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
      * @param {boolean} cfg.useOriginScroll config if use simulate or origin scroll
+     * @param {boolean} cfg.bounce config if use has the bounce effect when scrolling outside of the boundry
+     * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
+     * @param {boolean} cfg.preventDefault config if prevent the browser default behavior
      * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
      * @extends XScroll
      * @example
@@ -61,8 +64,9 @@
         init: function() {
             var self = this;
             var defaultCfg = {
-                preventDefault: true, //prevent touchstart 
-                bounce: true,
+                preventDefault: true, 
+                bounce: true, 
+                boundryCheck:true,
                 useTransition: true,
                 gpuAcceleration: true,
                 BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
