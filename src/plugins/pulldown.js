@@ -84,6 +84,7 @@
 			pulldown.style.top = -height + "px";
 			pulldown.style.textAlign = "center";
 			self.xscroll.container.appendChild(pulldown);
+      self.status = 'up';
 			Util.addClass(pulldown, clsPrefix + self.status);
 			pulldown.innerHTML = self.userConfig[self.status + "Content"] || self.userConfig.content;
 			self._bindEvt();
@@ -123,7 +124,7 @@
 		 */
         reset:function(callback){
         	this.xscroll.boundry.resetTop()
-			this.xscroll.bounce(true, callback);
+			this.xscroll.boundryCheckY(callback);
 			this._expanded = false;
 			return this;
         },
