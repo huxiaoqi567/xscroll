@@ -53,6 +53,14 @@ gulp.task('compress', ['amd-clean'], function() {
     }))
     .pipe(gulp.dest('./build/'))
 });
+//prepare for jsdoc generator
+gulp.task('clearsuffix',function(){
+  gulp.src(['src/animate.js']).on("data",function(file){
+    var str = String(file.contents);
+    // str.replace(/else\{\s+return\s+Animate;\s+\}/g,'')
+    // console.log(str.replace(/else\{\s+return\s+Animate;\s+\}/g,''))
+  })
+})
 
 
 gulp.task('default', ['compress']);

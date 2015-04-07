@@ -467,6 +467,7 @@ define(function(require, exports, module) {
      **/
     boundryCheckX: function(duration, easing, callback) {
       var self = this;
+      if(!self.userConfig.boundryCheck) return;
       if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
@@ -493,6 +494,7 @@ define(function(require, exports, module) {
      **/
     boundryCheckY: function(duration, easing, callback) {
       var self = this;
+      if(!self.userConfig.boundryCheck) return;
       if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
@@ -544,10 +546,6 @@ define(function(require, exports, module) {
         })
         self.isScrollingX = false;
         self.isScrollingY = false;
-        //disable click
-        self._isClickDisabled = true;
-      } else {
-        self._isClickDisabled = false;
       }
       return self;
     },

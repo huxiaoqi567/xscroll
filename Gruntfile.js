@@ -15,20 +15,21 @@ module.exports = function(grunt) {
     jsdoc: {
       dist: {
         src: [
-        'src/**/animate.js'
-        ,'src/**/base.js'
-        ,'src/**/core.js'
-        ,'src/**/xscroll.js'
-        ,'src/**/origin-scroll.js'
-        ,'src/**/simulate-scroll.js'
-        ,'src/**/xscroll-master.js'
-        ,'src/**/util.js'
-        ,'src/plugins/*.js'
-        ,'src/components/*.js'
+        // 'src/**/animate.js'
+        // ,'src/**/base.js'
+        // ,'src/**/core.js'
+        // ,'src/**/xscroll.js'
+        // ,'src/**/origin-scroll.js'
+        // ,'src/**/simulate-scroll.js'
+        // ,'src/**/xscroll-master.js'
+        // ,'src/**/util.js'
+        // ,'src/plugins/*.js'
+        // ,'src/components/*.js'
         ],
         options: {
+          closure:false,
           // 'private': true
-          destination: 'doc',
+          destination: 'doc-test',
           template: 'node_modules/jaguarjs-jsdoc/'
         }
       }

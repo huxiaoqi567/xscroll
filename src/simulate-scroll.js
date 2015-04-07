@@ -466,6 +466,7 @@
      **/
     boundryCheckX: function(duration, easing, callback) {
       var self = this;
+      if(!self.userConfig.boundryCheck) return;
       if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
@@ -492,6 +493,7 @@
      **/
     boundryCheckY: function(duration, easing, callback) {
       var self = this;
+      if(!self.userConfig.boundryCheck) return;
       if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
@@ -543,10 +545,6 @@
         })
         self.isScrollingX = false;
         self.isScrollingY = false;
-        //disable click
-        self._isClickDisabled = true;
-      } else {
-        self._isClickDisabled = false;
       }
       return self;
     },
