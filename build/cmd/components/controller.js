@@ -75,12 +75,12 @@ define(function(require, exports, module) {
 					}
 					if (e.direction == 16 && sub.getBoundryOutTop() >= 0) {
 						sub.userConfig.lockY = true;
-					} else if (e.direction == 8 && sub.getBoundryOutTop() >= 0) {
+					} else if (e.direction == 8 && sub.getBoundryOutTop() >= 0 && sub.getBoundryOutBottom() < 0) {
 						xscroll.userConfig.lockY = true;
 					}
 					if (e.direction == 8 && sub.getBoundryOutBottom() >= 0) {
 						sub.userConfig.lockY = true;
-					} else if (e.direction == 16 && sub.getBoundryOutBottom() >= 0) {
+					} else if (e.direction == 16 && sub.getBoundryOutBottom() >= 0 && sub.getBoundryOutTop() < 0) {
 						xscroll.userConfig.lockY = true;
 					}
 					if (sub.getBoundryOutTop() < 0 && sub.getBoundryOutBottom() < 0) {
@@ -95,19 +95,18 @@ define(function(require, exports, module) {
 					}
 					if (e.direction == 4 && sub.getBoundryOutLeft() >= 0) {
 						sub.userConfig.lockX = true;
-					} else if (e.direction == 2 && sub.getBoundryOutLeft() >= 0) {
+					} else if (e.direction == 2 && sub.getBoundryOutLeft() >= 0 && sub.getBoundryOutRight() < 0) {
 						xscroll.userConfig.lockX = true;
 					}
 					if (e.direction == 2 && sub.getBoundryOutRight() >= 0) {
 						sub.userConfig.lockX = true;
-					} else if (e.direction == 4 && sub.getBoundryOutRight() >= 0) {
+					} else if (e.direction == 4 && sub.getBoundryOutRight() >= 0 && sub.getBoundryOutLeft() < 0) {
 						xscroll.userConfig.lockX = true;
 					}
 					if (sub.getBoundryOutLeft() < 0 && sub.getBoundryOutRight() < 0) {
 						xscroll.userConfig.lockX = true;
 					}
 				}
-
 
 				if (!sub.userConfig.lockX && xscroll.userConfig.lockX) {
 					//pan x

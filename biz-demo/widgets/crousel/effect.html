@@ -90,19 +90,17 @@
             </ul>
         </div>
     </div>
-    <script src="../../../lib/sea.js"></script>
+<script src="../../../build/standalone/xscroll-master.min.js"></script>
+<script src="../../../build/standalone/plugins/snap.min.js"></script>
     <script>
-    seajs.config({
-        base: "../../../build/cmd" 
-    });
-    seajs.use(["simulate-scroll", "plugins/snap"], function(XScroll, Snap) {
-
+    (function(){
         var xscroll = new XScroll({
             renderTo: "#J_Scroll",
-            lockX:false
+            lockX:false,
+            scrollbarX:false
         });
 
-        var snap = new Snap({
+        var snap = new XScroll.Plugins.Snap({
             snapWidth:remFontSize * 16 + 2,
             snapColsNum:5,
             autoStep:true
@@ -127,7 +125,7 @@
             var percent = e.scrollLeft%snap.userConfig.snapWidth/snap.userConfig.snapWidth;
             el.style.webkitTransform = "scale("+((1-percent)/2+0.5)+")";
         })
-    });
+    })()
 
     </script>
 </body>

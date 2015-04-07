@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>scroll-x</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    #J_Scroll{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow-x:scroll;
+        overflow-y:hidden;
+    }
+    #J_Scroll ul{
+        white-space: nowrap;
+        position: absolute;
+        height: 100%;
+        font-size: 0;
+    }
+    #J_Scroll ul li{
+        display: inline-block;
+        font-size: 12px;
+        width: 100px;
+        height: 100%;
+        border-left:1px solid #ccc;
+        border-right:1px solid #fff;
+    }
+    .xs-container{
+        width: 100%;
+        height: 100%;
+
+    }
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+                <li>row</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script>
+    seajs.config({
+      base: "../../build/cmd/"
+    })
+    seajs.use(["simulate-scroll"],function(XScroll){
+        var xscroll = new XScroll({
+            renderTo:"#J_Scroll",
+            bounce:false,
+            boundryCheck:false
+        });
+        xscroll.render();
+        xscroll.on("scroll scrollend",function(e){
+            console.log(e.type)
+        })
+        window.xscroll = xscroll
+
+    });
+    </script>
+</body>
+</html>
