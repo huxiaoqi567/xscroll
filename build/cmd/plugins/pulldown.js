@@ -9,8 +9,8 @@ define(function(require, exports, module) {
 	 * A pulldown to refresh plugin for xscroll.
 	 * @constructor
 	 * @param {object} cfg
-	 * @param {number} cfg.height 
-	 * @param {string} cfg.content default html for pulldown 
+	 * @param {number} cfg.height
+	 * @param {string} cfg.content default html for pulldown
 	 * @param {string} cfg.downContent html for pulldown when scrollTop is smaller than cfg.height
 	 * @param {string} cfg.upContent html for pulldown when scrollTop is larger than cfg.height
 	 * @param {string} cfg.loadingContent html for pulldown when released
@@ -18,29 +18,29 @@ define(function(require, exports, module) {
 	 * @extends {Base}
 	 */
 	var PullDown = function(cfg) {
-		PullDown.superclass.constructor.call(this,cfg);
+		PullDown.superclass.constructor.call(this, cfg);
 		this.userConfig = Util.mix({
 			content: content,
 			height: 60,
-			autoRefresh: true, 
+			autoRefresh: true,
 			downContent: "Pull Down To Refresh",
 			upContent: "Release To Refresh",
 			loadingContent: loadingContent,
 			clsPrefix: "xs-plugin-pulldown-"
 		}, cfg);
 	}
-	Util.extend(PullDown,Base, {
+	Util.extend(PullDown, Base, {
 		/**
 		 * a pluginId
 		 * @memberOf PullDown
-		 * @type {string} 
+		 * @type {string}
 		 */
 		pluginId: "pulldown",
 		/**
 		 * plugin initializer
 		 * @memberOf PullDown
 		 * @override Base
-		 * @return {PullDown} 
+		 * @return {PullDown}
 		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
@@ -53,7 +53,7 @@ define(function(require, exports, module) {
 		 * detroy the plugin
 		 * @memberOf PullDown
 		 * @override Base
-		 * @return {PullDown} 
+		 * @return {PullDown}
 		 */
 		pluginDestructor: function() {
 			var self = this;
@@ -68,7 +68,7 @@ define(function(require, exports, module) {
 		/**
 		 * render pulldown plugin
 		 * @memberOf PullDown
-		 * @return {PullDown} 
+		 * @return {PullDown}
 		 */
 		render: function() {
 			var self = this;
@@ -85,6 +85,7 @@ define(function(require, exports, module) {
 			pulldown.style.top = -height + "px";
 			pulldown.style.textAlign = "center";
 			self.xscroll.container.appendChild(pulldown);
+			self.status = 'up';
 			Util.addClass(pulldown, clsPrefix + self.status);
 			pulldown.innerHTML = self.userConfig[self.status + "Content"] || self.userConfig.content;
 			self._bindEvt();
@@ -96,22 +97,24 @@ define(function(require, exports, module) {
 			self._evtBinded = true;
 			var pulldown = self.pulldown;
 			var xscroll = self.xscroll;
-			xscroll.on("pan", self._panHandler,self);
-			xscroll.on("panstart", self._panStartHandler,self);
-			xscroll.on("panend",self._panEndHandler,self);
+			xscroll.on("pan", self._panHandler, self);
+			xscroll.on("panstart", self._panStartHandler, self);
+			xscroll.on("panend", self._panEndHandler, self);
 		},
 		_changeStatus: function(status) {
 			var prevVal = this.status;
 			this.status = status;
 			Util.removeClass(this.pulldown, clsPrefix + prevVal)
 			Util.addClass(this.pulldown, clsPrefix + status);
-			this.pulldown.innerHTML = this.userConfig[status + "Content"];
-			if(prevVal != status){
-				this.trigger("statuschange",{
-					prevVal:prevVal,
-					newVal:status
+			if(this.userConfig[status + "Content"]){
+				this.pulldown.innerHTML = this.userConfig[status + "Content"];
+			}
+			if (prevVal != status) {
+				this.trigger("statuschange", {
+					prevVal: prevVal,
+					newVal: status
 				});
-				if(status == "loading"){
+				if (status == "loading") {
 					this.trigger("loading");
 				}
 			}
@@ -119,15 +122,15 @@ define(function(require, exports, module) {
 		/**
 		 * reset the pulldown plugin
 		 * @memberOf PullDown
-		 * @param {function} callback 
-		 * @return {PullDown} 
+		 * @param {function} callback
+		 * @return {PullDown}
 		 */
-        reset:function(callback){
-        	this.xscroll.boundry.resetTop()
-			this.xscroll.bounce(true, callback);
+		reset: function(callback) {
+			this.xscroll.boundry.resetTop()
+			this.xscroll.boundryCheckY(callback);
 			this._expanded = false;
 			return this;
-        },
+		},
 		_panStartHandler: function(e) {
 			clearTimeout(this.loadingItv);
 		},
@@ -146,10 +149,10 @@ define(function(require, exports, module) {
 				e.preventDefault();
 				xscroll.boundry.resetTop();
 				xscroll.boundry.expandTop(height);
-				xscroll.boundryCheckY(function(){
+				xscroll.boundryCheckY(function() {
 					self._changeStatus("loading");
 				});
-				if(self.userConfig.autoRefresh){
+				if (self.userConfig.autoRefresh) {
 					clearTimeout(self.loadingItv);
 					self.loadingItv = setTimeout(function() {
 						xscroll.boundry.resetTop();
@@ -162,9 +165,11 @@ define(function(require, exports, module) {
 		}
 	});
 
-	if(typeof module == 'object' && module.exports){
+	if (typeof module == 'object' && module.exports) {
 		module.exports = PullDown;
-	}else if(window.XScroll && window.XScroll.Plugins){
+	}
+	/** ignored by jsdoc **/
+	else if (window.XScroll && window.XScroll.Plugins) {
 		return XScroll.Plugins.PullDown = PullDown;
 	}
 });

@@ -34,6 +34,74 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Plugins">
+            <span class="title">
+                <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Util">
+            <span class="title">
+                <a href="Util.html">Util</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="Util.vendor"><a href="Util.html#vendor">vendor</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Util.addClass"><a href="Util.html#addClass">addClass</a></li>
+            
+                <li data-name="Util.findParentEl"><a href="Util.html#findParentEl">findParentEl</a></li>
+            
+                <li data-name="Util.getOffsetLeft"><a href="Util.html#getOffsetLeft">getOffsetLeft</a></li>
+            
+                <li data-name="Util.getOffsetTop"><a href="Util.html#getOffsetTop">getOffsetTop</a></li>
+            
+                <li data-name="Util.guid"><a href="Util.html#guid">guid</a></li>
+            
+                <li data-name="Util.hasClass"><a href="Util.html#hasClass">hasClass</a></li>
+            
+                <li data-name="Util.isAndroid"><a href="Util.html#isAndroid">isAndroid</a></li>
+            
+                <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
+            
+                <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Animate">
             <span class="title">
                 <a href="Animate.html">Animate</a>
@@ -98,6 +166,8 @@
             <span class="subtitle">Members</span>
             
                 <li data-name="Infinite.pluginId"><a href="Infinite.html#pluginId">pluginId</a></li>
+            
+                <li data-name="Infinite.sections"><a href="Infinite.html#sections">sections</a></li>
             
                 <li data-name="Infinite.visibleElements"><a href="Infinite.html#visibleElements">visibleElements</a></li>
             
@@ -337,8 +407,6 @@
             
                 <li data-name="SimuScroll.initScrollBars"><a href="SimuScroll.html#initScrollBars">initScrollBars</a></li>
             
-                <li data-name="SimuScroll.initTouchAction"><a href="SimuScroll.html#initTouchAction">initTouchAction</a></li>
-            
                 <li data-name="SimuScroll.isBoundryOut"><a href="SimuScroll.html#isBoundryOut">isBoundryOut</a></li>
             
                 <li data-name="SimuScroll.isBoundryOutBottom"><a href="SimuScroll.html#isBoundryOutBottom">isBoundryOutBottom</a></li>
@@ -443,6 +511,8 @@
             
                 <li data-name="XScroll.init"><a href="XScroll.html#init">init</a></li>
             
+                <li data-name="XScroll.initTouchAction"><a href="XScroll.html#initTouchAction">initTouchAction</a></li>
+            
                 <li data-name="XScroll.render"><a href="XScroll.html#render">render</a></li>
             
                 <li data-name="XScroll.resetSize"><a href="XScroll.html#resetSize">resetSize</a></li>
@@ -477,6 +547,14 @@
             
             </ul>
             <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="XScrollMaster.get"><a href="XScrollMaster.html#get">get</a></li>
+            
+                <li data-name="XScrollMaster.init"><a href="XScrollMaster.html#init">init</a></li>
+            
+                <li data-name="XScrollMaster.render"><a href="XScrollMaster.html#render">render</a></li>
             
             </ul>
             <ul class="events itemMembers">
@@ -514,10 +592,10 @@
 	var translateTpl = 'translateX({translateX}px) translateY({translateY}px) translateZ(0)';
 	//limit attrs
 	var animAttrs = {
-		'transform':true, 
-		'opacity':true, 
-		'scrollTop':true,
-		'scrollLeft':true
+		'transform': true,
+		'opacity': true,
+		'scrollTop': true,
+		'scrollLeft': true
 	};
 
 	function myParse(v) {
@@ -607,7 +685,6 @@
 					ret.translateX = myParse(val[0]);
 					ret.translateY = myParse(val[1] || 0);
 					break;
-
 				case 'scale':
 					val = val.split(',');
 					ret.scaleX = myParse(val[0]);
@@ -625,7 +702,10 @@
 	 * animate function
 	 * @constructor
 	 * @param {HTMLElement} el element to animate
-	 * @param {object} config config for animate
+	 * @param {Object} config config for animate
+	 * @param {Object} config.css 
+	 * @param {Number} config.duration 
+	 * @param {String} config.easing
 	 * @extends {Base}
 	 */
 	function Animate(el, cfg) {
@@ -636,13 +716,6 @@
 		var duration = cfg.duration || 0,
 			easing = cfg.easing || "ease",
 			delay = cfg.delay || 0;
-
-		self.transitionEndHandler = function(e) {
-			self.__isTransitionEnd = true;
-			if(e.target !== e.currentTarget) return;
-			self.__handlers.stop.call(self);
-		};
-
 		//trigger run
 		if (cfg.run) {
 			//frame animate
@@ -652,6 +725,7 @@
 			});
 			self.timer.on("run", cfg.run);
 		}
+		self._bindEvt();
 		return self;
 	}
 
@@ -694,7 +768,7 @@
 		/**
 		 * to start the animation
 		 * @memberof Animate
-		 * @return {Animate} 
+		 * @return {Animate}
 		 */
 		run: function() {
 			var self = this;
@@ -706,11 +780,12 @@
 			self.__isTransitionEnd = false;
 			clearTimeout(self.__itv)
 			self.timer && self.timer.run();
-			if(duration &lt;= Timer.MIN_DURATION){
+			if (duration &lt;= Timer.MIN_DURATION) {
 				for (var i in cfg.css) {
-					css(el,i,cfg.css[i]);
+					css(el, i, cfg.css[i]);
 				}
 				self.stop()
+				self.__handlers.stop.call(self);
 				return;
 			}
 
@@ -725,35 +800,27 @@
 					//set css
 					css(el, i, cfg.css[i]);
 				}
-				el.removeEventListener(vendorTransitionEnd, self.transitionEndHandler);
-				el.addEventListener(vendorTransitionEnd, self.transitionEndHandler, false);
-				self.__itv = setTimeout(function(){
-					if(!self.__isTransitionEnd){
+				self.__itv = setTimeout(function() {
+					if (!self.__isTransitionEnd) {
 						self.__isTransitionEnd = true;
-						self.__handlers.stop.call(self);
+						self.trigger("transitionend");
 					}
-				},Number(duration) + 60)
+				}, Number(duration) + 60);
 			} else {
-				var computeStyle = window.getComputedStyle(el);
+				self.computeStyle = self.computeStyle || window.getComputedStyle(el);
 				//transform
 				if (cfg.css.transform) {
-					var transmap = self.transmap = computeTransform(computeStyle[vendorTransform], cfg.css.transform);
+					var transmap = self.transmap = computeTransform(self.computeStyle[vendorTransform], cfg.css.transform);
 					self.timer && self.timer.off("run", self.__handlers.transRun);
 					self.timer && self.timer.on("run", self.__handlers.transRun, self);
 				}
-				var cssRun = function(e) {
-					for (var i in cfg.css) {
-						if (!/transform/.test(i)) {
-							setStyle(el, i, computeStyle[i], cfg.css[i], e.percent);
-						}
-					}
-				};
-				self.timer && self.timer.off("run", cssRun);
-				self.timer && self.timer.on("run", cssRun);
-				self.timer && self.timer.off("stop", self.__handlers.stop);
-				self.timer && self.timer.on("stop", self.__handlers.stop, self);
 			}
 			return self;
+		},
+		_transitionEndHandler: function(e) {
+			var self = this;
+			self.stop();
+			self.__handlers.stop.call(self);
 		},
 		__handlers: {
 			transRun: function(e) {
@@ -776,34 +843,57 @@
 				});
 			}
 		},
+		_bindEvt: function() {
+			var self = this;
+			var cfg = self.cfg;
+			var el = self.el;
+			self.el.addEventListener(vendorTransitionEnd, function(e) {
+				self.__isTransitionEnd = true;
+				if (e.target !== e.currentTarget) return;
+				self.trigger("transitionend", e);
+			})
+			self.on("transitionend", self._transitionEndHandler, self);
+			var cssRun = function(e) {
+				self.computeStyle = self.computeStyle || window.getComputedStyle(el);
+				for (var i in cfg.css) {
+					if (!/transform/.test(i)) {
+						setStyle(self.el, i, self.computeStyle[i], cfg.css[i], e.percent);
+					}
+				}
+			};
+			self.timer && self.timer.on("run", cssRun);
+			self.timer && self.timer.on("stop", self.__handlers.stop, self);
+		},
 		/**
 		 * to stop the animation
 		 * @memberof Animate
-		 * @return {Animate} 
+		 * @return {Animate}
 		 */
 		stop: function() {
 			var self = this;
 			if (self.cfg.useTransition && self.cfg.duration > Timer.MIN_DURATION) {
 				var computeStyle = window.getComputedStyle(this.el);
-				for (var i in self.cfg.css){
+				for (var i in self.cfg.css) {
 					if (animAttrs[i]) {
 						var value = /transform/.test(i) ? computeStyle[vendorTransform] : computeStyle[i];
-						css(self.el, i, value);
+						css(self.el, i, Util.substitute(translateTpl + ' ' + 'scale({scaleX},{scaleY})', getTransformInfo(value)));
 					}
 				}
 				self.el.style[vendorTransition] = "none";
 			}
 			self.timer && self.timer.stop() && self.timer.reset();
+			self.computeStyle = null;
 			return self;
 		},
 		/**
 		 * to reset the animation to a new state
 		 * @memberof Animate
 		 * @param {object} cfg cfg for new animation
-		 * @return {Animate} 
+		 * @return {Animate}
 		 */
 		reset: function(cfg) {
 			var self = this;
+			self.computeStyle = null;
 			Util.mix(self.cfg, cfg);
 			this.timer && self.timer.reset({
 				duration: Math.round(self.cfg.duration),
@@ -816,7 +906,8 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Animate;
-	} </code></pre>
+	}
+	</code></pre>
         </article>
     </section>
 
@@ -828,7 +919,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 13:35:29 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:55 GMT+0800 (CST)
         </footer>
     </div>
 </div>

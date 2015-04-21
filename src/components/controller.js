@@ -130,6 +130,8 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Controller;
-	} else{
+	} 
+	/** ignored by jsdoc **/
+	else{
 		return Controller;
 	}

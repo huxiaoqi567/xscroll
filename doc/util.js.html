@@ -34,6 +34,74 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Plugins">
+            <span class="title">
+                <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Util">
+            <span class="title">
+                <a href="Util.html">Util</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="Util.vendor"><a href="Util.html#vendor">vendor</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Util.addClass"><a href="Util.html#addClass">addClass</a></li>
+            
+                <li data-name="Util.findParentEl"><a href="Util.html#findParentEl">findParentEl</a></li>
+            
+                <li data-name="Util.getOffsetLeft"><a href="Util.html#getOffsetLeft">getOffsetLeft</a></li>
+            
+                <li data-name="Util.getOffsetTop"><a href="Util.html#getOffsetTop">getOffsetTop</a></li>
+            
+                <li data-name="Util.guid"><a href="Util.html#guid">guid</a></li>
+            
+                <li data-name="Util.hasClass"><a href="Util.html#hasClass">hasClass</a></li>
+            
+                <li data-name="Util.isAndroid"><a href="Util.html#isAndroid">isAndroid</a></li>
+            
+                <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
+            
+                <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Animate">
             <span class="title">
                 <a href="Animate.html">Animate</a>
@@ -98,6 +166,8 @@
             <span class="subtitle">Members</span>
             
                 <li data-name="Infinite.pluginId"><a href="Infinite.html#pluginId">pluginId</a></li>
+            
+                <li data-name="Infinite.sections"><a href="Infinite.html#sections">sections</a></li>
             
                 <li data-name="Infinite.visibleElements"><a href="Infinite.html#visibleElements">visibleElements</a></li>
             
@@ -337,8 +407,6 @@
             
                 <li data-name="SimuScroll.initScrollBars"><a href="SimuScroll.html#initScrollBars">initScrollBars</a></li>
             
-                <li data-name="SimuScroll.initTouchAction"><a href="SimuScroll.html#initTouchAction">initTouchAction</a></li>
-            
                 <li data-name="SimuScroll.isBoundryOut"><a href="SimuScroll.html#isBoundryOut">isBoundryOut</a></li>
             
                 <li data-name="SimuScroll.isBoundryOutBottom"><a href="SimuScroll.html#isBoundryOutBottom">isBoundryOutBottom</a></li>
@@ -443,6 +511,8 @@
             
                 <li data-name="XScroll.init"><a href="XScroll.html#init">init</a></li>
             
+                <li data-name="XScroll.initTouchAction"><a href="XScroll.html#initTouchAction">initTouchAction</a></li>
+            
                 <li data-name="XScroll.render"><a href="XScroll.html#render">render</a></li>
             
                 <li data-name="XScroll.resetSize"><a href="XScroll.html#resetSize">resetSize</a></li>
@@ -477,6 +547,14 @@
             
             </ul>
             <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="XScrollMaster.get"><a href="XScrollMaster.html#get">get</a></li>
+            
+                <li data-name="XScrollMaster.init"><a href="XScrollMaster.html#init">init</a></li>
+            
+                <li data-name="XScrollMaster.render"><a href="XScrollMaster.html#render">render</a></li>
             
             </ul>
             <ul class="events itemMembers">
@@ -520,14 +598,9 @@
 		return newProto;
 	}
 
-	// Generate a unique integer id (unique within the entire client session).
+	
 	// Useful for temporary DOM ids.
 	var idCounter = 0;
-	var guid = function(prefix) {
-		var id = ++idCounter + '';
-		// console.log(id)
-		return prefix ? prefix + id : id;
-	};
 
 	var Util = {
 		// Is a given variable an object?
@@ -625,11 +698,11 @@
 				return (o[name] === undefined) ? EMPTY : o[name];
 			});
 		},
-
-		/*
-        vendors
-        @example webkit|moz|ms|O 
-    	*/
+		/**
+		 * vendors
+		 * @return { String } webkit|moz|ms|o
+		 * @memberOf Util
+		 */
 		vendor: (function() {
 			var el = document.createElement('div').style;
 			var vendors = ['t', 'webkitT', 'MozT', 'msT', 'OT'],
@@ -643,37 +716,78 @@
 			return false;
 		})(),
 		/**
-		 *  attrs with vendor
+		 *  add vendor to attribute
+		 *  @memberOf Util
+		 *  @param {String} attrName name of attribute
 		 *  @return { String }
 		 **/
-		prefixStyle: function(style) {
+		prefixStyle: function(attrName) {
 			if (this.vendor === false) return false;
-			if (this.vendor === '') return style;
-			return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
+			if (this.vendor === '') return attrName;
+			return this.vendor + attrName.charAt(0).toUpperCase() + attrName.substr(1);
 		},
+		/**
+		 * judge if has class
+		 * @memberOf Util
+		 * @param  {HTMLElement}  el
+		 * @param  {String}  className
+		 * @return {Boolean}
+		 */
 		hasClass: function(el, className) {
 			return el && el.className && className && el.className.indexOf(className) != -1;
 		},
+		/**
+		 * add className for the element
+		 * @memberOf Util
+		 * @param  {HTMLElement}  el
+		 * @param  {String}  className
+		 */
 		addClass: function(el, className) {
 			if (el && className && !this.hasClass(el, className)) {
 				el.className += " " + className;
 			}
 		},
+		/**
+		 * remove className for the element
+		 * @memberOf Util
+		 * @param  {HTMLElement}  el
+		 * @param  {String}  className
+		 */
 		removeClass: function(el, className) {
 			if (el && el.className && className) {
 				el.className = el.className.replace(className, "");
 			}
 		},
+		/**
+		 * get offset top
+		 * @memberOf Util
+		 * @param  {Event}   e
+		 * @return {Number} offsetTop
+		 */
 		getOffsetTop: function(e) {
 			var offset = e.offsetTop;
 			if (e.offsetParent != null) offset += this.getOffsetTop(e.offsetParent);
 			return offset;
 		},
+		/**
+		 * get offset left
+		 * @memberOf Util
+		 * @param  {Event}  e
+		 * @return {Number} offsetLeft
+		 */
 		getOffsetLeft: function(e) {
 			var offset = e.offsetLeft;
 			if (e.offsetParent != null) offset += this.getOffsetLeft(e.offsetParent);
 			return offset;
 		},
+		/**
+		 * get offset left
+		 * @memberOf Util
+		 * @param  {HTMLElement} el
+		 * @param  {String} selector
+		 * @param  {HTMLElement} rootNode
+		 * @return {HTMLElement} parent element
+		 */
 		findParentEl: function(el, selector, rootNode) {
 			var rs = null;
 			rootNode = rootNode || document.body;
@@ -693,21 +807,37 @@
 			}
 			return null;
 		},
-		guid: guid,
+		/**
+		 * Generate a unique integer id (unique within the entire client session).
+		 * @param  {String} prefix 
+		 * @return {String} guid
+		 */
+		guid: function(prefix) {
+			var id = ++idCounter + '';
+			return prefix ? prefix + id : id;
+		},
+		/**
+		 * judge if is an android os
+		 * @return {Boolean} [description]
+		 */
 		isAndroid: function() {
 			return /Android /.test(window.navigator.appVersion);
 		},
+		/**
+		 * judge if is an android device with low  performance
+		 * @return {Boolean} 
+		 */
 		isBadAndroid: function() {
 			return /Android /.test(window.navigator.appVersion) && !(/Chrome\/\d/.test(window.navigator.appVersion))
 		},
-		px2Num:function(px){
-			return Number(px.replace(/px/,''));
+		px2Num: function(px) {
+			return Number(px.replace(/px/, ''));
 		}
 	}
 
 	// Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
 	var names = ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'];
-	for(var i = 0 ;i &lt; names.length;i++ ){
+	for (var i = 0; i &lt; names.length; i++) {
 		Util['is' + names[i]] = function(obj) {
 			return toString.call(obj) == '[object ' + names[i] + ']';
 		};
@@ -715,7 +845,8 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Util;
-	} </code></pre>
+	}
+	</code></pre>
         </article>
     </section>
 
@@ -727,7 +858,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 13:35:29 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:55 GMT+0800 (CST)
         </footer>
     </div>
 </div>

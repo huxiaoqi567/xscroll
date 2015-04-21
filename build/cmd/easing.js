@@ -21,7 +21,9 @@ var Easing = {
 }
 if (typeof module == 'object' && module.exports) {
 	module.exports = Easing;
-} else {
+}
+/** ignored by jsdoc **/
+ else {
 	return Easing;
 }
 });

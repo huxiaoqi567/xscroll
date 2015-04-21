@@ -20,13 +20,8 @@ util = function (exports) {
     newProto.constructor = constructor;
     return newProto;
   }
-  // Generate a unique integer id (unique within the entire client session).
   // Useful for temporary DOM ids.
   var idCounter = 0;
-  var guid = function (prefix) {
-    var id = ++idCounter + '';
-    return prefix ? prefix + id : id;
-  };
   var Util = {
     // Is a given variable an object?
     isObject: function (obj) {
@@ -122,10 +117,11 @@ util = function (exports) {
         return o[name] === undefined ? EMPTY : o[name];
       });
     },
-    /*
-        vendors
-        @example webkit|moz|ms|O 
-    	*/
+    /**
+     * vendors
+     * @return { String } webkit|moz|ms|o
+     * @memberOf Util
+     */
     vendor: function () {
       var el = document.createElement('div').style;
       var vendors = [
@@ -143,41 +139,82 @@ util = function (exports) {
       return false;
     }(),
     /**
-     *  attrs with vendor
+     *  add vendor to attribute
+     *  @memberOf Util
+     *  @param {String} attrName name of attribute
      *  @return { String }
      **/
-    prefixStyle: function (style) {
+    prefixStyle: function (attrName) {
       if (this.vendor === false)
         return false;
       if (this.vendor === '')
-        return style;
-      return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
+        return attrName;
+      return this.vendor + attrName.charAt(0).toUpperCase() + attrName.substr(1);
     },
+    /**
+     * judge if has class
+     * @memberOf Util
+     * @param  {HTMLElement}  el
+     * @param  {String}  className
+     * @return {Boolean}
+     */
     hasClass: function (el, className) {
       return el && el.className && className && el.className.indexOf(className) != -1;
     },
+    /**
+     * add className for the element
+     * @memberOf Util
+     * @param  {HTMLElement}  el
+     * @param  {String}  className
+     */
     addClass: function (el, className) {
       if (el && className && !this.hasClass(el, className)) {
         el.className += ' ' + className;
       }
     },
+    /**
+     * remove className for the element
+     * @memberOf Util
+     * @param  {HTMLElement}  el
+     * @param  {String}  className
+     */
     removeClass: function (el, className) {
       if (el && el.className && className) {
         el.className = el.className.replace(className, '');
       }
     },
+    /**
+     * get offset top
+     * @memberOf Util
+     * @param  {Event}   e
+     * @return {Number} offsetTop
+     */
     getOffsetTop: function (e) {
       var offset = e.offsetTop;
       if (e.offsetParent != null)
         offset += this.getOffsetTop(e.offsetParent);
       return offset;
     },
+    /**
+     * get offset left
+     * @memberOf Util
+     * @param  {Event}  e
+     * @return {Number} offsetLeft
+     */
     getOffsetLeft: function (e) {
       var offset = e.offsetLeft;
       if (e.offsetParent != null)
         offset += this.getOffsetLeft(e.offsetParent);
       return offset;
     },
+    /**
+     * get offset left
+     * @memberOf Util
+     * @param  {HTMLElement} el
+     * @param  {String} selector
+     * @param  {HTMLElement} rootNode
+     * @return {HTMLElement} parent element
+     */
     findParentEl: function (el, selector, rootNode) {
       var rs = null;
       rootNode = rootNode || document.body;
@@ -199,10 +236,26 @@ util = function (exports) {
       }
       return null;
     },
-    guid: guid,
+    /**
+     * Generate a unique integer id (unique within the entire client session).
+     * @param  {String} prefix 
+     * @return {String} guid
+     */
+    guid: function (prefix) {
+      var id = ++idCounter + '';
+      return prefix ? prefix + id : id;
+    },
+    /**
+     * judge if is an android os
+     * @return {Boolean} [description]
+     */
     isAndroid: function () {
       return /Android /.test(window.navigator.appVersion);
     },
+    /**
+     * judge if is an android device with low  performance
+     * @return {Boolean} 
+     */
     isBadAndroid: function () {
       return /Android /.test(window.navigator.appVersion) && !/Chrome\/\d/.test(window.navigator.appVersion);
     },
@@ -613,13 +666,23 @@ plugins_lazyload = function (exports) {
      * @return {LazyLoad}
      */
     reset: function () {
-      var self = this, img;
+      var self = this, img, rect;
       self.zoomType = !self.xscroll.userConfig.lockX ? 'x' : 'y';
       self.imgs = self.xscroll.renderTo.querySelectorAll(self.userConfig.imgsSelector);
+      var e = self.xscroll.getScrollPos();
+      var __top = self.zoomType == 'x' ? 'left' : 'top';
+      var __bottom = self.zoomType == 'x' ? 'right' : 'bottom';
+      var __offsetTop = self.zoomType == 'x' ? 'offsetLeft' : 'offsetTop';
+      var __offsetHeight = self.zoomType == 'x' ? 'offsetWidth' : 'offsetHeight';
+      var __height = self.zoomType == 'x' ? 'width' : 'height';
       self.positions = [];
       for (var i = 0, l = self.imgs.length; i < l; i++) {
         img = self.imgs[i];
-        self.positions.push(img.getBoundingClientRect());
+        rect = {};
+        rect[__top] = img[__offsetTop];
+        rect[__height] = img[__offsetHeight];
+        rect[__bottom] = rect[__top] + rect[__height];
+        self.positions.push(rect);
       }
       return self;
     },

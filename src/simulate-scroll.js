@@ -607,6 +607,8 @@
 
   if (typeof module == 'object' && module.exports) {
     module.exports = SimuScroll;
-  } else {
+  } 
+  /** ignored by jsdoc **/
+  else {
     return SimuScroll;
   }

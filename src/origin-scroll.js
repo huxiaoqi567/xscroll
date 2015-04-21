@@ -137,6 +137,8 @@
 
     if (typeof module == 'object' && module.exports) {
         module.exports = OriginScroll;
-    }else{
+    }
+    /** ignored by jsdoc **/
+    else{
         return OriginScroll;
     }

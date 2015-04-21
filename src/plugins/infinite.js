@@ -249,7 +249,6 @@
 					prevEl = prevElementsPos[j];
 					if (prevEl.guid === newEl.guid) {
 						if (newEl.style != prevEl.style || newEl[self._nameTop] != prevEl[self._nameTop] || newEl[self._nameHeight] != prevEl[self._nameHeight]) {
-							// console.log( "data:", JSON.stringify(newEl.data),prevEl[self._nameTop], '->', newEl[self._nameTop])
 							self._renderStyle(self.infiniteElements[newEl.__infiniteIndex], newEl, true);
 						}
 						if (JSON.stringify(newEl.data) != JSON.stringify(prevEl.data)) {
@@ -597,6 +596,8 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Infinite;
-	} else if (window.XScroll && window.XScroll.Plugins) {
+	} 
+	/** ignored by jsdoc **/
+	else if (window.XScroll && window.XScroll.Plugins) {
 		return XScroll.Plugins.Infinite = Infinite;
 	}

@@ -34,6 +34,74 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Plugins">
+            <span class="title">
+                <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Util">
+            <span class="title">
+                <a href="Util.html">Util</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="Util.vendor"><a href="Util.html#vendor">vendor</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Util.addClass"><a href="Util.html#addClass">addClass</a></li>
+            
+                <li data-name="Util.findParentEl"><a href="Util.html#findParentEl">findParentEl</a></li>
+            
+                <li data-name="Util.getOffsetLeft"><a href="Util.html#getOffsetLeft">getOffsetLeft</a></li>
+            
+                <li data-name="Util.getOffsetTop"><a href="Util.html#getOffsetTop">getOffsetTop</a></li>
+            
+                <li data-name="Util.guid"><a href="Util.html#guid">guid</a></li>
+            
+                <li data-name="Util.hasClass"><a href="Util.html#hasClass">hasClass</a></li>
+            
+                <li data-name="Util.isAndroid"><a href="Util.html#isAndroid">isAndroid</a></li>
+            
+                <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
+            
+                <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Animate">
             <span class="title">
                 <a href="Animate.html">Animate</a>
@@ -98,6 +166,8 @@
             <span class="subtitle">Members</span>
             
                 <li data-name="Infinite.pluginId"><a href="Infinite.html#pluginId">pluginId</a></li>
+            
+                <li data-name="Infinite.sections"><a href="Infinite.html#sections">sections</a></li>
             
                 <li data-name="Infinite.visibleElements"><a href="Infinite.html#visibleElements">visibleElements</a></li>
             
@@ -337,8 +407,6 @@
             
                 <li data-name="SimuScroll.initScrollBars"><a href="SimuScroll.html#initScrollBars">initScrollBars</a></li>
             
-                <li data-name="SimuScroll.initTouchAction"><a href="SimuScroll.html#initTouchAction">initTouchAction</a></li>
-            
                 <li data-name="SimuScroll.isBoundryOut"><a href="SimuScroll.html#isBoundryOut">isBoundryOut</a></li>
             
                 <li data-name="SimuScroll.isBoundryOutBottom"><a href="SimuScroll.html#isBoundryOutBottom">isBoundryOutBottom</a></li>
@@ -443,6 +511,8 @@
             
                 <li data-name="XScroll.init"><a href="XScroll.html#init">init</a></li>
             
+                <li data-name="XScroll.initTouchAction"><a href="XScroll.html#initTouchAction">initTouchAction</a></li>
+            
                 <li data-name="XScroll.render"><a href="XScroll.html#render">render</a></li>
             
                 <li data-name="XScroll.resetSize"><a href="XScroll.html#resetSize">resetSize</a></li>
@@ -477,6 +547,14 @@
             
             </ul>
             <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="XScrollMaster.get"><a href="XScrollMaster.html#get">get</a></li>
+            
+                <li data-name="XScrollMaster.init"><a href="XScrollMaster.html#init">init</a></li>
+            
+                <li data-name="XScrollMaster.render"><a href="XScrollMaster.html#render">render</a></li>
             
             </ul>
             <ul class="events itemMembers">
@@ -516,7 +594,7 @@
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line39">line 39</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line42">line 42</a>
         </div>
         
     </div>
@@ -800,7 +878,7 @@
 	
         <tr>
             
-                <td class="name"><code>simulateScroll</code></td>
+                <td class="name"><code>useOriginScroll</code></td>
             
             
             <td class="type">
@@ -816,7 +894,76 @@
             
             <td class="description last">
                 
-                config if use animation or origin scroll</td>
+                config if use simulate or origin scroll</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>bounce</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config if use has the bounce effect when scrolling outside of the boundry</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>boundryCheck</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config if scrolling inside of the boundry</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>preventDefault</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                config if prevent the browser default behavior</td>
         </tr>
 	
 	
@@ -989,7 +1136,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line243">line 243</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line269">line 269</a>
         </div>
         
     </div>
@@ -1065,7 +1212,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line251">line 251</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line277">line 277</a>
         </div>
         
     </div>
@@ -1141,7 +1288,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line259">line 259</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line285">line 285</a>
         </div>
         
     </div>
@@ -1217,7 +1364,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line103">line 103</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line107">line 107</a>
         </div>
         
     </div>
@@ -1289,7 +1436,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line95">line 95</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line99">line 99</a>
         </div>
         
     </div>
@@ -1361,7 +1508,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line130">line 130</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line134">line 134</a>
         </div>
         
     </div>
@@ -1437,7 +1584,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line112">line 112</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line116">line 116</a>
         </div>
         
     </div>
@@ -1513,7 +1660,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line124">line 124</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line128">line 128</a>
         </div>
         
     </div>
@@ -1589,7 +1736,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line61">line 61</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line64">line 64</a>
         </div>
         
     </div>
@@ -1658,6 +1805,82 @@ xscroll.render();</code></pre>
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="initTouchAction">
+            
+            <span class="type-signature static">static</span>XScroll.initTouchAction<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="XScroll.html">XScroll</a>}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line238">line 238</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        init touch action
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="render">
             
             <span class="type-signature static">static</span>XScroll.render<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="XScroll.html">XScroll</a>}</span>
@@ -1665,7 +1888,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line220">line 220</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line224">line 224</a>
         </div>
         
     </div>
@@ -1741,7 +1964,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line199">line 199</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line203">line 203</a>
         </div>
         
     </div>
@@ -1817,7 +2040,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line154">line 154</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line158">line 158</a>
         </div>
         
     </div>
@@ -2002,7 +2225,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line185">line 185</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line189">line 189</a>
         </div>
         
     </div>
@@ -2164,7 +2387,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line165">line 165</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line169">line 169</a>
         </div>
         
     </div>
@@ -2326,7 +2549,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line139">line 139</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line143">line 143</a>
         </div>
         
     </div>
@@ -2511,7 +2734,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line193">line 193</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line197">line 197</a>
         </div>
         
     </div>
@@ -2673,7 +2896,7 @@ xscroll.render();</code></pre>
     
         
         <div class="tag-source">
-            <a href="core.js.html">core.js</a>, <a href="core.js.html#line175">line 175</a>
+            <a href="core.js.html">core.js</a>, <a href="core.js.html#line179">line 179</a>
         </div>
         
     </div>
@@ -2841,7 +3064,7 @@ xscroll.render();</code></pre>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 13:35:30 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:56 GMT+0800 (CST)
         </footer>
     </div>
 </div>

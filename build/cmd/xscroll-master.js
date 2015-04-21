@@ -16,33 +16,33 @@ define(function(require, exports, module) {
 	Util.extend(XScrollMaster, Base, {
 		/**
 		 * init the master
+		 * @memberof XScrollMaster
 		 * @param {object} cfg config for master
 		 * @param {string} selector xscroll root elements,it will be set to xscroll.renderTo
-		 * @return {[type]}
+		 * @return {XScrollMaster}
 		 */
 		init: function(cfg) {
 			var self = this;
 			self.userConfig = Util.mix({
 				selector: ".xscroll"
 			}, cfg)
+			return self;
 		},
 		/**
 		 * find xscroll instance
+		 * @memberof XScrollMaster
 		 * @param {string} id element id for xscroll instance
 		 * @return {XScroll} xscroll instance
 		 */
 		get: function(id) {
 			var self = this;
 			if (!id) return;
-			for (var i = 0, l = self.__xscrolls.length; i < l; i++) {
-				if (self.__xscrolls[i].renderTo.id === id) {
-					return self.__xscrolls[i];
+			for (var i = 0, l = self.xscrolls.length; i < l; i++) {
+				if (self.xscrolls[i].renderTo.id === id) {
+					return self.xscrolls[i];
 				}
 			}
 			return;
-		},
-		getAll: function() {
-			return this.__xscrolls;
 		},
 		getElPos: function() {
 			var self = this;
@@ -60,6 +60,11 @@ define(function(require, exports, module) {
 			}
 			return elpos;
 		},
+		/**
+		 * render xscrolls
+		 * @memberof XScrollMaster
+		 * @return {XScrollMaster} 
+		 */
 		render: function() {
 			var self = this;
 			var findByEl = function(el, xscrolls) {
@@ -72,9 +77,9 @@ define(function(require, exports, module) {
 			}
 			var els = document.querySelectorAll(self.userConfig.selector);
 			var elpos = self.getElPos();
-			self.__xscrolls = [];
+			self.xscrolls = [];
 			for (var i = 0; i < els.length; i++) {
-				self.__xscrolls.push(new XScroll({
+				self.xscrolls.push(new XScroll({
 					renderTo: els[i],
 					containerWidth: elpos[i].containerWidth,
 					containerHeight: elpos[i].containerHeight,
@@ -82,25 +87,25 @@ define(function(require, exports, module) {
 					height: elpos[i].height
 				}).render());
 			}
-			for (var i = 0, l = self.__xscrolls.length; i < l; i++) {
-				var innerEls = self.__xscrolls[i].renderTo.querySelectorAll(self.userConfig.selector);
+			for (var i = 0, l = self.xscrolls.length; i < l; i++) {
+				var innerEls = self.xscrolls[i].renderTo.querySelectorAll(self.userConfig.selector);
 				for (var j = 0; j < innerEls.length; j++) {
-					var xscroll = findByEl(innerEls[j], self.__xscrolls);
-					if (xscroll && self.__xscrolls[i].controller) {
-						self.__xscrolls[i].controller.add(xscroll);
+					var xscroll = findByEl(innerEls[j], self.xscrolls);
+					if (xscroll && self.xscrolls[i].controller) {
+						self.xscrolls[i].controller.add(xscroll);
 					}
 				}
 			}
 			self._bindEvt();
+			return self;
 		},
 		_bindEvt: function() {
 			var self = this;
-			//window resize
 			window.addEventListener("resize", function(e) {
 				setTimeout(function() {
 					var elpos = self.getElPos();
-					for (var i = 0, l = self.__xscrolls.length; i < l; i++) {
-						var xscroll = self.__xscrolls[i];
+					for (var i = 0, l = self.xscrolls.length; i < l; i++) {
+						var xscroll = self.xscrolls[i];
 						xscroll.userConfig.containerWidth = elpos[i].containerWidth;
 						xscroll.userConfig.containerHeight = elpos[i].containerHeight;
 						xscroll.userConfig.width = elpos[i].width;
@@ -119,7 +124,9 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = XScrollMaster;
-	}else{
+	}
+	/** ignored by jsdoc **/
+	else{
 		return window.XScrollMaster = XScrollMaster;
 	}
 });

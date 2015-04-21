@@ -34,7 +34,6 @@
 				return t/l;
 			}
 			mc.on("panend",function(e){
-				// console.log(e.velocityY)
 				if(Math.abs(e.velocityY)>1.5 && (speedRecords.length == 0 || e.velocityY/speedRecords[speedRecords.length-1]>0)){
 					speedRecords.push(e.velocityY*Math.pow(1.2,speedRecords.length));
 				}else{
@@ -43,7 +42,6 @@
 				}
 				if(speedRecords.length > 3){
 					var v = average(speedRecords);
-					console.log("acc"," v:",v)
 					//cancel limit speed
 					xscroll.userConfig.maxSpeed = Math.abs(v);
 					xscroll._onpanend({
@@ -56,6 +54,8 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = FastScroll;
-	} else if (window.XScroll && window.XScroll.Plugins) {
+	} 
+	/** ignored by jsdoc **/
+	else if (window.XScroll && window.XScroll.Plugins) {
 		return XScroll.Plugins.FastScroll = FastScroll;
 	} 

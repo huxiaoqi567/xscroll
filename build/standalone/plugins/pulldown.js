@@ -20,13 +20,8 @@ util = function (exports) {
     newProto.constructor = constructor;
     return newProto;
   }
-  // Generate a unique integer id (unique within the entire client session).
   // Useful for temporary DOM ids.
   var idCounter = 0;
-  var guid = function (prefix) {
-    var id = ++idCounter + '';
-    return prefix ? prefix + id : id;
-  };
   var Util = {
     // Is a given variable an object?
     isObject: function (obj) {
@@ -122,10 +117,11 @@ util = function (exports) {
         return o[name] === undefined ? EMPTY : o[name];
       });
     },
-    /*
-        vendors
-        @example webkit|moz|ms|O 
-    	*/
+    /**
+     * vendors
+     * @return { String } webkit|moz|ms|o
+     * @memberOf Util
+     */
     vendor: function () {
       var el = document.createElement('div').style;
       var vendors = [
@@ -143,41 +139,82 @@ util = function (exports) {
       return false;
     }(),
     /**
-     *  attrs with vendor
+     *  add vendor to attribute
+     *  @memberOf Util
+     *  @param {String} attrName name of attribute
      *  @return { String }
      **/
-    prefixStyle: function (style) {
+    prefixStyle: function (attrName) {
       if (this.vendor === false)
         return false;
       if (this.vendor === '')
-        return style;
-      return this.vendor + style.charAt(0).toUpperCase() + style.substr(1);
+        return attrName;
+      return this.vendor + attrName.charAt(0).toUpperCase() + attrName.substr(1);
     },
+    /**
+     * judge if has class
+     * @memberOf Util
+     * @param  {HTMLElement}  el
+     * @param  {String}  className
+     * @return {Boolean}
+     */
     hasClass: function (el, className) {
       return el && el.className && className && el.className.indexOf(className) != -1;
     },
+    /**
+     * add className for the element
+     * @memberOf Util
+     * @param  {HTMLElement}  el
+     * @param  {String}  className
+     */
     addClass: function (el, className) {
       if (el && className && !this.hasClass(el, className)) {
         el.className += ' ' + className;
       }
     },
+    /**
+     * remove className for the element
+     * @memberOf Util
+     * @param  {HTMLElement}  el
+     * @param  {String}  className
+     */
     removeClass: function (el, className) {
       if (el && el.className && className) {
         el.className = el.className.replace(className, '');
       }
     },
+    /**
+     * get offset top
+     * @memberOf Util
+     * @param  {Event}   e
+     * @return {Number} offsetTop
+     */
     getOffsetTop: function (e) {
       var offset = e.offsetTop;
       if (e.offsetParent != null)
         offset += this.getOffsetTop(e.offsetParent);
       return offset;
     },
+    /**
+     * get offset left
+     * @memberOf Util
+     * @param  {Event}  e
+     * @return {Number} offsetLeft
+     */
     getOffsetLeft: function (e) {
       var offset = e.offsetLeft;
       if (e.offsetParent != null)
         offset += this.getOffsetLeft(e.offsetParent);
       return offset;
     },
+    /**
+     * get offset left
+     * @memberOf Util
+     * @param  {HTMLElement} el
+     * @param  {String} selector
+     * @param  {HTMLElement} rootNode
+     * @return {HTMLElement} parent element
+     */
     findParentEl: function (el, selector, rootNode) {
       var rs = null;
       rootNode = rootNode || document.body;
@@ -199,10 +236,26 @@ util = function (exports) {
       }
       return null;
     },
-    guid: guid,
+    /**
+     * Generate a unique integer id (unique within the entire client session).
+     * @param  {String} prefix 
+     * @return {String} guid
+     */
+    guid: function (prefix) {
+      var id = ++idCounter + '';
+      return prefix ? prefix + id : id;
+    },
+    /**
+     * judge if is an android os
+     * @return {Boolean} [description]
+     */
     isAndroid: function () {
       return /Android /.test(window.navigator.appVersion);
     },
+    /**
+     * judge if is an android device with low  performance
+     * @return {Boolean} 
+     */
     isBadAndroid: function () {
       return /Android /.test(window.navigator.appVersion) && !/Chrome\/\d/.test(window.navigator.appVersion);
     },
@@ -533,8 +586,8 @@ plugins_pulldown = function (exports) {
   * A pulldown to refresh plugin for xscroll.
   * @constructor
   * @param {object} cfg
-  * @param {number} cfg.height 
-  * @param {string} cfg.content default html for pulldown 
+  * @param {number} cfg.height
+  * @param {string} cfg.content default html for pulldown
   * @param {string} cfg.downContent html for pulldown when scrollTop is smaller than cfg.height
   * @param {string} cfg.upContent html for pulldown when scrollTop is larger than cfg.height
   * @param {string} cfg.loadingContent html for pulldown when released
@@ -557,14 +610,14 @@ plugins_pulldown = function (exports) {
     /**
      * a pluginId
      * @memberOf PullDown
-     * @type {string} 
+     * @type {string}
      */
     pluginId: 'pulldown',
     /**
      * plugin initializer
      * @memberOf PullDown
      * @override Base
-     * @return {PullDown} 
+     * @return {PullDown}
      */
     pluginInitializer: function (xscroll) {
       var self = this;
@@ -577,7 +630,7 @@ plugins_pulldown = function (exports) {
      * detroy the plugin
      * @memberOf PullDown
      * @override Base
-     * @return {PullDown} 
+     * @return {PullDown}
      */
     pluginDestructor: function () {
       var self = this;
@@ -592,7 +645,7 @@ plugins_pulldown = function (exports) {
     /**
      * render pulldown plugin
      * @memberOf PullDown
-     * @return {PullDown} 
+     * @return {PullDown}
      */
     render: function () {
       var self = this;
@@ -610,6 +663,7 @@ plugins_pulldown = function (exports) {
       pulldown.style.top = -height + 'px';
       pulldown.style.textAlign = 'center';
       self.xscroll.container.appendChild(pulldown);
+      self.status = 'up';
       Util.addClass(pulldown, clsPrefix + self.status);
       pulldown.innerHTML = self.userConfig[self.status + 'Content'] || self.userConfig.content;
       self._bindEvt();
@@ -631,7 +685,9 @@ plugins_pulldown = function (exports) {
       this.status = status;
       Util.removeClass(this.pulldown, clsPrefix + prevVal);
       Util.addClass(this.pulldown, clsPrefix + status);
-      this.pulldown.innerHTML = this.userConfig[status + 'Content'];
+      if (this.userConfig[status + 'Content']) {
+        this.pulldown.innerHTML = this.userConfig[status + 'Content'];
+      }
       if (prevVal != status) {
         this.trigger('statuschange', {
           prevVal: prevVal,
@@ -645,12 +701,12 @@ plugins_pulldown = function (exports) {
     /**
      * reset the pulldown plugin
      * @memberOf PullDown
-     * @param {function} callback 
-     * @return {PullDown} 
+     * @param {function} callback
+     * @return {PullDown}
      */
     reset: function (callback) {
       this.xscroll.boundry.resetTop();
-      this.xscroll.bounce(true, callback);
+      this.xscroll.boundryCheckY(callback);
       this._expanded = false;
       return this;
     },

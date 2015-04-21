@@ -79,6 +79,8 @@
 
  if (typeof module == 'object' && module.exports) {
      module.exports = Boundry;
- }else{
+ }
+ /** ignored by jsdoc **/
+ else{
     return Boundry;
  }

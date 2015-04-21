@@ -34,6 +34,74 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Plugins">
+            <span class="title">
+                <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Util">
+            <span class="title">
+                <a href="Util.html">Util</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="Util.vendor"><a href="Util.html#vendor">vendor</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Util.addClass"><a href="Util.html#addClass">addClass</a></li>
+            
+                <li data-name="Util.findParentEl"><a href="Util.html#findParentEl">findParentEl</a></li>
+            
+                <li data-name="Util.getOffsetLeft"><a href="Util.html#getOffsetLeft">getOffsetLeft</a></li>
+            
+                <li data-name="Util.getOffsetTop"><a href="Util.html#getOffsetTop">getOffsetTop</a></li>
+            
+                <li data-name="Util.guid"><a href="Util.html#guid">guid</a></li>
+            
+                <li data-name="Util.hasClass"><a href="Util.html#hasClass">hasClass</a></li>
+            
+                <li data-name="Util.isAndroid"><a href="Util.html#isAndroid">isAndroid</a></li>
+            
+                <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
+            
+                <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Animate">
             <span class="title">
                 <a href="Animate.html">Animate</a>
@@ -98,6 +166,8 @@
             <span class="subtitle">Members</span>
             
                 <li data-name="Infinite.pluginId"><a href="Infinite.html#pluginId">pluginId</a></li>
+            
+                <li data-name="Infinite.sections"><a href="Infinite.html#sections">sections</a></li>
             
                 <li data-name="Infinite.visibleElements"><a href="Infinite.html#visibleElements">visibleElements</a></li>
             
@@ -337,8 +407,6 @@
             
                 <li data-name="SimuScroll.initScrollBars"><a href="SimuScroll.html#initScrollBars">initScrollBars</a></li>
             
-                <li data-name="SimuScroll.initTouchAction"><a href="SimuScroll.html#initTouchAction">initTouchAction</a></li>
-            
                 <li data-name="SimuScroll.isBoundryOut"><a href="SimuScroll.html#isBoundryOut">isBoundryOut</a></li>
             
                 <li data-name="SimuScroll.isBoundryOutBottom"><a href="SimuScroll.html#isBoundryOutBottom">isBoundryOutBottom</a></li>
@@ -443,6 +511,8 @@
             
                 <li data-name="XScroll.init"><a href="XScroll.html#init">init</a></li>
             
+                <li data-name="XScroll.initTouchAction"><a href="XScroll.html#initTouchAction">initTouchAction</a></li>
+            
                 <li data-name="XScroll.render"><a href="XScroll.html#render">render</a></li>
             
                 <li data-name="XScroll.resetSize"><a href="XScroll.html#resetSize">resetSize</a></li>
@@ -478,6 +548,14 @@
             </ul>
             <ul class="methods itemMembers">
             
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="XScrollMaster.get"><a href="XScrollMaster.html#get">get</a></li>
+            
+                <li data-name="XScrollMaster.init"><a href="XScrollMaster.html#init">init</a></li>
+            
+                <li data-name="XScrollMaster.render"><a href="XScrollMaster.html#render">render</a></li>
+            
             </ul>
             <ul class="events itemMembers">
             
@@ -503,7 +581,7 @@
   //reduced boundry pan distance
   var PAN_RATE = 1 - 0.618;
   //constant for scrolling acceleration
-  var SROLL_ACCELERATION = 0.001;
+  var SROLL_ACCELERATION = 0.0005;
   //constant for outside of boundry acceleration
   var BOUNDRY_ACCELERATION = 0.03;
   //transform-origin
@@ -554,7 +632,6 @@
         lockY: self.userConfig.lockY,
         lockX: self.userConfig.lockX
       }
-      self.boundryCheckEnabled = true;
       return self;
     },
     /**
@@ -699,26 +776,30 @@
       timer.reset(config);
       timer.run();
       self.trigger("scrollanimate", {
+        type: "scrollanimate",
         scrollTop: -self.y,
         scrollLeft: -self.x,
-        type: "scrollanimate",
         duration: duration,
         easing: easing,
         zoomType: type
       })
       return this;
     },
+    _ontap: function(e) {
+      var self = this;
+      e.preventDefault();
+      e.srcEvent.stopPropagation();
+      self.boundryCheck();
+      self._triggerClick(e);
+    },
     _bindEvt: function() {
+      SimuScroll.superclass._bindEvt.call(this);
       var self = this;
       if (self.__isEvtBind) return;
       self.__isEvtBind = true;
-      var renderTo = self.renderTo;
-      var mc = self.mc = new Hammer.Manager(self.renderTo);
-      var tap = new Hammer.Tap();
-      var pan = new Hammer.Pan();
       var pinch = new Hammer.Pinch();
-      mc.add([tap, pan, pinch]);
-
+      self.mc.add(pinch);
+      var renderTo = self.renderTo;
       renderTo.addEventListener("touchstart", function(e) {
         if (self.userConfig.preventDefault) {
           e.preventDefault();
@@ -726,34 +807,10 @@
         self.stop();
       }, false);
 
-      mc.on("tap", function(e) {
-        e.preventDefault();
-        e.srcEvent.stopPropagation();
-        self.boundryCheck();
-        if (!self._isClickDisabled) {
-          self._triggerClick(e);
-          self.trigger(e.type, e);
-        }
-      });
-
-      mc.on("panstart", function(e) {
-        self._onpanstart(e);
-        self.trigger(e.type, e);
-      });
-
-      mc.on("pan", function(e) {
-        self._onpan(e);
-        self.trigger(e.type, e);
-      });
-
-      mc.on("panend", function(e) {
-        self._onpanend(e);
-        self.trigger(e.type, e);
-      });
-
-      self.trigger("aftereventbind", {
-        mc: mc
-      });
+      self.on("tap", self._ontap, self);
+      self.on("panstart", self._onpanstart, self);
+      self.on("pan", self._onpan, self);
+      self.on("panend", self._onpanend, self);
       //window resize
       window.addEventListener("resize", function(e) {
         setTimeout(function() {
@@ -771,10 +828,6 @@
       var scrollTop = self.getScrollTop();
       self.stop();
       self.translate(-scrollLeft, -scrollTop);
-      self.trigger("panstart", Util.mix(e, {
-        scrollTop: scrollTop,
-        scrollLeft: scrollLeft
-      }));
       var threshold = self.mc.get("pan").options.threshold;
       self.thresholdY = e.direction == "8" ? threshold : e.direction == "16" ? -threshold : 0;
       self.thresholdX = e.direction == "2" ? threshold : e.direction == "4" ? -threshold : 0;
@@ -783,37 +836,36 @@
     _onpan: function(e) {
       var self = this;
       var boundry = self.boundry;
+      var userConfig = self.userConfig;
+      var boundryCheck = userConfig.boundryCheck;
+      var bounce = userConfig.bounce;
       var scrollTop = self.__topstart || (self.__topstart = -self.getScrollTop());
       var scrollLeft = self.__leftstart || (self.__leftstart = -self.getScrollLeft());
-      var y = self.userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY + self.thresholdY);
-      var x = self.userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
+      var y = userConfig.lockY ? Number(scrollTop) : Number(scrollTop) + (e.deltaY + self.thresholdY);
+      var x = userConfig.lockX ? Number(scrollLeft) : Number(scrollLeft) + (e.deltaX + self.thresholdX);
       var containerWidth = self.containerWidth;
       var containerHeight = self.containerHeight;
-      //over top
-      y = y > boundry.top ? (y - boundry.top) * PAN_RATE + boundry.top : y;
-      //over bottom
-      y = y &lt; boundry.bottom - containerHeight ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : y;
-      //over left
-      x = x > boundry.left ? (x - boundry.left) * PAN_RATE + boundry.left : x;
-      //over right
-      x = x &lt; boundry.right - containerWidth ? x + (boundry.right - containerWidth - x) * PAN_RATE : x;
+      if (boundryCheck) {
+        //over top
+        y = y > boundry.top ? bounce ? (y - boundry.top) * PAN_RATE + boundry.top : boundry.top : y;
+        //over bottom
+        y = y &lt; boundry.bottom - containerHeight ? bounce ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : boundry.bottom - containerHeight : y;
+        //over left
+        x = x > boundry.left ? bounce ? (x - boundry.left) * PAN_RATE + boundry.left : boundry.left : x;
+        //over right
+        x = x &lt; boundry.right - containerWidth ? bounce ? x + (boundry.right - containerWidth - x) * PAN_RATE : boundry.right - containerWidth : x;
+      }
       //move to x,y
       self.translate(x, y);
       //pan trigger the opposite direction
       self.directionX = e.type == 'panleft' ? 'right' : e.type == 'panright' ? 'left' : '';
       self.directionY = e.type == 'panup' ? 'down' : e.type == 'pandown' ? 'up' : '';
-      self.trigger("scroll", Util.mix(e, {
+      self.trigger("scroll", {
         scrollTop: -y,
         scrollLeft: -x,
         triggerType: "pan",
         type: "scroll"
-      }));
-
-      self.trigger("pan", Util.mix(e, {
-        scrollTop: -y,
-        scrollLeft: -x,
-        type: "pan"
-      }));
+      });
       return self;
     },
     _onpanend: function(e) {
@@ -933,17 +985,20 @@
       var boundryEnd = type == "x" ? boundry.right : boundry.bottom;
       var innerSize = type == "x" ? self.containerWidth : self.containerHeight;
       var maxSpeed = userConfig.maxSpeed || 2;
+      var boundryCheck = userConfig.boundryCheck;
+      var bounce = userConfig.bounce;
       var size = boundryEnd - boundryStart;
       var transition = {};
       var status = "inside";
-      if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
-        self.boundryCheckX();
-        return;
-      } else if (type == "y" && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
-        self.boundryCheckY();
-        return;
+      if (boundryCheck) {
+        if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
+          self.boundryCheckX();
+          return;
+        } else if (type == "y" && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
+          self.boundryCheckY();
+          return;
+        }
       }
-
       if (type == "x" && self.userConfig.lockX) return;
       if (type == "y" && self.userConfig.lockY) return;
       v = v > maxSpeed ? maxSpeed : v &lt; -maxSpeed ? -maxSpeed : v;
@@ -952,23 +1007,23 @@
       var t = isNaN(v / a) ? 0 : v / a;
       var s = Number(pos) + t * v / 2;
       //over top boundry check bounce
-      if (s &lt; boundryStart) {
+      if (s &lt; boundryStart && boundryCheck) {
         var _s = boundryStart - pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0 / a2);
         var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = boundryStart + s2;
+        s = bounce ? boundryStart + s2 : boundryStart;
         status = "outside";
-      } else if (s > innerSize - boundryEnd) {
+      } else if (s > innerSize - boundryEnd && boundryCheck) {
         var _s = (boundryEnd - innerSize) + pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0 / a2);
         var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = innerSize - boundryEnd + s2;
+        s = bounce ? innerSize - boundryEnd + s2 : innerSize - boundryEnd;
         status = "outside";
       }
       transition.pos = s;
@@ -985,6 +1040,7 @@
      **/
     boundryCheckX: function(duration, easing, callback) {
       var self = this;
+      if(!self.userConfig.boundryCheck) return;
       if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
@@ -993,7 +1049,7 @@
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
           easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
-      if (!self.boundryCheckEnabled || self.userConfig.lockX) return;
+      if (!self.userConfig.bounce || self.userConfig.lockX) return;
       var pos = self.getScrollLeft();
       var containerWidth = self.containerWidth;
       var boundry = self.boundry;
@@ -1011,6 +1067,7 @@
      **/
     boundryCheckY: function(duration, easing, callback) {
       var self = this;
+      if(!self.userConfig.boundryCheck) return;
       if (typeof arguments[0] == "function") {
         callback = arguments[0];
         duration = self.userConfig.BOUNDRY_CHECK_DURATION;
@@ -1019,7 +1076,7 @@
         duration = duration === 0 ? 0 : self.userConfig.BOUNDRY_CHECK_DURATION,
           easing = easing || self.userConfig.BOUNDRY_CHECK_EASING;
       }
-      if (!self.boundryCheckEnabled || self.userConfig.lockY) return;
+      if (!self.userConfig.boundryCheck || self.userConfig.lockY) return;
       var pos = self.getScrollTop();
       var containerHeight = self.containerHeight;
       var boundry = self.boundry;
@@ -1053,21 +1110,15 @@
         var scrollTop = self.getScrollTop(),
           scrollLeft = self.getScrollLeft();
         self.trigger("scrollend", {
-          type: "scrollend",
           scrollTop: scrollTop,
           scrollLeft: scrollLeft
         });
         self.trigger("stop", {
-          stype: "stop",
           scrollTop: scrollTop,
           scrollLeft: scrollLeft
         })
         self.isScrollingX = false;
         self.isScrollingY = false;
-        //disable click
-        self._isClickDisabled = true;
-      } else {
-        self._isClickDisabled = false;
       }
       return self;
     },
@@ -1086,28 +1137,6 @@
       self.renderTo.style.overflow = "hidden";
       self.initScrollBars();
       self.initController();
-      //update touch-action 
-      self.initTouchAction();
-      return self;
-    },
-    /**
-     * init touch action
-     * @memberof SimuScroll
-     * @return {SimuScroll}
-     */
-    initTouchAction: function() {
-      var self = this;
-      var touchAction = 'none';
-      if (!self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'pan-y';
-      } else if (!self.userConfig.lockY && self.userConfig.lockX) {
-        touchAction = 'pan-x';
-      } else if (self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'auto';
-      }
-      self.mc.set({
-        touchAction: touchAction
-      });
       return self;
     },
     /**
@@ -1117,6 +1146,7 @@
      */
     initScrollBars: function() {
       var self = this;
+      if (!self.userConfig.boundryCheck) return;
       if (self.userConfig.scrollbarX) {
         self.scrollbarX = self.scrollbarX || new ScrollBar({
           xscroll: self,
@@ -1151,7 +1181,8 @@
 
   if (typeof module == 'object' && module.exports) {
     module.exports = SimuScroll;
-  }</code></pre>
+  } 
+  </code></pre>
         </article>
     </section>
 
@@ -1163,7 +1194,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 13:35:29 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:55 GMT+0800 (CST)
         </footer>
     </div>
 </div>

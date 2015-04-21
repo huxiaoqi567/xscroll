@@ -88,6 +88,7 @@ define(function(require, exports, module) {
 			pullup.style.bottom = -height + "px";
 			self.xscroll.container.appendChild(pullup);
 			self.xscroll.boundry.expandBottom(self.userConfig.height);
+      self.status = 'up';
 			Util.addClass(pullup, clsPrefix + self.status);
 			pullup.innerHTML = self.userConfig[self.status + "Content"] || self.userConfig.content;
 			self._bindEvt();
@@ -170,7 +171,9 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = PullUp;
-	}else if(window.XScroll && window.XScroll.Plugins){
+	}
+	/** ignored by jsdoc **/
+	else if(window.XScroll && window.XScroll.Plugins){
 		return XScroll.Plugins.PullUp = PullUp;
 	}
 });

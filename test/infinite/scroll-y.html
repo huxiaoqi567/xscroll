@@ -160,31 +160,18 @@
             preventDefault:false
         });
 
-        // var infinite = new Infinite({
-        //     infiniteElements:"#J_Scroll .xs-row",
-        //     renderHook:function(el,row){
-        //         el.innerText = row.data.num;
-        //     }
-        // });
+        var infinite = new Infinite({
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,row){
+                el.innerText = row.data.num;
+            }
+        });
 
-        // xscroll.plug(infinite);
+        xscroll.plug(infinite);
 
-        // infinite.append(0,data);
+        infinite.append(0,data);
         
         xscroll.render();
-
-        // // xscroll.unplug(infinite);
-
-        // infinite.on("tap panstart pan panend",function(e){
-        //     console.log(e.type)
-        // })
-        // 
-
-
-        window.xscroll = xscroll;
-
-        // window.infinite =infinite;
-
 
     });
 

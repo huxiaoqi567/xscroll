@@ -73,7 +73,8 @@
                 BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,
                 BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
                 clsPrefix: "xs-",
-                useOriginScroll: false
+                useOriginScroll: false,
+                zoomType:"y"
             };
             //generate guid
             self.guid = Util.guid();
@@ -314,6 +315,8 @@
 
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
-    } else {
+    } 
+    /** ignored by jsdoc **/
+    else {
         return XScroll;
     }

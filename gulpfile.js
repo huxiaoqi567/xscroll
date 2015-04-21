@@ -6,6 +6,8 @@ var uglify = require('gulp-uglify');
 var fs = require('fs');
 var amdclean = require('amdclean');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
+
 
 gulp.task('clean', function() {
   gulp.src('./build').pipe(clean());
@@ -45,7 +47,7 @@ gulp.task('amd-clean', ['cmd'], function() {
   }
 })
 
-gulp.task('compress', ['amd-clean'], function() {
+gulp.task('compress', ['amd-clean','clearsuffix'], function() {
   gulp.src(['./build/**/*.js', '!./build/**/*.min.js'])
     .pipe(uglify())
     .pipe(rename({
@@ -55,11 +57,9 @@ gulp.task('compress', ['amd-clean'], function() {
 });
 //prepare for jsdoc generator
 gulp.task('clearsuffix',function(){
-  gulp.src(['src/animate.js']).on("data",function(file){
-    var str = String(file.contents);
-    // str.replace(/else\{\s+return\s+Animate;\s+\}/g,'')
-    // console.log(str.replace(/else\{\s+return\s+Animate;\s+\}/g,''))
-  })
+   gulp.src(['src/**/*.js'])
+   .pipe(replace(/\/\*\* ignored by jsdoc \*\*\/\s*[^]*/g,''))
+   .pipe(gulp.dest('./doc/code/'));
 })
 
 

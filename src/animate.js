@@ -128,7 +128,10 @@
 	 * animate function
 	 * @constructor
 	 * @param {HTMLElement} el element to animate
-	 * @param {object} config config for animate
+	 * @param {Object} config config for animate
+	 * @param {Object} config.css 
+	 * @param {Number} config.duration 
+	 * @param {String} config.easing
 	 * @extends {Base}
 	 */
 	function Animate(el, cfg) {
@@ -270,12 +273,12 @@
 			var self = this;
 			var cfg = self.cfg;
 			var el = self.el;
-			self.el.addEventListener(vendorTransitionEnd,function(e){
+			self.el.addEventListener(vendorTransitionEnd, function(e) {
 				self.__isTransitionEnd = true;
-				if(e.target !== e.currentTarget) return;
-				self.trigger("transitionend",e);
+				if (e.target !== e.currentTarget) return;
+				self.trigger("transitionend", e);
 			})
-			self.on("transitionend",self._transitionEndHandler,self);
+			self.on("transitionend", self._transitionEndHandler, self);
 			var cssRun = function(e) {
 				self.computeStyle = self.computeStyle || window.getComputedStyle(el);
 				for (var i in cfg.css) {
@@ -329,6 +332,8 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Animate;
-	}else{
+	}
+	/** ignored by jsdoc **/
+	else {
 		return Animate;
 	}

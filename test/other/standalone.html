@@ -80,18 +80,22 @@ li{
     	xscroll.render();
 
     	xscroll.on("tap doubletap panstart panend pan scroll scrollend",function(e){
-    		// console.log(e.type)
+    		console.log(e.type)
     	})
-
-    	xscroll.plug(new XScroll.Plugins.PullDown())
+    	var pulldown = new XScroll.Plugins.PullDown();
+    	xscroll.plug(pulldown);
 
     	xscroll.plug(new XScroll.Plugins.PullUp())
 
     	xscroll.plug(new XScroll.Plugins.Snap())
 
-    	xscroll.plug(new XScroll.Plugins.Infinite())
+    	var infinite = new XScroll.Plugins.Infinite()
 
-    	xscroll.plug(new XScroll.Plugins.Scale())
+    	xscroll.plug(infinite).unplug(infinite);
+
+    	var scale = new XScroll.Plugins.Scale()
+
+    	xscroll.plug(scale).unplug(scale);
 
     	xscroll.plug(new XScroll.Plugins.LazyLoad())
 

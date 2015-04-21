@@ -200,6 +200,8 @@ var Events = {
 
   if (typeof module == 'object' && module.exports) {
     module.exports = Events;
-  } else{
+  } 
+  /** ignored by jsdoc **/
+  else{
     return Events;
   }

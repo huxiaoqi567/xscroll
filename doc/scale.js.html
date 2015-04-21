@@ -34,6 +34,74 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Plugins">
+            <span class="title">
+                <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Util">
+            <span class="title">
+                <a href="Util.html">Util</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="Util.vendor"><a href="Util.html#vendor">vendor</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Util.addClass"><a href="Util.html#addClass">addClass</a></li>
+            
+                <li data-name="Util.findParentEl"><a href="Util.html#findParentEl">findParentEl</a></li>
+            
+                <li data-name="Util.getOffsetLeft"><a href="Util.html#getOffsetLeft">getOffsetLeft</a></li>
+            
+                <li data-name="Util.getOffsetTop"><a href="Util.html#getOffsetTop">getOffsetTop</a></li>
+            
+                <li data-name="Util.guid"><a href="Util.html#guid">guid</a></li>
+            
+                <li data-name="Util.hasClass"><a href="Util.html#hasClass">hasClass</a></li>
+            
+                <li data-name="Util.isAndroid"><a href="Util.html#isAndroid">isAndroid</a></li>
+            
+                <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
+            
+                <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Animate">
             <span class="title">
                 <a href="Animate.html">Animate</a>
@@ -98,6 +166,8 @@
             <span class="subtitle">Members</span>
             
                 <li data-name="Infinite.pluginId"><a href="Infinite.html#pluginId">pluginId</a></li>
+            
+                <li data-name="Infinite.sections"><a href="Infinite.html#sections">sections</a></li>
             
                 <li data-name="Infinite.visibleElements"><a href="Infinite.html#visibleElements">visibleElements</a></li>
             
@@ -337,8 +407,6 @@
             
                 <li data-name="SimuScroll.initScrollBars"><a href="SimuScroll.html#initScrollBars">initScrollBars</a></li>
             
-                <li data-name="SimuScroll.initTouchAction"><a href="SimuScroll.html#initTouchAction">initTouchAction</a></li>
-            
                 <li data-name="SimuScroll.isBoundryOut"><a href="SimuScroll.html#isBoundryOut">isBoundryOut</a></li>
             
                 <li data-name="SimuScroll.isBoundryOutBottom"><a href="SimuScroll.html#isBoundryOutBottom">isBoundryOutBottom</a></li>
@@ -443,6 +511,8 @@
             
                 <li data-name="XScroll.init"><a href="XScroll.html#init">init</a></li>
             
+                <li data-name="XScroll.initTouchAction"><a href="XScroll.html#initTouchAction">initTouchAction</a></li>
+            
                 <li data-name="XScroll.render"><a href="XScroll.html#render">render</a></li>
             
                 <li data-name="XScroll.resetSize"><a href="XScroll.html#resetSize">resetSize</a></li>
@@ -478,6 +548,14 @@
             </ul>
             <ul class="methods itemMembers">
             
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="XScrollMaster.get"><a href="XScrollMaster.html#get">get</a></li>
+            
+                <li data-name="XScrollMaster.init"><a href="XScrollMaster.html#init">init</a></li>
+            
+                <li data-name="XScrollMaster.render"><a href="XScrollMaster.html#render">render</a></li>
+            
             </ul>
             <ul class="events itemMembers">
             
@@ -497,12 +575,6 @@
             <pre class="prettyprint source "><code>	var Util = require('../util'),
 		Base = require('../base'),
 		Animate = require('../animate');
-
-	require('../hammer');
-
-	var SCALE_ANIMATE = "scaleanimate";
-	var SCALE = "scale";
-	var SCALE_END = "scaleend";
 	// reduced scale rate
 	var SCALE_RATE = 0.7;
 	var SCALE_TO_DURATION = 300;
@@ -510,6 +582,9 @@
 	 * A scalable plugin for xscroll.
 	 * @constructor
 	 * @param {object} cfg
+	 * @param {number} cfg.minScale min value for scale
+	 * @param {number} cfg.maxScale max value for scale
+	 * @param {number} cfg.duration duration for scale animation
 	 * @extends {Base}
 	 */
 	var Scale = function(cfg) {
@@ -525,19 +600,19 @@
 		/**
 		 * a pluginId
 		 * @memberOf Scale
-		 * @type {string} 
+		 * @type {string}
 		 */
 		pluginId: "scale",
 		/**
 		 * plugin initializer
 		 * @memberOf Scale
 		 * @override Scale
-		 * @return {Infinite} 
+		 * @return {Infinite}
 		 */
 		pluginInitializer: function(xscroll) {
 			var self = this;
 			self.scale = 1;
-			self.xscroll = xscroll;
+			self.xscroll = xscroll.render();
 			self.initialContainerWidth = xscroll.containerWidth;
 			self.initialContainerHeight = xscroll.containerHeight;
 			self.minScale = self.userConfig.minScale || Math.max(xscroll.width / xscroll.containerWidth, xscroll.height / xscroll.containerHeight);
@@ -545,82 +620,85 @@
 			self._bindEvt();
 			return self;
 		},
+		/**
+		 * detroy the plugin
+		 * @memberOf Scale
+		 * @override Base
+		 * @return {Scale}
+		 */
+		pluginDestructor: function() {
+			var self = this;
+			var xscroll = self.xscroll;
+			xscroll.off("doubletap", self._doubleTapHandler, self);
+			xscroll.off("pinchstart", self._pinchStartHandler, self);
+			xscroll.off("pinch", self._pinchHandler, self);
+			xscroll.off("pinchend", self._pinchEndHandler, self);
+			return self;
+		},
+		_doubleTapHandler: function(e) {
+			var self = this;
+			var xscroll = self.xscroll;
+			var minScale = self.userConfig.minScale;
+			var maxScale = self.userConfig.maxScale;
+			self.originX = (e.center.x - xscroll.x) / xscroll.containerWidth;
+			self.originY = (e.center.y - xscroll.y) / xscroll.containerHeight;
+			xscroll.scale > self.minScale ? self.scaleTo(minScale, self.originX, self.originY, 200) : self.scaleTo(maxScale, self.originX, self.originY, 200);
+			return self;
+		},
+		_pinchStartHandler: function(e) {
+			var self = this;
+			var xscroll = self.xscroll;
+			//disable pan gesture
+			xscroll.mc.get("pan").set({
+				enable: false
+			});
+			xscroll.stop();
+			self.isScaling = false;
+			self.scale = xscroll.scale;
+			self.originX = (e.center.x - xscroll.x) / xscroll.containerWidth;
+			self.originY = (e.center.y - xscroll.y) / xscroll.containerHeight;
+		},
+		_pinchHandler: function(e) {
+			var self = this;
+			var scale = self.scale;
+			var xscroll = self.xscroll;
+			var originX = self.originX;
+			var originY = self.originY;
+			var __scale = scale * e.scale;
+			if (__scale &lt;= self.userConfig.minScale) {
+				// s = 1/2 * a * 2^(s/a)
+				__scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
+			}
+			if (__scale >= self.userConfig.maxScale) {
+				// s = 2 * a * 1/2^(a/s)
+				__scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
+			}
+			self._scale(__scale, originX, originY);
+			self.xscroll.translate(xscroll.x, xscroll.y, __scale);
+		},
+		_pinchEndHandler: function(e) {
+			var self = this;
+			var originX = self.originX;
+			var originY = self.originY;
+			var xscroll = self.xscroll;
+			if (xscroll.scale &lt; self.minScale) {
+				self.scaleTo(self.minScale, originX, originY, SCALE_TO_DURATION, "ease-out");
+			} else if (xscroll.scale > self.maxScale) {
+				self.scaleTo(self.maxScale, originX, originY, SCALE_TO_DURATION, "ease-out");
+			} else {
+				xscroll.mc.get("pan").set({
+					enable: true
+				});
+			}
+		},
 		_bindEvt: function() {
 			var self = this;
 			var xscroll = self.xscroll;
-			var mc = xscroll.mc;
-			var pan = mc.get("pan");
-			var minScale = self.userConfig.minScale;
-			var maxScale = self.userConfig.maxScale;
-			var originX, originY,scale;
-			mc.on("tap", function(e) {
-				//double tap
-				if (e.tapCount == 2) {
-					originX = (e.center.x - xscroll.x) / xscroll.containerWidth;
-					originY = (e.center.y - xscroll.y) / xscroll.containerHeight;
-					xscroll.scale > self.minScale ? self.scaleTo(minScale, originX, originY, 200) : self.scaleTo(maxScale, originX, originY, 200);
-					xscroll.trigger("doubletap",e);
-				}
-			});
-
-			mc.on("pinchstart", function(e) {
-				//disable pan gesture
-				pan.set({enable:false});
-				// xscroll.stop();
-				self.isScaling = false;
-		        scale = xscroll.scale;
-		        originX = (e.center.x - xscroll.x) / xscroll.containerWidth;
-		        originY = (e.center.y - xscroll.y) / xscroll.containerHeight;
-		        xscroll.trigger("pinchstart", {
-		          scale: scale,
-		          origin: {
-		            x: originX,
-		            y: originY
-		          }
-		        });
-		      });
-
-			mc.on("pinch", function(e) {
-				var __scale = scale * e.scale;
-				if (__scale &lt;= self.userConfig.minScale) {
-					// s = 1/2 * a * 2^(s/a)
-					__scale = 0.5 * self.userConfig.minScale * Math.pow(2, __scale / self.userConfig.minScale);
-				}
-				if (__scale >= self.userConfig.maxScale) {
-					// s = 2 * a * 1/2^(a/s)
-					__scale = 2 * self.userConfig.maxScale * Math.pow(0.5, self.userConfig.maxScale / __scale);
-				}
-				self._scale(__scale, originX, originY);
-				xscroll.translate(xscroll.x,xscroll.y,__scale);
-				xscroll.trigger("pinch", {
-					scale: __scale,
-					origin: {
-						x: originX,
-						y: originY
-					}
-				});
-			});
-
-
-			mc.on("pinchend", function(e) {
-		        if (xscroll.scale &lt; self.minScale) {
-		          self.scaleTo(self.minScale, originX, originY,SCALE_TO_DURATION,"ease-out");
-		        } else if (xscroll.scale > self.maxScale) {
-		          self.scaleTo(self.maxScale, originX, originY,SCALE_TO_DURATION,"ease-out");
-		        }else{
-		        	pan.set({enable:true});
-		        }
-
-		        xscroll.trigger("pinchend", {
-		          scale: scale,
-		          origin: {
-		            x: originX,
-		            y: originY
-		          }
-		        });
-		      })
+			xscroll.on("doubletap", self._doubleTapHandler, self);
+			xscroll.on("pinchstart", self._pinchStartHandler, self);
+			xscroll.on("pinch", self._pinchHandler, self);
+			xscroll.on("pinchend", self._pinchEndHandler, self);
 			return self;
-
 		},
 		_scale: function(scale, originX, originY) {
 			var self = this;
@@ -664,13 +742,13 @@
 		/**
 		 * scale with an animation
 		 * @memberOf Scale
-		 * @param {number} scale 
+		 * @param {number} scale
 		 * @param {number} originX 0~1
 		 * @param {number} originY 0~1
 		 * @param {number} duration
 		 * @param {string} easing
 		 * @param {function} callback
-		*/
+		 */
 		scaleTo: function(scale, originX, originY, duration, easing, callback) {
 			var self = this;
 			var xscroll = self.xscroll;
@@ -679,15 +757,13 @@
 			var duration = duration || SCALE_TO_DURATION;
 			var easing = easing || "ease-out";
 			// transitionStr = [transformStr, " ", duration , "s ", easing, " 0s"].join("");
-			var scaleStart = xscroll.scale;
 			self._scale(scale, originX, originY);
 			xscroll._animate("x", "translateX(" + xscroll.x + "px) scale(" + scale + ")", duration, easing, callback);
 			xscroll._animate("y", "translateY(" + xscroll.y + "px)", duration, easing, callback);
-
 			self.scaleHandler = self.scaleHandler || function(e) {
 				var _scale = (scale - scaleStart) * e.percent + scaleStart;
 				//trigger scroll event
-				xscroll.trigger("scale", {
+				self.trigger("scale", {
 					scale: _scale,
 					origin: {
 						x: originX,
@@ -699,9 +775,11 @@
 			self.scaleendHandler = self.scaleendHandler || function(e) {
 				self.isScaling = false;
 				//enable pan gesture
-				xscroll.mc.get("pan").set({enable:true});
-				xscroll.trigger(SCALE_END, {
-					type: SCALE_END,
+				xscroll.mc.get("pan").set({
+					enable: true
+				});
+				self.trigger("scaleend", {
+					type: "scaleend",
 					scale: self.scale,
 					origin: {
 						x: originX,
@@ -709,12 +787,11 @@
 					}
 				})
 			}
-
-			xscroll.__timers.x.timer.off("run", self.scaleHandler);
-			xscroll.__timers.x.timer.on("run", self.scaleHandler);
-			xscroll.__timers.x.timer.off("stop", self.scaleendHandler);
-			xscroll.__timers.x.timer.on("stop", self.scaleendHandler);
-			xscroll.trigger(SCALE_ANIMATE, {
+			xscroll.__timers.x.timer.off("run", self._scaleHandler, self);
+			xscroll.__timers.x.timer.on("run", self._scaleHandler, self);
+			xscroll.__timers.x.timer.off("stop", self.scaleendHandler, self);
+			xscroll.__timers.x.timer.on("stop", self.scaleendHandler, self);
+			self.trigger("scaleanimate", {
 				scale: xscroll.scale,
 				duration: duration,
 				easing: easing,
@@ -727,23 +804,13 @@
 					y: originY
 				}
 			});
-
-		},
-		/**
-		 * detroy the plugin
-		 * @memberOf Scale
-		 * @override Base
-		 * @return {Scale} 
-		 */
-		pluginDestructor: function() {
-
 		}
 	});
 
-
 	if (typeof module == 'object' && module.exports) {
 		module.exports = Scale;
-	} </code></pre>
+	} 
+	</code></pre>
         </article>
     </section>
 
@@ -755,7 +822,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 13:35:29 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:55 GMT+0800 (CST)
         </footer>
     </div>
 </div>

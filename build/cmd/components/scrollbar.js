@@ -184,7 +184,9 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = ScrollBar;
-	} else {
+	} 
+	/** ignored by jsdoc **/
+	else {
 		return ScrollBar;
 	}
 });

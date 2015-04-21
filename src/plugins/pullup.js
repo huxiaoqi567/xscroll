@@ -170,6 +170,8 @@
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = PullUp;
-	}else if(window.XScroll && window.XScroll.Plugins){
+	}
+	/** ignored by jsdoc **/
+	else if(window.XScroll && window.XScroll.Plugins){
 		return XScroll.Plugins.PullUp = PullUp;
 	}

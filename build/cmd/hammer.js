@@ -1676,9 +1676,7 @@ inherit(PanRecognizer, AttrRecognizer, {
         this._super.emit.call(this, input);
     },
     reset:function(){
-        // console.log(this)
-
-        // console.log("panreset")
+        
     }
 });
 

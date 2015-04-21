@@ -34,6 +34,74 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Plugins">
+            <span class="title">
+                <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Util">
+            <span class="title">
+                <a href="Util.html">Util</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            <span class="subtitle">Members</span>
+            
+                <li data-name="Util.vendor"><a href="Util.html#vendor">vendor</a></li>
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Util.addClass"><a href="Util.html#addClass">addClass</a></li>
+            
+                <li data-name="Util.findParentEl"><a href="Util.html#findParentEl">findParentEl</a></li>
+            
+                <li data-name="Util.getOffsetLeft"><a href="Util.html#getOffsetLeft">getOffsetLeft</a></li>
+            
+                <li data-name="Util.getOffsetTop"><a href="Util.html#getOffsetTop">getOffsetTop</a></li>
+            
+                <li data-name="Util.guid"><a href="Util.html#guid">guid</a></li>
+            
+                <li data-name="Util.hasClass"><a href="Util.html#hasClass">hasClass</a></li>
+            
+                <li data-name="Util.isAndroid"><a href="Util.html#isAndroid">isAndroid</a></li>
+            
+                <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
+            
+                <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Animate">
             <span class="title">
                 <a href="Animate.html">Animate</a>
@@ -98,6 +166,8 @@
             <span class="subtitle">Members</span>
             
                 <li data-name="Infinite.pluginId"><a href="Infinite.html#pluginId">pluginId</a></li>
+            
+                <li data-name="Infinite.sections"><a href="Infinite.html#sections">sections</a></li>
             
                 <li data-name="Infinite.visibleElements"><a href="Infinite.html#visibleElements">visibleElements</a></li>
             
@@ -337,8 +407,6 @@
             
                 <li data-name="SimuScroll.initScrollBars"><a href="SimuScroll.html#initScrollBars">initScrollBars</a></li>
             
-                <li data-name="SimuScroll.initTouchAction"><a href="SimuScroll.html#initTouchAction">initTouchAction</a></li>
-            
                 <li data-name="SimuScroll.isBoundryOut"><a href="SimuScroll.html#isBoundryOut">isBoundryOut</a></li>
             
                 <li data-name="SimuScroll.isBoundryOutBottom"><a href="SimuScroll.html#isBoundryOutBottom">isBoundryOutBottom</a></li>
@@ -443,6 +511,8 @@
             
                 <li data-name="XScroll.init"><a href="XScroll.html#init">init</a></li>
             
+                <li data-name="XScroll.initTouchAction"><a href="XScroll.html#initTouchAction">initTouchAction</a></li>
+            
                 <li data-name="XScroll.render"><a href="XScroll.html#render">render</a></li>
             
                 <li data-name="XScroll.resetSize"><a href="XScroll.html#resetSize">resetSize</a></li>
@@ -478,6 +548,14 @@
             </ul>
             <ul class="methods itemMembers">
             
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="XScrollMaster.get"><a href="XScrollMaster.html#get">get</a></li>
+            
+                <li data-name="XScrollMaster.init"><a href="XScrollMaster.html#init">init</a></li>
+            
+                <li data-name="XScrollMaster.render"><a href="XScrollMaster.html#render">render</a></li>
+            
             </ul>
             <ul class="events itemMembers">
             
@@ -510,28 +588,31 @@
     var transition = Util.prefixStyle("transition");
     var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
     /** 
-   * @constructor
-   * @param {object} cfg config for scroll
-   * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
-   * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
-   * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
-   * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
-   * @param {boolean} cfg.lockX just like overflow-x:hidden
-   * @param {boolean} cfg.lockY just like overflow-y:hidden
-   * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
-   * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
-   * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
-   * @param {boolean} cfg.simulateScroll config if use animation or origin scroll
-   * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
-   * @extends XScroll
-   * @example
-   * var xscroll = new XScroll({
-   *    renderTo:"#scroll",
-   *    lockX:false,
-   *    scrollbarX:true
-   * });
-   * xscroll.render();
-   */
+     * @constructor
+     * @param {object} cfg config for scroll
+     * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
+     * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
+     * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
+     * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
+     * @param {boolean} cfg.lockX just like overflow-x:hidden
+     * @param {boolean} cfg.lockY just like overflow-y:hidden
+     * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
+     * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
+     * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
+     * @param {boolean} cfg.useOriginScroll config if use simulate or origin scroll
+     * @param {boolean} cfg.bounce config if use has the bounce effect when scrolling outside of the boundry
+     * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
+     * @param {boolean} cfg.preventDefault config if prevent the browser default behavior
+     * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
+     * @extends XScroll
+     * @example
+     * var xscroll = new XScroll({
+     *    renderTo:"#scroll",
+     *    lockX:false,
+     *    scrollbarX:true
+     * });
+     * xscroll.render();
+     */
     function XScroll(cfg) {
         XScroll.superclass.constructor.call(this);
         this.userConfig = cfg;
@@ -539,7 +620,7 @@
     }
 
     XScroll.Util = Util;
-    
+
     XScroll.Plugin = {};
 
     Util.extend(XScroll, Base, {
@@ -557,15 +638,16 @@
         init: function() {
             var self = this;
             var defaultCfg = {
-                preventDefault: true, //prevent touchstart 
-                bounce: true,
-                useTransition: false,
+                preventDefault: true, 
+                bounce: true, 
+                boundryCheck:true,
+                useTransition: true,
                 gpuAcceleration: true,
                 BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
                 BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,
                 BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
                 clsPrefix: "xs-",
-                simulateScroll: false
+                useOriginScroll: false
             };
             //generate guid
             self.guid = Util.guid();
@@ -615,17 +697,17 @@
         /**
          * get scroll top value
          * @memberof XScroll
-         * @return {number} scrollTop 
+         * @return {number} scrollTop
          */
         getScrollTop: function() {},
         /**
          * get scroll left value
          * @memberof XScroll
-         * @return {number} scrollLeft 
+         * @return {number} scrollLeft
          */
         getScrollLeft: function() {},
         /**
-         * scroll absolute to the destination 
+         * scroll absolute to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param scrollTop {number} scrollTop
@@ -640,7 +722,7 @@
             self.scrollTop(scrollTop, duration, easing, callback);
         },
         /**
-         * scroll relative to the destination 
+         * scroll relative to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param scrollTop {number} scrollTop
@@ -652,7 +734,7 @@
             this.scrollByY(scrollTop, duration, easing, callback);
         },
         /**
-         * horizontal scroll relative to the destination 
+         * horizontal scroll relative to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param duration {number} duration for animte
@@ -662,7 +744,7 @@
             this.scrollLeft(Number(scrollLeft) + Number(this.getScrollLeft()), duration, easing, callback);
         },
         /**
-         * vertical scroll relative to the destination 
+         * vertical scroll relative to the destination
          * @memberof XScroll
          * @param scrollTop {number} scrollTop
          * @param duration {number} duration for animte
@@ -672,7 +754,7 @@
             this.scrollTop(Number(scrollTop) + Number(this.getScrollTop()), duration, easing, callback);
         },
         /**
-         * horizontal scroll absolute to the destination 
+         * horizontal scroll absolute to the destination
          * @memberof XScroll
          * @param scrollLeft {number} scrollLeft
          * @param duration {number} duration for animte
@@ -680,7 +762,7 @@
          **/
         scrollLeft: function(scrollLeft, duration, easing, callback) {},
         /**
-         * vertical scroll absolute to the destination 
+         * vertical scroll absolute to the destination
          * @memberof XScroll
          * @param scrollTop {number} scrollTop
          * @param duration {number} duration for animte
@@ -690,7 +772,7 @@
         /**
          * reset the boundry size
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         resetSize: function() {
             var self = this;
@@ -711,13 +793,35 @@
         /**
          * render scroll
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         render: function() {
             var self = this;
             self.resetSize();
             self.trigger("afterrender");
             self._bindEvt();
+            //update touch-action 
+            self.initTouchAction();
+            return self;
+        },
+        /**
+         * init touch action
+         * @memberof XScroll
+         * @return {XScroll}
+         */
+        initTouchAction: function() {
+            var self = this;
+            var touchAction = 'none';
+            if (!self.userConfig.lockX && self.userConfig.lockY) {
+                touchAction = 'pan-y';
+            } else if (!self.userConfig.lockY && self.userConfig.lockX) {
+                touchAction = 'pan-x';
+            } else if (self.userConfig.lockX && self.userConfig.lockY) {
+                touchAction = 'auto';
+            }
+            self.mc.set({
+                touchAction: touchAction
+            });
             return self;
         },
         _triggerClick: function(e) {
@@ -734,7 +838,7 @@
         /**
          * bounce to the boundry vertical and horizontal
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         boundryCheck: function() {
             return this;
@@ -742,27 +846,50 @@
         /**
          * bounce to the boundry horizontal
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         boundryCheckX: function() {
             return this;
         },
         /**
-         * bounce to the boundry vertical 
+         * bounce to the boundry vertical
          * @memberof XScroll
-         * @return {XScroll} 
+         * @return {XScroll}
          **/
         boundryCheckY: function() {
             return this;
         },
         _bindEvt: function() {
-            return this;
-        }
+            var self = this;
+            if (self.___isEvtBind) return;
+            self.___isEvtBind = true;
+            var mc = self.mc = new Hammer.Manager(self.renderTo);
+            var tap = new Hammer.Tap();
+            var pan = new Hammer.Pan();
+            mc.add([tap, pan]);
+            //trigger all events 
+            self.mc.on("panstart pan panend pinchstart pinch pinchend", function(e) {
+                self.trigger(e.type, e);
+            });
+            self.mc.on("tap", function(e) {
+                if (e.tapCount == 1) {
+                    e.type = "tap";
+                    self.trigger(e.type, e);
+                } else if (e.tapCount == 2) {
+                    e.type = "doubletap";
+                    self.trigger("doubletap", e);
+                }
+            });
+            return self;
+        },
+        _resetLockConfig: function() {},
+        stop: function() {}
     });
 
     if (typeof module == 'object' && module.exports) {
         module.exports = XScroll;
-    }</code></pre>
+    } 
+    </code></pre>
         </article>
     </section>
 
@@ -774,7 +901,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Mar 10 2015 13:35:29 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:55 GMT+0800 (CST)
         </footer>
     </div>
 </div>

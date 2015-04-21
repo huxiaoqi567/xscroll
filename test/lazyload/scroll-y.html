@@ -155,19 +155,14 @@ li{
 					<span class="cat">Games</span>
 				</a>
 			</li>
-			<li>
-				<a href="https://itunes.apple.com/us/app/angry-birds-seasons/id398157641?mt=8">
-					<span class="img"><img data-src="http://a4.mzstatic.com/us/r30/Purple5/v4/a8/5c/d8/a85cd8cc-070d-b0ec-893b-711299619ad7/icon160x160.jpeg" width="80" height="80"/><span></span></span>
-					<span class="title">Angry Birds Seasons</span>
-					<span class="cat">Games</span>
-				</a>
-			</li>
+			
 			
 			</ul>
 		</div>
 	</div>
 </div>
 <script src="../../lib/sea.js"></script>
+<script src="../../lib/jquery.js"></script>
 <script>
 	seajs.config({
       base: "../../build/cmd" 
@@ -188,6 +183,25 @@ li{
     	xscroll.plug(lazyload);
 
     	xscroll.render();
+    	//isert a new element
+    	$('<li>'+
+'	<a href="https://itunes.apple.com/us/app/angry-birds-seasons/id398157641?mt=8">'+
+'		<span class="img"><img data-src="http://a4.mzstatic.com/us/r30/Purple5/v4/a8/5c/d8/a85cd8cc-070d-b0ec-893b-711299619ad7/icon160x160.jpeg" width="80" height="80"/><span></span></span>'+
+'		<span class="title">Angry Birds Seasons</span>'+
+'		<span class="cat">Games</span>'+
+'	</a>'+
+'</li>').prependTo("#scroll .xs-content ul");
+
+    	lazyload.reset();
+
+    	xscroll.render();
+
+
+
+
+
+
+
 
 
 

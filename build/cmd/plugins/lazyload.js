@@ -92,13 +92,23 @@ define(function(require, exports, module) {
 		 */
 		reset: function() {
 			var self = this,
-				img;
+				img,rect;
 			self.zoomType = !self.xscroll.userConfig.lockX ? "x" : "y";
 			self.imgs = self.xscroll.renderTo.querySelectorAll(self.userConfig.imgsSelector);
+			var e = self.xscroll.getScrollPos();
+			var __top = self.zoomType == "x" ? "left" : "top";
+			var __bottom = self.zoomType == "x" ? "right" : "bottom";
+			var __offsetTop = self.zoomType == "x" ? "offsetLeft" : "offsetTop";
+			var __offsetHeight = self.zoomType == "x" ? "offsetWidth" : "offsetHeight";
+			var __height = self.zoomType == "x" ? "width" : "height";
 			self.positions = [];
 			for (var i = 0, l = self.imgs.length; i < l; i++) {
 				img = self.imgs[i];
-				self.positions.push(img.getBoundingClientRect());
+				rect = {};
+				rect[__top] = img[__offsetTop];
+				rect[__height] = img[__offsetHeight];
+				rect[__bottom] = rect[__top] + rect[__height];
+				self.positions.push(rect);
 			}
 			return self;
 		},
@@ -119,7 +129,9 @@ define(function(require, exports, module) {
 
 	if (typeof module == 'object' && module.exports) {
 		module.exports = LazyLoad;
-	} else if (window.XScroll && window.XScroll.Plugins) {
+	} 
+	/** ignored by jsdoc **/
+	else if (window.XScroll && window.XScroll.Plugins) {
 		return XScroll.Plugins.LazyLoad = LazyLoad;
 	}
 });
