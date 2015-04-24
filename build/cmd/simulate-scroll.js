@@ -1,4 +1,5 @@
 define(function(require, exports, module) {
+"use strict";
   var Util = require('./util'),
     Base = require('./base'),
     Core = require('./core'),

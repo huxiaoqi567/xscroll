@@ -1,3 +1,4 @@
+"use strict";
  var Util = require('./util');
 
  function Boundry(cfg) {

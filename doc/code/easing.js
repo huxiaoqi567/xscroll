@@ -1,3 +1,4 @@
+"use strict";
 //easing
 var Easing = {
 	"linear": [0, 0, 1, 1],

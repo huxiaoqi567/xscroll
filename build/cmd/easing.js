@@ -1,4 +1,5 @@
 define(function(require, exports, module) {
+"use strict";
 //easing
 var Easing = {
 	"linear": [0, 0, 1, 1],

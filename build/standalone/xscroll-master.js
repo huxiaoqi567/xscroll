@@ -1,6 +1,7 @@
 ;(function() {
 var util, base, animate, hammer, core, components_scrollbar, components_controller, simulate_scroll, origin_scroll, _xscroll_, xscroll_master, _events_, _easing_, _timer_, _boundry_;
 util = function (exports) {
+  
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
   var RE_DASH = /-([a-z])/gi;
@@ -68,44 +69,44 @@ util = function (exports) {
       return r;
     },
     /**
-     * test whether a string start with a specified substring
-     * @param {String} str the whole string
-     * @param {String} prefix a specified substring
-     * @return {Boolean} whether str start with prefix
-     * @member util
-     */
+    * test whether a string start with a specified substring
+    * @param {String} str the whole string
+    * @param {String} prefix a specified substring
+    * @return {Boolean} whether str start with prefix
+    * @member util
+    */
     startsWith: function (str, prefix) {
       return str.lastIndexOf(prefix, 0) === 0;
     },
     /**
-     * test whether a string end with a specified substring
-     * @param {String} str the whole string
-     * @param {String} suffix a specified substring
-     * @return {Boolean} whether str end with suffix
-     * @member util
-     */
+    * test whether a string end with a specified substring
+    * @param {String} str the whole string
+    * @param {String} suffix a specified substring
+    * @return {Boolean} whether str end with suffix
+    * @member util
+    */
     endsWith: function (str, suffix) {
       var ind = str.length - suffix.length;
       return ind >= 0 && str.indexOf(suffix, ind) === ind;
     },
     /**
-     * Removes the whitespace from the beginning and end of a string.
-     * @method
-     * @member util
-     */
+    * Removes the whitespace from the beginning and end of a string.
+    * @method
+    * @member util
+    */
     trim: trim ? function (str) {
       return str == null ? EMPTY : trim.call(str);
     } : function (str) {
       return str == null ? EMPTY : (str + '').replace(RE_TRIM, EMPTY);
     },
     /**
-     * Substitutes keywords in a string using an object/array.
-     * Removes undef keywords and ignores escaped keywords.
-     * @param {String} str template string
-     * @param {Object} o json data
-     * @member util
-     * @param {RegExp} [regexp] to match a piece of template string
-     */
+    * Substitutes keywords in a string using an object/array.
+    * Removes undef keywords and ignores escaped keywords.
+    * @param {String} str template string
+    * @param {Object} o json data
+    * @member util
+    * @param {RegExp} [regexp] to match a piece of template string
+    */
     substitute: function (str, o, regexp) {
       if (typeof str !== 'string' || !o) {
         return str;
@@ -118,10 +119,10 @@ util = function (exports) {
       });
     },
     /**
-     * vendors
-     * @return { String } webkit|moz|ms|o
-     * @memberOf Util
-     */
+    * vendors
+    * @return { String } webkit|moz|ms|o
+    * @memberOf Util
+    */
     vendor: function () {
       var el = document.createElement('div').style;
       var vendors = [
@@ -139,11 +140,11 @@ util = function (exports) {
       return false;
     }(),
     /**
-     *  add vendor to attribute
-     *  @memberOf Util
-     *  @param {String} attrName name of attribute
-     *  @return { String }
-     **/
+    *  add vendor to attribute
+    *  @memberOf Util
+    *  @param {String} attrName name of attribute
+    *  @return { String }
+    **/
     prefixStyle: function (attrName) {
       if (this.vendor === false)
         return false;
@@ -152,43 +153,43 @@ util = function (exports) {
       return this.vendor + attrName.charAt(0).toUpperCase() + attrName.substr(1);
     },
     /**
-     * judge if has class
-     * @memberOf Util
-     * @param  {HTMLElement}  el
-     * @param  {String}  className
-     * @return {Boolean}
-     */
+    * judge if has class
+    * @memberOf Util
+    * @param  {HTMLElement}  el
+    * @param  {String}  className
+    * @return {Boolean}
+    */
     hasClass: function (el, className) {
       return el && el.className && className && el.className.indexOf(className) != -1;
     },
     /**
-     * add className for the element
-     * @memberOf Util
-     * @param  {HTMLElement}  el
-     * @param  {String}  className
-     */
+    * add className for the element
+    * @memberOf Util
+    * @param  {HTMLElement}  el
+    * @param  {String}  className
+    */
     addClass: function (el, className) {
       if (el && className && !this.hasClass(el, className)) {
         el.className += ' ' + className;
       }
     },
     /**
-     * remove className for the element
-     * @memberOf Util
-     * @param  {HTMLElement}  el
-     * @param  {String}  className
-     */
+    * remove className for the element
+    * @memberOf Util
+    * @param  {HTMLElement}  el
+    * @param  {String}  className
+    */
     removeClass: function (el, className) {
       if (el && el.className && className) {
         el.className = el.className.replace(className, '');
       }
     },
     /**
-     * get offset top
-     * @memberOf Util
-     * @param  {Event}   e
-     * @return {Number} offsetTop
-     */
+    * get offset top
+    * @memberOf Util
+    * @param  {Event}   e
+    * @return {Number} offsetTop
+    */
     getOffsetTop: function (e) {
       var offset = e.offsetTop;
       if (e.offsetParent != null)
@@ -196,11 +197,11 @@ util = function (exports) {
       return offset;
     },
     /**
-     * get offset left
-     * @memberOf Util
-     * @param  {Event}  e
-     * @return {Number} offsetLeft
-     */
+    * get offset left
+    * @memberOf Util
+    * @param  {Event}  e
+    * @return {Number} offsetLeft
+    */
     getOffsetLeft: function (e) {
       var offset = e.offsetLeft;
       if (e.offsetParent != null)
@@ -208,26 +209,26 @@ util = function (exports) {
       return offset;
     },
     /**
-     * get offset left
-     * @memberOf Util
-     * @param  {HTMLElement} el
-     * @param  {String} selector
-     * @param  {HTMLElement} rootNode
-     * @return {HTMLElement} parent element
-     */
+    * get offset left
+    * @memberOf Util
+    * @param  {HTMLElement} el
+    * @param  {String} selector
+    * @param  {HTMLElement} rootNode
+    * @return {HTMLElement} parent element
+    */
     findParentEl: function (el, selector, rootNode) {
-      var rs = null;
+      var rs = null, sel = selector.replace(/\.|#/g, '');
       rootNode = rootNode || document.body;
       if (!el || !selector)
         return;
-      if (el.className.match(selector.replace(/\.|#/g, ''))) {
+      if (el.className.match(sel)) {
         return el;
       }
       while (!rs) {
         rs = el.parentNode;
         if (el == rootNode)
           break;
-        if (rs) {
+        if (rs.className.match(sel)) {
           return rs;
           break;
         } else {
@@ -237,25 +238,25 @@ util = function (exports) {
       return null;
     },
     /**
-     * Generate a unique integer id (unique within the entire client session).
-     * @param  {String} prefix 
-     * @return {String} guid
-     */
+    * Generate a unique integer id (unique within the entire client session).
+    * @param  {String} prefix
+    * @return {String} guid
+    */
     guid: function (prefix) {
       var id = ++idCounter + '';
       return prefix ? prefix + id : id;
     },
     /**
-     * judge if is an android os
-     * @return {Boolean} [description]
-     */
+    * judge if is an android os
+    * @return {Boolean} [description]
+    */
     isAndroid: function () {
       return /Android /.test(window.navigator.appVersion);
     },
     /**
-     * judge if is an android device with low  performance
-     * @return {Boolean} 
-     */
+    * judge if is an android device with low  performance
+    * @return {Boolean}
+    */
     isBadAndroid: function () {
       return /Android /.test(window.navigator.appVersion) && !/Chrome\/\d/.test(window.navigator.appVersion);
     },
@@ -285,6 +286,7 @@ util = function (exports) {
   return exports;
 }({});
 _events_ = function (exports) {
+  
   var Util = util;
   // Returns a function that will be executed at most one time, no matter how
   // often you call it. Useful for lazy initialization.
@@ -510,6 +512,7 @@ _events_ = function (exports) {
   return exports;
 }({});
 base = function (exports) {
+  
   var Util = util;
   var Events = _events_;
   /** 
@@ -521,9 +524,9 @@ base = function (exports) {
   Util.mix(Base.prototype, Events);
   Util.mix(Base.prototype, {
     /**
-     * @memberof Base
-     * @param  {object} plugin plug a plugin
-     */
+    * @memberof Base
+    * @param  {object} plugin plug a plugin
+    */
     plug: function (plugin) {
       var self = this;
       if (!plugin || !plugin.pluginId)
@@ -538,9 +541,9 @@ base = function (exports) {
       return self;
     },
     /**
-     * @memberof Base
-     * @param  {object|string} plugin unplug a plugin by pluginId or plugin instance
-     */
+    * @memberof Base
+    * @param  {object|string} plugin unplug a plugin by pluginId or plugin instance
+    */
     unplug: function (plugin) {
       var self = this;
       if (!plugin)
@@ -554,9 +557,9 @@ base = function (exports) {
       }
     },
     /**
-     * @memberof Base
-     * @param  {object|string} plugin get plugin by pluginId
-     */
+    * @memberof Base
+    * @param  {object|string} plugin get plugin by pluginId
+    */
     getPlugin: function (pluginId) {
       var self = this;
       var plugins = [];
@@ -576,6 +579,7 @@ base = function (exports) {
   return exports;
 }({});
 _easing_ = function (exports) {
+  
   //easing
   var Easing = {
     'linear': [
@@ -648,6 +652,7 @@ _easing_ = function (exports) {
   return exports;
 }({});
 _timer_ = function (exports) {
+  
   var Util = util;
   var Base = base;
   var Easing = _easing_;
@@ -723,7 +728,7 @@ _timer_ = function (exports) {
       Util.mix(self.cfg, cfg);
       self.isfinished = false;
       self.percent = 0;
-      delete self._stop;
+      self._stop = null;
     },
     run: function () {
       var self = this;
@@ -736,7 +741,7 @@ _timer_ = function (exports) {
       if (self.isfinished)
         return;
       self._hasFinishedPercent = self._stop && self._stop.percent || 0;
-      delete self._stop;
+      self._stop = null;
       self.start = Date.now();
       self.percent = 0;
       // epsilon determines the precision of the solved values
@@ -785,6 +790,7 @@ _timer_ = function (exports) {
   return exports;
 }({});
 animate = function (exports) {
+  
   var Util = util;
   var Timer = _timer_;
   var Easing = _easing_;
@@ -892,15 +898,15 @@ animate = function (exports) {
     return ret;
   }
   /**
-  * animate function
-  * @constructor
-  * @param {HTMLElement} el element to animate
-  * @param {Object} config config for animate
-  * @param {Object} config.css 
-  * @param {Number} config.duration 
-  * @param {String} config.easing
-  * @extends {Base}
-  */
+   * animate function
+   * @constructor
+   * @param {HTMLElement} el element to animate
+   * @param {Object} config config for animate
+   * @param {Object} config.css
+   * @param {Number} config.duration
+   * @param {String} config.easing
+   * @extends {Base}
+   */
   function Animate(el, cfg) {
     if (!el || !cfg || !cfg.css)
       return;
@@ -953,10 +959,10 @@ animate = function (exports) {
   }
   Util.extend(Animate, Base, {
     /**
-     * to start the animation
-     * @memberof Animate
-     * @return {Animate}
-     */
+    * to start the animation
+    * @memberof Animate
+    * @return {Animate}
+    */
     run: function () {
       var self = this;
       var cfg = self.cfg, el = self.el, duration = cfg.duration || 0, easing = cfg.easing || 'ease', delay = cfg.delay || 0;
@@ -1045,10 +1051,10 @@ animate = function (exports) {
       self.timer && self.timer.on('stop', self.__handlers.stop, self);
     },
     /**
-     * to stop the animation
-     * @memberof Animate
-     * @return {Animate}
-     */
+    * to stop the animation
+    * @memberof Animate
+    * @return {Animate}
+    */
     stop: function () {
       var self = this;
       if (self.cfg.useTransition && self.cfg.duration > Timer.MIN_DURATION) {
@@ -1066,11 +1072,11 @@ animate = function (exports) {
       return self;
     },
     /**
-     * to reset the animation to a new state
-     * @memberof Animate
-     * @param {object} cfg cfg for new animation
-     * @return {Animate}
-     */
+    * to reset the animation to a new state
+    * @memberof Animate
+    * @param {object} cfg cfg for new animation
+    * @return {Animate}
+    */
     reset: function (cfg) {
       var self = this;
       self.computeStyle = null;
@@ -1090,6 +1096,7 @@ animate = function (exports) {
   return exports;
 }({});
 _boundry_ = function (exports) {
+  
   var Util = util;
   function Boundry(cfg) {
     this.cfg = Util.mix({
@@ -3352,6 +3359,7 @@ hammer = function (exports) {
   return exports;
 }({});
 core = function (exports) {
+  
   var Util = util, Base = base, Animate = animate, Boundry = _boundry_;
   hammer;
   // boundry checked bounce effect
@@ -3677,6 +3685,7 @@ core = function (exports) {
   return exports;
 }({});
 components_scrollbar = function (exports) {
+  
   var Util = util;
   var Animate = animate;
   var MIN_SCROLLBAR_SIZE = 60;
@@ -3713,7 +3722,6 @@ components_scrollbar = function (exports) {
       self.scrollbar && self.scrollbar.remove();
       self.xscroll.off('scroll', self._scrollHandler, self);
       self.xscroll.off('scrollend', self._scrollEndHandler, self);
-      delete self;
     },
     render: function () {
       var self = this;
@@ -3786,7 +3794,7 @@ components_scrollbar = function (exports) {
         }
       }
       self.barpos = Math.round(barpos);
-      return result = {
+      return {
         size: Math.round(barSize),
         pos: self.barpos
       };
@@ -3877,6 +3885,7 @@ components_controller = function (exports) {
   /*
   	wrapped scroll controller
   */
+  
   var Util = util, Base = base;
   var Controller = function (cfg) {
     Controller.superclass.constructor.call(this, cfg);
@@ -3910,9 +3919,9 @@ components_controller = function (exports) {
         return;
       var subscroll = self.__scrolls[scroll.guid];
       if (subscroll) {
-        delete subscroll.parentscroll;
+        subscroll.parentscroll = null;
         self._unbind(scroll);
-        delete subscroll;
+        subscroll = null;
       }
     },
     get: function (guid) {
@@ -4002,6 +4011,7 @@ components_controller = function (exports) {
   return exports;
 }({});
 simulate_scroll = function (exports) {
+  
   var Util = util, Base = base, Core = core, Animate = animate, ScrollBar = components_scrollbar, Controller = components_controller;
   //reduced boundry pan distance
   var PAN_RATE = 1 - 0.618;
@@ -4612,6 +4622,7 @@ simulate_scroll = function (exports) {
   return exports;
 }({});
 origin_scroll = function (exports) {
+  
   var Util = util, Base = base, Core = core, Animate = animate;
   var transformOrigin = Util.prefixStyle('transformOrigin');
   /** 
@@ -4753,22 +4764,23 @@ origin_scroll = function (exports) {
   return exports;
 }({});
 _xscroll_ = function (exports) {
+  
   var Util = util, SimuScroll = simulate_scroll, OriginScroll = origin_scroll;
   var XScroll = function (cfg) {
     var _ = cfg && cfg.useOriginScroll ? OriginScroll : SimuScroll;
     return new _(cfg);
   };
   /**
-   * util
-   * @namespace Util
-   * @type {Object}
-   */
-  XScroll.Util = Util;
-  /**
-  * plugins
-  * @namespace Plugins
+  * util
+  * @namespace Util
   * @type {Object}
   */
+  XScroll.Util = Util;
+  /**
+   * plugins
+   * @namespace Plugins
+   * @type {Object}
+   */
   XScroll.Plugins = {};
   if (typeof module == 'object' && module.exports) {
     exports = XScroll;
@@ -4778,36 +4790,37 @@ _xscroll_ = function (exports) {
   return exports;
 }({});
 xscroll_master = function (exports) {
+  
   var Util = util, Base = base, XScroll = _xscroll_;
   /** 
-  * A master for multi-scrollers. 
-  * @constructor
-  * @param {object} cfg - config for master.
-  * @extends Base
-  */
+   * A master for multi-scrollers.
+   * @constructor
+   * @param {object} cfg - config for master.
+   * @extends Base
+   */
   var XScrollMaster = function (cfg) {
     XScrollMaster.superclass.constructor.call(this, cfg);
     this.init(cfg);
   };
   Util.extend(XScrollMaster, Base, {
     /**
-     * init the master
-     * @memberof XScrollMaster
-     * @param {object} cfg config for master
-     * @param {string} selector xscroll root elements,it will be set to xscroll.renderTo
-     * @return {XScrollMaster}
-     */
+    * init the master
+    * @memberof XScrollMaster
+    * @param {object} cfg config for master
+    * @param {string} selector xscroll root elements,it will be set to xscroll.renderTo
+    * @return {XScrollMaster}
+    */
     init: function (cfg) {
       var self = this;
       self.userConfig = Util.mix({ selector: '.xscroll' }, cfg);
       return self;
     },
     /**
-     * find xscroll instance
-     * @memberof XScrollMaster
-     * @param {string} id element id for xscroll instance
-     * @return {XScroll} xscroll instance
-     */
+    * find xscroll instance
+    * @memberof XScrollMaster
+    * @param {string} id element id for xscroll instance
+    * @return {XScroll} xscroll instance
+    */
     get: function (id) {
       var self = this;
       if (!id)
@@ -4836,10 +4849,10 @@ xscroll_master = function (exports) {
       return elpos;
     },
     /**
-     * render xscrolls
-     * @memberof XScrollMaster
-     * @return {XScrollMaster} 
-     */
+    * render xscrolls
+    * @memberof XScrollMaster
+    * @return {XScrollMaster}
+    */
     render: function () {
       var self = this;
       var findByEl = function (el, xscrolls) {
