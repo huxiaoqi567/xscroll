@@ -34,9 +34,88 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Animate">
+            <span class="title">
+                <a href="Animate.html">Animate</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Animate.reset"><a href="Animate.html#reset">reset</a></li>
+            
+                <li data-name="Animate.run"><a href="Animate.html#run">run</a></li>
+            
+                <li data-name="Animate.stop"><a href="Animate.html#stop">stop</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Base">
+            <span class="title">
+                <a href="Base.html">Base</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Base.getPlugin"><a href="Base.html#getPlugin">getPlugin</a></li>
+            
+                <li data-name="Base.plug"><a href="Base.html#plug">plug</a></li>
+            
+                <li data-name="Base.unplug"><a href="Base.html#unplug">unplug</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Plugins">
             <span class="title">
                 <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Timer">
+            <span class="title">
+                <a href="Timer.html">Timer</a>
                 
                 <span class="static">static</span>
                 
@@ -572,133 +651,134 @@
     
     <section>
         <article>
-            <pre class="prettyprint source "><code>	var Util = require('./util'),
-		Base = require('./base'),
-		XScroll = require('./xscroll');
-	/** 
-	 * A master for multi-scrollers. 
-	 * @constructor
-	 * @param {object} cfg - config for master.
-	 * @extends Base
+            <pre class="prettyprint source "><code>"use strict";
+var Util = require('./util'),
+	Base = require('./base'),
+	XScroll = require('./xscroll');
+/** 
+ * A master for multi-scrollers.
+ * @constructor
+ * @param {object} cfg - config for master.
+ * @extends Base
+ */
+var XScrollMaster = function(cfg) {
+	XScrollMaster.superclass.constructor.call(this, cfg);
+	this.init(cfg);
+}
+
+Util.extend(XScrollMaster, Base, {
+	/**
+	 * init the master
+	 * @memberof XScrollMaster
+	 * @param {object} cfg config for master
+	 * @param {string} selector xscroll root elements,it will be set to xscroll.renderTo
+	 * @return {XScrollMaster}
 	 */
-	var XScrollMaster = function(cfg) {
-		XScrollMaster.superclass.constructor.call(this, cfg);
-		this.init(cfg);
-	}
-
-	Util.extend(XScrollMaster, Base, {
-		/**
-		 * init the master
-		 * @memberof XScrollMaster
-		 * @param {object} cfg config for master
-		 * @param {string} selector xscroll root elements,it will be set to xscroll.renderTo
-		 * @return {XScrollMaster}
-		 */
-		init: function(cfg) {
-			var self = this;
-			self.userConfig = Util.mix({
-				selector: ".xscroll"
-			}, cfg)
-			return self;
-		},
-		/**
-		 * find xscroll instance
-		 * @memberof XScrollMaster
-		 * @param {string} id element id for xscroll instance
-		 * @return {XScroll} xscroll instance
-		 */
-		get: function(id) {
-			var self = this;
-			if (!id) return;
-			for (var i = 0, l = self.xscrolls.length; i &lt; l; i++) {
-				if (self.xscrolls[i].renderTo.id === id) {
-					return self.xscrolls[i];
-				}
+	init: function(cfg) {
+		var self = this;
+		self.userConfig = Util.mix({
+			selector: ".xscroll"
+		}, cfg)
+		return self;
+	},
+	/**
+	 * find xscroll instance
+	 * @memberof XScrollMaster
+	 * @param {string} id element id for xscroll instance
+	 * @return {XScroll} xscroll instance
+	 */
+	get: function(id) {
+		var self = this;
+		if (!id) return;
+		for (var i = 0, l = self.xscrolls.length; i &lt; l; i++) {
+			if (self.xscrolls[i].renderTo.id === id) {
+				return self.xscrolls[i];
 			}
-			return;
-		},
-		getElPos: function() {
-			var self = this;
-			var elpos = [];
-			var els = document.querySelectorAll(self.userConfig.selector);
-			for (var i = 0; i &lt; els.length; i++) {
-				var content = els[i].querySelector('.xs-content');
-				elpos.push({
-					el: els[i],
-					containerWidth: content.offsetWidth,
-					containerHeight: content.offsetHeight,
-					width: els[i].offsetWidth,
-					height: els[i].offsetHeight
-				})
-			}
-			return elpos;
-		},
-		/**
-		 * render xscrolls
-		 * @memberof XScrollMaster
-		 * @return {XScrollMaster} 
-		 */
-		render: function() {
-			var self = this;
-			var findByEl = function(el, xscrolls) {
-				if (!el || !xscrolls) return;
-				for (var i = 0, l = xscrolls.length; i &lt; l; i++) {
-					if (xscrolls[i].renderTo === el) {
-						return xscrolls[i];
-					}
-				}
-			}
-			var els = document.querySelectorAll(self.userConfig.selector);
-			var elpos = self.getElPos();
-			self.xscrolls = [];
-			for (var i = 0; i &lt; els.length; i++) {
-				self.xscrolls.push(new XScroll({
-					renderTo: els[i],
-					containerWidth: elpos[i].containerWidth,
-					containerHeight: elpos[i].containerHeight,
-					width: elpos[i].width,
-					height: elpos[i].height
-				}).render());
-			}
-			for (var i = 0, l = self.xscrolls.length; i &lt; l; i++) {
-				var innerEls = self.xscrolls[i].renderTo.querySelectorAll(self.userConfig.selector);
-				for (var j = 0; j &lt; innerEls.length; j++) {
-					var xscroll = findByEl(innerEls[j], self.xscrolls);
-					if (xscroll && self.xscrolls[i].controller) {
-						self.xscrolls[i].controller.add(xscroll);
-					}
-				}
-			}
-			self._bindEvt();
-			return self;
-		},
-		_bindEvt: function() {
-			var self = this;
-			window.addEventListener("resize", function(e) {
-				setTimeout(function() {
-					var elpos = self.getElPos();
-					for (var i = 0, l = self.xscrolls.length; i &lt; l; i++) {
-						var xscroll = self.xscrolls[i];
-						xscroll.userConfig.containerWidth = elpos[i].containerWidth;
-						xscroll.userConfig.containerHeight = elpos[i].containerHeight;
-						xscroll.userConfig.width = elpos[i].width;
-						xscroll.userConfig.height = elpos[i].height;
-						xscroll.boundry.refresh({
-			                width: xscroll.userConfig.width,
-			                height: xscroll.userConfig.height
-			            });
-						xscroll.boundryCheck(0);
-						xscroll.render();
-					}
-				}, 0);
-			}, self);
 		}
-	});
-
-	if (typeof module == 'object' && module.exports) {
-		module.exports = XScrollMaster;
+		return;
+	},
+	getElPos: function() {
+		var self = this;
+		var elpos = [];
+		var els = document.querySelectorAll(self.userConfig.selector);
+		for (var i = 0; i &lt; els.length; i++) {
+			var content = els[i].querySelector('.xs-content');
+			elpos.push({
+				el: els[i],
+				containerWidth: content.offsetWidth,
+				containerHeight: content.offsetHeight,
+				width: els[i].offsetWidth,
+				height: els[i].offsetHeight
+			})
+		}
+		return elpos;
+	},
+	/**
+	 * render xscrolls
+	 * @memberof XScrollMaster
+	 * @return {XScrollMaster}
+	 */
+	render: function() {
+		var self = this;
+		var findByEl = function(el, xscrolls) {
+			if (!el || !xscrolls) return;
+			for (var i = 0, l = xscrolls.length; i &lt; l; i++) {
+				if (xscrolls[i].renderTo === el) {
+					return xscrolls[i];
+				}
+			}
+		}
+		var els = document.querySelectorAll(self.userConfig.selector);
+		var elpos = self.getElPos();
+		self.xscrolls = [];
+		for (var i = 0; i &lt; els.length; i++) {
+			self.xscrolls.push(new XScroll({
+				renderTo: els[i],
+				containerWidth: elpos[i].containerWidth,
+				containerHeight: elpos[i].containerHeight,
+				width: elpos[i].width,
+				height: elpos[i].height
+			}).render());
+		}
+		for (var i = 0, l = self.xscrolls.length; i &lt; l; i++) {
+			var innerEls = self.xscrolls[i].renderTo.querySelectorAll(self.userConfig.selector);
+			for (var j = 0; j &lt; innerEls.length; j++) {
+				var xscroll = findByEl(innerEls[j], self.xscrolls);
+				if (xscroll && self.xscrolls[i].controller) {
+					self.xscrolls[i].controller.add(xscroll);
+				}
+			}
+		}
+		self._bindEvt();
+		return self;
+	},
+	_bindEvt: function() {
+		var self = this;
+		window.addEventListener("resize", function(e) {
+			setTimeout(function() {
+				var elpos = self.getElPos();
+				for (var i = 0, l = self.xscrolls.length; i &lt; l; i++) {
+					var xscroll = self.xscrolls[i];
+					xscroll.userConfig.containerWidth = elpos[i].containerWidth;
+					xscroll.userConfig.containerHeight = elpos[i].containerHeight;
+					xscroll.userConfig.width = elpos[i].width;
+					xscroll.userConfig.height = elpos[i].height;
+					xscroll.boundry.refresh({
+						width: xscroll.userConfig.width,
+						height: xscroll.userConfig.height
+					});
+					xscroll.boundryCheck(0);
+					xscroll.render();
+				}
+			}, 0);
+		}, self);
 	}
-	</code></pre>
+});
+
+if (typeof module == 'object' && module.exports) {
+	module.exports = XScrollMaster;
+}
+</code></pre>
         </article>
     </section>
 
@@ -710,7 +790,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:55 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 28 2015 07:02:24 GMT+0800 (CST)
         </footer>
     </div>
 </div>

@@ -3,9 +3,8 @@ define(function(require, exports, module) {
 var Util = require('./util'),
     Base = require('./base'),
     Animate = require('./animate'),
-    Boundry = require('./boundry');
-
-require('./hammer');
+    Boundry = require('./boundry'),
+    Hammer = require('./hammer');
 // boundry checked bounce effect
 var BOUNDRY_CHECK_DURATION = 500;
 var BOUNDRY_CHECK_EASING = "ease";

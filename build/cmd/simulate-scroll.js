@@ -4,6 +4,7 @@ define(function(require, exports, module) {
     Base = require('./base'),
     Core = require('./core'),
     Animate = require('./animate'),
+    Hammer = require('./hammer'),
     ScrollBar = require('./components/scrollbar'),
     Controller = require('./components/controller');
   //reduced boundry pan distance

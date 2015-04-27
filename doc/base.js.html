@@ -34,9 +34,88 @@
     </div>
     <ul class="list">
     
+        <li class="item" data-name="Animate">
+            <span class="title">
+                <a href="Animate.html">Animate</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Animate.reset"><a href="Animate.html#reset">reset</a></li>
+            
+                <li data-name="Animate.run"><a href="Animate.html#run">run</a></li>
+            
+                <li data-name="Animate.stop"><a href="Animate.html#stop">stop</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Base">
+            <span class="title">
+                <a href="Base.html">Base</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="Base.getPlugin"><a href="Base.html#getPlugin">getPlugin</a></li>
+            
+                <li data-name="Base.plug"><a href="Base.html#plug">plug</a></li>
+            
+                <li data-name="Base.unplug"><a href="Base.html#unplug">unplug</a></li>
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Plugins">
             <span class="title">
                 <a href="Plugins.html">Plugins</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="Timer">
+            <span class="title">
+                <a href="Timer.html">Timer</a>
                 
                 <span class="static">static</span>
                 
@@ -572,68 +651,69 @@
     
     <section>
         <article>
-            <pre class="prettyprint source "><code>	var Util = require('./util');
-	var Events = require('./events');
-	/** 
+            <pre class="prettyprint source "><code>"use strict";
+var Util = require('./util');
+var Events = require('./events');
+/** 
       @constructor 
       @mixes Events
       */
-	var Base = function() {}
+var Base = function() {}
 
-	Util.mix(Base.prototype, Events);
-	
-	Util.mix(Base.prototype, {
-		/**
-		 * @memberof Base
-		 * @param  {object} plugin plug a plugin
-		 */
-		plug :function(plugin) {
-			var self = this;
-			if (!plugin || !plugin.pluginId) return;
-			if (!self.__plugins) {
-				self.__plugins = [];
-			}
-			var __plugin = self.getPlugin(plugin.pluginId);
-			__plugin && self.unplug(plugin.pluginId);
-			plugin.pluginInitializer(self);
-			self.__plugins.push(plugin);
-			return self;
-		},
-		/**
-		 * @memberof Base
-		 * @param  {object|string} plugin unplug a plugin by pluginId or plugin instance
-		 */
-		unplug: function(plugin) {
-			var self = this;
-			if (!plugin) return;
-			var _plugin = typeof plugin == "string" ? self.getPlugin(plugin) : plugin;
-			_plugin.pluginDestructor(self);
-			for (var i in self.__plugins) {
-				if (self.__plugins[i] == _plugin) {
-					return self.__plugins.splice(i, 1);
-				}
-			}
-		},
-		/**
-		 * @memberof Base
-		 * @param  {object|string} plugin get plugin by pluginId
-		 */
-		getPlugin: function(pluginId) {
-			var self = this;
-			var plugins = [];
-			for (var i in self.__plugins) {
-				if (self.__plugins[i] && self.__plugins[i].pluginId == pluginId) {
-					plugins.push(self.__plugins[i])
-				}
-			}
-			return plugins.length > 1 ? plugins : plugins[0] || null;
+Util.mix(Base.prototype, Events);
+
+Util.mix(Base.prototype, {
+	/**
+	 * @memberof Base
+	 * @param  {object} plugin plug a plugin
+	 */
+	plug: function(plugin) {
+		var self = this;
+		if (!plugin || !plugin.pluginId) return;
+		if (!self.__plugins) {
+			self.__plugins = [];
 		}
-	});
+		var __plugin = self.getPlugin(plugin.pluginId);
+		__plugin && self.unplug(plugin.pluginId);
+		plugin.pluginInitializer(self);
+		self.__plugins.push(plugin);
+		return self;
+	},
+	/**
+	 * @memberof Base
+	 * @param  {object|string} plugin unplug a plugin by pluginId or plugin instance
+	 */
+	unplug: function(plugin) {
+		var self = this;
+		if (!plugin) return;
+		var _plugin = typeof plugin == "string" ? self.getPlugin(plugin) : plugin;
+		_plugin.pluginDestructor(self);
+		for (var i in self.__plugins) {
+			if (self.__plugins[i] == _plugin) {
+				return self.__plugins.splice(i, 1);
+			}
+		}
+	},
+	/**
+	 * @memberof Base
+	 * @param  {object|string} plugin get plugin by pluginId
+	 */
+	getPlugin: function(pluginId) {
+		var self = this;
+		var plugins = [];
+		for (var i in self.__plugins) {
+			if (self.__plugins[i] && self.__plugins[i].pluginId == pluginId) {
+				plugins.push(self.__plugins[i])
+			}
+		}
+		return plugins.length > 1 ? plugins : plugins[0] || null;
+	}
+});
 
-	if (typeof module == 'object' && module.exports) {
-		module.exports = Base;
-	} 
-	</code></pre>
+if (typeof module == 'object' && module.exports) {
+	module.exports = Base;
+}
+</code></pre>
         </article>
     </section>
 
@@ -645,7 +725,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:21:55 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 28 2015 07:02:23 GMT+0800 (CST)
         </footer>
     </div>
 </div>

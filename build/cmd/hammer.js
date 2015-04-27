@@ -4,7 +4,6 @@ define(function(require, exports, module) {
  *
  * Copyright (c) 2014 Jorik Tangelder;
  * Licensed under the MIT license */
-(function(window, document, exportName, undefined) {
   'use strict';
 
 var VENDOR_PREFIXES = ['', 'webkit', 'moz', 'MS', 'ms', 'o'];
@@ -2452,15 +2451,11 @@ extend(Hammer, {
     prefixed: prefixed
 });
 
-// if (typeof define == TYPE_FUNCTION && define.amd) {
-//     define(function() {
-//         return Hammer;
-//     });
-// } else if (typeof module != 'undefined' && module.exports) {
-//     module.exports = Hammer;
-// } else {
-    window[exportName] = Hammer;
-// }
-
-})(window, document, 'Hammer');
+if (typeof module == 'object' && module.exports) {
+    module.exports = Hammer;
+}
+/** ignored by jsdoc **/
+else {
+    return Hammer;
+}
 });
