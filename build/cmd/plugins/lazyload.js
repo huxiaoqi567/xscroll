@@ -10,17 +10,12 @@ var Util = require('../util'),
  */
 var LazyLoad = function(cfg) {
 	LazyLoad.superclass.constructor.call(this, cfg);
-	var formatter = function(src) {
-			return src;
-		};
 	this.userConfig = Util.mix({
 		imgsSelector: "img",
-		formatter:formatter,
 		delay: 200,
 		imgSetter:function(img){
 			var src = img.getAttribute("data-src");
-			var formattedSrc = formatter.call(self, src);
-			formattedSrc && img.setAttribute("src", formattedSrc);
+			src && img.setAttribute("src", src);
 		}
 	}, cfg);
 }
