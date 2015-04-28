@@ -80,7 +80,7 @@ li{
     	xscroll.render();
 
     	xscroll.on("tap doubletap panstart panend pan scroll scrollend",function(e){
-    		console.log(e.type)
+    		console.log(e.type,e)
     	})
     	var pulldown = new XScroll.Plugins.PullDown();
     	xscroll.plug(pulldown);

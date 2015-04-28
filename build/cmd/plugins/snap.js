@@ -47,7 +47,6 @@ Util.extend(Snap, Base, {
     self.xscroll = xscroll.render();
     self.snapColIndex = self.userConfig.snapColIndex;
     self.snapRowIndex = self.userConfig.snapRowIndex;
-    prefix = self.userConfig.prefix;
     self.render();
   },
   /**

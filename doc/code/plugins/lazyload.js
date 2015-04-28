@@ -97,14 +97,14 @@ Util.extend(LazyLoad, Base, {
 		var e = self.xscroll.getScrollPos();
 		var __top = self.zoomType == "x" ? "left" : "top";
 		var __bottom = self.zoomType == "x" ? "right" : "bottom";
-		var __offsetTop = self.zoomType == "x" ? "offsetLeft" : "offsetTop";
+		var __getOffsetTop = self.zoomType == "x" ? Util.getOffsetLeft : Util.getOffsetTop;
 		var __offsetHeight = self.zoomType == "x" ? "offsetWidth" : "offsetHeight";
 		var __height = self.zoomType == "x" ? "width" : "height";
 		self.positions = [];
 		for (var i = 0, l = self.imgs.length; i < l; i++) {
 			img = self.imgs[i];
 			rect = {};
-			rect[__top] = img[__offsetTop];
+			rect[__top] = __getOffsetTop(img);
 			rect[__height] = img[__offsetHeight];
 			rect[__bottom] = rect[__top] + rect[__height];
 			self.positions.push(rect);

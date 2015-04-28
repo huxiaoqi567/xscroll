@@ -433,7 +433,7 @@ Util.extend(Infinite, Base, {
 		var self = this,
 			cell;
 		var el = Util.findParentEl(e.target, "._xs_infinite_elements_", self.xscroll.renderTo);
-		var guid = el.getAttribute("xs-guid");
+		var guid = el && el.getAttribute("xs-guid");
 		if (undefined === guid) return;
 		return self.__serializedData[guid];
 	},

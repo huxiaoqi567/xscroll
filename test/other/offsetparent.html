@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<style type="text/css">
+* {
+	margin:0;
+	padding: 0;
+}
+#outer{
+	margin-top:100px;
+	height: 200px;
+	background:red;
+	overflow: hidden;
+	margin-left: 50px;
+}
+#inner{
+	background:green;
+	width:100px;
+	height: 100px;
+	margin-top:15px;
+	margin-left:20px;
+}
+</style>
+</head>
+<body>
+<div id="outer">
+	<div id="inner"></div>
+</div>
+<script src="../../lib/sea.js"></script>
+<script>
+	seajs.config({
+      base: "../../build/cmd/"
+    })
+    seajs.use(["util"],function(Util){
+    	var outer = document.querySelector("#outer"),
+    		inner = document.querySelector("#inner");
+    	console.log("outer:",Util.getOffsetTop(outer),Util.getOffsetLeft(outer))
+    	console.log("inner:",Util.getOffsetTop(inner),Util.getOffsetLeft(inner))
+    })
+</script>

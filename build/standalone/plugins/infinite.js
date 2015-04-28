@@ -23,6 +23,18 @@ util = function (exports) {
   }
   // Useful for temporary DOM ids.
   var idCounter = 0;
+  var getOffsetTop = function (el) {
+    var offset = el.offsetTop;
+    if (el.offsetParent != null)
+      offset += getOffsetTop(el.offsetParent);
+    return offset;
+  };
+  var getOffsetLeft = function (el) {
+    var offset = el.offsetLeft;
+    if (el.offsetParent != null)
+      offset += getOffsetLeft(el.offsetParent);
+    return offset;
+  };
   var Util = {
     // Is a given variable an object?
     isObject: function (obj) {
@@ -187,27 +199,17 @@ util = function (exports) {
     /**
     * get offset top
     * @memberOf Util
-    * @param  {Event}   e
+    * @param  {HTMLElement}   el
     * @return {Number} offsetTop
     */
-    getOffsetTop: function (e) {
-      var offset = e.offsetTop;
-      if (e.offsetParent != null)
-        offset += this.getOffsetTop(e.offsetParent);
-      return offset;
-    },
+    getOffsetTop: getOffsetTop,
     /**
     * get offset left
     * @memberOf Util
-    * @param  {Event}  e
+    * @param  {HTMLElement}  el
     * @return {Number} offsetLeft
     */
-    getOffsetLeft: function (e) {
-      var offset = e.offsetLeft;
-      if (e.offsetParent != null)
-        offset += this.getOffsetLeft(e.offsetParent);
-      return offset;
-    },
+    getOffsetLeft: getOffsetLeft,
     /**
     * get offset left
     * @memberOf Util
@@ -217,7 +219,10 @@ util = function (exports) {
     * @return {HTMLElement} parent element
     */
     findParentEl: function (el, selector, rootNode) {
-      var rs = null, sel = selector.replace(/\.|#/g, '');
+      var rs = null, parent = null, sel = selector.replace(/\.|#/g, '');
+      if (rootNode && typeof rootNode === 'string') {
+        rootNode = document.querySelector(rootNode);
+      }
       rootNode = rootNode || document.body;
       if (!el || !selector)
         return;
@@ -225,14 +230,16 @@ util = function (exports) {
         return el;
       }
       while (!rs) {
-        rs = el.parentNode;
-        if (el == rootNode)
+        i++;
+        if (parent == rootNode)
           break;
-        if (rs.className.match(sel)) {
+        parent = el.parentNode;
+        if (parent.className && parent.className.match(sel)) {
+          rs = parent;
           return rs;
           break;
         } else {
-          el = el.parentNode;
+          el = parent;
         }
       }
       return null;
@@ -1003,7 +1010,7 @@ plugins_infinite = function (exports) {
     getCell: function (e) {
       var self = this, cell;
       var el = Util.findParentEl(e.target, '._xs_infinite_elements_', self.xscroll.renderTo);
-      var guid = el.getAttribute('xs-guid');
+      var guid = el && el.getAttribute('xs-guid');
       if (undefined === guid)
         return;
       return self.__serializedData[guid];
