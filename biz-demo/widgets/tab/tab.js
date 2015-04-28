@@ -2,6 +2,7 @@ define(function(require, exports, module) {
 	var XScroll = require('build/cmd/xscroll');
 	var Base = require('build/cmd/base');
 	var Util = require('build/cmd/util');
+	var Hammer = require('builg/cmd/hammer');
 	var transitionEnd = Util.vendor ? Util.prefixStyle("transitionEnd") : "transitionend";
 	var indexOf = function(el, list) {
 		for (var i in list) {
