@@ -9,11 +9,17 @@ var Util = require('../util'),
  */
 var LazyLoad = function(cfg) {
 	LazyLoad.superclass.constructor.call(this, cfg);
+	var formatter = function(src) {
+			return src;
+		};
 	this.userConfig = Util.mix({
 		imgsSelector: "img",
+		formatter:formatter,
 		delay: 200,
-		formatter: function(src) {
-			return src;
+		imgSetter:function(img){
+			var src = img.getAttribute("data-src");
+			var formattedSrc = formatter.call(self, src);
+			formattedSrc && img.setAttribute("src", formattedSrc);
 		}
 	}, cfg);
 }
@@ -46,12 +52,6 @@ Util.extend(LazyLoad, Base, {
 		}
 		self._isEvtBinded = false;
 	},
-	_setImgSrc: function(img) {
-		if (!img) return;
-		var src = img.getAttribute("data-src");
-		var formattedSrc = this.userConfig.formatter.call(self, src);
-		formattedSrc && img.setAttribute("src", formattedSrc);
-	},
 	_filterItem: function(e) {
 		var self = this,
 			pos;
@@ -63,7 +63,7 @@ Util.extend(LazyLoad, Base, {
 		for (var i in self.positions) {
 			pos = self.positions[i];
 			if ((pos[__top] >= __scrollTop && pos[__top] <= __scrollTop + self.xscroll.renderTo[__offsetHeight]) || (pos[__bottom] >= __scrollTop && pos[__bottom] <= __scrollTop + self.xscroll.renderTo[__offsetHeight])) {
-				self._setImgSrc(self.imgs[i]);
+				self.userConfig.imgSetter.call(self,self.imgs[i]);
 			}
 		}
 	},
@@ -77,7 +77,7 @@ Util.extend(LazyLoad, Base, {
 				if (infinite.infiniteElementsCache[i]._visible && infinite.infiniteElements[i]) {
 					var imgs = infinite.infiniteElements[i].querySelectorAll(self.userConfig.imgsSelector);
 					for (var j = 0, l = imgs.length; j < l; j++) {
-						self._setImgSrc(imgs[j]);
+						self.userConfig.imgSetter.call(self,imgs[j]);
 					}
 				}
 			}
