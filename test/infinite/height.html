@@ -163,6 +163,10 @@
 
         xscroll.render();
 
+        infinite.on("tap",function(e){
+            console.log(e.cell)
+        })
+
         window.xscroll = xscroll;
 
         window.infinite =infinite;

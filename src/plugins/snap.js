@@ -1,7 +1,6 @@
 "use strict";
 var Util = require('../util');
 var Base = require('../base');
-
 /**
  * a snap plugin for xscroll,wich support vertical and horizontal snap.
  * @constructor
@@ -94,7 +93,7 @@ Util.extend(Snap, Base, {
     col = col >= snapColsNum ? snapColsNum - 1 : col < 0 ? 0 : col;
     self.snapColIndex = col;
     var left = self.snapColIndex * snapWidth + snapOffsetLeft;
-    self.xscroll.scrollLeft(left, duration, easing, callback);
+    self.xscroll.scrollLeft(left, duration, easing,callback);
     return self;
   },
   /**
@@ -117,7 +116,7 @@ Util.extend(Snap, Base, {
     row = row >= snapRowsNum ? snapRowsNum - 1 : row < 0 ? 0 : row;
     self.snapRowIndex = row;
     var top = self.snapRowIndex * snapHeight + snapOffsetTop;
-    self.xscroll.scrollTop(top, duration, easing, callback);
+    self.xscroll.scrollTop(top, duration, easing,callback);
     return self;
   },
   /*

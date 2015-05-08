@@ -10,7 +10,7 @@
 }
 li{
 	display: block;
-	line-height: 200px;
+	line-height: 50px;
 	border: 1px solid;
 }
 #scroll{
@@ -80,8 +80,8 @@ li{
 
     	xscroll.render();
 
-    	xscroll.on("tap doubletap panstart panend pan scroll scrollend",function(e){
-    		// console.log(e.type)
+    	xscroll.on("tap doubletap panstart  panend pancancel pan scroll scrollend",function(e){
+    		console.log(e.type)
     	})
 
     	window.xscroll = xscroll

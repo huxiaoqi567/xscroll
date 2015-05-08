@@ -229,7 +229,7 @@ var Util = {
 		}
 		rootNode = rootNode || document.body;
 		if (!el || !selector) return;
-		if (el.className.match(sel)) {
+		if (el.className && el.className.match(sel)) {
 			return el;
 		}
 		while (!rs) {

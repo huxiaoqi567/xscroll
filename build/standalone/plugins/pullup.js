@@ -226,7 +226,7 @@ util = function (exports) {
       rootNode = rootNode || document.body;
       if (!el || !selector)
         return;
-      if (el.className.match(sel)) {
+      if (el.className && el.className.match(sel)) {
         return el;
       }
       while (!rs) {
@@ -699,8 +699,8 @@ plugins_pullup = function (exports) {
       return self;
     },
     _scrollEndHandler: function (e) {
-      var self = this, xscroll = self.xscroll;
-      if (e.scrollTop == xscroll.containerHeight - xscroll.height + self.userConfig.height) {
+      var self = this, xscroll = self.xscroll, scrollTop = xscroll.getScrollTop();
+      if (scrollTop == xscroll.containerHeight - xscroll.height + self.userConfig.height) {
         self._changeStatus('loading');
       }
       return self;

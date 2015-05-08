@@ -135,8 +135,9 @@ Util.extend(PullDown, Base, {
 	},
 	_panHandler: function(e) {
 		var self = this;
-		if (e.scrollTop > 0) return;
-		self._changeStatus(Math.abs(e.scrollTop) < self.userConfig.height ? "down" : "up");
+		var scrollTop = self.xscroll.getScrollTop();
+		if (scrollTop > 0) return;
+		self._changeStatus(Math.abs(scrollTop) < self.userConfig.height ? "down" : "up");
 	},
 	_panEndHandler: function(e) {
 		var self = this;

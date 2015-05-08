@@ -167,7 +167,8 @@
 
         var scale = new Scale({
             minScale:1,
-            maxScale:2
+            maxScale:2,
+            duration:200
         });
 
          xscroll.render();
@@ -177,7 +178,7 @@
          xscroll.plug(scale);
 
          scale.on("scale scaleanimate scaleend",function(e){
-            console.log(e)
+            // console.log(e)
          });
 
 

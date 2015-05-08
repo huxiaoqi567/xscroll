@@ -74,6 +74,8 @@ define(function(require, exports, module) {
          this.left = this._xleft;
          this.bottom = (cfg && cfg.height || this.cfg.height || 0) - this._xbottom;
          this.right = (cfg && cfg.width || this.cfg.width || 0) - this._xright;
+         this.width = this.right - this.left > 0 ? this.right - this.left : 0;
+         this.height = this.bottom - this.top > 0 ? this.bottom - this.top : 0;
          return this;
      }
  });

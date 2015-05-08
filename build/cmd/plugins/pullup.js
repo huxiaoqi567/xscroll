@@ -111,8 +111,9 @@ Util.extend(PullUp, Base, {
 	},
 	_scrollEndHandler: function(e) {
 		var self = this,
-			xscroll = self.xscroll;
-		if (e.scrollTop == xscroll.containerHeight - xscroll.height + self.userConfig.height) {
+			xscroll = self.xscroll,
+			scrollTop = xscroll.getScrollTop();
+		if (scrollTop == xscroll.containerHeight - xscroll.height + self.userConfig.height) {
 			self._changeStatus("loading");
 		}
 		return self;

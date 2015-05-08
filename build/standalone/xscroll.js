@@ -226,7 +226,7 @@ util = function (exports) {
       rootNode = rootNode || document.body;
       if (!el || !selector)
         return;
-      if (el.className.match(sel)) {
+      if (el.className && el.className.match(sel)) {
         return el;
       }
       while (!rs) {
@@ -776,7 +776,10 @@ _timer_ = function (exports) {
           }
           return;
         }
-        self.trigger('run', { percent: self.progress });
+        self.trigger('run', {
+          percent: self.progress,
+          originPercent: self.percent
+        });
         self._run();
       });
     },
@@ -1177,6 +1180,8 @@ _boundry_ = function (exports) {
       this.left = this._xleft;
       this.bottom = (cfg && cfg.height || this.cfg.height || 0) - this._xbottom;
       this.right = (cfg && cfg.width || this.cfg.width || 0) - this._xright;
+      this.width = this.right - this.left > 0 ? this.right - this.left : 0;
+      this.height = this.bottom - this.top > 0 ? this.bottom - this.top : 0;
       return this;
     }
   });
@@ -3393,6 +3398,7 @@ core = function (exports) {
    * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
    * @param {boolean} cfg.preventDefault config if prevent the browser default behavior
    * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
+   * @param {object}  cfg.indicatorInsets  config scrollbars position {top: number, left: number, bottom: number, right: number}
    * @extends XScroll
    * @example
    * var xscroll = new XScroll({
@@ -3434,7 +3440,16 @@ core = function (exports) {
         BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
         clsPrefix: 'xs-',
         useOriginScroll: false,
-        zoomType: 'y'
+        zoomType: 'y',
+        //config for scrollbars
+        indicatorInsets: {
+          top: 3,
+          bottom: 3,
+          left: 3,
+          right: 3,
+          width: 3,
+          spacing: 5
+        }
       };
       //generate guid
       self.guid = Util.guid();
@@ -3654,12 +3669,14 @@ core = function (exports) {
       var mc = self.mc = new Hammer.Manager(self.renderTo);
       var tap = new Hammer.Tap();
       var pan = new Hammer.Pan();
+      var pinch = new Hammer.Pinch();
       mc.add([
         tap,
-        pan
+        pan,
+        pinch
       ]);
       //trigger all events 
-      self.mc.on('panstart pan panend pinchstart pinch pinchend', function (e) {
+      self.mc.on('panstart pan panend pancancel pinchstart pinchmove pinchend pinchcancel pinchin pinchout', function (e) {
         self.trigger(e.type, e);
       });
       self.mc.on('tap', function (e) {
@@ -3689,8 +3706,9 @@ components_scrollbar = function (exports) {
   
   var Util = util;
   var Animate = animate;
-  var MIN_SCROLLBAR_SIZE = 60;
-  var BAR_MIN_SIZE = 8;
+  var MAX_BOUNCE_DISTANCE = 40;
+  var MIN_BAR_SCROLLED_SIZE = 10;
+  var MIN_BAR_SIZE = 50;
   var transform = Util.prefixStyle('transform');
   var transformStr = Util.vendor ? [
     '-',
@@ -3701,7 +3719,12 @@ components_scrollbar = function (exports) {
   var borderRadius = Util.prefixStyle('borderRadius');
   var transitionDuration = Util.prefixStyle('transitionDuration');
   var ScrollBar = function (cfg) {
-    this.userConfig = cfg;
+    this.userConfig = Util.mix({
+      MIN_BAR_SCROLLED_SIZE: MIN_BAR_SCROLLED_SIZE,
+      MIN_BAR_SIZE: MIN_BAR_SIZE,
+      MAX_BOUNCE_DISTANCE: MAX_BOUNCE_DISTANCE,
+      spacing: 5
+    }, cfg);
     this.init(cfg.xscroll);
   };
   Util.mix(ScrollBar.prototype, {
@@ -3711,12 +3734,6 @@ components_scrollbar = function (exports) {
       self.type = self.userConfig.type;
       self.isY = self.type == 'y' ? true : false;
       self.scrollTopOrLeft = self.isY ? 'scrollTop' : 'scrollLeft';
-      var boundry = self.xscroll.boundry;
-      self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
-      self.indicateSize = self.isY ? self.xscroll.height : self.xscroll.width;
-      self.pos = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
-      self.render();
-      self._bindEvt();
     },
     destroy: function () {
       var self = this;
@@ -3726,23 +3743,27 @@ components_scrollbar = function (exports) {
     },
     render: function () {
       var self = this;
-      if (self.__isRender)
-        return;
-      self.__isRender = true;
       var xscroll = self.xscroll;
+      var boundry = xscroll.boundry;
+      var indicatorInsets = self.xscroll.userConfig.indicatorInsets;
       var translateZ = xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       var transform = translateZ ? transformStr + ':' + translateZ + ';' : '';
       var commonCss = 'opacity:0;position:absolute;z-index:999;overflow:hidden;-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;' + transform;
-      var css = self.isY ? 'width: 3px;bottom:5px;top:5px;right:3px;' + commonCss : 'height:3px;left:5px;right:5px;bottom:3px;' + commonCss;
-      self.scrollbar = document.createElement('div');
+      indicatorInsets._xright = indicatorInsets.right + indicatorInsets.spacing;
+      indicatorInsets._xbottom = indicatorInsets.bottom + indicatorInsets.spacing;
+      var css = self.isY ? Util.substitute('width:{width}px;bottom:{_xbottom}px;top:{top}px;right:{right}px;', indicatorInsets) + commonCss : Util.substitute('height:{width}px;left:{left}px;right:{_xright}px;bottom:{bottom}px;', indicatorInsets) + commonCss;
+      if (!self.scrollbar) {
+        self.scrollbar = document.createElement('div');
+        self.indicate = document.createElement('div');
+        xscroll.renderTo.appendChild(self.scrollbar);
+        self.scrollbar.appendChild(self.indicate);
+      }
       self.scrollbar.style.cssText = css;
-      xscroll.renderTo.appendChild(self.scrollbar);
       var size = self.isY ? 'width:100%;' : 'height:100%;';
-      self.indicate = document.createElement('div');
       self.indicate.style.cssText = size + 'position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;';
-      self.scrollbar.appendChild(self.indicate);
       self._update();
       self.hide(0);
+      self._bindEvt();
     },
     _update: function (pos, duration, easing, callback) {
       var self = this;
@@ -3760,44 +3781,43 @@ components_scrollbar = function (exports) {
     computeScrollBar: function (pos) {
       var self = this;
       var type = self.isY ? 'y' : 'x';
-      var pos = Math.round(pos);
-      var spacing = 10;
-      var boundry = self.xscroll.boundry;
-      self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
-      //viewport size
-      self.size = self.isY ? self.xscroll.height : self.xscroll.width;
-      self.indicateSize = self.isY ? self.xscroll.height - spacing : self.xscroll.width - spacing;
-      //scrollbar size
+      var spacing = self.userConfig.spacing;
+      var xscroll = self.xscroll;
+      var boundry = xscroll.boundry;
+      var userConfig = self.userConfig;
+      var pos = self.isY ? Math.round(pos) + boundry._xtop : Math.round(pos) + boundry._xleft;
+      var MIN_BAR_SCROLLED_SIZE = userConfig.MIN_BAR_SCROLLED_SIZE;
+      var MIN_BAR_SIZE = userConfig.MIN_BAR_SIZE;
+      var MAX_BOUNCE_DISTANCE = userConfig.MAX_BOUNCE_DISTANCE;
+      self.containerSize = self.isY ? xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
+      self.size = self.isY ? boundry.cfg.height : boundry.cfg.width;
+      self.indicateSize = self.isY ? boundry.cfg.height - spacing * 2 : boundry.cfg.width - spacing * 2;
       var indicateSize = self.indicateSize;
       var containerSize = self.containerSize;
-      //pos bottom/right
-      var posout = containerSize - self.size;
-      var ratio = pos / containerSize;
-      var barpos = indicateSize * ratio;
+      var barPos = indicateSize * pos / containerSize;
       var barSize = Math.round(indicateSize * self.size / containerSize);
-      var _barpos = barpos * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize;
-      if (barSize < MIN_SCROLLBAR_SIZE) {
-        barSize = MIN_SCROLLBAR_SIZE;
-        barpos = _barpos;
+      var overTop = self.isY ? xscroll.getBoundryOutTop() : xscroll.getBoundryOutLeft();
+      var overBottom = self.isY ? xscroll.getBoundryOutBottom() : xscroll.getBoundryOutRight();
+      // barSize = barSize < MIN_BAR_SIZE ? MIN_BAR_SIZE : barSize;
+      // console.log({
+      // 	pos:pos,
+      // 	overTop:overTop,
+      // 	overBottom:overBottom
+      // })
+      if (overTop >= 0) {
+        var pct = overTop / MAX_BOUNCE_DISTANCE;
+        pct = pct > 1 ? 1 : pct;
+        barPos = -pct * (barSize - MIN_BAR_SCROLLED_SIZE);
       }
-      if (barpos < 0) {
-        if (Math.abs(pos) * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
-          barpos = BAR_MIN_SIZE - barSize;
-        } else {
-          barpos = pos * barSize / MIN_SCROLLBAR_SIZE;
-        }
-      } else if (barpos + barSize > indicateSize && pos - posout > 0) {
-        var _pos = pos - containerSize + indicateSize;
-        if (_pos * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
-          barpos = indicateSize + spacing - BAR_MIN_SIZE;
-        } else {
-          barpos = indicateSize + spacing - barSize + _pos * barSize / MIN_SCROLLBAR_SIZE;
-        }
+      if (overBottom >= 0) {
+        var pct = overBottom / MAX_BOUNCE_DISTANCE;
+        pct = pct > 1 ? 1 : pct;
+        barPos = pct * (barSize - MIN_BAR_SCROLLED_SIZE) + indicateSize - barSize;
       }
-      self.barpos = Math.round(barpos);
+      self.barPos = Math.round(barPos);
       return {
         size: Math.round(barSize),
-        pos: self.barpos
+        pos: self.barPos
       };
     },
     scrollTo: function (pos, duration, easing, callback) {
@@ -4375,7 +4395,7 @@ simulate_scroll = function (exports) {
      * @return {number} offset
      **/
     getBoundryOutTop: function () {
-      return this.boundry.top - this.getScrollTop();
+      return -this.boundry.top - this.getScrollTop();
     },
     /**
      * get the offset value outsideof left
@@ -4383,7 +4403,7 @@ simulate_scroll = function (exports) {
      * @return {number} offset
      **/
     getBoundryOutLeft: function () {
-      return this.boundry.left - this.getScrollLeft();
+      return -this.boundry.left - this.getScrollLeft();
     },
     /**
      * get the offset value outsideof bottom
@@ -4414,15 +4434,14 @@ simulate_scroll = function (exports) {
     computeScroll: function (type, v) {
       var self = this;
       var userConfig = self.userConfig;
-      var pos = type == 'x' ? self.getScrollLeft() : self.getScrollTop();
       var boundry = self.boundry;
+      var pos = type == 'x' ? self.getScrollLeft() : self.getScrollTop();
       var boundryStart = type == 'x' ? boundry.left : boundry.top;
       var boundryEnd = type == 'x' ? boundry.right : boundry.bottom;
       var innerSize = type == 'x' ? self.containerWidth : self.containerHeight;
       var maxSpeed = userConfig.maxSpeed || 2;
       var boundryCheck = userConfig.boundryCheck;
       var bounce = userConfig.bounce;
-      var size = boundryEnd - boundryStart;
       var transition = {};
       var status = 'inside';
       if (boundryCheck) {
@@ -4444,14 +4463,14 @@ simulate_scroll = function (exports) {
       var t = isNaN(v / a) ? 0 : v / a;
       var s = Number(pos) + t * v / 2;
       //over top boundry check bounce
-      if (s < boundryStart && boundryCheck) {
-        var _s = boundryStart - pos;
+      if (s < -boundryStart && boundryCheck) {
+        var _s = -boundryStart - pos;
         var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
         var v0 = v - a * _t;
         var _t2 = Math.abs(v0 / a2);
         var s2 = v0 / 2 * _t2;
         t = _t + _t2;
-        s = bounce ? boundryStart + s2 : boundryStart;
+        s = bounce ? -boundryStart + s2 : -boundryStart;
         status = 'outside';
       } else if (s > innerSize - boundryEnd && boundryCheck) {
         var _s = boundryEnd - innerSize + pos;
@@ -4463,6 +4482,8 @@ simulate_scroll = function (exports) {
         s = bounce ? innerSize - boundryEnd + s2 : innerSize - boundryEnd;
         status = 'outside';
       }
+      if (isNaN(s) || isNaN(t))
+        return;
       transition.pos = s;
       transition.duration = t;
       transition.easing = Math.abs(v) > 2 ? 'circular' : 'quadratic';
@@ -4488,13 +4509,11 @@ simulate_scroll = function (exports) {
       }
       if (!self.userConfig.bounce || self.userConfig.lockX)
         return;
-      var pos = self.getScrollLeft();
-      var containerWidth = self.containerWidth;
       var boundry = self.boundry;
-      if (pos < boundry.left) {
+      if (self.isBoundryOutLeft()) {
         self.scrollLeft(-boundry.left, duration, easing, callback);
-      } else if (pos > containerWidth - boundry.right) {
-        self.scrollLeft(containerWidth - boundry.right, duration, easing, callback);
+      } else if (self.isBoundryOutRight()) {
+        self.scrollLeft(self.containerWidth - boundry.right, duration, easing, callback);
       }
       return self;
     },
@@ -4516,13 +4535,11 @@ simulate_scroll = function (exports) {
       }
       if (!self.userConfig.boundryCheck || self.userConfig.lockY)
         return;
-      var pos = self.getScrollTop();
-      var containerHeight = self.containerHeight;
       var boundry = self.boundry;
-      if (pos < boundry.top) {
+      if (self.isBoundryOutTop()) {
         self.scrollTop(-boundry.top, duration, easing, callback);
-      } else if (pos > containerHeight - boundry.bottom) {
-        self.scrollTop(containerHeight - boundry.bottom, duration, easing, callback);
+      } else if (self.isBoundryOutBottom()) {
+        self.scrollTop(self.containerHeight - boundry.bottom, duration, easing, callback);
       }
       return self;
     },
@@ -4586,19 +4603,24 @@ simulate_scroll = function (exports) {
       var self = this;
       if (!self.userConfig.boundryCheck)
         return;
+      var indicatorInsets = self.userConfig.indicatorInsets;
       if (self.userConfig.scrollbarX) {
         self.scrollbarX = self.scrollbarX || new ScrollBar({
           xscroll: self,
-          type: 'x'
+          type: 'x',
+          spacing: indicatorInsets.spacing
         });
+        self.scrollbarX.render();
         self.scrollbarX._update();
         self.scrollbarX.hide();
       }
       if (self.userConfig.scrollbarY) {
         self.scrollbarY = self.scrollbarY || new ScrollBar({
           xscroll: self,
-          type: 'y'
+          type: 'y',
+          spacing: indicatorInsets.spacing
         });
+        self.scrollbarY.render();
         self.scrollbarY._update();
         self.scrollbarY.hide();
       }

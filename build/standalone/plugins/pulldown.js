@@ -226,7 +226,7 @@ util = function (exports) {
       rootNode = rootNode || document.body;
       if (!el || !selector)
         return;
-      if (el.className.match(sel)) {
+      if (el.className && el.className.match(sel)) {
         return el;
       }
       while (!rs) {
@@ -725,9 +725,10 @@ plugins_pulldown = function (exports) {
     },
     _panHandler: function (e) {
       var self = this;
-      if (e.scrollTop > 0)
+      var scrollTop = self.xscroll.getScrollTop();
+      if (scrollTop > 0)
         return;
-      self._changeStatus(Math.abs(e.scrollTop) < self.userConfig.height ? 'down' : 'up');
+      self._changeStatus(Math.abs(scrollTop) < self.userConfig.height ? 'down' : 'up');
     },
     _panEndHandler: function (e) {
       var self = this;

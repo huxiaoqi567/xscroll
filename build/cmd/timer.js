@@ -139,7 +139,8 @@ Util.extend(Timer, Base, {
 				return;
 			}
 			self.trigger("run", {
-				percent: self.progress
+				percent: self.progress,
+				originPercent:self.percent
 			});
 			self._run();
 		})

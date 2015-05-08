@@ -77,10 +77,14 @@ li{
     		downContent:'',
     		upContent:'',
     		loadingContent:'',
-    		content:'123'
+    		content:'<div class="sample-content">pulldown to refresh</div>'
     	}) ;
 
     	xscroll.plug(pulldown);
+
+    	pulldown.on('statuschange',function(e){
+    		pulldown.pulldown.querySelector(".sample-content").innerHTML = JSON.stringify(e);
+    	})
 
 
     	xscroll.render();

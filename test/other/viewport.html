@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=0.5, user-scalable=0">
 <style type="text/css">
 * {
 	margin:0;
@@ -10,14 +10,15 @@
 }
 li{
 	display: block;
-	line-height: 200px;
+	line-height:200px;
 	border: 1px solid;
 }
 #scroll{
 	position: absolute;
 	width:100%;
 	height: 100%;
-	overflow: scroll;
+	overflow-x: hidden;
+	overflow-y:scroll; 
 	-webkit-overflow-scrolling:touch;
 }
 </style>
@@ -64,35 +65,36 @@ li{
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
-      base: "../../build/cmd" 
+      base: "../../build/cmd/",
+      map: [
+        [".js", ".js?" + new Date().getTime()]
+
+        ]
     })
-    seajs.use(["simulate-scroll","plugins/pullup"],function(XScroll,PullUp){
+    seajs.use(["xscroll"],function(XScroll){
+
+    	var dpr = 2;
+    	var SROLL_ACCELERATION=  0.0005;
 
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
-    		lockX:true,
-    		scrollbarX:false
+    		useTransition:false,
+    		SROLL_ACCELERATION:SROLL_ACCELERATION/dpr,
+    		indicatorInsets: {
+                top: 3 * dpr,
+                bottom: 3 * dpr,
+                left: 3 * dpr,
+                right: 3 * dpr,
+                width: 3 * dpr,
+                spacing:5 * dpr
+            }
     	})
 
-    	var pullup = new PullUp({});
-
-    	xscroll.plug(pullup);
 
     	xscroll.render();
 
-    	var ul = xscroll.renderTo.querySelector("ul");
 
-    	pullup.on("loading",function(){
-    		for(var i = 0;i<10;i++){
-    			var li = document.createElement("li");
-    			li.innerHTML = i;
-    			ul.appendChild(li);
-    		}
-    		xscroll.render();
-    		pullup.complete();
-        });
-
-        window.xscroll= xscroll
+    	window.xscroll = xscroll
 
     })
 </script>

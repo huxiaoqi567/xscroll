@@ -1,8 +1,9 @@
 "use strict";
 var Util = require('../util');
 var Animate = require('../animate');
-var MIN_SCROLLBAR_SIZE = 60;
-var BAR_MIN_SIZE = 8;
+var MAX_BOUNCE_DISTANCE = 40;
+var MIN_BAR_SCROLLED_SIZE = 10;
+var MIN_BAR_SIZE = 50;
 var transform = Util.prefixStyle("transform");
 var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 var transition = Util.prefixStyle("transition");
@@ -10,7 +11,12 @@ var borderRadius = Util.prefixStyle("borderRadius");
 var transitionDuration = Util.prefixStyle("transitionDuration");
 
 var ScrollBar = function(cfg) {
-	this.userConfig = cfg;
+	this.userConfig = Util.mix({
+		MIN_BAR_SCROLLED_SIZE:MIN_BAR_SCROLLED_SIZE,
+		MIN_BAR_SIZE:MIN_BAR_SIZE,
+		MAX_BOUNCE_DISTANCE:MAX_BOUNCE_DISTANCE,
+		spacing:5
+	}, cfg);
 	this.init(cfg.xscroll);
 }
 
@@ -21,12 +27,6 @@ Util.mix(ScrollBar.prototype, {
 		self.type = self.userConfig.type;
 		self.isY = self.type == "y" ? true : false;
 		self.scrollTopOrLeft = self.isY ? "scrollTop" : "scrollLeft";
-		var boundry = self.xscroll.boundry;
-		self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
-		self.indicateSize = self.isY ? self.xscroll.height : self.xscroll.width;
-		self.pos = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
-		self.render();
-		self._bindEvt();
 	},
 	destroy: function() {
 		var self = this;
@@ -36,24 +36,31 @@ Util.mix(ScrollBar.prototype, {
 	},
 	render: function() {
 		var self = this;
-		if (self.__isRender) return;
-		self.__isRender = true;
 		var xscroll = self.xscroll;
+		var boundry = xscroll.boundry;
+		var indicatorInsets = self.xscroll.userConfig.indicatorInsets;
 		var translateZ = xscroll.userConfig.gpuAcceleration ? " translateZ(0) " : "";
 		var transform = translateZ ? transformStr + ":" + translateZ + ";" : "";
 		var commonCss = "opacity:0;position:absolute;z-index:999;overflow:hidden;-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;" + transform;
+		indicatorInsets._xright =  indicatorInsets.right + indicatorInsets.spacing;
+		indicatorInsets._xbottom =  indicatorInsets.bottom + indicatorInsets.spacing;
 		var css = self.isY ?
-			"width: 3px;bottom:5px;top:5px;right:3px;" + commonCss :
-			"height:3px;left:5px;right:5px;bottom:3px;" + commonCss;
-		self.scrollbar = document.createElement("div");
+			Util.substitute("width:{width}px;bottom:{_xbottom}px;top:{top}px;right:{right}px;", indicatorInsets) + commonCss :
+			Util.substitute("height:{width}px;left:{left}px;right:{_xright}px;bottom:{bottom}px;",indicatorInsets) + commonCss;
+		
+
+		if(!self.scrollbar){
+			self.scrollbar = document.createElement("div");	
+			self.indicate = document.createElement("div");
+			xscroll.renderTo.appendChild(self.scrollbar);
+			self.scrollbar.appendChild(self.indicate);
+		}
 		self.scrollbar.style.cssText = css;
-		xscroll.renderTo.appendChild(self.scrollbar);
 		var size = self.isY ? "width:100%;" : "height:100%;";
-		self.indicate = document.createElement("div");
 		self.indicate.style.cssText = size + "position:absolute;background:rgba(0,0,0,0.3);-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;"
-		self.scrollbar.appendChild(self.indicate);
 		self._update();
 		self.hide(0);
+		self._bindEvt();
 	},
 	_update: function(pos, duration, easing, callback) {
 		var self = this;
@@ -71,44 +78,43 @@ Util.mix(ScrollBar.prototype, {
 	computeScrollBar: function(pos) {
 		var self = this;
 		var type = self.isY ? "y" : "x";
-		var pos = Math.round(pos);
-		var spacing = 10;
-		var boundry = self.xscroll.boundry;
-		self.containerSize = self.isY ? self.xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
-		//viewport size
-		self.size = self.isY ? self.xscroll.height : self.xscroll.width;
-		self.indicateSize = self.isY ? self.xscroll.height - spacing : self.xscroll.width - spacing;
-		//scrollbar size
+		var spacing = self.userConfig.spacing;
+		var xscroll = self.xscroll;
+		var boundry = xscroll.boundry;
+		var userConfig = self.userConfig;
+		var pos = self.isY ? Math.round(pos) + boundry._xtop : Math.round(pos) + boundry._xleft;
+		var MIN_BAR_SCROLLED_SIZE = userConfig.MIN_BAR_SCROLLED_SIZE;
+		var MIN_BAR_SIZE = userConfig.MIN_BAR_SIZE;
+		var MAX_BOUNCE_DISTANCE = userConfig.MAX_BOUNCE_DISTANCE;
+		self.containerSize = self.isY ? xscroll.containerHeight + boundry._xtop + boundry._xbottom : self.xscroll.containerWidth + boundry._xright + boundry._xleft;
+		self.size = self.isY ? boundry.cfg.height : boundry.cfg.width;
+		self.indicateSize = self.isY ? boundry.cfg.height - spacing * 2 : boundry.cfg.width - spacing * 2;
 		var indicateSize = self.indicateSize;
 		var containerSize = self.containerSize;
-		//pos bottom/right
-		var posout = containerSize - self.size;
-		var ratio = pos / containerSize;
-		var barpos = indicateSize * ratio;
+		var barPos = indicateSize * pos / containerSize;
 		var barSize = Math.round(indicateSize * self.size / containerSize);
-		var _barpos = barpos * (indicateSize - MIN_SCROLLBAR_SIZE + barSize) / indicateSize;
-		if (barSize < MIN_SCROLLBAR_SIZE) {
-			barSize = MIN_SCROLLBAR_SIZE;
-			barpos = _barpos;
+		var overTop = self.isY ? xscroll.getBoundryOutTop() : xscroll.getBoundryOutLeft();
+		var overBottom = self.isY ? xscroll.getBoundryOutBottom() : xscroll.getBoundryOutRight();
+		// barSize = barSize < MIN_BAR_SIZE ? MIN_BAR_SIZE : barSize;
+		// console.log({
+		// 	pos:pos,
+		// 	overTop:overTop,
+		// 	overBottom:overBottom
+		// })
+		if (overTop >= 0) {
+			var pct = overTop / MAX_BOUNCE_DISTANCE;
+			pct = pct > 1 ? 1 : pct;
+			barPos = - pct * (barSize -  MIN_BAR_SCROLLED_SIZE)
 		}
-		if (barpos < 0) {
-			if (Math.abs(pos) * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
-				barpos = BAR_MIN_SIZE - barSize
-			} else {
-				barpos = pos * barSize / MIN_SCROLLBAR_SIZE;
-			}
-		} else if (barpos + barSize > indicateSize && pos - posout > 0) {
-			var _pos = pos - containerSize + indicateSize;
-			if (_pos * barSize / MIN_SCROLLBAR_SIZE > barSize - BAR_MIN_SIZE) {
-				barpos = indicateSize + spacing - BAR_MIN_SIZE;
-			} else {
-				barpos = indicateSize + spacing - barSize + _pos * barSize / MIN_SCROLLBAR_SIZE;
-			}
+		if (overBottom >= 0) {
+			var pct = overBottom / MAX_BOUNCE_DISTANCE;
+			pct = pct > 1 ? 1 : pct;
+			barPos = pct * (barSize - MIN_BAR_SCROLLED_SIZE) + indicateSize - barSize; 
 		}
-		self.barpos = Math.round(barpos);
+		self.barPos = Math.round(barPos);
 		return {
 			size: Math.round(barSize),
-			pos: self.barpos
+			pos: self.barPos
 		};
 	},
 	scrollTo: function(pos, duration, easing, callback) {
