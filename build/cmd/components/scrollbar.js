@@ -96,12 +96,9 @@ Util.mix(ScrollBar.prototype, {
 		var barSize = Math.round(indicateSize * self.size / containerSize);
 		var overTop = self.isY ? xscroll.getBoundryOutTop() : xscroll.getBoundryOutLeft();
 		var overBottom = self.isY ? xscroll.getBoundryOutBottom() : xscroll.getBoundryOutRight();
-		// barSize = barSize < MIN_BAR_SIZE ? MIN_BAR_SIZE : barSize;
-		// console.log({
-		// 	pos:pos,
-		// 	overTop:overTop,
-		// 	overBottom:overBottom
-		// })
+		var barShiftSize = MIN_BAR_SIZE - barSize > 0 ? MIN_BAR_SIZE - barSize : 0;
+		barSize = barSize < MIN_BAR_SIZE ? MIN_BAR_SIZE : barSize;
+		barPos = (indicateSize - barShiftSize) * pos / containerSize;
 		if (overTop >= 0) {
 			var pct = overTop / MAX_BOUNCE_DISTANCE;
 			pct = pct > 1 ? 1 : pct;

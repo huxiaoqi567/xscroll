@@ -234,6 +234,8 @@ util = function (exports) {
         if (parent == rootNode)
           break;
         parent = el.parentNode;
+        if (!parent)
+          break;
         if (parent.className && parent.className.match(sel)) {
           rs = parent;
           return rs;

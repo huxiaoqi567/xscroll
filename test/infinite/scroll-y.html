@@ -142,10 +142,12 @@
                     num:"sticky"
                 },
                 style:{
-                    position:"sticky"
+                    position:"sticky",
+                    height:50,
+                    background:"#fff"
                 }
             });
-            for (var i = 1; i <= 100; i++) {
+            for (var i = 1; i < 50; i++) {
                 tmp.push({
                     data:{num: i},
                     style:{height:50,background:"#fff","color":"#000"}
@@ -172,6 +174,10 @@
         infinite.append(0,data);
         
         xscroll.render();
+
+        // xscroll.boundry.expandTop(100);
+
+        window.xscroll = xscroll
 
     });
 
