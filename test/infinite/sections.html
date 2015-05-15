@@ -78,7 +78,8 @@
     seajs.use(["xscroll", "plugins/infinite"], function(XScroll, Infinite) {
 
         var xscroll = new XScroll({
-            renderTo: "#J_Scroll"
+            renderTo: "#J_Scroll",
+            useOriginScroll:true
         });
 
         var infinite = new Infinite({

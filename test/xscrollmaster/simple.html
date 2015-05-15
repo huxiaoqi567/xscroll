@@ -64,8 +64,8 @@ li{
 	font-size: 0;
 }
 
-#pagewrapper .xs-container{
-
+#pagewrapper .xs-content{
+	position: absolute;
 }
 
 #pagewrapper .inner{
@@ -84,7 +84,9 @@ li{
 	height: 100px;
 	line-height: 100px;
 }
-
+#pagewrapper .inner .xs-content{
+	position: static;
+}
 #innerslider{
 	position: relative;
 	width: 200px;
@@ -259,26 +261,6 @@ li{
 		var useOriginScroll = /origin/.test(location.search);
 		var master = new XScrollMaster();
 		master.render();
-
-		var slider = master.get("slider");
-
-		slider.plug(new Snap({
-			snapWidth:slider.width +2,
-			snapColsNum:5
-		}))
-
-		slider.render();
-
-
-		// var pagewrapper = master.get("pagewrapper");
-		// pagewrapper.plug(new Snap({
-		// 	snapWidth:pagewrapper.width -4,
-		// 	snapColsNum:4
-		// }))
-
-		// pagewrapper.render();
-
-		window.master = master;
-
+		master.render();
 	})
 </script>

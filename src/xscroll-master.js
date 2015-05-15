@@ -77,6 +77,10 @@ Util.extend(XScrollMaster, Base, {
 		}
 		var els = document.querySelectorAll(self.userConfig.selector);
 		var elpos = self.getElPos();
+		for(var i in self.xscrolls){
+			//destroy
+			self.xscrolls[i].destroy();
+		}
 		self.xscrolls = [];
 		for (var i = 0; i < els.length; i++) {
 			self.xscrolls.push(new XScroll({

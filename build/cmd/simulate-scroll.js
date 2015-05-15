@@ -63,6 +63,18 @@ Util.extend(SimuScroll, Core, {
     }
     return self;
   },
+  destroy: function() {
+    var self = this;
+    SimuScroll.superclass.destroy.call(this);
+    self.renderTo.style.overflow = "";
+    self.renderTo.style.touchAction = "";
+    self.container.style.transform = "";
+    self.container.style.transformOrigin = "";
+    self.content.style.transform = "";
+    self.content.style.transformOrigin = "";
+    self.off("touchstart",self._ontouchstart);
+    self.destroyScrollBars();
+  },
   /**
    * set overflow behavior
    * @return {boolean} [description]
@@ -228,14 +240,7 @@ Util.extend(SimuScroll, Core, {
     self.__isEvtBind = true;
     var pinch = new Hammer.Pinch();
     self.mc.add(pinch);
-    var renderTo = self.renderTo;
-    renderTo.addEventListener("touchstart", function(e) {
-      if (self.userConfig.preventDefault) {
-        e.preventDefault();
-      }
-      self.stop();
-    }, false);
-
+    self.on("touchstart",self._ontouchstart,self);
     self.on("tap", self._ontap, self);
     self.on("panstart", self._onpanstart, self);
     self.on("pan", self._onpan, self);
@@ -250,6 +255,13 @@ Util.extend(SimuScroll, Core, {
     }, self);
 
     return this;
+  },
+  _ontouchstart: function(e) {
+    var self =  this;
+    if (self.userConfig.preventDefault) {
+        e.preventDefault();
+    }
+    self.stop();
   },
   _onpanstart: function(e) {
     var self = this;
@@ -562,6 +574,7 @@ Util.extend(SimuScroll, Core, {
     self.renderTo.style.overflow = "hidden";
     self.initScrollBars();
     self.initController();
+    self.initStickies();
     return self;
   },
   /**
@@ -596,6 +609,16 @@ Util.extend(SimuScroll, Core, {
     return self;
   },
   /**
+   * destroy scrollbars
+   * @memberof SimuScroll
+   * @return {SimuScroll}
+   */
+  destroyScrollBars: function() {
+    this.scrollbarX && this.scrollbarX.destroy();
+    this.scrollbarY && this.scrollbarY.destroy();
+    return this;
+  },
+  /**
    * init controller for multi-scrollers
    * @memberof SimuScroll
    * @return {SimuScroll}
@@ -606,6 +629,11 @@ Util.extend(SimuScroll, Core, {
       xscroll: self
     });
     return self;
+  },
+  initStickies: function() {
+    var self = this;
+
+
   }
 });
 

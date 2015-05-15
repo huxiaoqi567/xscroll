@@ -103,6 +103,15 @@ Util.extend(XScroll, Base, {
         self.boundry.refresh();
         return self;
     },
+    /**
+     * destroy scroll
+     * @memberof XScroll
+     * @return {XScroll}
+     */
+    destroy:function(){
+        var self = this;
+        self._unBindEvt();
+    },
     _initContainer: function() {},
     /**
      * @memberof XScroll
@@ -236,7 +245,9 @@ Util.extend(XScroll, Base, {
     render: function() {
         var self = this;
         self.resetSize();
-        self.trigger("afterrender");
+        self.trigger("afterrender",{
+            type:"afterrender"
+        });
         self._bindEvt();
         //update touch-action 
         self.initTouchAction();
@@ -249,13 +260,13 @@ Util.extend(XScroll, Base, {
      */
     initTouchAction: function() {
         var self = this;
-        var touchAction = 'none';
+        var touchAction = 'auto';
         if (!self.userConfig.lockX && self.userConfig.lockY) {
             touchAction = 'pan-y';
         } else if (!self.userConfig.lockY && self.userConfig.lockX) {
             touchAction = 'pan-x';
         } else if (self.userConfig.lockX && self.userConfig.lockY) {
-            touchAction = 'auto';
+            touchAction = 'none';
         }
         self.mc.set({
             touchAction: touchAction
@@ -305,11 +316,19 @@ Util.extend(XScroll, Base, {
         var tap = new Hammer.Tap();
         var pan = new Hammer.Pan();
         var pinch = new Hammer.Pinch();
-        mc.add([tap, pan,pinch]);
+        mc.add([tap, pan]);
         //trigger all events 
         self.mc.on("panstart pan panend pancancel pinchstart pinchmove pinchend pinchcancel pinchin pinchout", function(e) {
             self.trigger(e.type, e);
         });
+        //trigger touch events
+        var touchEvents = ['touchstart','touchmove','touchend','touchcancel'];
+        for(var i in touchEvents){
+             self.renderTo.addEventListener(touchEvents[i],function(e){
+                self.trigger(e.type,e);
+            });
+        }
+       
         self.mc.on("tap", function(e) {
             if (e.tapCount == 1) {
                 e.type = "tap";
@@ -320,6 +339,10 @@ Util.extend(XScroll, Base, {
             }
         });
         return self;
+    },
+    _unBindEvt:function(){
+        var self = this;
+        self.mc && self.mc.destroy();
     },
     _resetLockConfig: function() {},
     stop: function() {}

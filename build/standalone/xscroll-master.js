@@ -3469,6 +3469,15 @@ core = function (exports) {
       self.boundry.refresh();
       return self;
     },
+    /**
+     * destroy scroll
+     * @memberof XScroll
+     * @return {XScroll}
+     */
+    destroy: function () {
+      var self = this;
+      self._unBindEvt();
+    },
     _initContainer: function () {
     },
     /**
@@ -3607,7 +3616,7 @@ core = function (exports) {
     render: function () {
       var self = this;
       self.resetSize();
-      self.trigger('afterrender');
+      self.trigger('afterrender', { type: 'afterrender' });
       self._bindEvt();
       //update touch-action 
       self.initTouchAction();
@@ -3620,13 +3629,13 @@ core = function (exports) {
      */
     initTouchAction: function () {
       var self = this;
-      var touchAction = 'none';
+      var touchAction = 'auto';
       if (!self.userConfig.lockX && self.userConfig.lockY) {
         touchAction = 'pan-y';
       } else if (!self.userConfig.lockY && self.userConfig.lockX) {
         touchAction = 'pan-x';
       } else if (self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'auto';
+        touchAction = 'none';
       }
       self.mc.set({ touchAction: touchAction });
       return self;
@@ -3674,13 +3683,24 @@ core = function (exports) {
       var pinch = new Hammer.Pinch();
       mc.add([
         tap,
-        pan,
-        pinch
+        pan
       ]);
       //trigger all events 
       self.mc.on('panstart pan panend pancancel pinchstart pinchmove pinchend pinchcancel pinchin pinchout', function (e) {
         self.trigger(e.type, e);
       });
+      //trigger touch events
+      var touchEvents = [
+        'touchstart',
+        'touchmove',
+        'touchend',
+        'touchcancel'
+      ];
+      for (var i in touchEvents) {
+        self.renderTo.addEventListener(touchEvents[i], function (e) {
+          self.trigger(e.type, e);
+        });
+      }
       self.mc.on('tap', function (e) {
         if (e.tapCount == 1) {
           e.type = 'tap';
@@ -3691,6 +3711,10 @@ core = function (exports) {
         }
       });
       return self;
+    },
+    _unBindEvt: function () {
+      var self = this;
+      self.mc && self.mc.destroy();
     },
     _resetLockConfig: function () {
     },
@@ -4088,6 +4112,18 @@ simulate_scroll = function (exports) {
       };
       return self;
     },
+    destroy: function () {
+      var self = this;
+      SimuScroll.superclass.destroy.call(this);
+      self.renderTo.style.overflow = '';
+      self.renderTo.style.touchAction = '';
+      self.container.style.transform = '';
+      self.container.style.transformOrigin = '';
+      self.content.style.transform = '';
+      self.content.style.transformOrigin = '';
+      self.off('touchstart', self._ontouchstart);
+      self.destroyScrollBars();
+    },
     /**
      * set overflow behavior
      * @return {boolean} [description]
@@ -4255,13 +4291,7 @@ simulate_scroll = function (exports) {
       self.__isEvtBind = true;
       var pinch = new Hammer.Pinch();
       self.mc.add(pinch);
-      var renderTo = self.renderTo;
-      renderTo.addEventListener('touchstart', function (e) {
-        if (self.userConfig.preventDefault) {
-          e.preventDefault();
-        }
-        self.stop();
-      }, false);
+      self.on('touchstart', self._ontouchstart, self);
       self.on('tap', self._ontap, self);
       self.on('panstart', self._onpanstart, self);
       self.on('pan', self._onpan, self);
@@ -4275,6 +4305,13 @@ simulate_scroll = function (exports) {
         }, 100);
       }, self);
       return this;
+    },
+    _ontouchstart: function (e) {
+      var self = this;
+      if (self.userConfig.preventDefault) {
+        e.preventDefault();
+      }
+      self.stop();
     },
     _onpanstart: function (e) {
       var self = this;
@@ -4591,6 +4628,7 @@ simulate_scroll = function (exports) {
       self.renderTo.style.overflow = 'hidden';
       self.initScrollBars();
       self.initController();
+      self.initStickies();
       return self;
     },
     /**
@@ -4626,6 +4664,16 @@ simulate_scroll = function (exports) {
       return self;
     },
     /**
+     * destroy scrollbars
+     * @memberof SimuScroll
+     * @return {SimuScroll}
+     */
+    destroyScrollBars: function () {
+      this.scrollbarX && this.scrollbarX.destroy();
+      this.scrollbarY && this.scrollbarY.destroy();
+      return this;
+    },
+    /**
      * init controller for multi-scrollers
      * @memberof SimuScroll
      * @return {SimuScroll}
@@ -4634,6 +4682,9 @@ simulate_scroll = function (exports) {
       var self = this;
       self.controller = self.controller || new Controller({ xscroll: self });
       return self;
+    },
+    initStickies: function () {
+      var self = this;
     }
   });
   if (typeof module == 'object' && module.exports) {
@@ -4669,12 +4720,9 @@ origin_scroll = function (exports) {
     },
     _initContainer: function () {
       var self = this;
-      if (self.__isContainerInited)
-        return;
       var renderTo = self.renderTo;
-      var container = self.container = self.renderTo.querySelector('.' + self.containerClsName);
-      var content = self.content = self.renderTo.querySelector('.' + self.contentClsName);
-      self.__isContainerInited = true;
+      self.container = self.container || renderTo.querySelector('.' + self.containerClsName);
+      self.content = self.content || self.renderTo.querySelector('.' + self.contentClsName);
       return self;
     },
     /**
@@ -4906,6 +4954,10 @@ xscroll_master = function (exports) {
       };
       var els = document.querySelectorAll(self.userConfig.selector);
       var elpos = self.getElPos();
+      for (var i in self.xscrolls) {
+        //destroy
+        self.xscrolls[i].destroy();
+      }
       self.xscrolls = [];
       for (var i = 0; i < els.length; i++) {
         self.xscrolls.push(new XScroll({

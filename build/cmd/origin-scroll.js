@@ -29,11 +29,9 @@ Util.extend(OriginScroll, Core, {
     },
     _initContainer: function() {
         var self = this;
-        if (self.__isContainerInited) return;
         var renderTo = self.renderTo;
-        var container = self.container = self.renderTo.querySelector("." + self.containerClsName);
-        var content = self.content = self.renderTo.querySelector("." + self.contentClsName);
-        self.__isContainerInited = true;
+        self.container = self.container || renderTo.querySelector("." + self.containerClsName);
+        self.content = self.content || self.renderTo.querySelector("." + self.contentClsName);
         return self;
     },
     /**
