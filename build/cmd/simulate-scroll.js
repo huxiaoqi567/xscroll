@@ -10,7 +10,7 @@ var Util = require('./util'),
 //reduced boundry pan distance
 var PAN_RATE = 1 - 0.618;
 //constant for scrolling acceleration
-var SROLL_ACCELERATION = 0.0005;
+var SCROLL_ACCELERATION = 0.0005;
 //constant for outside of boundry acceleration
 var BOUNDRY_ACCELERATION = 0.03;
 //transform-origin
@@ -20,7 +20,7 @@ var transform = Util.prefixStyle("transform");
 /** 
  * @constructor
  * @param {object} cfg config for scroll
- * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
+ * @param {number} cfg.SCROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
  * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
  * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
  * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
@@ -51,7 +51,7 @@ Util.extend(SimuScroll, Core, {
   init: function() {
     var self = this;
     SimuScroll.superclass.init.call(this);
-    self.SROLL_ACCELERATION = self.userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
+    self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
     self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
     self._initContainer();
     self.resetSize();
@@ -442,7 +442,7 @@ Util.extend(SimuScroll, Core, {
     if (type == "x" && self.userConfig.lockX) return;
     if (type == "y" && self.userConfig.lockY) return;
     v = v > maxSpeed ? maxSpeed : v < -maxSpeed ? -maxSpeed : v;
-    var a = self.SROLL_ACCELERATION * (v / (Math.abs(v) || 1));
+    var a = self.SCROLL_ACCELERATION * (v / (Math.abs(v) || 1));
     var a2 = self.BOUNDRY_ACCELERATION;
     var t = isNaN(v / a) ? 0 : v / a;
     var s = Number(pos) + t * v / 2;
@@ -574,7 +574,6 @@ Util.extend(SimuScroll, Core, {
     self.renderTo.style.overflow = "hidden";
     self.initScrollBars();
     self.initController();
-    self.initStickies();
     return self;
   },
   /**
@@ -629,11 +628,6 @@ Util.extend(SimuScroll, Core, {
       xscroll: self
     });
     return self;
-  },
-  initStickies: function() {
-    var self = this;
-
-
   }
 });
 

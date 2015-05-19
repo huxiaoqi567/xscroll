@@ -2,24 +2,42 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=0.5, user-scalable=0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
 <style type="text/css">
 * {
 	margin:0;
 	padding: 0;
 }
 li{
-	display: block;
-	line-height:200px;
+	display: inline-block;
 	border: 1px solid;
+	height: 100%;
+	width: 50px;
+	font-size: 12px;
+	height:100px;
 }
 #scroll{
 	position: absolute;
 	width:100%;
 	height: 100%;
-	overflow-x: hidden;
-	overflow-y:scroll; 
+	overflow-x: scroll;
+	overflow-y:hidden; 
 	-webkit-overflow-scrolling:touch;
+	font-size: 0;
+	white-space: nowrap;
+
+}
+.xs-content{
+	position: absolute;
+}
+.xs-sticky{
+	border: 1px solid;
+	background: #fff;
+	width: 50px;
+	background:red;
+	font-size: 12px;
+
+
 }
 </style>
 </head>
@@ -28,6 +46,13 @@ li{
 	<div class="xs-container">
 		<div class="xs-content">
 			<ul>
+				<li class="xs-sticky">section1</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li class="xs-sticky">section2</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
@@ -36,13 +61,7 @@ li{
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
+				<li class="xs-sticky">section3</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
@@ -73,28 +92,15 @@ li{
     })
     seajs.use(["xscroll"],function(XScroll){
 
-    	var dpr = 2;
-    	var SCROLL_ACCELERATION=  0.0005;
-
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
     		useTransition:false,
-    		SCROLL_ACCELERATION:SCROLL_ACCELERATION/dpr,
-    		indicatorInsets: {
-                top: 3 * dpr,
-                bottom: 3 * dpr,
-                left: 3 * dpr,
-                right: 3 * dpr,
-                width: 3 * dpr,
-                spacing:5 * dpr
-            }
+    		zoomType:'x',
+    		// useOriginScroll:true,
+    		// stickyHeaderIndices:[0,1]
+    		stickyElements:".xs-sticky"
     	})
-
-
     	xscroll.render();
-
-
-    	window.xscroll = xscroll
 
     })
 </script>

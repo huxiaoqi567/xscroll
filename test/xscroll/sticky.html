@@ -21,6 +21,11 @@ li{
 	overflow-y:scroll; 
 	-webkit-overflow-scrolling:touch;
 }
+.xs-sticky{
+	line-height: 50px;
+	border: 1px solid;
+	background: red;
+}
 </style>
 </head>
 <body>
@@ -28,21 +33,22 @@ li{
 	<div class="xs-container">
 		<div class="xs-content">
 			<ul>
-				<li>row</li>
-				<li class="sticky">row</li>
-				<li>row</li>
+				<li class="xs-sticky">section1</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
-				<li>row</li>
+				<li class="xs-sticky">section2</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li class="xs-sticky">section3</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
@@ -77,10 +83,10 @@ li{
     		renderTo:"#scroll",
     		useTransition:false,
     		// useOriginScroll:true,
-    		stickyHeaderIndices:[0,1]
+    		// stickyHeaderIndices:[0,1]
+    		stickyElements:".xs-sticky"
     	})
     	xscroll.render();
-    	xscroll.destroy();
 
     })
 </script>

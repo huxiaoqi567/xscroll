@@ -170,7 +170,8 @@ li{
     seajs.use(["xscroll","plugins/lazyload"],function(XScroll,LazyLoad){
 
     	var xscroll = new XScroll({
-    		renderTo:"#scroll"
+    		renderTo:"#scroll",
+    		useOriginScroll:true
     	});
 
     	var lazyload = new LazyLoad({

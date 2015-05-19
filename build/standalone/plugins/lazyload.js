@@ -631,13 +631,20 @@ plugins_lazyload = function (exports) {
       var self = this;
       if (self.xscroll) {
         self.xscroll.off('scroll scrollend afterrender', self._filterItem, self);
-        self.xscroll.off('scroll scrollend afterrender', self._filterItemByInfinite, self);
       }
       self._isEvtBinded = false;
     },
-    _filterItem: function (e) {
+    _filterItem: function () {
+      var self = this;
+      if (self.xscroll.getPlugin('infinite')) {
+        self._filterItemByInfinite.call(self);
+      } else {
+        self._filterItemByNormal.call(self);
+      }
+    },
+    _filterItemByNormal: function () {
       var self = this, pos;
-      var e = e || self.xscroll.getScrollPos();
+      var e = self.xscroll.getScrollPos();
       var __scrollTop = self.zoomType == 'x' ? e.scrollLeft : e.scrollTop;
       var __offsetHeight = self.zoomType == 'x' ? 'offsetWidth' : 'offsetHeight';
       var __top = self.zoomType == 'x' ? 'left' : 'top';
@@ -663,6 +670,7 @@ plugins_lazyload = function (exports) {
             }
           }
         }
+        self._filterItemByNormal();
       }, self.userConfig.delay);
     },
     /**
@@ -673,7 +681,7 @@ plugins_lazyload = function (exports) {
     */
     reset: function () {
       var self = this, img, rect;
-      self.zoomType = !self.xscroll.userConfig.lockX ? 'x' : 'y';
+      self.zoomType = self.xscroll.userConfig.zoomType;
       self.imgs = self.xscroll.renderTo.querySelectorAll(self.userConfig.imgsSelector);
       var e = self.xscroll.getScrollPos();
       var __top = self.zoomType == 'x' ? 'left' : 'top';
@@ -698,13 +706,8 @@ plugins_lazyload = function (exports) {
         return;
       self._isEvtBinded = true;
       var eventType = self.xscroll.userConfig.useOriginScroll ? 'scroll' : 'scrollend';
-      self.xscroll.on('afterrender', self.xscroll.getPlugin('infinite') ? self._filterItemByInfinite : self._filterItem, self);
-      //judge infinite mode
-      if (self.xscroll.getPlugin('infinite')) {
-        self.xscroll.on(eventType, self._filterItemByInfinite, self);
-      } else {
-        self.xscroll.on(eventType, self._filterItem, self);
-      }
+      self.xscroll.on('afterrender', self._filterItem, self);
+      self.xscroll.on(eventType, self._filterItem, self);
     }
   });
   if (typeof module == 'object' && module.exports) {

@@ -3386,7 +3386,7 @@ core = function (exports) {
   /** 
    * @constructor
    * @param {object} cfg config for scroll
-   * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
+   * @param {number} cfg.SCROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
    * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
    * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
    * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
@@ -3451,7 +3451,9 @@ core = function (exports) {
           right: 3,
           width: 3,
           spacing: 5
-        }
+        },
+        //config for sticky elements
+        stickyElements: '.xs-sticky'
       };
       //generate guid
       self.guid = Util.guid();
@@ -3620,6 +3622,8 @@ core = function (exports) {
       self._bindEvt();
       //update touch-action 
       self.initTouchAction();
+      //init stickies
+      self.initStickies();
       return self;
     },
     /**
@@ -3638,6 +3642,83 @@ core = function (exports) {
         touchAction = 'none';
       }
       self.mc.set({ touchAction: touchAction });
+      return self;
+    },
+    initStickies: function () {
+      var self = this, sticky;
+      var stickyElements = self.userConfig.stickyElements;
+      self.isY = !!(self.userConfig.zoomType == 'y');
+      self.nameTop = self.isY ? 'top' : 'left';
+      self.nameHeight = self.isY ? 'height' : 'width';
+      self.nameWidth = self.isY ? 'width' : 'height';
+      self._stickies = typeof stickyElements == 'string' ? self.content.querySelectorAll(stickyElements) : stickyElements;
+      self._stickiesNum = self._stickies.length;
+      self._stickiesPos = [];
+      for (var i = 0; i < self._stickiesNum; i++) {
+        sticky = self._stickies[i];
+        var pos = {};
+        pos[self.nameTop] = self.isY ? Util.getOffsetTop(sticky) : Util.getOffsetLeft(sticky);
+        pos[self.nameHeight] = self.isY ? sticky.offsetHeight : sticky.offsetWidth;
+        self._stickiesPos.push(pos);
+      }
+      if (self._stickiesNum > 0 && !self.stickyElement) {
+        self.stickyElement = document.createElement('div');
+        self.stickyElement.style.display = 'none';
+        self.renderTo.appendChild(self.stickyElement);
+      }
+      self.stickyHandler();
+      return self;
+    },
+    stickyHandler: function () {
+      var self = this;
+      var zoomType = self.userConfig.zoomType;
+      var pos = self.isY ? self.getScrollTop() : self.getScrollLeft();
+      var stickiesPos = self._stickiesPos;
+      var indexes = [];
+      self.curStickyIndex = undefined;
+      for (var i in stickiesPos) {
+        var top = stickiesPos[i][self.nameTop];
+        if (pos > top) {
+          indexes.push(i);
+        }
+      }
+      if (!indexes.length) {
+        if (self.stickyElement) {
+          self.stickyElement.style.display = 'none';
+        }
+        self.curStickyIndex = undefined;
+        return;
+      }
+      var curStickyIndex = Math.max.apply(null, indexes);
+      if (self.curStickyIndex !== curStickyIndex) {
+        self.curStickyIndex = curStickyIndex;
+        self.renderStickyElement();
+      }
+      var trans = 0;
+      if (self._stickiesPos[self.curStickyIndex + 1]) {
+        var cur = self._stickiesPos[self.curStickyIndex];
+        var next = self._stickiesPos[self.curStickyIndex + 1];
+        if (pos + cur[self.nameHeight] > next[self.nameTop] && pos + cur[self.nameHeight] < next[self.nameTop] + cur[self.nameHeight]) {
+          trans = cur[self.nameHeight] + pos - next[self.nameTop];
+        } else {
+          trans = 0;
+        }
+      }
+      self.stickyElement.style[transform] = self.isY ? 'translateY(-' + trans + 'px) translateZ(0)' : 'translateX(-' + trans + 'px) translateZ(0)';
+    },
+    renderStickyElement: function () {
+      var self = this;
+      var stickyElement = self.stickyElement;
+      var curStickyIndex = self.curStickyIndex;
+      var curSticky = self._stickies[curStickyIndex];
+      stickyElement.style.display = 'block';
+      stickyElement.innerHTML = curSticky.innerHTML;
+      stickyElement.className = curSticky.className;
+      stickyElement.style = curSticky.style;
+      stickyElement.style.position = 'fixed';
+      stickyElement.style[self.nameWidth] = '100%';
+      stickyElement.style[self.nameTop] = 0;
+      stickyElement.id = curSticky.id;
       return self;
     },
     _triggerClick: function (e) {
@@ -3710,6 +3791,7 @@ core = function (exports) {
           self.trigger('doubletap', e);
         }
       });
+      self.on('scroll', self.stickyHandler, self);
       return self;
     },
     _unBindEvt: function () {
@@ -4060,7 +4142,7 @@ simulate_scroll = function (exports) {
   //reduced boundry pan distance
   var PAN_RATE = 1 - 0.618;
   //constant for scrolling acceleration
-  var SROLL_ACCELERATION = 0.0005;
+  var SCROLL_ACCELERATION = 0.0005;
   //constant for outside of boundry acceleration
   var BOUNDRY_ACCELERATION = 0.03;
   //transform-origin
@@ -4070,7 +4152,7 @@ simulate_scroll = function (exports) {
   /** 
    * @constructor
    * @param {object} cfg config for scroll
-   * @param {number} cfg.SROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
+   * @param {number} cfg.SCROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
    * @param {number} cfg.BOUNDRY_CHECK_DURATION duration for boundry bounce
    * @param {number} cfg.BOUNDRY_CHECK_EASING easing for boundry bounce
    * @param {number} cfg.BOUNDRY_CHECK_ACCELERATION acceleration for boundry bounce
@@ -4100,7 +4182,7 @@ simulate_scroll = function (exports) {
     init: function () {
       var self = this;
       SimuScroll.superclass.init.call(this);
-      self.SROLL_ACCELERATION = self.userConfig.SROLL_ACCELERATION || SROLL_ACCELERATION;
+      self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
       self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
       self._initContainer();
       self.resetSize();
@@ -4494,7 +4576,7 @@ simulate_scroll = function (exports) {
       if (type == 'y' && self.userConfig.lockY)
         return;
       v = v > maxSpeed ? maxSpeed : v < -maxSpeed ? -maxSpeed : v;
-      var a = self.SROLL_ACCELERATION * (v / (Math.abs(v) || 1));
+      var a = self.SCROLL_ACCELERATION * (v / (Math.abs(v) || 1));
       var a2 = self.BOUNDRY_ACCELERATION;
       var t = isNaN(v / a) ? 0 : v / a;
       var s = Number(pos) + t * v / 2;
@@ -4628,7 +4710,6 @@ simulate_scroll = function (exports) {
       self.renderTo.style.overflow = 'hidden';
       self.initScrollBars();
       self.initController();
-      self.initStickies();
       return self;
     },
     /**
@@ -4682,9 +4763,6 @@ simulate_scroll = function (exports) {
       var self = this;
       self.controller = self.controller || new Controller({ xscroll: self });
       return self;
-    },
-    initStickies: function () {
-      var self = this;
     }
   });
   if (typeof module == 'object' && module.exports) {

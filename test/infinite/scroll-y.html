@@ -134,7 +134,7 @@
     seajs.config({
       base: "../../build/cmd" 
     })
-    seajs.use(["simulate-scroll","plugins/infinite"],function(XScroll,Infinite){
+    seajs.use(["xscroll","plugins/infinite"],function(XScroll,Infinite){
         var data = (function() {
             var tmp = [];
             tmp.push({
@@ -158,7 +158,6 @@
         })()
         var xscroll = new XScroll({
             renderTo: "#J_Scroll",
-            useOriginScroll:true,
             preventDefault:false
         });
 

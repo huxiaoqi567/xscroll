@@ -23,6 +23,7 @@
         top:0;
         bottom: 0;
         width:100%;
+        overflow:auto;
      }
     #J_Scroll ul{
         width: 100%;
@@ -31,9 +32,6 @@
         width: 100%;
         display: block;
         height: 200px;
-        /*border-bottom:1px solid;*/
-        /*-webkit-transition:all 0.5s ease;*/
-        /*visibility: hidden;*/
     }
     .xs-container{
         width: 100%;
@@ -42,6 +40,7 @@
     <div id="J_Scroll">
         <div class="xs-container">
             <ul class="xs-content">
+                <li><img data-src="http://a4.mzstatic.com/us/r30/Purple3/v4/05/ce/17/05ce171e-8518-8c5d-824d-4d5e2e1bbbdf/icon160x160.jpeg"></li>
                 <li class="xs-row">1</li>
                 <li class="xs-row">2</li>
                 <li class="xs-row">3</li>
@@ -80,9 +79,8 @@
     seajs.config({
       base: "../../build/cmd" 
     })
-    seajs.use(["simulate-scroll","plugins/infinite","plugins/lazyload"],function(XScroll,Infinite,LazyLoad){
+    seajs.use(["xscroll","plugins/infinite","plugins/lazyload"],function(XScroll,Infinite,LazyLoad){
         var imgs = [
-        'http://a4.mzstatic.com/us/r30/Purple3/v4/05/ce/17/05ce171e-8518-8c5d-824d-4d5e2e1bbbdf/icon160x160.jpeg',
         'http://a4.mzstatic.com/us/r30/Purple5/v4/92/e0/31/92e0313f-e65b-9c1e-cb1c-992a15059262/icon160x160.jpeg',
         'http://a5.mzstatic.com/us/r30/Purple3/v4/a9/c4/7b/a9c47b92-ffab-8825-4eea-858ab41484be/icon160x160.jpeg',
         'http://a5.mzstatic.com/us/r30/Purple1/v4/d3/69/3d/d3693d7c-8622-62f6-bfaf-305edac67945/icon160x160.jpeg',
@@ -102,7 +100,13 @@
         'http://a4.mzstatic.com/us/r30/Purple5/v4/a8/5c/d8/a85cd8cc-070d-b0ec-893b-711299619ad7/icon160x160.jpeg'
         ];
         var data = (function() {
-            var tmp = [];
+            var tmp = [{
+                data:{},
+                style:{
+                    height:300
+                },
+                recycled:false
+            }];
             for (var i = 0;i<imgs.length;i++) {
                 tmp.push({
                     data:{num: i,src:imgs[i]},
@@ -116,17 +120,22 @@
             renderTo: "#J_Scroll"
         });
 
+         xscroll.render();
+
         var infinite = new Infinite({
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
-            el.innerHTML = 
-'<a href="https://itunes.apple.com/us/app/bejeweled/id479536744?mt=8">'+
-'    <span class="img"><img data-src="'+row.data.src+'" width="80" height="80"/><span></span></span>'+
-'    <span class="title">Bejeweled</span>'+
-'    <span class="cat">Games</span>'+
-'</a>';
+                if(row.recycled){
+                        el.innerHTML = 
+            '<a href="https://itunes.apple.com/us/app/bejeweled/id479536744?mt=8">'+
+            '    <span class="img"><img data-src="'+row.data.src+'" width="80" height="80"/><span></span></span>'+
+            '    <span class="title">Bejeweled</span>'+
+            '    <span class="cat">Games</span>'+
+            '</a>';
                 
             }
+                }
+            
         });
 
         xscroll.plug(infinite);
@@ -140,6 +149,8 @@
         xscroll.render();
 
         window.xscroll = xscroll;
+
+        window.lazyload = lazyload;
 
     });
 
