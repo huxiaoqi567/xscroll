@@ -80,9 +80,14 @@ li{
 
     	xscroll.render();
 
-    	xscroll.on("tap doubletap panstart  panend pancancel pan scroll scrollend",function(e){
-    		console.log(e.type)
-    	})
+    	// xscroll.on("tap doubletap panstart  panend pancancel pan scroll scrollend",function(e){
+    	// 	console.log(e.type)
+    	// })
+
+    	document.body.addEventListener("touchend",function(e){
+    console.log(e.type)
+})
+
 
     	window.xscroll = xscroll
 

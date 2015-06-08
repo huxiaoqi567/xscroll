@@ -3676,7 +3676,7 @@ core = function (exports) {
       var stickiesPos = self._stickiesPos;
       var indexes = [];
       self.curStickyIndex = undefined;
-      for (var i in stickiesPos) {
+      for (var i = 0, l = stickiesPos.length; i < l; i++) {
         var top = stickiesPos[i][self.nameTop];
         if (pos > top) {
           indexes.push(i);
@@ -3777,7 +3777,7 @@ core = function (exports) {
         'touchend',
         'touchcancel'
       ];
-      for (var i in touchEvents) {
+      for (var i = 0, l = touchEvents.length; i < l; i++) {
         self.renderTo.addEventListener(touchEvents[i], function (e) {
           self.trigger(e.type, e);
         });
@@ -4361,7 +4361,6 @@ simulate_scroll = function (exports) {
     _ontap: function (e) {
       var self = this;
       e.preventDefault();
-      e.srcEvent.stopPropagation();
       self.boundryCheck();
       self._triggerClick(e);
     },

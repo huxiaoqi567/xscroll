@@ -228,7 +228,6 @@ Util.extend(SimuScroll, Core, {
   _ontap: function(e) {
     var self = this;
     e.preventDefault();
-    e.srcEvent.stopPropagation();
     self.boundryCheck();
     self._triggerClick(e);
   },

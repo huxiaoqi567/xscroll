@@ -87,7 +87,7 @@ Util.extend(XScroll, Base, {
                 spacing: 5
             },
             //config for sticky elements
-            stickyElements:".xs-sticky"
+            stickyElements: ".xs-sticky"
         };
         //generate guid
         self.guid = Util.guid();
@@ -279,7 +279,8 @@ Util.extend(XScroll, Base, {
         return self;
     },
     initStickies: function() {
-        var self = this,sticky;
+        var self = this,
+            sticky;
         var stickyElements = self.userConfig.stickyElements;
         self.isY = !!(self.userConfig.zoomType == "y");
         self.nameTop = self.isY ? "top" : "left";
@@ -288,14 +289,14 @@ Util.extend(XScroll, Base, {
         self._stickies = typeof stickyElements == "string" ? self.content.querySelectorAll(stickyElements) : stickyElements;
         self._stickiesNum = self._stickies.length;
         self._stickiesPos = [];
-        for(var i  = 0;i<self._stickiesNum;i++){
+        for (var i = 0; i < self._stickiesNum; i++) {
             sticky = self._stickies[i];
             var pos = {};
-            pos[self.nameTop] = self.isY ? Util.getOffsetTop(sticky) :  Util.getOffsetLeft(sticky);
+            pos[self.nameTop] = self.isY ? Util.getOffsetTop(sticky) : Util.getOffsetLeft(sticky);
             pos[self.nameHeight] = self.isY ? sticky.offsetHeight : sticky.offsetWidth;
             self._stickiesPos.push(pos);
         }
-        if(self._stickiesNum > 0 && !self.stickyElement){
+        if (self._stickiesNum > 0 && !self.stickyElement) {
             self.stickyElement = document.createElement('div');
             self.stickyElement.style.display = "none";
             self.renderTo.appendChild(self.stickyElement);
@@ -303,16 +304,16 @@ Util.extend(XScroll, Base, {
         self.stickyHandler();
         return self;
     },
-    stickyHandler:function(){
+    stickyHandler: function() {
         var self = this;
         var zoomType = self.userConfig.zoomType;
         var pos = self.isY ? self.getScrollTop() : self.getScrollLeft();
         var stickiesPos = self._stickiesPos;
         var indexes = [];
         self.curStickyIndex = undefined;
-        for(var i in stickiesPos){
+        for (var i = 0, l = stickiesPos.length; i < l; i++) {
             var top = stickiesPos[i][self.nameTop];
-            if(pos > top){
+            if (pos > top) {
                 indexes.push(i);
             }
         }
@@ -342,7 +343,7 @@ Util.extend(XScroll, Base, {
         self.stickyElement.style[transform] = self.isY ? "translateY(-" + (trans) + "px) translateZ(0)" : "translateX(-" + (trans) + "px) translateZ(0)";
 
     },
-    renderStickyElement:function(){
+    renderStickyElement: function() {
         var self = this;
         var stickyElement = self.stickyElement;
         var curStickyIndex = self.curStickyIndex;
@@ -407,7 +408,7 @@ Util.extend(XScroll, Base, {
         });
         //trigger touch events
         var touchEvents = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
-        for (var i in touchEvents) {
+        for (var i = 0, l = touchEvents.length; i < l; i++) {
             self.renderTo.addEventListener(touchEvents[i], function(e) {
                 self.trigger(e.type, e);
             });
@@ -423,7 +424,7 @@ Util.extend(XScroll, Base, {
             }
         });
 
-        self.on("scroll",self.stickyHandler,self);
+        self.on("scroll", self.stickyHandler, self);
 
         return self;
     },
