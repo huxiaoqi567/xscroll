@@ -222,22 +222,24 @@
 			return changedRows;
 		},
 		_getElementsPos: function(offset) {
-			var self = this;
-			var data = self.domInfo;
-			var offset = -(offset || (self.isY ? self.getOffsetTop() : self.getOffsetLeft()));
-			var itemSize = self.isY ? self.userConfig.itemHeight : self.userConfig.itemWidth;
-			var elementsPerPage = self.isY ? Math.ceil(self.height / itemSize) : Math.ceil(self.width / itemSize);
-			var maxBufferedNum = self.userConfig.maxBufferedNum === undefined ? Math.max(Math.ceil(elementsPerPage / 3), 1) : self.userConfig.maxBufferedNum;
-			var pos = Math.max(offset - maxBufferedNum * itemSize, 0);
-			var tmp = {},
-				item;
+			var self = this,
+				item,
+				size,
+				_top,
+				tmp = {},
+				isY = self.isY,
+				data = self.domInfo,
+				itemSize = isY ? self.userConfig.itemHeight : self.userConfig.itemWidth,
+				pos = -(offset || (self.isY ? self.getOffsetTop() : self.getOffsetLeft()));
 			for (var i = 0, len = data.length; i < len; i++) {
 				item = data[i];
-				if (item[self._nameTop] >= pos - itemSize && item[self._nameTop] <= pos + 2 * maxBufferedNum * itemSize + (self.isY ? self.height:self.width)) {
+				size = (item.style && (isY ? item.style.height : item.style.width )) || itemSize || 0;
+				_top = item[self._nameTop];
+				if (_top + size >= pos && _top <= pos + (isY ? self.height : self.width)) {
 					tmp[item[self._nameRow]] = item;
 				}
 			}
-			return tmp
+			return tmp;
 		},
 		render: function() {
 			var self = this;
