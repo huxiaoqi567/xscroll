@@ -801,7 +801,7 @@ plugins_infinite = function (exports) {
       var _pos = e && e[self.nameScrollTop];
       var pos = _pos === undefined ? self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft() : _pos;
       var elementsPos = self.getVisibleElements(pos);
-      var changedRows = self._getChangedRows(elementsPos);
+      var changedRows = self.changedRows = self._getChangedRows(elementsPos);
       for (var i in changedRows) {
         if (changedRows[i] == 'delete') {
           self._pushEl(i);

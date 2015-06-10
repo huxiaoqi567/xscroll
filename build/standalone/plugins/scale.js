@@ -989,6 +989,10 @@ animate = function (exports) {
         self.__handlers.stop.call(self);
         return;
       }
+      if (Util.isBadAndroid()) {
+        //use frame animate on bad android device
+        cfg.useTransition = false;
+      }
       if (cfg.useTransition) {
         //transition
         el.style[vendorTransition] = Util.substitute('all {duration}ms {easing} {delay}ms', {

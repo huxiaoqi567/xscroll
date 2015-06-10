@@ -36,16 +36,20 @@ li{
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
-      base: "../../build/cmd" 
+      base: "../../build/cmd/",
+      map: [
+        [".js", ".js?" + new Date().getTime()]
+
+        ]
     })
-    seajs.use(["animate"],function(Animate){
+    seajs.use(["animate","util"],function(Animate,Util){
     	var block = document.querySelector("#block");
     	var anim = new Animate(block,{
-    		useTransition:false,
+    		useTransition:true,
     		css:{
                 transform:"translateX(100px) scale(2)",
     		},
-    		duration:10,
+    		duration:2000,
     		easing:"quadratic",
     		run:function(e){
     			console.log(e)

@@ -72,10 +72,11 @@ li{
         ]
     })
     seajs.use(["xscroll"],function(XScroll){
-
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
-    		useTransition:false
+    		useTransition:true,
+    		gpuAcceleration:false,
+    		useOriginScroll:true
     	})
 
     	xscroll.render();
