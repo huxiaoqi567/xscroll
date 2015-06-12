@@ -353,7 +353,7 @@ Util.extend(XScroll, Base, {
         stickyElement.style.display = "block";
         stickyElement.innerHTML = curSticky.innerHTML;
         stickyElement.className = curSticky.className;
-        stickyElement.style = curSticky.style;
+        stickyElement.setAttribute("style",curSticky.getAttribute("style"));
         stickyElement.style.position = "fixed";
         stickyElement.style[self.nameWidth] = "100%";
         stickyElement.style[self.nameTop] = 0;
