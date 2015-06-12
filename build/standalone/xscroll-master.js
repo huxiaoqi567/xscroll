@@ -3457,7 +3457,9 @@ core = function (exports) {
           spacing: 5
         },
         //config for sticky elements
-        stickyElements: '.xs-sticky'
+        stickyElements: '.xs-sticky',
+        //config for touchaction
+        touchAction: 'auto'
       };
       //generate guid
       self.guid = Util.guid();
@@ -3637,15 +3639,15 @@ core = function (exports) {
      */
     initTouchAction: function () {
       var self = this;
-      var touchAction = 'auto';
-      if (!self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'pan-y';
-      } else if (!self.userConfig.lockY && self.userConfig.lockX) {
-        touchAction = 'pan-x';
-      } else if (self.userConfig.lockX && self.userConfig.lockY) {
-        touchAction = 'none';
-      }
-      self.mc.set({ touchAction: touchAction });
+      // var touchAction = 'auto';
+      // if (!self.userConfig.lockX && self.userConfig.lockY) {
+      //     touchAction = 'pan-y';
+      // } else if (!self.userConfig.lockY && self.userConfig.lockX) {
+      //     touchAction = 'pan-x';
+      // } else if (self.userConfig.lockX && self.userConfig.lockY) {
+      //     touchAction = 'none';
+      // }
+      self.mc.set({ touchAction: self.userConfig.touchAction });
       return self;
     },
     initStickies: function () {

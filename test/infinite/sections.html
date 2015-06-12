@@ -73,13 +73,17 @@
     <script src="../../lib/sea.js"></script>
     <script>
     seajs.config({
-        base: "../../build/cmd" 
+      base: "../../build/cmd/",
+      map: [
+        [".js", ".js?" + new Date().getTime()]
+
+        ]
     })
     seajs.use(["xscroll", "plugins/infinite"], function(XScroll, Infinite) {
 
         var xscroll = new XScroll({
             renderTo: "#J_Scroll",
-            useOriginScroll:true
+            // useOriginScroll:true
         });
 
         var infinite = new Infinite({
