@@ -1,7 +1,6 @@
 ;(function() {
-var util, base, animate, hammer, core, components_scrollbar, components_controller, simulate_scroll, origin_scroll, _xscroll_, xscroll_master, _events_, _easing_, _timer_, _boundry_;
+var util = {}, events = {}, base = {}, easing = {}, timer = {}, animate = {}, boundry = {}, hammer = {}, core = {}, components_scrollbar = {}, components_controller = {}, simulate_scroll = {}, origin_scroll = {}, xscroll = {}, xscroll_master = {};
 util = function (exports) {
-  
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
   var RE_DASH = /-([a-z])/gi;
@@ -289,13 +288,12 @@ util = function (exports) {
   }
   if (typeof module == 'object' && module.exports) {
     exports = Util;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Util;
   }
   return exports;
-}({});
-_events_ = function (exports) {
-  
+}(util);
+events = function (exports) {
   var Util = util;
   // Returns a function that will be executed at most one time, no matter how
   // often you call it. Useful for lazy initialization.
@@ -515,15 +513,14 @@ _events_ = function (exports) {
   Events.unbind = Events.off;
   if (typeof module == 'object' && module.exports) {
     exports = Events;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Events;
   }
   return exports;
-}({});
+}(events);
 base = function (exports) {
-  
   var Util = util;
-  var Events = _events_;
+  var Events = events;
   /** 
   @constructor 
   @mixes Events
@@ -582,13 +579,12 @@ base = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Base;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Base;
   }
   return exports;
-}({});
-_easing_ = function (exports) {
-  
+}(base);
+easing = function (exports) {
   //easing
   var Easing = {
     'linear': [
@@ -655,16 +651,15 @@ _easing_ = function (exports) {
   };
   if (typeof module == 'object' && module.exports) {
     exports = Easing;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Easing;
   }
   return exports;
-}({});
-_timer_ = function (exports) {
-  
+}(easing);
+timer = function (exports) {
   var Util = util;
   var Base = base;
-  var Easing = _easing_;
+  var Easing = easing;
   var RAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
     window.setTimeout(callback, 1000 / 60);
   };
@@ -796,16 +791,15 @@ _timer_ = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Timer;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Timer;
   }
   return exports;
-}({});
+}(timer);
 animate = function (exports) {
-  
   var Util = util;
-  var Timer = _timer_;
-  var Easing = _easing_;
+  var Timer = timer;
+  var Easing = easing;
   var Base = base;
   //transform
   var vendorTransform = Util.prefixStyle('transform');
@@ -860,7 +854,7 @@ animate = function (exports) {
       if (A * D < B * C) {
         skew = -skew;
         scaleX = -scaleX;
-      }
+      }  // matrix is singular and cannot be interpolated
     } else {
       // In this case the elem shouldn't be rendered, hence scale == 0
       scaleX = scaleY = skew = 0;
@@ -1106,13 +1100,12 @@ animate = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Animate;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Animate;
   }
   return exports;
-}({});
-_boundry_ = function (exports) {
-  
+}(animate);
+boundry = function (exports) {
   var Util = util;
   function Boundry(cfg) {
     this.cfg = Util.mix({
@@ -1193,18 +1186,12 @@ _boundry_ = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Boundry;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Boundry;
   }
   return exports;
-}({});
+}(boundry);
 hammer = function (exports) {
-  /*! Hammer.JS - v2.0.4 - 2014-09-28
-   * http://hammerjs.github.io/
-   *
-   * Copyright (c) 2014 Jorik Tangelder;
-   * Licensed under the MIT license */
-  
   var VENDOR_PREFIXES = [
     '',
     'webkit',
@@ -1892,7 +1879,7 @@ hammer = function (exports) {
     2: INPUT_TYPE_TOUCH,
     3: INPUT_TYPE_PEN,
     4: INPUT_TYPE_MOUSE,
-    5: INPUT_TYPE_KINECT
+    5: INPUT_TYPE_KINECT  // see https://twitter.com/jacobrossi/status/480596438489890816
   };
   var POINTER_ELEMENT_EVENTS = 'pointerdown';
   var POINTER_WINDOW_EVENTS = 'pointermove pointerup pointercancel';
@@ -2727,7 +2714,7 @@ hammer = function (exports) {
       pointers: 1,
       time: 500,
       // minimal time of the pointer to be pressed
-      threshold: 5
+      threshold: 5  // a minimal movement is ok, but keep it low
     },
     getTouchAction: function () {
       return [TOUCH_ACTION_AUTO];
@@ -2873,7 +2860,7 @@ hammer = function (exports) {
       // max time of the pointer to be down (like finger on the screen)
       threshold: 2,
       // a minimal movement is ok, but keep it low
-      posThreshold: 10
+      posThreshold: 10  // a multi-tap can be a bit off the initial position
     },
     getTouchAction: function () {
       return [TOUCH_ACTION_MANIPULATION];
@@ -3366,14 +3353,13 @@ hammer = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Hammer;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Hammer;
   }
   return exports;
-}({});
+}(hammer);
 core = function (exports) {
-  
-  var Util = util, Base = base, Animate = animate, Boundry = _boundry_, Hammer = hammer;
+  var Util = util, Base = base, Animate = animate, Boundry = boundry, Hammer = hammer;
   // boundry checked bounce effect
   var BOUNDRY_CHECK_DURATION = 500;
   var BOUNDRY_CHECK_EASING = 'ease';
@@ -3811,13 +3797,12 @@ core = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = XScroll;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return XScroll;
   }
   return exports;
-}({});
+}(core);
 components_scrollbar = function (exports) {
-  
   var Util = util;
   var Animate = animate;
   var MAX_BOUNCE_DISTANCE = 40;
@@ -4008,16 +3993,12 @@ components_scrollbar = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = ScrollBar;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return ScrollBar;
   }
   return exports;
-}({});
+}(components_scrollbar);
 components_controller = function (exports) {
-  /*
-  	wrapped scroll controller
-  */
-  
   var Util = util, Base = base;
   var Controller = function (cfg) {
     Controller.superclass.constructor.call(this, cfg);
@@ -4137,13 +4118,12 @@ components_controller = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Controller;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Controller;
   }
   return exports;
-}({});
+}(components_controller);
 simulate_scroll = function (exports) {
-  
   var Util = util, Base = base, Core = core, Animate = animate, Hammer = hammer, ScrollBar = components_scrollbar, Controller = components_controller;
   //reduced boundry pan distance
   var PAN_RATE = 1 - 0.618;
@@ -4772,13 +4752,12 @@ simulate_scroll = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = SimuScroll;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return SimuScroll;
   }
   return exports;
-}({});
+}(simulate_scroll);
 origin_scroll = function (exports) {
-  
   var Util = util, Base = base, Core = core, Animate = animate;
   var transformOrigin = Util.prefixStyle('transformOrigin');
   /** 
@@ -4911,14 +4890,13 @@ origin_scroll = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = OriginScroll;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return OriginScroll;
   }
   return exports;
-}({});
-_xscroll_ = function (exports) {
-  
-  var Util = util, Base = base, Timer = _timer_, Animate = animate, SimuScroll = simulate_scroll, OriginScroll = origin_scroll;
+}(origin_scroll);
+xscroll = function (exports) {
+  var Util = util, Base = base, Timer = timer, Animate = animate, SimuScroll = simulate_scroll, OriginScroll = origin_scroll;
   var XScroll = function (cfg) {
     var _ = cfg && cfg.useOriginScroll ? OriginScroll : SimuScroll;
     return new _(cfg);
@@ -4955,14 +4933,13 @@ _xscroll_ = function (exports) {
   XScroll.Plugins = {};
   if (typeof module == 'object' && module.exports) {
     exports = XScroll;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return window.XScroll = XScroll;
   }
   return exports;
-}({});
+}(xscroll);
 xscroll_master = function (exports) {
-  
-  var Util = util, Base = base, XScroll = _xscroll_;
+  var Util = util, Base = base, XScroll = xscroll;
   /** 
    * A master for multi-scrollers.
    * @constructor
@@ -5087,9 +5064,9 @@ xscroll_master = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = XScrollMaster;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return window.XScrollMaster = XScrollMaster;
   }
   return exports;
-}({});
+}(xscroll_master);
 }());

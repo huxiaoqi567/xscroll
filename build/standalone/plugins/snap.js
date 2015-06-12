@@ -1,7 +1,6 @@
 ;(function() {
-var util, base, plugins_snap, _events_;
+var util = {}, events = {}, base = {}, plugins_snap = {};
 util = function (exports) {
-  
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
   var RE_DASH = /-([a-z])/gi;
@@ -289,13 +288,12 @@ util = function (exports) {
   }
   if (typeof module == 'object' && module.exports) {
     exports = Util;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Util;
   }
   return exports;
-}({});
-_events_ = function (exports) {
-  
+}(util);
+events = function (exports) {
   var Util = util;
   // Returns a function that will be executed at most one time, no matter how
   // often you call it. Useful for lazy initialization.
@@ -515,15 +513,14 @@ _events_ = function (exports) {
   Events.unbind = Events.off;
   if (typeof module == 'object' && module.exports) {
     exports = Events;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Events;
   }
   return exports;
-}({});
+}(events);
 base = function (exports) {
-  
   var Util = util;
-  var Events = _events_;
+  var Events = events;
   /** 
   @constructor 
   @mixes Events
@@ -582,13 +579,12 @@ base = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Base;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Base;
   }
   return exports;
-}({});
+}(base);
 plugins_snap = function (exports) {
-  
   var Util = util;
   var Base = base;
   /**
@@ -613,7 +609,7 @@ plugins_snap = function (exports) {
       snapEasing: 'ease',
       snapOffsetLeft: 0,
       snapOffsetTop: 0,
-      autoStep: false
+      autoStep: false  //autostep
     }, cfg);
   };
   Util.extend(Snap, Base, {
@@ -782,9 +778,9 @@ plugins_snap = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Snap;
-  } else if (window.XScroll && window.XScroll.Plugins) {
+  }  /** ignored by jsdoc **/ else if (window.XScroll && window.XScroll.Plugins) {
     return XScroll.Plugins.Snap = Snap;
   }
   return exports;
-}({});
+}(plugins_snap);
 }());

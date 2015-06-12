@@ -1,7 +1,6 @@
 ;(function() {
-var util, base, timer, animate, plugins_scale, _events_, _easing_;
+var util = {}, events = {}, base = {}, easing = {}, timer = {}, animate = {}, plugins_scale = {};
 util = function (exports) {
-  
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
   var RE_DASH = /-([a-z])/gi;
@@ -289,13 +288,12 @@ util = function (exports) {
   }
   if (typeof module == 'object' && module.exports) {
     exports = Util;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Util;
   }
   return exports;
-}({});
-_events_ = function (exports) {
-  
+}(util);
+events = function (exports) {
   var Util = util;
   // Returns a function that will be executed at most one time, no matter how
   // often you call it. Useful for lazy initialization.
@@ -515,15 +513,14 @@ _events_ = function (exports) {
   Events.unbind = Events.off;
   if (typeof module == 'object' && module.exports) {
     exports = Events;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Events;
   }
   return exports;
-}({});
+}(events);
 base = function (exports) {
-  
   var Util = util;
-  var Events = _events_;
+  var Events = events;
   /** 
   @constructor 
   @mixes Events
@@ -582,13 +579,12 @@ base = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Base;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Base;
   }
   return exports;
-}({});
-_easing_ = function (exports) {
-  
+}(base);
+easing = function (exports) {
   //easing
   var Easing = {
     'linear': [
@@ -655,16 +651,15 @@ _easing_ = function (exports) {
   };
   if (typeof module == 'object' && module.exports) {
     exports = Easing;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Easing;
   }
   return exports;
-}({});
+}(easing);
 timer = function (exports) {
-  
   var Util = util;
   var Base = base;
-  var Easing = _easing_;
+  var Easing = easing;
   var RAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
     window.setTimeout(callback, 1000 / 60);
   };
@@ -796,16 +791,15 @@ timer = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Timer;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Timer;
   }
   return exports;
-}({});
+}(timer);
 animate = function (exports) {
-  
   var Util = util;
   var Timer = timer;
-  var Easing = _easing_;
+  var Easing = easing;
   var Base = base;
   //transform
   var vendorTransform = Util.prefixStyle('transform');
@@ -860,7 +854,7 @@ animate = function (exports) {
       if (A * D < B * C) {
         skew = -skew;
         scaleX = -scaleX;
-      }
+      }  // matrix is singular and cannot be interpolated
     } else {
       // In this case the elem shouldn't be rendered, hence scale == 0
       scaleX = scaleY = skew = 0;
@@ -1106,13 +1100,12 @@ animate = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Animate;
-  } else {
+  }  /** ignored by jsdoc **/ else {
     return Animate;
   }
   return exports;
-}({});
+}(animate);
 plugins_scale = function (exports) {
-  
   var Util = util, Base = base, Animate = animate;
   // reduced scale rate
   var SCALE_RATE = 0.7;
@@ -1356,9 +1349,9 @@ plugins_scale = function (exports) {
   });
   if (typeof module == 'object' && module.exports) {
     exports = Scale;
-  } else if (window.XScroll && window.XScroll.Plugins) {
+  }  /** ignored by jsdoc **/ else if (window.XScroll && window.XScroll.Plugins) {
     return XScroll.Plugins.Scale = Scale;
   }
   return exports;
-}({});
+}(plugins_scale);
 }());

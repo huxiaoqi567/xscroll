@@ -13,5 +13,30 @@
     "gulp-uglify": "^1.1.0",
     "jaguarjs-jsdoc": "0.0.1",
     "requirejs": "^2.1.15"
-  }
+  },
+  "description": "Xscroll - A Javascript Scrolling Framework For Mobile Web",
+  "main": "Gruntfile.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "dependencies": {
+    
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:huxiaoqi567/xscroll.git"
+  },
+  "keywords": [
+    "xscroll"
+  ],
+  "author": "huxiaoqi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/huxiaoqi567/xscroll/issues"
+  },
+  "homepage": "https://github.com/huxiaoqi567/xscroll"
 }
