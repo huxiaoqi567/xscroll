@@ -21,6 +21,12 @@ gulp.task('cmd', function() {
 
 });
 
+gulp.task('cmd-clean-suffix',function(){
+  var stream = gulp.src('src/**/*.js')
+  .pipe(replace(/\/\*\* ignored by jsdoc \*\*\/\s*[^]*/g,''))
+  .pipe(gulp.dest("./dist/"))
+});
+
 function cleanModule(pathName) {
   requirejs.optimize({
     'findNestedDependencies': true,
@@ -47,7 +53,7 @@ gulp.task('amd-clean', ['cmd'], function() {
   }
 })
 
-gulp.task('compress', ['amd-clean','clearsuffix'], function() {
+gulp.task('compress', ['amd-clean','cmd-clean-suffix','clearsuffix'], function() {
   gulp.src(['./build/**/*.js', '!./build/**/*.min.js'])
     .pipe(uglify())
     .pipe(rename({
