@@ -242,10 +242,12 @@ Util.extend(Animate, Base, {
 		} else {
 			self.computeStyle = self.computeStyle || window.getComputedStyle(el);
 			//transform
-			if (cfg.css.transform) {
+			if (cfg.css.transform && self.timer) {
 				var transmap = self.transmap = computeTransform(self.computeStyle[vendorTransform], cfg.css.transform);
-				self.timer && self.timer.off("run", self.__handlers.transRun);
-				self.timer && self.timer.on("run", self.__handlers.transRun, self);
+				self.timer.off("run", self.__handlers.transRun);
+				self.timer.on("run", self.__handlers.transRun, self);
+				self.timer.off("end",self.__handlers.transRun);
+				self.timer.on("end", self.__handlers.transRun, self);
 			}
 		}
 		return self;

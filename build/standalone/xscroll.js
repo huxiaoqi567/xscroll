@@ -1007,10 +1007,12 @@ animate = function (exports) {
       } else {
         self.computeStyle = self.computeStyle || window.getComputedStyle(el);
         //transform
-        if (cfg.css.transform) {
+        if (cfg.css.transform && self.timer) {
           var transmap = self.transmap = computeTransform(self.computeStyle[vendorTransform], cfg.css.transform);
-          self.timer && self.timer.off('run', self.__handlers.transRun);
-          self.timer && self.timer.on('run', self.__handlers.transRun, self);
+          self.timer.off('run', self.__handlers.transRun);
+          self.timer.on('run', self.__handlers.transRun, self);
+          self.timer.off('end', self.__handlers.transRun);
+          self.timer.on('end', self.__handlers.transRun, self);
         }
       }
       return self;
@@ -4190,6 +4192,7 @@ simulate_scroll = function (exports) {
       self.content.style.transform = '';
       self.content.style.transformOrigin = '';
       self.off('touchstart', self._ontouchstart);
+      self.off('touchmove', self._ontouchmove);
       self.destroyScrollBars();
     },
     /**
@@ -4346,7 +4349,6 @@ simulate_scroll = function (exports) {
     },
     _ontap: function (e) {
       var self = this;
-      e.preventDefault();
       self.boundryCheck();
       self._triggerClick(e);
     },
@@ -4359,6 +4361,7 @@ simulate_scroll = function (exports) {
       var pinch = new Hammer.Pinch();
       self.mc.add(pinch);
       self.on('touchstart', self._ontouchstart, self);
+      self.on('touchmove', self._ontouchmove, self);
       self.on('tap', self._ontap, self);
       self.on('panstart', self._onpanstart, self);
       self.on('pan', self._onpan, self);
@@ -4380,7 +4383,11 @@ simulate_scroll = function (exports) {
       }
       self.stop();
     },
+    _ontouchmove: function (e) {
+      e.preventDefault();
+    },
     _onpanstart: function (e) {
+      e.preventDefault();
       var self = this;
       var scrollLeft = self.getScrollLeft();
       var scrollTop = self.getScrollTop();
@@ -4392,6 +4399,7 @@ simulate_scroll = function (exports) {
       return self;
     },
     _onpan: function (e) {
+      e.preventDefault();
       var self = this;
       var boundry = self.boundry;
       var userConfig = self.userConfig;
@@ -4427,6 +4435,7 @@ simulate_scroll = function (exports) {
       return self;
     },
     _onpanend: function (e) {
+      e.preventDefault();
       var self = this;
       var userConfig = self.userConfig;
       var transX = self.computeScroll('x', e.velocityX);

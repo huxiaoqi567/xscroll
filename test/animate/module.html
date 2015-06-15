@@ -15,8 +15,6 @@ li{
 }
 .xs-container{
 	opacity: 1;
-	/*-webkit-transform:translateZ(100px) scaleZ(150) scaleX(200) scaleY(300) translateX(123px) ;*/
-	/*-webkit-transform:matrix(1,0,0,1,0,0);*/
 }
 #block{
 	position: absolute;
@@ -45,7 +43,7 @@ li{
     seajs.use(["animate","util"],function(Animate,Util){
     	var block = document.querySelector("#block");
     	var anim = new Animate(block,{
-    		useTransition:true,
+    		useTransition:false,
     		css:{
                 transform:"translateX(100px) scale(2)",
     		},

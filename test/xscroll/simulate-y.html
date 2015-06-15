@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="spm-id" content="a222r.7714867">
+<meta name="aplus-terminal" content="1">
+<meta name="aplus-touch" content="1">
 <style type="text/css">
 * {
 	margin:0;
@@ -21,47 +24,64 @@ li{
 	overflow-y:scroll; 
 	-webkit-overflow-scrolling:touch;
 }
+a{
+	display: block;
+}
 </style>
 </head>
 <body>
-<div id="scroll">
+	<script>
+with(document)with(body)with(insertBefore(createElement("script"),firstChild))setAttribute("exparams","category=&userid=&aplus&yunid=&o5d8Tvx4o8HkJK2&asid=AQAAAAC7VXxVWhGrbwAAAACQdyn9ZSXZuw==",id="tb-beacon-aplus",src=(location>"https"?"//g":"//g")+".alicdn.com/alilog/mlog/aplus_v2.js")
+</script>
+<div id="scroll" data-spm="7406091">
 	<div class="xs-container">
 		<div class="xs-content">
 			<ul>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
-				<li>row</li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
+				<li><a href="http://m.taobao.com">link</a></li>
 			</ul>
 		</div>
 	</div>
 </div>
+
 <script src="../../lib/sea.js"></script>
 <script>
 	seajs.config({
@@ -74,6 +94,7 @@ li{
     seajs.use(["xscroll"],function(XScroll){
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
+    		preventDefault:true
     		// SCROLL_ACCELERATION:0.0005
     		// useTransition:true,
     		// gpuAcceleration:false,
@@ -82,13 +103,9 @@ li{
 
     	xscroll.render();
 
-    	// xscroll.on("tap doubletap panstart  panend pancancel pan scroll scrollend",function(e){
-    	// 	console.log(e.type)
-    	// })
-
-    	document.body.addEventListener("touchend",function(e){
-    console.log(e.type)
-})
+    	document.body.addEventListener("touchstart",function(e){
+		    console.log(e.type)
+		})
 
 
     	window.xscroll = xscroll
