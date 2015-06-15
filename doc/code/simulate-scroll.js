@@ -49,7 +49,11 @@ Util.extend(SimuScroll, Core, {
    */
   init: function() {
     var self = this;
+    var defaultCfg = {
+      preventTouchMove:true
+    };
     SimuScroll.superclass.init.call(this);
+    self.userConfig = Util.mix(self.userConfig,defaultCfg);
     self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
     self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
     self._initContainer();
@@ -71,8 +75,8 @@ Util.extend(SimuScroll, Core, {
     self.container.style.transformOrigin = "";
     self.content.style.transform = "";
     self.content.style.transformOrigin = "";
-    self.off("touchstart",self._ontouchstart);
-    self.off("touchmove",self._ontouchmove);
+    self.off("touchstart", self._ontouchstart);
+    self.off("touchmove", self._ontouchmove);
     self.destroyScrollBars();
   },
   /**
@@ -201,6 +205,7 @@ Util.extend(SimuScroll, Core, {
         callback && callback();
         if ((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear") {
           self['isScrolling' + type.toUpperCase()] = false;
+          self['isRealScrolling' + type.toUpperCase()] = false;
           self.trigger("scrollend", {
             type: "scrollend",
             scrollTop: self.getScrollTop(),
@@ -229,7 +234,11 @@ Util.extend(SimuScroll, Core, {
   _ontap: function(e) {
     var self = this;
     self.boundryCheck();
-    self._triggerClick(e);
+    if(!self.isRealScrollingY && !self.isRealScrollingY){
+      self._triggerClick(e);
+    }
+    self.isRealScrollingY = false;
+    self.isRealScrollingY = false;
   },
   _bindEvt: function() {
     SimuScroll.superclass._bindEvt.call(this);
@@ -238,8 +247,8 @@ Util.extend(SimuScroll, Core, {
     self.__isEvtBind = true;
     var pinch = new Hammer.Pinch();
     self.mc.add(pinch);
-    self.on("touchstart",self._ontouchstart,self);
-    self.on("touchmove",self._ontouchmove,self);
+    self.on("touchstart", self._ontouchstart, self);
+    self.on("touchmove", self._ontouchmove, self);
     self.on("tap", self._ontap, self);
     self.on("panstart", self._onpanstart, self);
     self.on("pan", self._onpan, self);
@@ -256,14 +265,14 @@ Util.extend(SimuScroll, Core, {
     return this;
   },
   _ontouchstart: function(e) {
-    var self =  this;
+    var self = this;
     if (self.userConfig.preventDefault) {
-        e.preventDefault();
+      e.preventDefault();
     }
     self.stop();
   },
-  _ontouchmove:function(e){
-    e.preventDefault();
+  _ontouchmove: function(e) {
+    this.userConfig.preventTouchMove && e.preventDefault();
   },
   _onpanstart: function(e) {
     e.preventDefault();
@@ -476,7 +485,9 @@ Util.extend(SimuScroll, Core, {
     transition.duration = t;
     transition.easing = Math.abs(v) > 2 ? "circular" : "quadratic";
     transition.status = status;
-    self['isScrolling' + type.toUpperCase()] = true;
+    var Type = type.toUpperCase();
+    self['isScrolling' + Type] = true;
+    self['isRealScrolling' + Type] = true;
     return transition;
   },
   /**
@@ -633,6 +644,17 @@ Util.extend(SimuScroll, Core, {
       xscroll: self
     });
     return self;
+  },
+  _triggerClick: function(e) {
+    var target = e.target;
+    if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
+      var ev = document.createEvent('MouseEvents');
+      ev.initMouseEvent('click', true, true, e.view, 1,
+        target.screenX, target.screenY, target.clientX, target.clientY,
+        e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+        0, null);
+      target.dispatchEvent(ev);
+    }
   }
 });
 

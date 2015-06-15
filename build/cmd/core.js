@@ -360,17 +360,6 @@ Util.extend(XScroll, Base, {
         stickyElement.id = curSticky.id;
         return self;
     },
-    _triggerClick: function(e) {
-        var target = e.target;
-        if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
-            var ev = document.createEvent('MouseEvents');
-            ev.initMouseEvent('click', true, true, e.view, 1,
-                target.screenX, target.screenY, target.clientX, target.clientY,
-                e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
-                0, null);
-            target.dispatchEvent(ev);
-        }
-    },
     /**
      * bounce to the boundry vertical and horizontal
      * @memberof XScroll
@@ -425,7 +414,6 @@ Util.extend(XScroll, Base, {
                 self.trigger("doubletap", e);
             }
         });
-
         self.on("scroll", self.stickyHandler, self);
 
         return self;

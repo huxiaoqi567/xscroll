@@ -3715,14 +3715,6 @@ core = function (exports) {
       stickyElement.id = curSticky.id;
       return self;
     },
-    _triggerClick: function (e) {
-      var target = e.target;
-      if (!/(SELECT|INPUT|TEXTAREA)/i.test(target.tagName)) {
-        var ev = document.createEvent('MouseEvents');
-        ev.initMouseEvent('click', true, true, e.view, 1, target.screenX, target.screenY, target.clientX, target.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
-        target.dispatchEvent(ev);
-      }
-    },
     /**
      * bounce to the boundry vertical and horizontal
      * @memberof XScroll
@@ -4169,7 +4161,9 @@ simulate_scroll = function (exports) {
      */
     init: function () {
       var self = this;
+      var defaultCfg = { preventTouchMove: true };
       SimuScroll.superclass.init.call(this);
+      self.userConfig = Util.mix(self.userConfig, defaultCfg);
       self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
       self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
       self._initContainer();
@@ -4322,6 +4316,7 @@ simulate_scroll = function (exports) {
           callback && callback();
           if ((self['_bounce' + type] === 0 || self['_bounce' + type] === undefined) && easing != 'linear') {
             self['isScrolling' + type.toUpperCase()] = false;
+            self['isRealScrolling' + type.toUpperCase()] = false;
             self.trigger('scrollend', {
               type: 'scrollend',
               scrollTop: self.getScrollTop(),
@@ -4350,7 +4345,11 @@ simulate_scroll = function (exports) {
     _ontap: function (e) {
       var self = this;
       self.boundryCheck();
-      self._triggerClick(e);
+      if (!self.isRealScrollingY && !self.isRealScrollingY) {
+        self._triggerClick(e);
+      }
+      self.isRealScrollingY = false;
+      self.isRealScrollingY = false;
     },
     _bindEvt: function () {
       SimuScroll.superclass._bindEvt.call(this);
@@ -4384,7 +4383,7 @@ simulate_scroll = function (exports) {
       self.stop();
     },
     _ontouchmove: function (e) {
-      e.preventDefault();
+      this.userConfig.preventTouchMove && e.preventDefault();
     },
     _onpanstart: function (e) {
       e.preventDefault();
@@ -4600,7 +4599,9 @@ simulate_scroll = function (exports) {
       transition.duration = t;
       transition.easing = Math.abs(v) > 2 ? 'circular' : 'quadratic';
       transition.status = status;
-      self['isScrolling' + type.toUpperCase()] = true;
+      var Type = type.toUpperCase();
+      self['isScrolling' + Type] = true;
+      self['isRealScrolling' + Type] = true;
       return transition;
     },
     /**
@@ -4757,6 +4758,14 @@ simulate_scroll = function (exports) {
       var self = this;
       self.controller = self.controller || new Controller({ xscroll: self });
       return self;
+    },
+    _triggerClick: function (e) {
+      var target = e.target;
+      if (!/(SELECT|INPUT|TEXTAREA)/i.test(target.tagName)) {
+        var ev = document.createEvent('MouseEvents');
+        ev.initMouseEvent('click', true, true, e.view, 1, target.screenX, target.screenY, target.clientX, target.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+        target.dispatchEvent(ev);
+      }
     }
   });
   if (typeof module == 'object' && module.exports) {
