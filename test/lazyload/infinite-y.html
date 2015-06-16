@@ -36,11 +36,14 @@
     .xs-container{
         width: 100%;
     }
+    .lazyload{
+        width: 80px;
+        height: 80px;
+    }
     </style>
     <div id="J_Scroll">
         <div class="xs-container">
             <ul class="xs-content">
-                <li><img data-src="http://a4.mzstatic.com/us/r30/Purple3/v4/05/ce/17/05ce171e-8518-8c5d-824d-4d5e2e1bbbdf/icon160x160.jpeg"></li>
                 <li class="xs-row">1</li>
                 <li class="xs-row">2</li>
                 <li class="xs-row">3</li>
@@ -128,7 +131,8 @@
                 if(row.recycled){
                         el.innerHTML = 
             '<a href="https://itunes.apple.com/us/app/bejeweled/id479536744?mt=8">'+
-            '    <span class="img"><img data-src="'+row.data.src+'" width="80" height="80"/><span></span></span>'+
+            // '    <img class="lazyload" data-src="'+row.data.src+'" width="80" height="80">'+
+            '    <div class="lazyload" data-src="'+row.data.src+'" width="80" height="80"></div>'+
             '    <span class="title">Bejeweled</span>'+
             '    <span class="cat">Games</span>'+
             '</a>';
@@ -140,7 +144,16 @@
 
         xscroll.plug(infinite);
 
-        var lazyload = new LazyLoad();
+        var lazyload = new LazyLoad({
+            imgsSelector:".lazyload",
+            imgSetter:function(img){
+                var src = img.getAttribute("data-src");
+                if(src && img.style.backgroundImage && img.style.backgroundImage.match(new RegExp(src))) {
+                    return;
+                }
+                img.style.backgroundImage = 'url('+src+')';
+            }
+        });
 
         xscroll.plug(lazyload)
 
@@ -148,9 +161,7 @@
         
         xscroll.render();
 
-        window.xscroll = xscroll;
 
-        window.lazyload = lazyload;
 
     });
 

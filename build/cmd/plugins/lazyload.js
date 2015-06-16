@@ -13,7 +13,7 @@ var LazyLoad = function(cfg) {
 	this.userConfig = Util.mix({
 		imgsSelector: "img",
 		delay: 200,
-		imgSetter:function(img){
+		imgSetter: function(img) {
 			var src = img.getAttribute("data-src");
 			src && img.setAttribute("src", src);
 		}
@@ -47,11 +47,11 @@ Util.extend(LazyLoad, Base, {
 		}
 		self._isEvtBinded = false;
 	},
-	_filterItem:function(){
+	_filterItem: function() {
 		var self = this;
-		if(self.xscroll.getPlugin("infinite")){
+		if (self.xscroll.getPlugin("infinite")) {
 			self._filterItemByInfinite.call(self);
-		}else{
+		} else {
 			self._filterItemByNormal.call(self);
 		}
 	},
@@ -63,10 +63,10 @@ Util.extend(LazyLoad, Base, {
 		var __offsetHeight = self.zoomType == "x" ? "offsetWidth" : "offsetHeight";
 		var __top = self.zoomType == "x" ? "left" : "top";
 		var __bottom = self.zoomType == "x" ? "right" : "bottom";
-		for (var i in self.positions) {
+		for (var i = 0, l = self.positions.length; i < l; i++) {
 			pos = self.positions[i];
 			if ((pos[__top] >= __scrollTop && pos[__top] <= __scrollTop + self.xscroll.renderTo[__offsetHeight]) || (pos[__bottom] >= __scrollTop && pos[__bottom] <= __scrollTop + self.xscroll.renderTo[__offsetHeight])) {
-				self.userConfig.imgSetter.call(self,self.imgs[i]);
+				self.userConfig.imgSetter.call(self, self.imgs[i]);
 			}
 		}
 	},
@@ -80,7 +80,7 @@ Util.extend(LazyLoad, Base, {
 				if (infinite.infiniteElementsCache[i]._visible && infinite.infiniteElements[i]) {
 					var imgs = infinite.infiniteElements[i].querySelectorAll(self.userConfig.imgsSelector);
 					for (var j = 0, l = imgs.length; j < l; j++) {
-						self.userConfig.imgSetter.call(self,imgs[j]);
+						self.userConfig.imgSetter.call(self, imgs[j]);
 					}
 				}
 			}
