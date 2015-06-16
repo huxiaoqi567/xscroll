@@ -32,10 +32,10 @@ Util.mix(Base.prototype, {
 	 */
 	unplug: function(plugin) {
 		var self = this;
-		if (!plugin) return;
+		if (!plugin || !self.__plugins) return;
 		var _plugin = typeof plugin == "string" ? self.getPlugin(plugin) : plugin;
 		_plugin.pluginDestructor(self);
-		for (var i in self.__plugins) {
+		for (var i = 0, l = self.__plugins.length;i < l;i++) {
 			if (self.__plugins[i] == _plugin) {
 				return self.__plugins.splice(i, 1);
 			}
@@ -48,7 +48,8 @@ Util.mix(Base.prototype, {
 	getPlugin: function(pluginId) {
 		var self = this;
 		var plugins = [];
-		for (var i in self.__plugins) {
+		if(!self.__plugins) return;
+		for (var i = 0, l = self.__plugins.length;i < l;i++) {
 			if (self.__plugins[i] && self.__plugins[i].pluginId == pluginId) {
 				plugins.push(self.__plugins[i])
 			}

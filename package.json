@@ -1,6 +1,6 @@
 {
   "name": "xscroll",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "devDependencies": {
     "amdclean": "^2.3.0",
     "grunt": "^0.4.5",
