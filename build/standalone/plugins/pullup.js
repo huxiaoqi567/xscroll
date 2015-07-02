@@ -648,7 +648,9 @@ plugins_pullup = function (exports) {
     */
     pluginDestructor: function () {
       var self = this;
-      self.pullup && self.pullup.remove();
+      console.log('remove');
+      self.xscroll.renderTo.removeChild(self.pullup);
+      // self.pullup && self.pullup.remove();
       self.xscroll.off('scrollend', self._scrollEndHandler, self);
       self.xscroll.off('scroll', self._scrollHandler, self);
       self.xscroll.off('pan', self._panHandler, self);
