@@ -61,9 +61,7 @@ Util.extend(PullUp, Base, {
 	 */
 	pluginDestructor: function() {
 		var self = this;
-		console.log("remove")
-		self.xscroll.container.removeChild(self.pullup);
-		// self.pullup && self.pullup.remove();
+		Util.remove(self.pullup);		
 		self.xscroll.off("scrollend", self._scrollEndHandler, self);
 		self.xscroll.off("scroll", self._scrollHandler, self);
 		self.xscroll.off("pan", self._panHandler, self);

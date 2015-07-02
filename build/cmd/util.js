@@ -198,6 +198,15 @@ var Util = {
 		}
 	},
 	/**
+	 * remove an element
+	 * @memberOf Util
+	 * @param  {HTMLElement}  el
+	 */
+	remove:function(el){
+		if(!el || !el.parentNode) return;
+		el.parentNode.removeChild(el);
+	},
+	/**
 	 * get offset top
 	 * @memberOf Util
 	 * @param  {HTMLElement}   el

@@ -196,6 +196,16 @@ util = function (exports) {
       }
     },
     /**
+    * remove an element
+    * @memberOf Util
+    * @param  {HTMLElement}  el
+    */
+    remove: function (el) {
+      if (!el || !el.parentNode)
+        return;
+      el.parentNode.removeChild(el);
+    },
+    /**
     * get offset top
     * @memberOf Util
     * @param  {HTMLElement}   el
@@ -648,9 +658,7 @@ plugins_pullup = function (exports) {
     */
     pluginDestructor: function () {
       var self = this;
-      console.log('remove');
-      self.xscroll.renderTo.removeChild(self.pullup);
-      // self.pullup && self.pullup.remove();
+      Util.remove(self.pullup);
       self.xscroll.off('scrollend', self._scrollEndHandler, self);
       self.xscroll.off('scroll', self._scrollHandler, self);
       self.xscroll.off('pan', self._panHandler, self);
