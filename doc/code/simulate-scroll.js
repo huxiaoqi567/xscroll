@@ -50,6 +50,7 @@ Util.extend(SimuScroll, Core, {
   init: function() {
     var self = this;
     var defaultCfg = {
+      preventDefault:true,
       preventTouchMove:true
     };
     SimuScroll.superclass.init.call(this);

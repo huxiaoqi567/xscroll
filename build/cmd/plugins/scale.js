@@ -1,8 +1,7 @@
 define(function(require, exports, module) {
 "use strict";
 var Util = require('../util'),
-	Base = require('../base'),
-	Animate = require('../animate');
+	Base = require('../base');
 // reduced scale rate
 var SCALE_RATE = 0.7;
 var SCALE_TO_DURATION = 300;

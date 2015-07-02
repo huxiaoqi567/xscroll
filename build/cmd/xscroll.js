@@ -4,6 +4,7 @@ var Util = require('./util'),
 	Base = require('./base'),
 	Timer = require('./timer'),
 	Animate = require('./animate'),
+	Hammer = require('./hammer'),
 	SimuScroll = require('./simulate-scroll'),
 	OriginScroll = require('./origin-scroll');
 var XScroll = function(cfg) {
@@ -31,10 +32,15 @@ XScroll.Timer = Timer;
 /**
  * Animate
  * @namespace Animate
- * @type {Object}
+ * @type {Animate}
  */
 XScroll.Animate = Animate;
-
+/**
+ * Hammer
+ * @namespace Hammer
+ * @type {Hammer}
+ */
+XScroll.Hammer = Hammer;
 /**
  * plugins
  * @namespace Plugins

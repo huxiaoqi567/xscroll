@@ -1,5 +1,5 @@
 ;(function() {
-var util = {}, events = {}, base = {}, easing = {}, timer = {}, animate = {}, boundry = {}, hammer = {}, core = {}, components_scrollbar = {}, components_controller = {}, simulate_scroll = {}, origin_scroll = {}, xscroll = {};
+var util = {}, events = {}, base = {}, easing = {}, timer = {}, animate = {}, hammer = {}, boundry = {}, core = {}, components_scrollbar = {}, components_controller = {}, simulate_scroll = {}, origin_scroll = {}, xscroll = {};
 util = function (exports) {
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
@@ -1109,92 +1109,6 @@ animate = function (exports) {
   }
   return exports;
 }(animate);
-boundry = function (exports) {
-  var Util = util;
-  function Boundry(cfg) {
-    this.cfg = Util.mix({
-      width: 0,
-      height: 0
-    }, cfg);
-    this.init();
-  }
-  Util.mix(Boundry.prototype, {
-    init: function () {
-      var self = this;
-      self._xtop = 0;
-      self._xright = 0;
-      self._xleft = 0;
-      self._xbottom = 0;
-      self.refresh({
-        width: self.cfg.width,
-        height: self.cfg.height
-      });
-    },
-    reset: function () {
-      this.resetTop();
-      this.resetLeft();
-      this.resetBottom();
-      this.resetRight();
-      return this;
-    },
-    resetTop: function () {
-      this._xtop = 0;
-      this.refresh();
-      return this;
-    },
-    resetLeft: function () {
-      this._xleft = 0;
-      this.refresh();
-      return this;
-    },
-    resetBottom: function () {
-      this._xbottom = 0;
-      this.refresh();
-      return this;
-    },
-    resetRight: function () {
-      this._xright = 0;
-      this.refresh();
-      return this;
-    },
-    expandTop: function (top) {
-      this._xtop = top;
-      this.refresh();
-      return this;
-    },
-    expandLeft: function (left) {
-      this._xleft = left;
-      this.refresh();
-      return this;
-    },
-    expandRight: function (right) {
-      this._xright = right;
-      this.refresh();
-      return this;
-    },
-    expandBottom: function (bottom) {
-      this._xbottom = bottom;
-      this.refresh();
-      return this;
-    },
-    refresh: function (cfg) {
-      Util.mix(this.cfg, cfg);
-      this.top = this._xtop;
-      this.left = this._xleft;
-      this.bottom = (cfg && cfg.height || this.cfg.height || 0) - this._xbottom;
-      this.right = (cfg && cfg.width || this.cfg.width || 0) - this._xright;
-      this.width = this.right - this.left > 0 ? this.right - this.left : 0;
-      this.height = this.bottom - this.top > 0 ? this.bottom - this.top : 0;
-      return this;
-    }
-  });
-  if (typeof module == 'object' && module.exports) {
-    exports = Boundry;
-  }  /** ignored by jsdoc **/ else {
-    return Boundry;
-  }
-  return exports;
-}(boundry);
 hammer = function (exports) {
   var VENDOR_PREFIXES = [
     '',
@@ -3362,6 +3276,92 @@ hammer = function (exports) {
   }
   return exports;
 }(hammer);
+boundry = function (exports) {
+  var Util = util;
+  function Boundry(cfg) {
+    this.cfg = Util.mix({
+      width: 0,
+      height: 0
+    }, cfg);
+    this.init();
+  }
+  Util.mix(Boundry.prototype, {
+    init: function () {
+      var self = this;
+      self._xtop = 0;
+      self._xright = 0;
+      self._xleft = 0;
+      self._xbottom = 0;
+      self.refresh({
+        width: self.cfg.width,
+        height: self.cfg.height
+      });
+    },
+    reset: function () {
+      this.resetTop();
+      this.resetLeft();
+      this.resetBottom();
+      this.resetRight();
+      return this;
+    },
+    resetTop: function () {
+      this._xtop = 0;
+      this.refresh();
+      return this;
+    },
+    resetLeft: function () {
+      this._xleft = 0;
+      this.refresh();
+      return this;
+    },
+    resetBottom: function () {
+      this._xbottom = 0;
+      this.refresh();
+      return this;
+    },
+    resetRight: function () {
+      this._xright = 0;
+      this.refresh();
+      return this;
+    },
+    expandTop: function (top) {
+      this._xtop = top;
+      this.refresh();
+      return this;
+    },
+    expandLeft: function (left) {
+      this._xleft = left;
+      this.refresh();
+      return this;
+    },
+    expandRight: function (right) {
+      this._xright = right;
+      this.refresh();
+      return this;
+    },
+    expandBottom: function (bottom) {
+      this._xbottom = bottom;
+      this.refresh();
+      return this;
+    },
+    refresh: function (cfg) {
+      Util.mix(this.cfg, cfg);
+      this.top = this._xtop;
+      this.left = this._xleft;
+      this.bottom = (cfg && cfg.height || this.cfg.height || 0) - this._xbottom;
+      this.right = (cfg && cfg.width || this.cfg.width || 0) - this._xright;
+      this.width = this.right - this.left > 0 ? this.right - this.left : 0;
+      this.height = this.bottom - this.top > 0 ? this.bottom - this.top : 0;
+      return this;
+    }
+  });
+  if (typeof module == 'object' && module.exports) {
+    exports = Boundry;
+  }  /** ignored by jsdoc **/ else {
+    return Boundry;
+  }
+  return exports;
+}(boundry);
 core = function (exports) {
   var Util = util, Base = base, Animate = animate, Boundry = boundry, Hammer = hammer;
   // boundry checked bounce effect
@@ -3409,8 +3409,6 @@ core = function (exports) {
     this.userConfig = cfg;
     this.init();
   }
-  XScroll.Util = Util;
-  XScroll.Plugin = {};
   Util.extend(XScroll, Base, {
     /**
      * version
@@ -3629,14 +3627,6 @@ core = function (exports) {
      */
     initTouchAction: function () {
       var self = this;
-      // var touchAction = 'auto';
-      // if (!self.userConfig.lockX && self.userConfig.lockY) {
-      //     touchAction = 'pan-y';
-      // } else if (!self.userConfig.lockY && self.userConfig.lockX) {
-      //     touchAction = 'pan-x';
-      // } else if (self.userConfig.lockX && self.userConfig.lockY) {
-      //     touchAction = 'none';
-      // }
       self.mc.set({ touchAction: self.userConfig.touchAction });
       return self;
     },
@@ -4163,7 +4153,10 @@ simulate_scroll = function (exports) {
      */
     init: function () {
       var self = this;
-      var defaultCfg = { preventTouchMove: true };
+      var defaultCfg = {
+        preventDefault: true,
+        preventTouchMove: true
+      };
       SimuScroll.superclass.init.call(this);
       self.userConfig = Util.mix(self.userConfig, defaultCfg);
       self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
@@ -4916,7 +4909,7 @@ origin_scroll = function (exports) {
   return exports;
 }(origin_scroll);
 xscroll = function (exports) {
-  var Util = util, Base = base, Timer = timer, Animate = animate, SimuScroll = simulate_scroll, OriginScroll = origin_scroll;
+  var Util = util, Base = base, Timer = timer, Animate = animate, Hammer = hammer, SimuScroll = simulate_scroll, OriginScroll = origin_scroll;
   var XScroll = function (cfg) {
     var _ = cfg && cfg.useOriginScroll ? OriginScroll : SimuScroll;
     return new _(cfg);
@@ -4942,9 +4935,15 @@ xscroll = function (exports) {
   /**
    * Animate
    * @namespace Animate
-   * @type {Object}
+   * @type {Animate}
    */
   XScroll.Animate = Animate;
+  /**
+   * Hammer
+   * @namespace Hammer
+   * @type {Hammer}
+   */
+  XScroll.Hammer = Hammer;
   /**
    * plugins
    * @namespace Plugins

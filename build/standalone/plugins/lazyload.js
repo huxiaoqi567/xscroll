@@ -647,7 +647,7 @@ plugins_lazyload = function (exports) {
       var __offsetHeight = self.zoomType == 'x' ? 'offsetWidth' : 'offsetHeight';
       var __top = self.zoomType == 'x' ? 'left' : 'top';
       var __bottom = self.zoomType == 'x' ? 'right' : 'bottom';
-      for (var i in self.positions) {
+      for (var i = 0, l = self.positions.length; i < l; i++) {
         pos = self.positions[i];
         if (pos[__top] >= __scrollTop && pos[__top] <= __scrollTop + self.xscroll.renderTo[__offsetHeight] || pos[__bottom] >= __scrollTop && pos[__bottom] <= __scrollTop + self.xscroll.renderTo[__offsetHeight]) {
           self.userConfig.imgSetter.call(self, self.imgs[i]);

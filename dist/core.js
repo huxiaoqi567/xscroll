@@ -46,10 +46,6 @@ function XScroll(cfg) {
     this.init();
 }
 
-XScroll.Util = Util;
-
-XScroll.Plugin = {};
-
 Util.extend(XScroll, Base, {
     /**
      * version
@@ -266,14 +262,6 @@ Util.extend(XScroll, Base, {
      */
     initTouchAction: function() {
         var self = this;
-        // var touchAction = 'auto';
-        // if (!self.userConfig.lockX && self.userConfig.lockY) {
-        //     touchAction = 'pan-y';
-        // } else if (!self.userConfig.lockY && self.userConfig.lockX) {
-        //     touchAction = 'pan-x';
-        // } else if (self.userConfig.lockX && self.userConfig.lockY) {
-        //     touchAction = 'none';
-        // }
         self.mc.set({
             touchAction: self.userConfig.touchAction
         });
