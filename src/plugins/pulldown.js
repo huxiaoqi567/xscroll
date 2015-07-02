@@ -57,7 +57,7 @@ Util.extend(PullDown, Base, {
 	 */
 	pluginDestructor: function() {
 		var self = this;
-		self.pulldown && self.pulldown.remove();
+		Util.remove(self.pulldown);
 		self.xscroll.off("panstart", self._panStartHandler, self);
 		self.xscroll.off("pan", self._panHandler, self);
 		self.xscroll.off("panend", self._panEndHandler, self);

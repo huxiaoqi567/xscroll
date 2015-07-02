@@ -31,7 +31,7 @@ Util.mix(ScrollBar.prototype, {
 	},
 	destroy: function() {
 		var self = this;
-		self.scrollbar && self.scrollbar.remove();
+		Util.remove(self.scrollbar);
 		self.xscroll.off("scroll", self._scrollHandler, self);
 		self.xscroll.off("scrollend", self._scrollEndHandler, self);
 	},

@@ -730,7 +730,7 @@ plugins_infinite = function (exports) {
     _destroySticky: function () {
       var self = this;
       self.hasSticky = false;
-      self.stickyElement && self.stickyElement.remove();
+      Util.remove(self.stickyElement);
       self._isStickyRendered = false;
       return self;
     },
