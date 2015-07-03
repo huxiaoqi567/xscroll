@@ -663,7 +663,7 @@ Util.extend(SimuScroll, Core, {
       target.dispatchEvent(ev);
       if(target.tagName.toLowerCase() == "a"){
         var href = target.getAttribute("href");
-        target.setAttribute("href",null);
+        target.setAttribute("href","javascript:void(0)");
         target.setAttribute("data-xs-href",href);
       }
     }
