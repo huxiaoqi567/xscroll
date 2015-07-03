@@ -4356,6 +4356,7 @@ simulate_scroll = function (exports) {
     _ontap: function (e) {
       var self = this;
       self.boundryCheck();
+      self._preventHref(e);
       if (!self.isRealScrollingY && !self.isRealScrollingY) {
         self._triggerClick(e);
       }
@@ -4770,15 +4771,18 @@ simulate_scroll = function (exports) {
       self.controller = self.controller || new Controller({ xscroll: self });
       return self;
     },
+    _preventHref: function (e) {
+      var target = e.target;
+      if (target.tagName.toLowerCase() == 'a') {
+        var href = target.getAttribute('data-xs-href');
+        if (href) {
+          target.setAttribute('href', href);
+        }
+      }
+    },
     _triggerClick: function (e) {
       var target = e.target;
       if (!/(SELECT|INPUT|TEXTAREA)/i.test(target.tagName)) {
-        if (target.tagName.toLowerCase() == 'a') {
-          var href = target.getAttribute('data-xs-href');
-          if (href) {
-            target.setAttribute('href', href);
-          }
-        }
         var ev = document.createEvent('MouseEvents');
         ev.initMouseEvent('click', true, true, e.view, 1, target.screenX, target.screenY, target.clientX, target.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
         target.dispatchEvent(ev);

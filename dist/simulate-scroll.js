@@ -235,6 +235,7 @@ Util.extend(SimuScroll, Core, {
   _ontap: function(e) {
     var self = this;
     self.boundryCheck();
+    self._preventHref(e);
     if(!self.isRealScrollingY && !self.isRealScrollingY){
       self._triggerClick(e);
     }
@@ -646,15 +647,18 @@ Util.extend(SimuScroll, Core, {
     });
     return self;
   },
-  _triggerClick: function(e) {
+  _preventHref:function(e){
     var target = e.target;
-    if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
-      if(target.tagName.toLowerCase() == "a"){
+    if(target.tagName.toLowerCase() == "a"){
          var href = target.getAttribute("data-xs-href");
          if(href){
             target.setAttribute("href",href);
          }
       }
+  },
+  _triggerClick: function(e) {
+    var target = e.target;
+    if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
       var ev = document.createEvent('MouseEvents');
       ev.initMouseEvent('click', true, true, e.view, 1,
         target.screenX, target.screenY, target.clientX, target.clientY,
