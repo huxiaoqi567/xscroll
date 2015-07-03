@@ -280,6 +280,12 @@ util = function (exports) {
     },
     px2Num: function (px) {
       return Number(px.replace(/px/, ''));
+    },
+    /**
+    * judge if is surpport mouse events
+    */
+    isMouseSupport: function () {
+      return !!('onmousedown' in document);
     }
   };
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
@@ -4765,12 +4771,14 @@ simulate_scroll = function (exports) {
       return self;
     },
     _triggerClick: function (e) {
-      var target = e.target;
-      if (!/(SELECT|INPUT|TEXTAREA)/i.test(target.tagName)) {
-        var ev = document.createEvent('MouseEvents');
-        ev.initMouseEvent('click', true, true, e.view, 1, target.screenX, target.screenY, target.clientX, target.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
-        target.dispatchEvent(ev);
-      }
+      var target = e.target;  // if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
+                              //   var ev = document.createEvent('MouseEvents');
+                              //   ev.initMouseEvent('click', true, true, e.view, 1,
+                              //     target.screenX, target.screenY, target.clientX, target.clientY,
+                              //     e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+                              //     0, null);
+                              //   target.dispatchEvent(ev);
+                              // }
     }
   });
   if (typeof module == 'object' && module.exports) {

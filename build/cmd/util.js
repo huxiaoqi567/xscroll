@@ -281,6 +281,12 @@ var Util = {
 	},
 	px2Num: function(px) {
 		return Number(px.replace(/px/, ''));
+	},
+	/**
+	 * judge if is surpport mouse events
+	 */
+	isMouseSupport:function(){
+		return !!("onmousedown" in document);
 	}
 }
 
