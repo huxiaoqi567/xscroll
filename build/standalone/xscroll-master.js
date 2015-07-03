@@ -4771,14 +4771,23 @@ simulate_scroll = function (exports) {
       return self;
     },
     _triggerClick: function (e) {
-      var target = e.target;  // if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
-                              //   var ev = document.createEvent('MouseEvents');
-                              //   ev.initMouseEvent('click', true, true, e.view, 1,
-                              //     target.screenX, target.screenY, target.clientX, target.clientY,
-                              //     e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
-                              //     0, null);
-                              //   target.dispatchEvent(ev);
-                              // }
+      var target = e.target;
+      if (!/(SELECT|INPUT|TEXTAREA)/i.test(target.tagName)) {
+        if (target.tagName.toLowerCase() == 'a') {
+          var href = target.getAttribute('data-xs-href');
+          if (href) {
+            target.setAttribute('href', href);
+          }
+        }
+        var ev = document.createEvent('MouseEvents');
+        ev.initMouseEvent('click', true, true, e.view, 1, target.screenX, target.screenY, target.clientX, target.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+        target.dispatchEvent(ev);
+        if (target.tagName.toLowerCase() == 'a') {
+          var href = target.getAttribute('href');
+          target.setAttribute('href', null);
+          target.setAttribute('data-xs-href', href);
+        }
+      }
     }
   });
   if (typeof module == 'object' && module.exports) {
