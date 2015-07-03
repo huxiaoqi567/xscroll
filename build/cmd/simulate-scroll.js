@@ -240,6 +240,7 @@ Util.extend(SimuScroll, Core, {
     if(!self.isRealScrollingY && !self.isRealScrollingY){
       self._triggerClick(e);
     }
+    self._unPreventHref(e);
     self.isRealScrollingY = false;
     self.isRealScrollingY = false;
   },
@@ -657,6 +658,14 @@ Util.extend(SimuScroll, Core, {
          }
       }
   },
+  _unPreventHref:function(e){
+    var target = e.target;
+    if(target.tagName.toLowerCase() == "a"){
+        var href = target.getAttribute("href");
+        target.setAttribute("href","javascript:void(0)");
+        target.setAttribute("data-xs-href",href);
+      }
+  },
   _triggerClick: function(e) {
     var target = e.target;
     if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
@@ -666,11 +675,6 @@ Util.extend(SimuScroll, Core, {
         e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
         0, null);
       target.dispatchEvent(ev);
-      if(target.tagName.toLowerCase() == "a"){
-        var href = target.getAttribute("href");
-        target.setAttribute("href","javascript:void(0)");
-        target.setAttribute("data-xs-href",href);
-      }
     }
   }
 });

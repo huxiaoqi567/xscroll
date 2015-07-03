@@ -4360,6 +4360,7 @@ simulate_scroll = function (exports) {
       if (!self.isRealScrollingY && !self.isRealScrollingY) {
         self._triggerClick(e);
       }
+      self._unPreventHref(e);
       self.isRealScrollingY = false;
       self.isRealScrollingY = false;
     },
@@ -4780,17 +4781,20 @@ simulate_scroll = function (exports) {
         }
       }
     },
+    _unPreventHref: function (e) {
+      var target = e.target;
+      if (target.tagName.toLowerCase() == 'a') {
+        var href = target.getAttribute('href');
+        target.setAttribute('href', 'javascript:void(0)');
+        target.setAttribute('data-xs-href', href);
+      }
+    },
     _triggerClick: function (e) {
       var target = e.target;
       if (!/(SELECT|INPUT|TEXTAREA)/i.test(target.tagName)) {
         var ev = document.createEvent('MouseEvents');
         ev.initMouseEvent('click', true, true, e.view, 1, target.screenX, target.screenY, target.clientX, target.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
         target.dispatchEvent(ev);
-        if (target.tagName.toLowerCase() == 'a') {
-          var href = target.getAttribute('href');
-          target.setAttribute('href', 'javascript:void(0)');
-          target.setAttribute('data-xs-href', href);
-        }
       }
     }
   });
