@@ -242,7 +242,6 @@ var Util = {
 			return el;
 		}
 		while (!rs) {
-			i++;
 			if (parent == rootNode) break;
 			parent = el.parentNode;
 			if(!parent) break;

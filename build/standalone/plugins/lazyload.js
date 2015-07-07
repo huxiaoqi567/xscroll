@@ -239,7 +239,6 @@ util = function (exports) {
         return el;
       }
       while (!rs) {
-        i++;
         if (parent == rootNode)
           break;
         parent = el.parentNode;
