@@ -92,6 +92,27 @@
             </ul>
         </li>
     
+        <li class="item" data-name="Hammer">
+            <span class="title">
+                <a href="Hammer.html">Hammer</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Plugins">
             <span class="title">
                 <a href="Plugins.html">Plugins</a>
@@ -171,7 +192,11 @@
             
                 <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
             
+                <li data-name="Util.isMouseSupport"><a href="Util.html#isMouseSupport">isMouseSupport</a></li>
+            
                 <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.remove"><a href="Util.html#remove">remove</a></li>
             
                 <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
             
@@ -468,6 +493,8 @@
             
                 <li data-name="SimuScroll.computeScroll"><a href="SimuScroll.html#computeScroll">computeScroll</a></li>
             
+                <li data-name="SimuScroll.destroyScrollBars"><a href="SimuScroll.html#destroyScrollBars">destroyScrollBars</a></li>
+            
                 <li data-name="SimuScroll.getBoundryOutBottom"><a href="SimuScroll.html#getBoundryOutBottom">getBoundryOutBottom</a></li>
             
                 <li data-name="SimuScroll.getBoundryOutLeft"><a href="SimuScroll.html#getBoundryOutLeft">getBoundryOutLeft</a></li>
@@ -577,6 +604,8 @@
                 <li data-name="XScroll.boundryCheckX"><a href="XScroll.html#boundryCheckX">boundryCheckX</a></li>
             
                 <li data-name="XScroll.boundryCheckY"><a href="XScroll.html#boundryCheckY">boundryCheckY</a></li>
+            
+                <li data-name="XScroll.destroy"><a href="XScroll.html#destroy">destroy</a></li>
             
                 <li data-name="XScroll.disableGPUAcceleration"><a href="XScroll.html#disableGPUAcceleration">disableGPUAcceleration</a></li>
             
@@ -702,7 +731,12 @@ Util.extend(SimuScroll, Core, {
    */
   init: function() {
     var self = this;
+    var defaultCfg = {
+      preventDefault:true,
+      preventTouchMove:true
+    };
     SimuScroll.superclass.init.call(this);
+    self.userConfig = Util.mix(self.userConfig,defaultCfg);
     self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
     self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
     self._initContainer();
@@ -714,6 +748,19 @@ Util.extend(SimuScroll, Core, {
       lockX: self.userConfig.lockX
     }
     return self;
+  },
+  destroy: function() {
+    var self = this;
+    SimuScroll.superclass.destroy.call(this);
+    self.renderTo.style.overflow = "";
+    self.renderTo.style.touchAction = "";
+    self.container.style.transform = "";
+    self.container.style.transformOrigin = "";
+    self.content.style.transform = "";
+    self.content.style.transformOrigin = "";
+    self.off("touchstart", self._ontouchstart);
+    self.off("touchmove", self._ontouchmove);
+    self.destroyScrollBars();
   },
   /**
    * set overflow behavior
@@ -841,6 +888,7 @@ Util.extend(SimuScroll, Core, {
         callback && callback();
         if ((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear") {
           self['isScrolling' + type.toUpperCase()] = false;
+          self['isRealScrolling' + type.toUpperCase()] = false;
           self.trigger("scrollend", {
             type: "scrollend",
             scrollTop: self.getScrollTop(),
@@ -868,10 +916,14 @@ Util.extend(SimuScroll, Core, {
   },
   _ontap: function(e) {
     var self = this;
-    e.preventDefault();
-    e.srcEvent.stopPropagation();
     self.boundryCheck();
-    self._triggerClick(e);
+    self._preventHref(e);
+    if(!self.isRealScrollingY && !self.isRealScrollingY){
+      self._triggerClick(e);
+    }
+    self._unPreventHref(e);
+    self.isRealScrollingY = false;
+    self.isRealScrollingY = false;
   },
   _bindEvt: function() {
     SimuScroll.superclass._bindEvt.call(this);
@@ -880,14 +932,8 @@ Util.extend(SimuScroll, Core, {
     self.__isEvtBind = true;
     var pinch = new Hammer.Pinch();
     self.mc.add(pinch);
-    var renderTo = self.renderTo;
-    renderTo.addEventListener("touchstart", function(e) {
-      if (self.userConfig.preventDefault) {
-        e.preventDefault();
-      }
-      self.stop();
-    }, false);
-
+    self.on("touchstart", self._ontouchstart, self);
+    self.on("touchmove", self._ontouchmove, self);
     self.on("tap", self._ontap, self);
     self.on("panstart", self._onpanstart, self);
     self.on("pan", self._onpan, self);
@@ -903,7 +949,18 @@ Util.extend(SimuScroll, Core, {
 
     return this;
   },
+  _ontouchstart: function(e) {
+    var self = this;
+    if (self.userConfig.preventDefault) {
+      e.preventDefault();
+    }
+    self.stop();
+  },
+  _ontouchmove: function(e) {
+    this.userConfig.preventTouchMove && e.preventDefault();
+  },
   _onpanstart: function(e) {
+    e.preventDefault();
     var self = this;
     var scrollLeft = self.getScrollLeft();
     var scrollTop = self.getScrollTop();
@@ -915,6 +972,7 @@ Util.extend(SimuScroll, Core, {
     return self;
   },
   _onpan: function(e) {
+    e.preventDefault();
     var self = this;
     var boundry = self.boundry;
     var userConfig = self.userConfig;
@@ -950,6 +1008,7 @@ Util.extend(SimuScroll, Core, {
     return self;
   },
   _onpanend: function(e) {
+    e.preventDefault();
     var self = this;
     var userConfig = self.userConfig;
     var transX = self.computeScroll("x", e.velocityX);
@@ -1111,7 +1170,9 @@ Util.extend(SimuScroll, Core, {
     transition.duration = t;
     transition.easing = Math.abs(v) > 2 ? "circular" : "quadratic";
     transition.status = status;
-    self['isScrolling' + type.toUpperCase()] = true;
+    var Type = type.toUpperCase();
+    self['isScrolling' + Type] = true;
+    self['isRealScrolling' + Type] = true;
     return transition;
   },
   /**
@@ -1248,6 +1309,16 @@ Util.extend(SimuScroll, Core, {
     return self;
   },
   /**
+   * destroy scrollbars
+   * @memberof SimuScroll
+   * @return {SimuScroll}
+   */
+  destroyScrollBars: function() {
+    this.scrollbarX && this.scrollbarX.destroy();
+    this.scrollbarY && this.scrollbarY.destroy();
+    return this;
+  },
+  /**
    * init controller for multi-scrollers
    * @memberof SimuScroll
    * @return {SimuScroll}
@@ -1258,6 +1329,34 @@ Util.extend(SimuScroll, Core, {
       xscroll: self
     });
     return self;
+  },
+  _preventHref:function(e){
+    var target = e.target;
+    if(target.tagName.toLowerCase() == "a"){
+         var href = target.getAttribute("data-xs-href");
+         if(href){
+            target.setAttribute("href",href);
+         }
+      }
+  },
+  _unPreventHref:function(e){
+    var target = e.target;
+    if(target.tagName.toLowerCase() == "a"){
+        var href = target.getAttribute("href");
+        target.setAttribute("href","javascript:void(0)");
+        target.setAttribute("data-xs-href",href);
+      }
+  },
+  _triggerClick: function(e) {
+    var target = e.target;
+    if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
+      var ev = document.createEvent('MouseEvents');
+      ev.initMouseEvent('click', true, true, e.view, 1,
+        target.screenX, target.screenY, target.clientX, target.clientY,
+        e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+        0, null);
+      target.dispatchEvent(ev);
+    }
   }
 });
 
@@ -1276,7 +1375,7 @@ if (typeof module == 'object' && module.exports) {
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sun May 10 2015 15:16:46 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jul 08 2015 10:11:00 GMT+0800 (CST)
         </footer>
     </div>
 </div>

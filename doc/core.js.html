@@ -92,6 +92,27 @@
             </ul>
         </li>
     
+        <li class="item" data-name="Hammer">
+            <span class="title">
+                <a href="Hammer.html">Hammer</a>
+                
+                <span class="static">static</span>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="Plugins">
             <span class="title">
                 <a href="Plugins.html">Plugins</a>
@@ -171,7 +192,11 @@
             
                 <li data-name="Util.isBadAndroid"><a href="Util.html#isBadAndroid">isBadAndroid</a></li>
             
+                <li data-name="Util.isMouseSupport"><a href="Util.html#isMouseSupport">isMouseSupport</a></li>
+            
                 <li data-name="Util.prefixStyle"><a href="Util.html#prefixStyle">prefixStyle</a></li>
+            
+                <li data-name="Util.remove"><a href="Util.html#remove">remove</a></li>
             
                 <li data-name="Util.removeClass"><a href="Util.html#removeClass">removeClass</a></li>
             
@@ -468,6 +493,8 @@
             
                 <li data-name="SimuScroll.computeScroll"><a href="SimuScroll.html#computeScroll">computeScroll</a></li>
             
+                <li data-name="SimuScroll.destroyScrollBars"><a href="SimuScroll.html#destroyScrollBars">destroyScrollBars</a></li>
+            
                 <li data-name="SimuScroll.getBoundryOutBottom"><a href="SimuScroll.html#getBoundryOutBottom">getBoundryOutBottom</a></li>
             
                 <li data-name="SimuScroll.getBoundryOutLeft"><a href="SimuScroll.html#getBoundryOutLeft">getBoundryOutLeft</a></li>
@@ -577,6 +604,8 @@
                 <li data-name="XScroll.boundryCheckX"><a href="XScroll.html#boundryCheckX">boundryCheckX</a></li>
             
                 <li data-name="XScroll.boundryCheckY"><a href="XScroll.html#boundryCheckY">boundryCheckY</a></li>
+            
+                <li data-name="XScroll.destroy"><a href="XScroll.html#destroy">destroy</a></li>
             
                 <li data-name="XScroll.disableGPUAcceleration"><a href="XScroll.html#disableGPUAcceleration">disableGPUAcceleration</a></li>
             
@@ -699,10 +728,6 @@ function XScroll(cfg) {
     this.init();
 }
 
-XScroll.Util = Util;
-
-XScroll.Plugin = {};
-
 Util.extend(XScroll, Base, {
     /**
      * version
@@ -736,8 +761,12 @@ Util.extend(XScroll, Base, {
                 left: 3,
                 right: 3,
                 width: 3,
-                spacing:5
-            }
+                spacing: 5
+            },
+            //config for sticky elements
+            stickyElements: ".xs-sticky",
+            //config for touchaction
+            touchAction:"auto"
         };
         //generate guid
         self.guid = Util.guid();
@@ -754,6 +783,15 @@ Util.extend(XScroll, Base, {
         self.boundry = new Boundry();
         self.boundry.refresh();
         return self;
+    },
+    /**
+     * destroy scroll
+     * @memberof XScroll
+     * @return {XScroll}
+     */
+    destroy: function() {
+        var self = this;
+        self._unBindEvt();
     },
     _initContainer: function() {},
     /**
@@ -888,10 +926,15 @@ Util.extend(XScroll, Base, {
     render: function() {
         var self = this;
         self.resetSize();
-        self.trigger("afterrender");
+        self.trigger("afterrender", {
+            type: "afterrender"
+        });
         self._bindEvt();
         //update touch-action 
         self.initTouchAction();
+        //init stickies
+        self.initStickies();
+
         return self;
     },
     /**
@@ -901,29 +944,90 @@ Util.extend(XScroll, Base, {
      */
     initTouchAction: function() {
         var self = this;
-        var touchAction = 'none';
-        if (!self.userConfig.lockX && self.userConfig.lockY) {
-            touchAction = 'pan-y';
-        } else if (!self.userConfig.lockY && self.userConfig.lockX) {
-            touchAction = 'pan-x';
-        } else if (self.userConfig.lockX && self.userConfig.lockY) {
-            touchAction = 'auto';
-        }
         self.mc.set({
-            touchAction: touchAction
+            touchAction: self.userConfig.touchAction
         });
         return self;
     },
-    _triggerClick: function(e) {
-        var target = e.target;
-        if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
-            var ev = document.createEvent('MouseEvents');
-            ev.initMouseEvent('click', true, true, e.view, 1,
-                target.screenX, target.screenY, target.clientX, target.clientY,
-                e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
-                0, null);
-            target.dispatchEvent(ev);
+    initStickies: function() {
+        var self = this,
+            sticky;
+        var stickyElements = self.userConfig.stickyElements;
+        self.isY = !!(self.userConfig.zoomType == "y");
+        self.nameTop = self.isY ? "top" : "left";
+        self.nameHeight = self.isY ? "height" : "width";
+        self.nameWidth = self.isY ? "width" : "height";
+        self._stickies = typeof stickyElements == "string" ? self.content.querySelectorAll(stickyElements) : stickyElements;
+        self._stickiesNum = self._stickies.length;
+        self._stickiesPos = [];
+        for (var i = 0; i &lt; self._stickiesNum; i++) {
+            sticky = self._stickies[i];
+            var pos = {};
+            pos[self.nameTop] = self.isY ? Util.getOffsetTop(sticky) : Util.getOffsetLeft(sticky);
+            pos[self.nameHeight] = self.isY ? sticky.offsetHeight : sticky.offsetWidth;
+            self._stickiesPos.push(pos);
         }
+        if (self._stickiesNum > 0 && !self.stickyElement) {
+            self.stickyElement = document.createElement('div');
+            self.stickyElement.style.display = "none";
+            self.renderTo.appendChild(self.stickyElement);
+        }
+        self.stickyHandler();
+        return self;
+    },
+    stickyHandler: function() {
+        var self = this;
+        var zoomType = self.userConfig.zoomType;
+        var pos = self.isY ? self.getScrollTop() : self.getScrollLeft();
+        var stickiesPos = self._stickiesPos;
+        var indexes = [];
+        self.curStickyIndex = undefined;
+        for (var i = 0, l = stickiesPos.length; i &lt; l; i++) {
+            var top = stickiesPos[i][self.nameTop];
+            if (pos > top) {
+                indexes.push(i);
+            }
+        }
+        if (!indexes.length) {
+            if (self.stickyElement) {
+                self.stickyElement.style.display = "none";
+            }
+            self.curStickyIndex = undefined;
+            return;
+        }
+        var curStickyIndex = Math.max.apply(null, indexes);
+        if (self.curStickyIndex !== curStickyIndex) {
+            self.curStickyIndex = curStickyIndex;
+            self.renderStickyElement();
+        }
+
+        var trans = 0;
+        if (self._stickiesPos[self.curStickyIndex + 1]) {
+            var cur = self._stickiesPos[self.curStickyIndex];
+            var next = self._stickiesPos[self.curStickyIndex + 1];
+            if (pos + cur[self.nameHeight] > next[self.nameTop] && pos + cur[self.nameHeight] &lt; next[self.nameTop] + cur[self.nameHeight]) {
+                trans = cur[self.nameHeight] + pos - next[self.nameTop];
+            } else {
+                trans = 0;
+            }
+        }
+        self.stickyElement.style[transform] = self.isY ? "translateY(-" + (trans) + "px) translateZ(0)" : "translateX(-" + (trans) + "px) translateZ(0)";
+
+    },
+    renderStickyElement: function() {
+        var self = this;
+        var stickyElement = self.stickyElement;
+        var curStickyIndex = self.curStickyIndex;
+        var curSticky = self._stickies[curStickyIndex];
+        stickyElement.style.display = "block";
+        stickyElement.innerHTML = curSticky.innerHTML;
+        stickyElement.className = curSticky.className;
+        stickyElement.setAttribute("style",curSticky.getAttribute("style"));
+        stickyElement.style.position = "fixed";
+        stickyElement.style[self.nameWidth] = "100%";
+        stickyElement.style[self.nameTop] = 0;
+        stickyElement.id = curSticky.id;
+        return self;
     },
     /**
      * bounce to the boundry vertical and horizontal
@@ -957,11 +1061,19 @@ Util.extend(XScroll, Base, {
         var tap = new Hammer.Tap();
         var pan = new Hammer.Pan();
         var pinch = new Hammer.Pinch();
-        mc.add([tap, pan,pinch]);
+        mc.add([tap, pan]);
         //trigger all events 
         self.mc.on("panstart pan panend pancancel pinchstart pinchmove pinchend pinchcancel pinchin pinchout", function(e) {
             self.trigger(e.type, e);
         });
+        //trigger touch events
+        var touchEvents = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+        for (var i = 0, l = touchEvents.length; i &lt; l; i++) {
+            self.renderTo.addEventListener(touchEvents[i], function(e) {
+                self.trigger(e.type, e);
+            });
+        }
+
         self.mc.on("tap", function(e) {
             if (e.tapCount == 1) {
                 e.type = "tap";
@@ -971,7 +1083,13 @@ Util.extend(XScroll, Base, {
                 self.trigger("doubletap", e);
             }
         });
+        self.on("scroll", self.stickyHandler, self);
+
         return self;
+    },
+    _unBindEvt: function() {
+        var self = this;
+        self.mc && self.mc.destroy();
     },
     _resetLockConfig: function() {},
     stop: function() {}
@@ -992,7 +1110,7 @@ if (typeof module == 'object' && module.exports) {
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sun May 10 2015 15:16:46 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jul 08 2015 10:11:00 GMT+0800 (CST)
         </footer>
     </div>
 </div>
