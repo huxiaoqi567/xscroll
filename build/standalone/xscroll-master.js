@@ -4173,7 +4173,7 @@ simulate_scroll = function (exports) {
         preventTouchMove: true
       };
       SimuScroll.superclass.init.call(this);
-      self.userConfig = Util.mix(self.userConfig, defaultCfg);
+      self.userConfig = Util.mix(defaultCfg, self.userConfig);
       self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
       self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
       self._initContainer();
@@ -4389,7 +4389,7 @@ simulate_scroll = function (exports) {
     },
     _ontouchstart: function (e) {
       var self = this;
-      if (self.userConfig.preventDefault) {
+      if (!/(SELECT|INPUT|TEXTAREA)/i.test(e.target.tagName) && self.userConfig.preventDefault) {
         e.preventDefault();
       }
       self.stop();

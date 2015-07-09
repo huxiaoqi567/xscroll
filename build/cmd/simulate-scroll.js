@@ -51,11 +51,11 @@ Util.extend(SimuScroll, Core, {
   init: function() {
     var self = this;
     var defaultCfg = {
-      preventDefault:true,
-      preventTouchMove:true
+      preventDefault: true,
+      preventTouchMove: true
     };
     SimuScroll.superclass.init.call(this);
-    self.userConfig = Util.mix(self.userConfig,defaultCfg);
+    self.userConfig = Util.mix(defaultCfg, self.userConfig);
     self.SCROLL_ACCELERATION = self.userConfig.SCROLL_ACCELERATION || SCROLL_ACCELERATION;
     self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
     self._initContainer();
@@ -237,7 +237,7 @@ Util.extend(SimuScroll, Core, {
     var self = this;
     self.boundryCheck();
     self._preventHref(e);
-    if(!self.isRealScrollingY && !self.isRealScrollingY){
+    if (!self.isRealScrollingY && !self.isRealScrollingY) {
       self._triggerClick(e);
     }
     self._unPreventHref(e);
@@ -270,7 +270,7 @@ Util.extend(SimuScroll, Core, {
   },
   _ontouchstart: function(e) {
     var self = this;
-    if (self.userConfig.preventDefault) {
+    if (!(/(SELECT|INPUT|TEXTAREA)/i).test(e.target.tagName) && self.userConfig.preventDefault) {
       e.preventDefault();
     }
     self.stop();
@@ -649,22 +649,22 @@ Util.extend(SimuScroll, Core, {
     });
     return self;
   },
-  _preventHref:function(e){
+  _preventHref: function(e) {
     var target = e.target;
-    if(target.tagName.toLowerCase() == "a"){
-         var href = target.getAttribute("data-xs-href");
-         if(href){
-            target.setAttribute("href",href);
-         }
+    if (target.tagName.toLowerCase() == "a") {
+      var href = target.getAttribute("data-xs-href");
+      if (href) {
+        target.setAttribute("href", href);
       }
+    }
   },
-  _unPreventHref:function(e){
+  _unPreventHref: function(e) {
     var target = e.target;
-    if(target.tagName.toLowerCase() == "a"){
-        var href = target.getAttribute("href");
-        target.setAttribute("href","javascript:void(0)");
-        target.setAttribute("data-xs-href",href);
-      }
+    if (target.tagName.toLowerCase() == "a") {
+      var href = target.getAttribute("href");
+      target.setAttribute("href", "javascript:void(0)");
+      target.setAttribute("data-xs-href", href);
+    }
   },
   _triggerClick: function(e) {
     var target = e.target;
