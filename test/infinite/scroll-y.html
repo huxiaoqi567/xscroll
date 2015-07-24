@@ -577,9 +577,10 @@ body > div{
         
         xscroll.render();
 
-        // xscroll.boundry.expandTop(100);
+        xscroll.on("tap",function(e){
+            console.log(e.type)
+        })
 
-        window.xscroll = xscroll
 
     });
 

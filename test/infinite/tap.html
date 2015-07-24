@@ -133,6 +133,7 @@
         xscroll.render();
 
         infinite.on("tap",function(e){
+            if(xscroll.isRealScrollingY) return;
             // infinite.remove(e.cell.sectionId,e.cell.index);
             infinite.sections[e.cell.sectionId][e.cell.index].style.height=150;
             xscroll.render();

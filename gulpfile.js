@@ -71,6 +71,8 @@ gulp.task('clearsuffix',function(){
 
 gulp.task('default', ['compress']);
 
+
+
 gulp.task('watch', function() {
-  gulp.watch('src/**/*.js', ['default'])
+  gulp.watch('src/**/*.js', ['cmd'])
 })

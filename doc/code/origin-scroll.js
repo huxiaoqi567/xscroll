@@ -23,15 +23,7 @@ Util.extend(OriginScroll, Core, {
     init: function() {
         var self = this;
         OriginScroll.superclass.init.call(this);
-        self._initContainer();
         self.resetSize();
-    },
-    _initContainer: function() {
-        var self = this;
-        var renderTo = self.renderTo;
-        self.container = self.container || renderTo.querySelector("." + self.containerClsName);
-        self.content = self.content || self.renderTo.querySelector("." + self.contentClsName);
-        return self;
     },
     /**
      * get scroll top value

@@ -25,6 +25,15 @@ function createObject(proto, constructor) {
 	return newProto;
 }
 
+function getNodes(node,rootNode){
+	if(!node) return;
+	if(node.nodeType) return [node];
+	var rootNode = rootNode && rootNode.nodeType ? rootNode : document;
+	if(node && typeof node === "string"){
+		return rootNode.querySelectorAll(node);
+	}
+	return;
+}
 
 // Useful for temporary DOM ids.
 var idCounter = 0;
@@ -280,11 +289,10 @@ var Util = {
 	px2Num: function(px) {
 		return Number(px.replace(/px/, ''));
 	},
-	/**
-	 * judge if is surpport mouse events
-	 */
-	isMouseSupport:function(){
-		return !!("onmousedown" in document);
+	getNodes:getNodes,
+	getNode:function(node,rootNode){
+		var nodes = getNodes(node,rootNode);
+		return nodes && nodes[0];
 	}
 }
 

@@ -444,7 +444,6 @@ function inputHandler(manager, eventType, input) {
 
     input.isFirst = !!isFirst;
     input.isFinal = !!isFinal;
-
     if (isFirst) {
         manager.session = {};
     }
@@ -1908,7 +1907,7 @@ inherit(TapRecognizer, Recognizer, {
         taps: 1,
         interval: 300, // max time between the multi-tap taps
         time: 250, // max time of the pointer to be down (like finger on the screen)
-        threshold: 2, // a minimal movement is ok, but keep it low
+        threshold: 10, // a minimal movement is ok, but keep it low
         posThreshold: 10 // a multi-tap can be a bit off the initial position
     },
 
@@ -1918,17 +1917,14 @@ inherit(TapRecognizer, Recognizer, {
 
     process: function(input) {
         var options = this.options;
-
         var validPointers = input.pointers.length === options.pointers;
         var validMovement = input.distance < options.threshold;
         var validTouchTime = input.deltaTime < options.time;
-
         this.reset();
 
         if ((input.eventType & INPUT_START) && (this.count === 0)) {
             return this.failTimeout();
         }
-
         // we only allow little movement
         // and we've reached an end event, so a tap is possible
         if (validMovement && validTouchTime && validPointers) {
@@ -1941,7 +1937,6 @@ inherit(TapRecognizer, Recognizer, {
 
             this.pTime = input.timeStamp;
             this.pCenter = input.center;
-
             if (!validMultiTap || !validInterval) {
                 this.count = 1;
             } else {

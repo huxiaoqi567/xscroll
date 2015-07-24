@@ -279,12 +279,6 @@ util = function (exports) {
     },
     px2Num: function (px) {
       return Number(px.replace(/px/, ''));
-    },
-    /**
-    * judge if is surpport mouse events
-    */
-    isMouseSupport: function () {
-      return !!('onmousedown' in document);
     }
   };
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
@@ -720,6 +714,7 @@ plugins_infinite = function (exports) {
         sticky.style.top = 0;
         sticky.style.display = 'none';
         Util.addClass(sticky, '_xs_infinite_elements_');
+        Util.addClass(sticky, '_xs_sticky_');
         self.xscroll.renderTo.appendChild(sticky);
         self.stickyElement = sticky;
         self._isStickyRendered = true;
@@ -868,7 +863,9 @@ plugins_infinite = function (exports) {
     },
     _stickyHandler: function (_pos) {
       var self = this;
-      _pos = undefined === _pos ? self.isY ? self.xscroll.getScrollTop() : self.xscroll.getScrollLeft() : _pos;
+      var xscroll = self.xscroll;
+      var stickyElement = self.stickyElement;
+      _pos = undefined === _pos ? self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft() : _pos;
       var pos = Math.abs(_pos);
       var index = [];
       var allTops = [];
@@ -879,8 +876,8 @@ plugins_infinite = function (exports) {
         }
       }
       if (!index.length) {
-        if (self.stickyElement) {
-          self.stickyElement.style.display = 'none';
+        if (stickyElement) {
+          stickyElement.style.display = 'none';
         }
         self.curStickyIndex = undefined;
         return;
@@ -888,17 +885,21 @@ plugins_infinite = function (exports) {
       var curStickyIndex = Math.max.apply(null, index);
       if (self.curStickyIndex !== curStickyIndex) {
         self.curStickyIndex = curStickyIndex;
-        self.userConfig.renderHook.call(self, self.stickyElement, self.stickyDomInfo[self.curStickyIndex]);
-        self.stickyElement.style.display = 'block';
-        self.stickyElement.style[self.nameWidth] = '100%';
-        self.stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + 'px';
-        self.stickyElement.setAttribute('xs-guid', self.stickyDomInfo[self.curStickyIndex].guid);
-        Util.addClass(self.stickyElement, self.stickyDomInfo[self.curStickyIndex].className);
+        self.userConfig.renderHook.call(self, stickyElement, self.stickyDomInfo[self.curStickyIndex]);
+        stickyElement.style.display = 'block';
+        stickyElement.style[self.nameWidth] = '100%';
+        stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + 'px';
+        stickyElement.setAttribute('xs-guid', self.stickyDomInfo[self.curStickyIndex].guid);
+        Util.addClass(stickyElement, self.stickyDomInfo[self.curStickyIndex].className);
         for (var attrName in self.stickyDomInfo[self.curStickyIndex].style) {
           if (attrName != self.nameHeight && attrName != 'display' && attrName != 'position') {
-            self.stickyElement.style[attrName] = self.stickyDomInfo[self.curStickyIndex].style[attrName];
+            stickyElement.style[attrName] = self.stickyDomInfo[self.curStickyIndex].style[attrName];
           }
         }
+        xscroll.trigger('stickychange', {
+          stickyElement: stickyElement,
+          curStickyIndex: self.curStickyIndex
+        });
       }
       var trans = 0;
       if (self.stickyDomInfo[self.curStickyIndex + 1]) {
@@ -910,10 +911,10 @@ plugins_infinite = function (exports) {
           trans = 0;
         }
       }
-      self.stickyElement.style[transform] = self.isY ? 'translateY(-' + trans + 'px) translateZ(0)' : 'translateX(-' + trans + 'px) translateZ(0)';
+      stickyElement.style[transform] = self.isY ? 'translateY(-' + trans + 'px) translateZ(0)' : 'translateX(-' + trans + 'px) translateZ(0)';
       //top
       if (_pos < Math.min.apply(null, allTops)) {
-        self.stickyElement.style.display = 'none';
+        stickyElement.style.display = 'none';
         self.curStickyIndex = undefined;
         return;
       }

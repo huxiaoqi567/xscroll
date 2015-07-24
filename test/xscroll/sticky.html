@@ -22,9 +22,8 @@ li{
 	-webkit-overflow-scrolling:touch;
 }
 .xs-sticky{
-	line-height: 50px;
+	line-height: 100px;
 	border: 1px solid;
-	background: red;
 }
 </style>
 </head>
@@ -33,13 +32,24 @@ li{
 	<div class="xs-container">
 		<div class="xs-content">
 			<ul>
-				<li class="xs-sticky">section1</li>
+				<li>row</li>
+				<li>row</li>
+				<li>row</li>
+				<li class="xs-sticky">
+					<div class="container">
+						<div class="content">sticky1</div>
+					</div>
+				</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
-				<li class="xs-sticky">section2</li>
+				<li class="xs-sticky">
+					<div class="container">
+						<div class="content">sticky2</div>
+					</div>
+				</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
@@ -48,7 +58,11 @@ li{
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
-				<li class="xs-sticky">section3</li>
+				<li class="xs-sticky">
+					<div class="container">
+						<div class="content">sticky3</div>
+					</div>
+				</li>
 				<li>row</li>
 				<li>row</li>
 				<li>row</li>
@@ -79,14 +93,47 @@ li{
     })
     seajs.use(["xscroll"],function(XScroll){
 
+    	var bgcolors = ['red','green','blue'];
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
     		useTransition:false,
     		// useOriginScroll:true,
-    		// stickyHeaderIndices:[0,1]
     		stickyElements:".xs-sticky"
     	})
+
+    	window.scrolls = [];
+
+    	xscroll.on("stickychange",function(e){
+    		if(!e.isRender){
+    			window.scrolls[e.curStickyIndex] = renderScroll(e.stickyElement,bgcolors[e.curStickyIndex])
+    		}
+    	})
+
     	xscroll.render();
+
+    	var stickys = document.querySelectorAll(".xs-sticky");
+    	
+    	for(var i = 0;i < stickys.length;i++){
+    		renderScroll(stickys[i],bgcolors[i]);
+    	}	
+
+
+    	function renderScroll(el,background){
+    		var scroll = new XScroll({
+    			renderTo:el,
+    			lockX:false,
+    			lockY:true,
+    			container:'.container',
+    			content:'.content'
+    		});
+    		scroll.render();
+    		scroll.content.style.background = background || "none";
+    		xscroll.controller.add(scroll)
+    		scroll.on("tap",function(e){
+    			console.log("tap")
+    		})
+    		return scroll;
+    	}
 
     })
 </script>

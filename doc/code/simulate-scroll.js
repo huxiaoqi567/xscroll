@@ -28,7 +28,11 @@ var transform = Util.prefixStyle("transform");
  * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
  * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
  * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
- * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
+ * @param {string|HTMLElement}  cfg.container config for scroller's container which default value is ".xs-container"
+ * @param {string|HTMLElement}  cfg.content config for scroller's content which default value is ".xs-content"
+ * @param {string}  cfg.stickyElements config for sticky-positioned elements
+ * @param {string}  cfg.fixedElements config for fixed-positioned elements
+ * @param {string}  cfg.touchAction config for touchAction of the scroller
  * @extends XScroll
  * @example
  * var xscroll = new SimuScroll({

@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <style type="text/css">
 * {
 	margin:0;
@@ -42,7 +42,7 @@ li{
 	</div>
 </div>
 <script src="../../lib/sea.js"></script>
-<script src="../../lib/log.js"></script>
+<!-- <script src="../../lib/log.js"></script> -->
 <script>
 
 	seajs.config({
@@ -51,12 +51,11 @@ li{
     seajs.use(["hammer"],function(Hammer){
     	var mc = new Hammer.Manager(document.body);
     	mc.add(new Hammer.Tap())
-    	mc.get("tap").set({time:1000})
+    	mc.get("tap").set({interval:500})
+
     	mc.on("tap",function(e){
     		console.log(e.type)
     	})
-    	
-
 
     })
 </script>

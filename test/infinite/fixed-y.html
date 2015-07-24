@@ -144,6 +144,11 @@
                         style:{position:"sticky",background:bgcolors[i%3],width:"100%",height:50+i*5},
                         data:{num: i}
                     });
+                }else if(i == 4 || i == 6){
+                    tmp.push({
+                        style:{background:"#f60",position:"fixed"},
+                        data:{num: i}
+                    });
                 }else{
                     tmp.push({
                         style:{background:"#fff"},
@@ -179,7 +184,6 @@
         xscroll.plug(infinite)
         infinite.append(0,data);
         xscroll.render();
-
         console.log(infinite)
         function renderScroll(el,background){
             var scroll = new XScroll({

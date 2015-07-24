@@ -279,12 +279,6 @@ util = function (exports) {
     },
     px2Num: function (px) {
       return Number(px.replace(/px/, ''));
-    },
-    /**
-    * judge if is surpport mouse events
-    */
-    isMouseSupport: function () {
-      return !!('onmousedown' in document);
     }
   };
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
@@ -3408,8 +3402,12 @@ core = function (exports) {
    * @param {boolean} cfg.bounce config if use has the bounce effect when scrolling outside of the boundry
    * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
    * @param {boolean} cfg.preventDefault config if prevent the browser default behavior
-   * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
+   * @param {string|HTMLElement}  cfg.container config for scroller's container which default value is ".xs-container"
+   * @param {string|HTMLElement}  cfg.content config for scroller's content which default value is ".xs-content"
    * @param {object}  cfg.indicatorInsets  config scrollbars position {top: number, left: number, bottom: number, right: number}
+   * @param {string}  cfg.stickyElements config for sticky-positioned elements
+   * @param {string}  cfg.fixedElements config for fixed-positioned elements
+   * @param {string}  cfg.touchAction config for touchAction of the scroller
    * @extends XScroll
    * @example
    * var xscroll = new XScroll({
@@ -3447,10 +3445,8 @@ core = function (exports) {
         BOUNDRY_CHECK_EASING: BOUNDRY_CHECK_EASING,
         BOUNDRY_CHECK_DURATION: BOUNDRY_CHECK_DURATION,
         BOUNDRY_CHECK_ACCELERATION: BOUNDRY_CHECK_ACCELERATION,
-        clsPrefix: 'xs-',
         useOriginScroll: false,
         zoomType: 'y',
-        //config for scrollbars
         indicatorInsets: {
           top: 3,
           bottom: 3,
@@ -3459,9 +3455,10 @@ core = function (exports) {
           width: 3,
           spacing: 5
         },
-        //config for sticky elements
+        container: '.xs-container',
+        content: '.xs-content',
         stickyElements: '.xs-sticky',
-        //config for touchaction
+        fixedElements: '.xs-fixed',
         touchAction: 'auto'
       };
       //generate guid
@@ -3472,10 +3469,8 @@ core = function (exports) {
       //config attributes on element
       var elCfg = JSON.parse(self.renderTo.getAttribute('xs-cfg'));
       var userConfig = self.userConfig = Util.mix(Util.mix(defaultCfg, elCfg), self.userConfig);
-      self.containerClsName = userConfig.clsPrefix + 'container';
-      self.contentClsName = userConfig.clsPrefix + 'content';
-      self.container = self.renderTo.querySelector('.' + self.containerClsName);
-      self.content = self.renderTo.querySelector('.' + self.contentClsName);
+      self.container = userConfig.container.nodeType ? userConfig.container : self.renderTo.querySelector(userConfig.container);
+      self.content = userConfig.content.nodeType ? userConfig.content : self.renderTo.querySelector(userConfig.content);
       self.boundry = new Boundry();
       self.boundry.refresh();
       return self;
@@ -3665,6 +3660,7 @@ core = function (exports) {
       if (self._stickiesNum > 0 && !self.stickyElement) {
         self.stickyElement = document.createElement('div');
         self.stickyElement.style.display = 'none';
+        Util.addClass(self.stickyElement, '_xs_sticky_');
         self.renderTo.appendChild(self.stickyElement);
       }
       self.stickyHandler();
@@ -3676,7 +3672,6 @@ core = function (exports) {
       var pos = self.isY ? self.getScrollTop() : self.getScrollLeft();
       var stickiesPos = self._stickiesPos;
       var indexes = [];
-      self.curStickyIndex = undefined;
       for (var i = 0, l = stickiesPos.length; i < l; i++) {
         var top = stickiesPos[i][self.nameTop];
         if (pos > top) {
@@ -3691,9 +3686,13 @@ core = function (exports) {
         return;
       }
       var curStickyIndex = Math.max.apply(null, indexes);
-      if (self.curStickyIndex !== curStickyIndex) {
+      if (self.curStickyIndex != curStickyIndex) {
         self.curStickyIndex = curStickyIndex;
         self.renderStickyElement();
+        self.trigger('stickychange', {
+          stickyElement: self.stickyElement,
+          curStickyIndex: self.curStickyIndex
+        });
       }
       var trans = 0;
       if (self._stickiesPos[self.curStickyIndex + 1]) {
@@ -4148,7 +4147,11 @@ simulate_scroll = function (exports) {
    * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
    * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
    * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
-   * @param {string}  cfg.clsPrefix config the class prefix which default value is "xs-"
+   * @param {string|HTMLElement}  cfg.container config for scroller's container which default value is ".xs-container"
+   * @param {string|HTMLElement}  cfg.content config for scroller's content which default value is ".xs-content"
+   * @param {string}  cfg.stickyElements config for sticky-positioned elements
+   * @param {string}  cfg.fixedElements config for fixed-positioned elements
+   * @param {string}  cfg.touchAction config for touchAction of the scroller
    * @extends XScroll
    * @example
    * var xscroll = new SimuScroll({
@@ -4824,15 +4827,7 @@ origin_scroll = function (exports) {
     init: function () {
       var self = this;
       OriginScroll.superclass.init.call(this);
-      self._initContainer();
       self.resetSize();
-    },
-    _initContainer: function () {
-      var self = this;
-      var renderTo = self.renderTo;
-      self.container = self.container || renderTo.querySelector('.' + self.containerClsName);
-      self.content = self.content || self.renderTo.querySelector('.' + self.contentClsName);
-      return self;
     },
     /**
      * get scroll top value
