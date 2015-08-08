@@ -14,7 +14,7 @@ var Fixed = function(cfg) {
 }
 
 Util.extend(Fixed, Base, {
-  fixedElements:[],
+  fixedElements: [],
   init: function() {
     var self = this,
       userConfig = self.userConfig,
@@ -24,56 +24,91 @@ Util.extend(Fixed, Base, {
     self._ = self.isY ? {
       top: "top",
       height: "height",
-      width: "width"
+      width: "width",
+      offsetTop:"offsetTop"
     } : {
       top: "left",
       height: "width",
-      width: "height"
+      width: "height",
+      offsetTop:"offsetLeft"
     };
     self.renderTo = Util.getNode(userConfig.renderTo);
     return self;
   },
   render: function() {
     var self = this;
-    var userConfig = self.userConfig;
     var xscroll = self.xscroll;
-    var fixedElements = userConfig.fixedElements;
-    var originalFixedElements = self.originalFixedElements = Util.getNodes(fixedElements,self.content);
-    self.isInfinite = !!xscroll.getPlugin("infinite");
+    self.infinite = xscroll.getPlugin("infinite");
+    var originalFixedElements = self.originalFixedElements = self.getFixedElements();
     for (var i = 0, l = originalFixedElements.length; i < l; i++) {
       self.renderFixedElement(originalFixedElements[i], i);
     }
     return self;
   },
+  getFixedElements: function() {
+    var self = this;
+    var infinite = self.infinite;
+    var userConfig = self.userConfig;
+    if (infinite) {
+      var els = [];
+      for (var i in infinite.__serializedData) {
+        var data = infinite.__serializedData[i];
+        if (data && data.style && data.style.position == "fixed") {
+          els.push(data);
+        }
+      }
+      return els;
+    } else {
+      return Util.getNodes(userConfig.fixedElements, self.content);
+    }
+  },
   renderFixedElement: function(el, fixedIndex) {
     var self = this;
+    var isRender = true;
+    var _ = self._;
     var xscroll = self.xscroll;
     var userConfig = self.userConfig;
     var xscrollConfig = self.xscrollConfig;
     var useOriginScroll = xscrollConfig.useOriginScroll;
-    if (useOriginScroll) {
-      //use original position:fixed stylesheet
-      el.style.position = "fixed";
-      el.style.display = "block";
-    } else {
-      //deep clone fixed nodes and hide original nodes
-      var fixedElement = document.createElement("div");
-      fixedElement.innerHTML = el.innerHTML;
-      fixedElement.style.display = "block";
-      fixedElement.innerHTML = el.innerHTML;
-      fixedElement.className = el.className;
-      fixedElement.setAttribute("style", el.getAttribute("style"));
-      fixedElement.style.position = "absolute";
-      fixedElement.style.width = "100%";
-      fixedElement.style.top = el.offsetTop + "px";
-      xscroll.renderTo.appendChild(fixedElement);
-      self.fixedElements.push(fixedElement);
-      el.style.display = "none";
+    var infinite = self.infinite;
+    if (!self.fixedElements[fixedIndex]) {
+      isRender = false;
+      if (useOriginScroll) {
+        //use original position:fixed stylesheet
+        el.style.position = "fixed";
+        el.style.display = "block";
+      } else {
+        //deep clone fixed nodes and hide original nodes
+        var fixedElement = document.createElement("div");
+        if (infinite) {
+          fixedElement.setAttribute("style", Util.stringifyStyle(Util.mix(el.style, {
+            display: "block",
+            width: "100%"
+          })));
+          fixedElement.style[_.top] = (el.style[_.top] >= 0 ? el.style[_.top] : el._top) + "px";
+          if (el.style[_.height]) {
+            fixedElement.style[_.height] = el.style[_.height] + "px";
+          }
+          infinite.userConfig.renderHook.call(self, fixedElement, el);
+        } else {
+          fixedElement.style.display = "block";
+          fixedElement.style.position = "absolute";
+          fixedElement.style.width = "100%";
+          fixedElement.innerHTML = el.innerHTML;
+          fixedElement.className = el.className;
+          fixedElement.setAttribute("style", el.getAttribute("style"));
+          fixedElement.style[_.top] = el[_.offsetTop] + "px";
+          el.style.display = "none";
+        }
+        xscroll.renderTo.appendChild(fixedElement);
+        self.fixedElements.push(fixedElement);
+      }
     }
-    xscroll.trigger("fixedrender", {
+    xscroll.trigger("fixedchange", {
       fixedIndex: fixedIndex,
       fixedElement: useOriginScroll ? el : fixedElement,
-      originalFixedElement: el
+      originalFixedElement: el,
+      isRender: isRender
     });
   },
   destroy: function() {

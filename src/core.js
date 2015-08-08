@@ -5,7 +5,7 @@ var Util = require('./util'),
     Boundry = require('./boundry'),
     Hammer = require('./hammer'),
     Sticky = require('./components/sticky'),
-    FixedHandler = require('./components/fixed');
+    Fixed = require('./components/fixed');
 // boundry checked bounce effect
 var BOUNDRY_CHECK_DURATION = 500;
 var BOUNDRY_CHECK_EASING = "ease";
@@ -109,7 +109,7 @@ Util.extend(XScroll, Base, {
         var self = this;
         self.mc && self.mc.destroy();
         self.sticky && self.sticky.destroy();
-        self.fixedHandler && self.fixedHandler.destroy();
+        self.fixed && self.fixed.destroy();
     },
     _initContainer: function() {},
     /**
@@ -273,11 +273,11 @@ Util.extend(XScroll, Base, {
     initFixed: function() {
         var self = this,
             userConfig = self.userConfig;
-        self.fixedHandler = self.fixedHandler || new FixedHandler({
+        self.fixed = self.fixed || new Fixed({
             fixedElements:userConfig.fixedElements,
             xscroll:self
         });
-        self.fixedHandler.render();
+        self.fixed.render();
         self.resetSize();
         return self;
     },
@@ -285,7 +285,8 @@ Util.extend(XScroll, Base, {
         var self = this,userConfig = self.userConfig;
         var sticky = self.sticky = self.sticky || new Sticky({
             xscroll:self,
-            zoomType:userConfig.zoomType
+            zoomType:userConfig.zoomType,
+            stickyRenderTo:userConfig.stickyRenderTo
         });
         sticky.render();
     },

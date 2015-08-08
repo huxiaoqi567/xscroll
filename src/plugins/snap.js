@@ -91,9 +91,20 @@ Util.extend(Snap, Base, {
     var snapColsNum = userConfig.snapColsNum;
     var snapOffsetLeft = userConfig.snapOffsetLeft;
     col = col >= snapColsNum ? snapColsNum - 1 : col < 0 ? 0 : col;
+    self.prevColIndex = self.snapColIndex;
     self.snapColIndex = col;
     var left = self.snapColIndex * snapWidth + snapOffsetLeft;
-    self.xscroll.scrollLeft(left, duration, easing,callback);
+    self.xscroll.scrollLeft(left, duration, easing, callback);
+    return self;
+  },
+  _colChange: function(e) {
+    var self = this;
+    if (self.prevColIndex != self.snapColIndex) {
+      self.trigger('colchange',Util.mix(e,{
+        curColIndex: self.snapColIndex,
+        prevColIndex: self.prevColIndex
+      }));
+    }
     return self;
   },
   /**
@@ -114,9 +125,20 @@ Util.extend(Snap, Base, {
     var snapRowsNum = userConfig.snapRowsNum;
     var snapOffsetTop = userConfig.snapOffsetTop;
     row = row >= snapRowsNum ? snapRowsNum - 1 : row < 0 ? 0 : row;
+    self.prevRowIndex = self.snapRowIndex;
     self.snapRowIndex = row;
     var top = self.snapRowIndex * snapHeight + snapOffsetTop;
-    self.xscroll.scrollTop(top, duration, easing,callback);
+    self.xscroll.scrollTop(top, duration, easing, callback);
+    return self;
+  },
+  _rowChange: function(e) {
+    var self = this;
+    if (self.prevRowIndex != self.snapRowIndex) {
+      self.trigger('rowchange', Util.mix(e,{
+        curRowIndex: self.snapRowIndex,
+        prevRowIndex: self.prevRowIndex,
+      }));
+    }
     return self;
   },
   /*
@@ -154,6 +176,7 @@ Util.extend(Snap, Base, {
       } else if (transX) {
         self.xscroll.scrollLeft(transX.pos, transX.duration, transX.easing, function() {
           self.xscroll.boundryCheckX();
+          self.prevColIndex = self.snapColIndex;
           self.snapColIndex = Math.round(Math.abs(self.xscroll.getScrollLeft()) / snapWidth);
         });
       }
@@ -164,6 +187,7 @@ Util.extend(Snap, Base, {
       } else if (transY) {
         self.xscroll.scrollTop(transY.pos, transY.duration, transY.easing, function() {
           self.xscroll.boundryCheckY();
+          self.prevRowIndex = self.snapRowIndex;
           self.snapRowIndex = Math.round(Math.abs(self.xscroll.getScrollTop()) / snapHeight);
         });
       }
@@ -188,7 +212,24 @@ Util.extend(Snap, Base, {
     //remove default listener
     xscroll.off("panend", xscroll._onpanend);
     xscroll.on("panend", self._snapAnimate, self);
+    self._bindEvt();
     return self;
+  },
+  _bindEvt:function(){
+    var self =this;
+    var xscroll = self.xscroll;
+    if(self._isEvtBinded) return;
+    self._isEvtBinded = true;
+    xscroll.on("scrollend",function(e){
+      if(e.zoomType == 'y' && !xscroll.isBoundryOutTop() && !xscroll.isBoundryOutBottom()){
+        self._rowChange(e);
+      }
+    })
+    xscroll.on("scrollend",function(e){
+      if(e.zoomType == 'x' && !xscroll.isBoundryOutLeft() && !xscroll.isBoundryOutRight()){
+        self._colChange(e);
+      }
+    })
   }
 });
 

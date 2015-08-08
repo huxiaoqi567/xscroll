@@ -102,6 +102,13 @@
 
         xscroll.render();
 
+        snap.on('colchange',function(e){
+            console.log(e,e.prevColIndex,e.curColIndex)
+        })
+        snap.on('rowchange',function(e){
+           console.log(e,e.prevRowIndex,e.curRowIndex)
+        })
+
 
     });
 

@@ -132,13 +132,17 @@
     <script src="../../lib/sea.js"></script>
     <script>
     seajs.config({
-      base: "../../build/cmd" 
+      base: "../../build/cmd/",
+      map: [
+        [".js", ".js?" + new Date().getTime()]
+
+        ]
     })
-    seajs.use(["xscroll","plugins/infinite"],function(XScroll,Infinite){
+    seajs.use(["xscroll","plugins/infinite","plugins/pulldown"],function(XScroll,Infinite,PullDown){
         var bgcolors = ['red','green','blue'];
         var data = (function() {
             var tmp = [];
-            for (var i = 1; i <= 1000; i++) {
+            for (var i = 1; i <= 100; i++) {
                 if(i == 2 || i == 10 || i == 20){
                     tmp.push({
                         style:{position:"sticky",background:bgcolors[i%3],width:"100%",height:50+i*5},
@@ -146,12 +150,12 @@
                     });
                 }else if(i == 4 || i == 6){
                     tmp.push({
-                        style:{background:"#f60",position:"fixed"},
+                        style:{background:"#f60",position:"fixed",height:60},
                         data:{num: i}
                     });
                 }else{
                     tmp.push({
-                        style:{background:"#fff"},
+                        style:{background:"#fff",height:100},
                         data:{num: i}
                     });
                 }
@@ -160,19 +164,28 @@
             return tmp
         })()
         var xscroll = new XScroll({
-            renderTo: "#J_Scroll"
+            renderTo: "#J_Scroll",
+            scrollbarY:false,
+            useOriginScroll:true
         });
 
         xscroll.on("stickychange",function(e){
-            if(!e.isRender){
-                console.log("render")
-            }
+            // if(!e.isRender){
+            //     console.log("render")
+            // }
         })
+
+        xscroll.on("fixedchange",function(e){
+
+        })
+
+        xscroll.plug(new PullDown())
 
         var infinite = new Infinite({
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
-                if(row.style.position == "sticky"){
+                if(row.style.position == "sticky" || row.style.position == "fixed"){
+                    console.log(row.style.position)
                     el.innerHTML = '<div class="container"><div class="content">'+row.data.num+'</div></div>';
                     renderScroll(el);
                 }else{
@@ -184,7 +197,6 @@
         xscroll.plug(infinite)
         infinite.append(0,data);
         xscroll.render();
-        console.log(infinite)
         function renderScroll(el,background){
             var scroll = new XScroll({
                 renderTo:el,
@@ -195,12 +207,15 @@
             });
             scroll.render();
             scroll.content.style.background = background || "none";
-            xscroll.controller.add(scroll)
+            // xscroll.controller.add(scroll)
             scroll.on("tap",function(e){
                 console.log("tap")
             })
             return scroll;
         }
+
+        window.xscroll = xscroll;
+        window.infinite = infinite
 
     });
 

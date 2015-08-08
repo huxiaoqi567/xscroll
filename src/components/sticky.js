@@ -31,8 +31,8 @@ var defaultStickyRenderFunc = function(e) {
 var Sticky = function(cfg) {
   Sticky.superclass.constructor.call(this, cfg);
   this.userConfig = Util.mix({
-    renderTo: undefined,
-    force: true,
+    stickyRenderTo: undefined,
+    forceSticky: true,
     prefix: "xs-sticky-container",
     stickyRenderFunc: defaultStickyRenderFunc,
     zoomType: "y"
@@ -53,7 +53,7 @@ Util.extend(Sticky, Base, {
       height: self.isY ? "height" : "width",
       width: self.isY ? "width" : "height"
     };
-    self.renderTo = Util.getNode(userConfig.renderTo);
+    self.stickyRenderTo = Util.getNode(userConfig.stickyRenderTo);
     return self;
   },
   getStickiesPos: function() {
@@ -111,17 +111,17 @@ Util.extend(Sticky, Base, {
     self.stickyElements = self.getStickyElements();
     self.stickiesNum = self.stickyElements && self.stickyElements.length;
     if (!self.stickiesNum) return;
-    if (!self.renderTo) {
-      self.renderTo = document.createElement('div');
-      xscroll.renderTo.appendChild(self.renderTo);
+    if (!self.stickyRenderTo) {
+      self.stickyRenderTo = document.createElement('div');
+      xscroll.renderTo.appendChild(self.stickyRenderTo);
     }
     self.stickiesPos = self.getStickiesPos();
-    var renderTo = self.renderTo;
-    renderTo.style[_.top] = 0;
-    renderTo.style[_.left] = 0;
-    renderTo.style[_.right] = 0;
-    renderTo.style.position = xscroll.userConfig.useOriginScroll ? "fixed" : "absolute";
-    Util.addClass(self.renderTo, userConfig.prefix);
+    var stickyRenderTo = self.stickyRenderTo;
+    stickyRenderTo.style[_.top] = 0;
+    stickyRenderTo.style[_.left] = 0;
+    stickyRenderTo.style[_.right] = 0;
+    stickyRenderTo.style.position = xscroll.userConfig.useOriginScroll ? "fixed" : "absolute";
+    Util.addClass(self.stickyRenderTo, userConfig.prefix);
     self.stickyHandler();
     self._bindEvt();
   },
@@ -130,7 +130,7 @@ Util.extend(Sticky, Base, {
     var el = document.createElement('div');
     el.style.display = "none";
     Util.addClass(el, "xs-sticky-handler");
-    self.renderTo.appendChild(el);
+    self.stickyRenderTo.appendChild(el);
     return el;
   },
   _bindEvt: function() {

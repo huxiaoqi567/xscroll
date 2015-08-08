@@ -149,6 +149,7 @@ Util.extend(Infinite, Base, {
 		self.visibleElements = self.getVisibleElements(offset);
 		self.__serializedData = self._computeDomPositions();
 		xscroll.sticky && xscroll.sticky.render();
+		xscroll.fixed && xscroll.fixed.render();
 		var size = xscroll[_.height];
 		var containerSize = self._containerSize;
 		if (containerSize < size) {
@@ -264,7 +265,7 @@ Util.extend(Infinite, Base, {
 		self.userConfig.maxSpeed = 0.06 * 50;
 		for (var i = 0, l = data.length; i < l; i++) {
 			var item = data[i];
-			size = item.style && item.style[_.height] >= 0 ? item.style[_.height] : 100;
+			size = item.style && item.style[_.height] >= 0 && item.style.position != "fixed" ? item.style[_.height] : 0;
 			item.guid = item.guid || Util.guid();
 			item[_._top] = pos;
 			item[_._height] = size;
@@ -322,7 +323,7 @@ Util.extend(Infinite, Base, {
 	},
 	_renderData: function(el, elementObj) {
 		var self = this;
-		if (!el) return;
+		if (!el || !elementObj || elementObj.style.position == "fixed") return;
 		self.userConfig.renderHook.call(self, el, elementObj);
 	},
 	_renderStyle: function(el, elementObj, useTransition) {

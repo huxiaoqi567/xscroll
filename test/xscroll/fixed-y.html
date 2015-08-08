@@ -39,9 +39,14 @@ a{
 	line-height: 50px;
 	/*border: 1px solid;*/
 }
+.outer-sticky-container{
+	z-index: 9999;
+	position: absolute;
+}
 </style>
 </head>
 <body>
+	<div class="outer-sticky-container"></div>
 <div id="scroll" data-spm="7406091">
 	<div class="xs-container">
 		<div class="xs-content">
@@ -111,6 +116,7 @@ a{
 </div>
 
 <script src="../../lib/sea.js"></script>
+<script src="../../lib/log.js"></script>
 <script>
 	seajs.config({
       base: "../../build/cmd/",
@@ -134,23 +140,17 @@ a{
     	},
     	onClick:function(e){
     		e.preventDefault()
-    		console.log(e.currentTarget.innerHTML)
-    	},
-    	destroy:function(){
-    		console.log("destroy")
-    		this.el.innerHTML = this.el.innerHTML.replace(/inited/g,'');
-    		this.el.removeEventListener("click",this.onClick);
+    		// console.log(e.currentTarget.innerHTML)
     	}
     }
 
 
-    seajs.use(["xscroll","util"],function(XScroll,Util){
-
-    	var stickyComponent ;
+    seajs.use(["xscroll","util","plugins/pulldown"],function(XScroll,Util,PullDown){
 
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
-    		// useOriginScroll:true
+    		// stickyRenderTo:".outer-sticky-container"
+    		useOriginScroll:true
     	})
 
     	var els = xscroll.renderTo.querySelectorAll(".xs-fixed,.xs-sticky");
@@ -158,18 +158,19 @@ a{
     		new Component({el:els[i]});
     	}
 
-    	xscroll.on("fixedrender",function(e){
+    	xscroll.on("fixedchange",function(e){
     		// console.log(e)
     		new Component({el:e.fixedElement});
     	})
 
     	xscroll.on("stickychange",function(e){
-    		// console.log(e)
-    		if(e.prevStickyIndex >= 0){
-    			stickyComponent && stickyComponent.destroy()
+    		if(!e.isRender){
+    			new Component({el:e.stickyElement});
     		}
-    		stickyComponent = new Component({el:e.stickyElement});
+    		
     	})
+
+    	xscroll.plug(new PullDown())
 
     	xscroll.render();
 
@@ -177,6 +178,12 @@ a{
     		e.preventDefault();
     	})
     	
+    	window.xscroll = xscroll
+
+    	xscroll.on("scroll",function(e){
+    		console.log(e.scrollTop,true)
+    	})
+
 
     })
 </script>
