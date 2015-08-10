@@ -20,6 +20,17 @@ util = function (exports) {
     newProto.constructor = constructor;
     return newProto;
   }
+  function getNodes(node, rootNode) {
+    if (!node)
+      return;
+    if (node.nodeType)
+      return [node];
+    var rootNode = rootNode && rootNode.nodeType ? rootNode : document;
+    if (node && typeof node === 'string') {
+      return rootNode.querySelectorAll(node);
+    }
+    return;
+  }
   // Useful for temporary DOM ids.
   var idCounter = 0;
   var getOffsetTop = function (el) {
@@ -279,6 +290,23 @@ util = function (exports) {
     },
     px2Num: function (px) {
       return Number(px.replace(/px/, ''));
+    },
+    getNodes: getNodes,
+    getNode: function (node, rootNode) {
+      var nodes = getNodes(node, rootNode);
+      return nodes && nodes[0];
+    },
+    stringifyStyle: function (style) {
+      var styleStr = '';
+      for (var i in style) {
+        styleStr += [
+          i,
+          ':',
+          style[i],
+          ';'
+        ].join('');
+      }
+      return styleStr;
     }
   };
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
@@ -687,9 +715,21 @@ plugins_snap = function (exports) {
       var snapColsNum = userConfig.snapColsNum;
       var snapOffsetLeft = userConfig.snapOffsetLeft;
       col = col >= snapColsNum ? snapColsNum - 1 : col < 0 ? 0 : col;
+      self.prevColIndex = self.snapColIndex;
       self.snapColIndex = col;
       var left = self.snapColIndex * snapWidth + snapOffsetLeft;
       self.xscroll.scrollLeft(left, duration, easing, callback);
+      return self;
+    },
+    _colChange: function (e) {
+      var self = this;
+      if (self.prevColIndex != self.snapColIndex) {
+        self.trigger('colchange', Util.mix(e, {
+          type: 'colchange',
+          curColIndex: self.snapColIndex,
+          prevColIndex: self.prevColIndex
+        }));
+      }
       return self;
     },
     /**
@@ -710,9 +750,21 @@ plugins_snap = function (exports) {
       var snapRowsNum = userConfig.snapRowsNum;
       var snapOffsetTop = userConfig.snapOffsetTop;
       row = row >= snapRowsNum ? snapRowsNum - 1 : row < 0 ? 0 : row;
+      self.prevRowIndex = self.snapRowIndex;
       self.snapRowIndex = row;
       var top = self.snapRowIndex * snapHeight + snapOffsetTop;
       self.xscroll.scrollTop(top, duration, easing, callback);
+      return self;
+    },
+    _rowChange: function (e) {
+      var self = this;
+      if (self.prevRowIndex != self.snapRowIndex) {
+        self.trigger('rowchange', Util.mix(e, {
+          type: 'rowchange',
+          curRowIndex: self.snapRowIndex,
+          prevRowIndex: self.prevRowIndex
+        }));
+      }
       return self;
     },
     /*
@@ -734,9 +786,9 @@ plugins_snap = function (exports) {
       if (Math.abs(e.velocity) <= 0.2) {
         var left = Math.abs(self.xscroll.getScrollLeft());
         var top = Math.abs(self.xscroll.getScrollTop());
-        self.snapColIndex = Math.round(left / snapWidth);
-        self.snapRowIndex = Math.round(top / snapHeight);
-        self.snapTo(self.snapColIndex, self.snapRowIndex);
+        var snapColIndex = Math.round(left / snapWidth);
+        var snapRowIndex = Math.round(top / snapHeight);
+        self.snapTo(snapColIndex, snapRowIndex);
       } else if (userConfig.autoStep) {
         var transX = self.xscroll.computeScroll('x', e.velocityX);
         var transY = self.xscroll.computeScroll('y', e.velocityY);
@@ -750,6 +802,7 @@ plugins_snap = function (exports) {
         } else if (transX) {
           self.xscroll.scrollLeft(transX.pos, transX.duration, transX.easing, function () {
             self.xscroll.boundryCheckX();
+            self.prevColIndex = self.snapColIndex;
             self.snapColIndex = Math.round(Math.abs(self.xscroll.getScrollLeft()) / snapWidth);
           });
         }
@@ -760,6 +813,7 @@ plugins_snap = function (exports) {
         } else if (transY) {
           self.xscroll.scrollTop(transY.pos, transY.duration, transY.easing, function () {
             self.xscroll.boundryCheckY();
+            self.prevRowIndex = self.snapRowIndex;
             self.snapRowIndex = Math.round(Math.abs(self.xscroll.getScrollTop()) / snapHeight);
           });
         }
@@ -784,7 +838,25 @@ plugins_snap = function (exports) {
       //remove default listener
       xscroll.off('panend', xscroll._onpanend);
       xscroll.on('panend', self._snapAnimate, self);
+      self._bindEvt();
       return self;
+    },
+    _bindEvt: function () {
+      var self = this;
+      var xscroll = self.xscroll;
+      if (self._isEvtBinded)
+        return;
+      self._isEvtBinded = true;
+      xscroll.on('scrollend', function (e) {
+        if (e.zoomType == 'y' && !xscroll.isBoundryOutTop() && !xscroll.isBoundryOutBottom()) {
+          self._rowChange(e);
+        }
+      });
+      xscroll.on('scrollend', function (e) {
+        if (e.zoomType == 'x' && !xscroll.isBoundryOutLeft() && !xscroll.isBoundryOutRight()) {
+          self._colChange(e);
+        }
+      });
     }
   });
   if (typeof module == 'object' && module.exports) {

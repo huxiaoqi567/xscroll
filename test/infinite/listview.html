@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>simple</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+    *{
+        padding: 0;margin:0;
+    }
+    html{
+        font-size: 20px;
+    }
+    h1{
+        font-size: 6rem;
+    }
+    h2{
+        font-size: 5rem;
+    }
+    h3{
+        font-size: 4rem;
+    }
+    h4{
+        font-size: 3rem;
+    }
+    h5{
+        font-size: 2rem;
+    }
+    h6{
+        font-size: 1rem;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+     #J_Scroll{
+        position: absolute;
+        top:0;
+        bottom: 0;
+        width:100%;
+        visibility: hidden;
+     }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li.xs-row{
+        width: 100%;
+        display: block;
+        height: 50px;
+        /*border-bottom:1px solid;*/
+        /*-webkit-transition:all 0.5s ease;*/
+        /*visibility: hidden;*/
+    }
+    .xs-container{
+        width: 100%;
+    }
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row">1</li>
+                <li class="xs-row">2</li>
+                <li class="xs-row">3</li>
+                <li class="xs-row">4</li>
+                <li class="xs-row">5</li>
+
+                <li class="xs-row">6</li>
+                <li class="xs-row">7</li>
+                <li class="xs-row">8</li>
+                <li class="xs-row">9</li>
+                <li class="xs-row">10</li>
+
+                <li class="xs-row">11</li>
+                <li class="xs-row">12</li>
+                <li class="xs-row">13</li>
+                <li class="xs-row">14</li>
+                <li class="xs-row">15</li>
+
+                <li class="xs-row">16</li>
+                <li class="xs-row">17</li>
+                <li class="xs-row">18</li>
+                <li class="xs-row">19</li>
+                <li class="xs-row">20</li>
+
+                <li class="xs-row">21</li>
+                <li class="xs-row">22</li>
+                <li class="xs-row">23</li>
+                <li class="xs-row">24</li>
+                <li class="xs-row">25</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script>
+    seajs.config({
+      base: "../../build/cmd" 
+    })
+    seajs.use(["simulate-scroll","plugins/infinite","util"],function(XScroll,Infinite,Util){
+        var data = (function() {
+            var tmp = [];
+            for (var i = 1; i <= 50; i++) {
+                tmp.push({
+                    data:{num: i},
+                    style:{height:50,background:"#fff","color":"#000"}
+                });
+            }
+
+            return tmp
+        })()
+        var xscroll = new XScroll({
+            renderTo: "#J_Scroll",
+            scrollbarY:false
+        });
+
+        var infinite = new Infinite({
+            transition:"",
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,row){
+                el.innerHTML = '<h'+(row.data.num % 6) +'>'+row.data.num+'</h'+(row.data.num % 6) +'>';
+            }
+        });
+
+        xscroll.plug(infinite);
+
+        infinite.append(0,data);
+
+        xscroll.render();
+
+        xscroll.on("scroll",function(e){
+            heightAdaptter()
+        })
+        heightAdaptter();
+
+        xscroll.renderTo.style.visibility = "visible"
+
+        function heightAdaptter (){
+            // if(xscroll.isBoundryOutTop() && xscroll.isBoundryOutBottom()) return;
+            if(xscroll.getBoundryOutTop() > 0 || xscroll.getBoundryOutBottom() >0) return;
+            // 
+            var visibleEls = infinite.getVisibleElements();
+            for(var i in visibleEls){
+                var visibleEl = visibleEls[i];
+                var sectionId = visibleEl.sectionId;
+                var rowId = visibleEl.index;
+                var el = infinite.infiniteElements[visibleEl.__infiniteIndex];
+                var computedHeight = Util.px2Num(window.getComputedStyle(el.querySelector("*")).height);
+                if(visibleEl.style.height != computedHeight){
+                    infinite.sections[sectionId][rowId].style.height = computedHeight;
+                    xscroll.render();
+                }
+            }
+        }
+
+        window.xscroll = xscroll;
+
+        window.infinite =infinite;
+
+
+    });
+
+    </script>
+</body>
+</html>

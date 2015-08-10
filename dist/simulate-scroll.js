@@ -115,7 +115,7 @@ Util.extend(SimuScroll, Core, {
   _initContainer: function() {
     var self = this;
     SimuScroll.superclass._initContainer.call(self);
-    if (self.__isContainerInited) return;
+    if (self.__isContainerInited || !self.container || !self.content) return;
     self.container.style[transformOrigin] = "0 0";
     self.content.style[transformOrigin] = "0 0";
     self.translate(0, 0);

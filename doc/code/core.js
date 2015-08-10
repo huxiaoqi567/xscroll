@@ -3,16 +3,13 @@ var Util = require('./util'),
     Base = require('./base'),
     Animate = require('./animate'),
     Boundry = require('./boundry'),
-    Hammer = require('./hammer');
+    Hammer = require('./hammer'),
+    Sticky = require('./components/sticky'),
+    Fixed = require('./components/fixed');
 // boundry checked bounce effect
 var BOUNDRY_CHECK_DURATION = 500;
 var BOUNDRY_CHECK_EASING = "ease";
 var BOUNDRY_CHECK_ACCELERATION = 0.1;
-//transform
-var transform = Util.prefixStyle("transform");
-//transition webkitTransition MozTransition OTransition msTtransition
-var transition = Util.prefixStyle("transition");
-var transformStr = Util.vendor ? ["-", Util.vendor, "-transform"].join("") : "transform";
 /** 
  * @constructor
  * @param {object} cfg config for scroll
@@ -83,22 +80,22 @@ Util.extend(XScroll, Base, {
                 width: 3,
                 spacing: 5
             },
-            container:".xs-container",
-            content:".xs-content",
+            container: ".xs-container",
+            content: ".xs-content",
             stickyElements: ".xs-sticky",
-            fixedElements:".xs-fixed",
-            touchAction:"auto"
+            fixedElements: ".xs-fixed",
+            touchAction: "auto"
         };
         //generate guid
         self.guid = Util.guid();
-        self.renderTo = self.userConfig.renderTo.nodeType ? self.userConfig.renderTo : document.querySelector(self.userConfig.renderTo);
+        self.renderTo = Util.getNode(self.userConfig.renderTo);
         //timer for animtion
         self.__timers = {};
         //config attributes on element
         var elCfg = JSON.parse(self.renderTo.getAttribute('xs-cfg'));
         var userConfig = self.userConfig = Util.mix(Util.mix(defaultCfg, elCfg), self.userConfig);
-        self.container = userConfig.container.nodeType ? userConfig.container : self.renderTo.querySelector(userConfig.container);
-        self.content = userConfig.content.nodeType ? userConfig.content : self.renderTo.querySelector(userConfig.content);
+        self.container = Util.getNode(userConfig.container,self.renderTo);
+        self.content = Util.getNode(userConfig.content,self.renderTo);
         self.boundry = new Boundry();
         self.boundry.refresh();
         return self;
@@ -110,7 +107,9 @@ Util.extend(XScroll, Base, {
      */
     destroy: function() {
         var self = this;
-        self._unBindEvt();
+        self.mc && self.mc.destroy();
+        self.sticky && self.sticky.destroy();
+        self.fixed && self.fixed.destroy();
     },
     _initContainer: function() {},
     /**
@@ -223,6 +222,7 @@ Util.extend(XScroll, Base, {
      **/
     resetSize: function() {
         var self = this;
+        if(!self.container || !self.content) return;
         var userConfig = self.userConfig;
         var renderToStyle = getComputedStyle(self.renderTo);
         var width = self.width = (userConfig.width || self.renderTo.offsetWidth) - Util.px2Num(renderToStyle['padding-left']) - Util.px2Num(renderToStyle['padding-right']);
@@ -245,15 +245,17 @@ Util.extend(XScroll, Base, {
     render: function() {
         var self = this;
         self.resetSize();
+        //init stickies
+        self.initSticky();
+        //init fixed elements
+        self.initFixed();
+
         self.trigger("afterrender", {
             type: "afterrender"
         });
         self._bindEvt();
         //update touch-action 
         self.initTouchAction();
-        //init stickies
-        self.initStickies();
-
         return self;
     },
     /**
@@ -268,89 +270,25 @@ Util.extend(XScroll, Base, {
         });
         return self;
     },
-    initStickies: function() {
+    initFixed: function() {
         var self = this,
-            sticky;
-        var stickyElements = self.userConfig.stickyElements;
-        self.isY = !!(self.userConfig.zoomType == "y");
-        self.nameTop = self.isY ? "top" : "left";
-        self.nameHeight = self.isY ? "height" : "width";
-        self.nameWidth = self.isY ? "width" : "height";
-        self._stickies = typeof stickyElements == "string" ? self.content.querySelectorAll(stickyElements) : stickyElements;
-        self._stickiesNum = self._stickies.length;
-        self._stickiesPos = [];
-        for (var i = 0; i < self._stickiesNum; i++) {
-            sticky = self._stickies[i];
-            var pos = {};
-            pos[self.nameTop] = self.isY ? Util.getOffsetTop(sticky) : Util.getOffsetLeft(sticky);
-            pos[self.nameHeight] = self.isY ? sticky.offsetHeight : sticky.offsetWidth;
-            self._stickiesPos.push(pos);
-        }
-        if (self._stickiesNum > 0 && !self.stickyElement) {
-            self.stickyElement = document.createElement('div');
-            self.stickyElement.style.display = "none";
-            Util.addClass(self.stickyElement,"_xs_sticky_");
-            self.renderTo.appendChild(self.stickyElement);
-        }
-        self.stickyHandler();
+            userConfig = self.userConfig;
+        self.fixed = self.fixed || new Fixed({
+            fixedElements:userConfig.fixedElements,
+            xscroll:self
+        });
+        self.fixed.render();
+        self.resetSize();
         return self;
     },
-    stickyHandler: function() {
-        var self = this;
-        var zoomType = self.userConfig.zoomType;
-        var pos = self.isY ? self.getScrollTop() : self.getScrollLeft();
-        var stickiesPos = self._stickiesPos;
-        var indexes = [];
-        for (var i = 0, l = stickiesPos.length; i < l; i++) {
-            var top = stickiesPos[i][self.nameTop];
-            if (pos > top) {
-                indexes.push(i);
-            }
-        }
-        if (!indexes.length) {
-            if (self.stickyElement) {
-                self.stickyElement.style.display = "none";
-            }
-            self.curStickyIndex = undefined;
-            return;
-        }
-        var curStickyIndex = Math.max.apply(null, indexes);
-        if (self.curStickyIndex != curStickyIndex) {
-            self.curStickyIndex = curStickyIndex;
-            self.renderStickyElement();
-            self.trigger("stickychange",{
-                stickyElement:self.stickyElement,
-                curStickyIndex:self.curStickyIndex
-            });
-        }
-
-        var trans = 0;
-        if (self._stickiesPos[self.curStickyIndex + 1]) {
-            var cur = self._stickiesPos[self.curStickyIndex];
-            var next = self._stickiesPos[self.curStickyIndex + 1];
-            if (pos + cur[self.nameHeight] > next[self.nameTop] && pos + cur[self.nameHeight] < next[self.nameTop] + cur[self.nameHeight]) {
-                trans = cur[self.nameHeight] + pos - next[self.nameTop];
-            } else {
-                trans = 0;
-            }
-        }
-        self.stickyElement.style[transform] = self.isY ? "translateY(-" + (trans) + "px) translateZ(0)" : "translateX(-" + (trans) + "px) translateZ(0)";
-
-    },
-    renderStickyElement: function() {
-        var self = this;
-        var stickyElement = self.stickyElement;
-        var curStickyIndex = self.curStickyIndex;
-        var curSticky = self._stickies[curStickyIndex];
-        stickyElement.style.display = "block";
-        stickyElement.innerHTML = curSticky.innerHTML;
-        stickyElement.className = curSticky.className;
-        stickyElement.setAttribute("style",curSticky.getAttribute("style"));
-        stickyElement.style.position = "fixed";
-        stickyElement.style[self.nameWidth] = "100%";
-        stickyElement.style[self.nameTop] = 0;
-        stickyElement.id = curSticky.id;
-        return self;
+    initSticky:function(){
+        var self = this,userConfig = self.userConfig;
+        var sticky = self.sticky = self.sticky || new Sticky({
+            xscroll:self,
+            zoomType:userConfig.zoomType,
+            stickyRenderTo:userConfig.stickyRenderTo
+        });
+        sticky.render();
     },
     /**
      * bounce to the boundry vertical and horizontal
@@ -406,13 +344,7 @@ Util.extend(XScroll, Base, {
                 self.trigger("doubletap", e);
             }
         });
-        self.on("scroll", self.stickyHandler, self);
-
         return self;
-    },
-    _unBindEvt: function() {
-        var self = this;
-        self.mc && self.mc.destroy();
     },
     _resetLockConfig: function() {},
     stop: function() {}

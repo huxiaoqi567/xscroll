@@ -20,6 +20,17 @@ util = function (exports) {
     newProto.constructor = constructor;
     return newProto;
   }
+  function getNodes(node, rootNode) {
+    if (!node)
+      return;
+    if (node.nodeType)
+      return [node];
+    var rootNode = rootNode && rootNode.nodeType ? rootNode : document;
+    if (node && typeof node === 'string') {
+      return rootNode.querySelectorAll(node);
+    }
+    return;
+  }
   // Useful for temporary DOM ids.
   var idCounter = 0;
   var getOffsetTop = function (el) {
@@ -279,6 +290,23 @@ util = function (exports) {
     },
     px2Num: function (px) {
       return Number(px.replace(/px/, ''));
+    },
+    getNodes: getNodes,
+    getNode: function (node, rootNode) {
+      var nodes = getNodes(node, rootNode);
+      return nodes && nodes[0];
+    },
+    stringifyStyle: function (style) {
+      var styleStr = '';
+      for (var i in style) {
+        styleStr += [
+          i,
+          ':',
+          style[i],
+          ';'
+        ].join('');
+      }
+      return styleStr;
     }
   };
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.

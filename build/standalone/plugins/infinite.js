@@ -20,6 +20,17 @@ util = function (exports) {
     newProto.constructor = constructor;
     return newProto;
   }
+  function getNodes(node, rootNode) {
+    if (!node)
+      return;
+    if (node.nodeType)
+      return [node];
+    var rootNode = rootNode && rootNode.nodeType ? rootNode : document;
+    if (node && typeof node === 'string') {
+      return rootNode.querySelectorAll(node);
+    }
+    return;
+  }
   // Useful for temporary DOM ids.
   var idCounter = 0;
   var getOffsetTop = function (el) {
@@ -279,6 +290,23 @@ util = function (exports) {
     },
     px2Num: function (px) {
       return Number(px.replace(/px/, ''));
+    },
+    getNodes: getNodes,
+    getNode: function (node, rootNode) {
+      var nodes = getNodes(node, rootNode);
+      return nodes && nodes[0];
+    },
+    stringifyStyle: function (style) {
+      var styleStr = '';
+      for (var i in style) {
+        styleStr += [
+          i,
+          ':',
+          style[i],
+          ';'
+        ].join('');
+      }
+      return styleStr;
     }
   };
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
@@ -603,7 +631,6 @@ plugins_infinite = function (exports) {
    * An infinity dom-recycled list plugin for xscroll.
    * @constructor
    * @param {object} cfg
-   * @param {string} cfg.zoomType choose scroll vertically or horizontally
    * @param {string} cfg.transition recomposition cell with a transition
    * @param {string} cfg.infiniteElements dom-selector for reused elements
    * @param {function} cfg.renderHook render function for cell by per col or per row duration scrolling
@@ -611,10 +638,7 @@ plugins_infinite = function (exports) {
    */
   var Infinite = function (cfg) {
     Infinite.superclass.constructor.call(this, cfg);
-    this.userConfig = Util.mix({
-      zoomType: 'y',
-      transition: 'all 0.5s ease'
-    }, cfg);
+    this.userConfig = Util.mix({ transition: 'all 0.5s ease' }, cfg);
   };
   Util.extend(Infinite, Base, {
     /**
@@ -644,16 +668,18 @@ plugins_infinite = function (exports) {
     pluginInitializer: function (xscroll) {
       var self = this;
       self.xscroll = xscroll;
-      self.isY = !!(self.userConfig.zoomType == 'y');
-      self._nameTop = self.isY ? '_top' : '_left';
-      self._nameHeight = self.isY ? '_height' : '_width';
-      self.nameTop = self.isY ? 'top' : 'left';
-      self.nameHeight = self.isY ? 'height' : 'width';
-      self.nameWidth = self.isY ? 'width' : 'height';
-      self.nameY = self.isY ? 'y' : 'x';
-      self.nameTranslate = self.isY ? 'translateY' : 'translateX';
-      self.nameContainerHeight = self.isY ? 'containerHeight' : 'containerWidth';
-      self.nameScrollTop = self.isY ? 'scrollTop' : 'scrollLeft';
+      self.isY = !!(xscroll.userConfig.zoomType == 'y');
+      self._ = {
+        _top: self.isY ? '_top' : '_left',
+        _height: self.isY ? '_height' : '_width',
+        top: self.isY ? 'top' : 'left',
+        height: self.isY ? 'height' : 'width',
+        width: self.isY ? 'width' : 'height',
+        y: self.isY ? 'y' : 'x',
+        translate: self.isY ? 'translateY' : 'translateX',
+        containerHeight: self.isY ? 'containerHeight' : 'containerWidth',
+        scrollTop: self.isY ? 'scrollTop' : 'scrollLeft'
+      };
       self._initInfinite();
       xscroll.on('afterrender', function () {
         self.render();
@@ -669,18 +695,19 @@ plugins_infinite = function (exports) {
     */
     pluginDestructor: function () {
       var self = this;
+      var _ = self._;
       for (var i = 0; i < self.infiniteLength; i++) {
-        self.infiniteElements[i].style[self.nameTop] = 'auto';
+        self.infiniteElements[i].style[_.top] = 'auto';
         self.infiniteElements[i].style[transform] = 'none';
       }
       self.xscroll && self.xscroll.off('scroll', self._updateByScroll, self);
       self.xscroll && self.xscroll.off('tap panstart pan panend', self._cellEventsHandler, self);
-      self._destroySticky();
       return self;
     },
     _initInfinite: function () {
       var self = this;
       var xscroll = self.xscroll;
+      var _ = self._;
       self.sections = {};
       self.infiniteElements = xscroll.renderTo.querySelectorAll(self.userConfig.infiniteElements);
       self.infiniteLength = self.infiniteElements.length;
@@ -689,7 +716,7 @@ plugins_infinite = function (exports) {
         for (var i = 0; i < self.infiniteLength; i++) {
           tmp.push({});
           self.infiniteElements[i].style.position = 'absolute';
-          self.infiniteElements[i].style[self.nameTop] = 0;
+          self.infiniteElements[i].style[_.top] = 0;
           self.infiniteElements[i].style.visibility = 'hidden';
           self.infiniteElements[i].style.display = 'block';
           Util.addClass(self.infiniteElements[i], '_xs_infinite_elements_');
@@ -700,42 +727,9 @@ plugins_infinite = function (exports) {
       xscroll.on('scroll', self._updateByScroll, self);
       return self;
     },
-    _initSticky: function () {
-      var self = this;
-      self.stickyDomInfo = [];
-      if (!self.hasSticky) {
-        return;
-      }
-      //create sticky element
-      if (!self._isStickyRendered) {
-        var sticky = document.createElement('div');
-        sticky.style.position = 'fixed';
-        sticky.style.left = 0;
-        sticky.style.top = 0;
-        sticky.style.display = 'none';
-        Util.addClass(sticky, '_xs_infinite_elements_');
-        Util.addClass(sticky, '_xs_sticky_');
-        self.xscroll.renderTo.appendChild(sticky);
-        self.stickyElement = sticky;
-        self._isStickyRendered = true;
-      }
-      for (var i in self.__serializedData) {
-        var sticky = self.__serializedData[i];
-        if (sticky && sticky.style && 'sticky' == sticky.style.position) {
-          self.stickyDomInfo.push(sticky);
-        }
-      }
-      return self;
-    },
-    _destroySticky: function () {
-      var self = this;
-      self.hasSticky = false;
-      Util.remove(self.stickyElement);
-      self._isStickyRendered = false;
-      return self;
-    },
     _renderUnRecycledEl: function () {
       var self = this;
+      var _ = self._;
       var translateZ = self.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       for (var i in self.__serializedData) {
         var unrecycledEl = self.__serializedData[i];
@@ -746,15 +740,15 @@ plugins_infinite = function (exports) {
           unrecycledEl.id = el.id;
           self.xscroll.content.appendChild(el);
           for (var attrName in unrecycledEl.style) {
-            if (attrName != self.nameHeight && attrName != 'display' && attrName != 'position') {
+            if (attrName != _.height && attrName != 'display' && attrName != 'position') {
               el.style[attrName] = unrecycledEl.style[attrName];
             }
           }
-          el.style[self.nameTop] = 0;
+          el.style[_.top] = 0;
           el.style.position = 'absolute';
           el.style.display = 'block';
-          el.style[self.nameHeight] = unrecycledEl[self._nameHeight] + 'px';
-          el.style[transform] = self.nameTranslate + '(' + unrecycledEl[self._nameTop] + 'px) ' + translateZ;
+          el.style[_.height] = unrecycledEl[_._height] + 'px';
+          el.style[transform] = _.translate + '(' + unrecycledEl[_._top] + 'px) ' + translateZ;
           Util.addClass(el, unrecycledEl.className);
           self.userConfig.renderHook.call(self, el, unrecycledEl);
         }
@@ -767,20 +761,21 @@ plugins_infinite = function (exports) {
     */
     render: function () {
       var self = this;
+      var _ = self._;
       var xscroll = self.xscroll;
       var offset = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
       self.visibleElements = self.getVisibleElements(offset);
       self.__serializedData = self._computeDomPositions();
-      self._initSticky();
-      var size = xscroll[self.nameHeight];
+      xscroll.sticky && xscroll.sticky.render();
+      xscroll.fixed && xscroll.fixed.render();
+      var size = xscroll[_.height];
       var containerSize = self._containerSize;
       if (containerSize < size) {
         containerSize = size;
       }
-      xscroll[self.nameContainerHeight] = containerSize;
-      xscroll.container.style[self.nameHeight] = containerSize + 'px';
-      xscroll.content.style[self.nameHeight] = containerSize + 'px';
-      self.curStickyIndex = undefined;
+      xscroll[_.containerHeight] = containerSize;
+      xscroll.container.style[_.height] = containerSize + 'px';
+      xscroll.content.style[_.height] = containerSize + 'px';
       self._renderUnRecycledEl();
       self._updateByScroll();
       self._updateByRender(offset);
@@ -806,7 +801,8 @@ plugins_infinite = function (exports) {
     _updateByScroll: function (e) {
       var self = this;
       var xscroll = self.xscroll;
-      var _pos = e && e[self.nameScrollTop];
+      var _ = self._;
+      var _pos = e && e[_.scrollTop];
       var pos = _pos === undefined ? self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft() : _pos;
       var elementsPos = self.getVisibleElements(pos);
       var changedRows = self.changedRows = self._getChangedRows(elementsPos);
@@ -826,11 +822,11 @@ plugins_infinite = function (exports) {
           }
         }
       }
-      self._stickyHandler(pos);
       return self;
     },
     _updateByRender: function (pos) {
       var self = this;
+      var _ = self._;
       var xscroll = self.xscroll;
       var pos = pos === undefined ? self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft() : pos;
       var prevElementsPos = self.visibleElements;
@@ -842,7 +838,7 @@ plugins_infinite = function (exports) {
         for (var j in prevElementsPos) {
           prevEl = prevElementsPos[j];
           if (prevEl.guid === newEl.guid) {
-            if (newEl.style != prevEl.style || newEl[self._nameTop] != prevEl[self._nameTop] || newEl[self._nameHeight] != prevEl[self._nameHeight]) {
+            if (newEl.style != prevEl.style || newEl[_._top] != prevEl[_._top] || newEl[_._height] != prevEl[_._height]) {
               self._renderStyle(self.infiniteElements[newEl.__infiniteIndex], newEl, true);
             }
             if (JSON.stringify(newEl.data) != JSON.stringify(prevEl.data)) {
@@ -861,72 +857,14 @@ plugins_infinite = function (exports) {
       }
       self.visibleElements = newElementsPos;
     },
-    _stickyHandler: function (_pos) {
-      var self = this;
-      var xscroll = self.xscroll;
-      var stickyElement = self.stickyElement;
-      _pos = undefined === _pos ? self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft() : _pos;
-      var pos = Math.abs(_pos);
-      var index = [];
-      var allTops = [];
-      for (var i = 0; i < self.stickyDomInfo.length; i++) {
-        allTops.push(self.stickyDomInfo[i][self._nameTop]);
-        if (pos >= self.stickyDomInfo[i][self._nameTop]) {
-          index.push(i);
-        }
-      }
-      if (!index.length) {
-        if (stickyElement) {
-          stickyElement.style.display = 'none';
-        }
-        self.curStickyIndex = undefined;
-        return;
-      }
-      var curStickyIndex = Math.max.apply(null, index);
-      if (self.curStickyIndex !== curStickyIndex) {
-        self.curStickyIndex = curStickyIndex;
-        self.userConfig.renderHook.call(self, stickyElement, self.stickyDomInfo[self.curStickyIndex]);
-        stickyElement.style.display = 'block';
-        stickyElement.style[self.nameWidth] = '100%';
-        stickyElement.style[self.nameHeight] = self.stickyDomInfo[self.curStickyIndex].style[self.nameHeight] + 'px';
-        stickyElement.setAttribute('xs-guid', self.stickyDomInfo[self.curStickyIndex].guid);
-        Util.addClass(stickyElement, self.stickyDomInfo[self.curStickyIndex].className);
-        for (var attrName in self.stickyDomInfo[self.curStickyIndex].style) {
-          if (attrName != self.nameHeight && attrName != 'display' && attrName != 'position') {
-            stickyElement.style[attrName] = self.stickyDomInfo[self.curStickyIndex].style[attrName];
-          }
-        }
-        xscroll.trigger('stickychange', {
-          stickyElement: stickyElement,
-          curStickyIndex: self.curStickyIndex
-        });
-      }
-      var trans = 0;
-      if (self.stickyDomInfo[self.curStickyIndex + 1]) {
-        var cur = self.stickyDomInfo[self.curStickyIndex];
-        var next = self.stickyDomInfo[self.curStickyIndex + 1];
-        if (_pos + cur[self._nameHeight] > next[self._nameTop] && _pos + cur[self._nameHeight] < next[self._nameTop] + cur[self._nameHeight]) {
-          trans = cur[self._nameHeight] + pos - next[self._nameTop];
-        } else {
-          trans = 0;
-        }
-      }
-      stickyElement.style[transform] = self.isY ? 'translateY(-' + trans + 'px) translateZ(0)' : 'translateX(-' + trans + 'px) translateZ(0)';
-      //top
-      if (_pos < Math.min.apply(null, allTops)) {
-        stickyElement.style.display = 'none';
-        self.curStickyIndex = undefined;
-        return;
-      }
-    },
     /**
     * get all element posInfo such as top,height,template,html
     * @return {Array}
     **/
     _computeDomPositions: function () {
       var self = this;
+      var _ = self._;
       var pos = 0, size = 0, sections = self.sections, section;
-      self.hasSticky = false;
       var data = [];
       var serializedData = {};
       for (var i in sections) {
@@ -941,15 +879,12 @@ plugins_infinite = function (exports) {
       self.userConfig.maxSpeed = 0.06 * 50;
       for (var i = 0, l = data.length; i < l; i++) {
         var item = data[i];
-        size = item.style && item.style[self.nameHeight] >= 0 ? item.style[self.nameHeight] : 100;
+        size = item.style && item.style[_.height] >= 0 && item.style.position != 'fixed' ? item.style[_.height] : 0;
         item.guid = item.guid || Util.guid();
-        item[self._nameTop] = pos;
-        item[self._nameHeight] = size;
+        item[_._top] = pos;
+        item[_._height] = size;
         item.recycled = item.recycled === false ? false : true;
         pos += size;
-        if (!self.hasSticky && item.style && item.style.position == 'sticky') {
-          self.hasSticky = true;
-        }
         serializedData[item.guid] = item;
       }
       self._containerSize = pos;
@@ -964,13 +899,14 @@ plugins_infinite = function (exports) {
     getVisibleElements: function (pos) {
       var self = this;
       var xscroll = self.xscroll;
+      var _ = self._;
       var pos = pos === undefined ? self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft() : pos;
-      var threshold = self.userConfig.threshold >= 0 ? self.userConfig.threshold : xscroll[self.nameHeight] / 3;
+      var threshold = self.userConfig.threshold >= 0 ? self.userConfig.threshold : xscroll[_.height] / 3;
       var tmp = {}, item;
       var data = self.__serializedData;
       for (var i in data) {
         item = data[i];
-        if (item[self._nameTop] >= pos - threshold && item[self._nameTop] <= pos + xscroll[self.nameHeight] + threshold) {
+        if (item[_._top] >= pos - threshold && item[_._top] <= pos + xscroll[_.height] + threshold) {
           tmp[item.guid] = item;
         }
       }
@@ -1000,18 +936,19 @@ plugins_infinite = function (exports) {
     },
     _renderData: function (el, elementObj) {
       var self = this;
-      if (!el)
+      if (!el || !elementObj || elementObj.style.position == 'fixed')
         return;
       self.userConfig.renderHook.call(self, el, elementObj);
     },
     _renderStyle: function (el, elementObj, useTransition) {
       var self = this;
+      var _ = self._;
       if (!el)
         return;
       var translateZ = self.xscroll.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
       //update style
       for (var attrName in elementObj.style) {
-        if (attrName != self.nameHeight && attrName != 'display' && attrName != 'position') {
+        if (attrName != _.height && attrName != 'display' && attrName != 'position') {
           el.style[attrName] = elementObj.style[attrName];
         }
       }
@@ -1019,8 +956,8 @@ plugins_infinite = function (exports) {
       el.setAttribute('xs-sectionid', elementObj.sectionId);
       el.setAttribute('xs-guid', elementObj.guid);
       el.style.visibility = 'visible';
-      el.style[self.nameHeight] = elementObj[self._nameHeight] + 'px';
-      el.style[transform] = self.nameTranslate + '(' + elementObj[self._nameTop] + 'px) ' + translateZ;
+      el.style[_.height] = elementObj[_._height] + 'px';
+      el.style[transform] = _.translate + '(' + elementObj[_._top] + 'px) ' + translateZ;
       el.style[transition] = useTransition ? self.userConfig.transition : 'none';
     },
     getCell: function (e) {

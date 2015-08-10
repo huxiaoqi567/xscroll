@@ -101,6 +101,7 @@ Util.extend(Snap, Base, {
     var self = this;
     if (self.prevColIndex != self.snapColIndex) {
       self.trigger('colchange',Util.mix(e,{
+        type:'colchange',
         curColIndex: self.snapColIndex,
         prevColIndex: self.prevColIndex
       }));
@@ -128,13 +129,14 @@ Util.extend(Snap, Base, {
     self.prevRowIndex = self.snapRowIndex;
     self.snapRowIndex = row;
     var top = self.snapRowIndex * snapHeight + snapOffsetTop;
-    self.xscroll.scrollTop(top, duration, easing, callback);
+    self.xscroll.scrollTop(top, duration, easing,callback);
     return self;
   },
   _rowChange: function(e) {
     var self = this;
     if (self.prevRowIndex != self.snapRowIndex) {
       self.trigger('rowchange', Util.mix(e,{
+        type:'rowchange',
         curRowIndex: self.snapRowIndex,
         prevRowIndex: self.prevRowIndex,
       }));
@@ -160,9 +162,9 @@ Util.extend(Snap, Base, {
     if (Math.abs(e.velocity) <= 0.2) {
       var left = Math.abs(self.xscroll.getScrollLeft());
       var top = Math.abs(self.xscroll.getScrollTop());
-      self.snapColIndex = Math.round(left / snapWidth);
-      self.snapRowIndex = Math.round(top / snapHeight);
-      self.snapTo(self.snapColIndex, self.snapRowIndex);
+      var snapColIndex = Math.round(left / snapWidth);
+      var snapRowIndex = Math.round(top / snapHeight);
+      self.snapTo(snapColIndex, snapRowIndex);
     } else if (userConfig.autoStep) {
       var transX = self.xscroll.computeScroll("x", e.velocityX);
       var transY = self.xscroll.computeScroll("y", e.velocityY);

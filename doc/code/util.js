@@ -25,6 +25,15 @@ function createObject(proto, constructor) {
 	return newProto;
 }
 
+function getNodes(node, rootNode) {
+	if (!node) return;
+	if (node.nodeType) return [node];
+	var rootNode = rootNode && rootNode.nodeType ? rootNode : document;
+	if (node && typeof node === "string") {
+		return rootNode.querySelectorAll(node);
+	}
+	return;
+}
 
 // Useful for temporary DOM ids.
 var idCounter = 0;
@@ -201,8 +210,8 @@ var Util = {
 	 * @memberOf Util
 	 * @param  {HTMLElement}  el
 	 */
-	remove:function(el){
-		if(!el || !el.parentNode) return;
+	remove: function(el) {
+		if (!el || !el.parentNode) return;
 		el.parentNode.removeChild(el);
 	},
 	/**
@@ -232,7 +241,7 @@ var Util = {
 			parent = null,
 			sel = selector.replace(/\.|#/g, "");
 
-		if(rootNode && typeof rootNode === "string"){
+		if (rootNode && typeof rootNode === "string") {
 			rootNode = document.querySelector(rootNode);
 		}
 		rootNode = rootNode || document.body;
@@ -243,12 +252,12 @@ var Util = {
 		while (!rs) {
 			if (parent == rootNode) break;
 			parent = el.parentNode;
-			if(!parent) break;
+			if (!parent) break;
 			if (parent.className && parent.className.match(sel)) {
 				rs = parent
 				return rs;
 				break;
-			}else{
+			} else {
 				el = parent;
 			}
 		}
@@ -279,6 +288,18 @@ var Util = {
 	},
 	px2Num: function(px) {
 		return Number(px.replace(/px/, ''));
+	},
+	getNodes: getNodes,
+	getNode: function(node, rootNode) {
+		var nodes = getNodes(node, rootNode);
+		return nodes && nodes[0];
+	},
+	stringifyStyle: function(style) {
+		var styleStr = "";
+		for (var i in style) {
+			styleStr += [i, ":", style[i], ";"].join("");
+		}
+		return styleStr;
 	}
 }
 
