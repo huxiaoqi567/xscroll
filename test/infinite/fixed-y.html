@@ -143,17 +143,13 @@
         var data = (function() {
             var tmp = [];
             for (var i = 1; i <= 100; i++) {
-                if(i == 2 || i == 10 || i == 20){
+                if(i == 2 || i == 4 || i == 7){
                     tmp.push({
-                        style:{position:"sticky",background:bgcolors[i%3],width:"100%",height:50+i*5},
+                        style:{position:"fixed",background:bgcolors[i%3],width:"100%",height:50+i*5},
                         data:{num: i}
                     });
-                }else if(i == 4 || i == 6){
-                    tmp.push({
-                        style:{background:"#f60",position:"fixed",height:60},
-                        data:{num: i}
-                    });
-                }else{
+                }
+                else{
                     tmp.push({
                         style:{background:"#fff",height:100},
                         data:{num: i}
@@ -166,14 +162,8 @@
         var xscroll = new XScroll({
             renderTo: "#J_Scroll",
             scrollbarY:false,
-            useOriginScroll:true
+            // useOriginScroll:true
         });
-
-        xscroll.on("stickychange",function(e){
-            // if(!e.isRender){
-            //     console.log("render")
-            // }
-        })
 
         xscroll.on("fixedchange",function(e){
 
@@ -184,10 +174,9 @@
         var infinite = new Infinite({
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
-                if(row.style.position == "sticky" || row.style.position == "fixed"){
-                    console.log(row.style.position)
+                if(row.style.position == "fixed"){
                     el.innerHTML = '<div class="container"><div class="content">'+row.data.num+'</div></div>';
-                    renderScroll(el);
+                    // renderScroll(el);
                 }else{
                     el.innerHTML = row.data.num;
                 }
@@ -197,6 +186,9 @@
         xscroll.plug(infinite)
         infinite.append(0,data);
         xscroll.render();
+
+
+
         function renderScroll(el,background){
             var scroll = new XScroll({
                 renderTo:el,

@@ -638,6 +638,12 @@ easing = function (exports) {
       0.25,
       1
     ],
+    'ease-in': [
+      0.42,
+      0,
+      1,
+      1
+    ],
     'ease-out': [
       0,
       0,
@@ -3451,6 +3457,7 @@ components_sticky = function (exports) {
         width: self.isY ? 'width' : 'height'
       };
       self.stickyRenderTo = Util.getNode(userConfig.stickyRenderTo);
+      self._handlers = [];
       return self;
     },
     getStickiesPos: function () {
@@ -3473,7 +3480,8 @@ components_sticky = function (exports) {
       };
       for (var i = 0; i < self.stickiesNum; i++) {
         var pos = getPos(self.stickyElements[i]);
-        pos.el = self.createStickyEl();
+        self._handlers[i] = self._handlers[i] || self.createStickyEl();
+        pos.el = self._handlers[i];
         pos.isRender = false;
         stickiesPos.push(pos);
       }
@@ -3498,7 +3506,7 @@ components_sticky = function (exports) {
         return Util.getNodes(xscroll.userConfig.stickyElements, xscroll.content);
       }
     },
-    render: function () {
+    render: function (force) {
       var self = this;
       var userConfig = self.userConfig;
       var xscroll = self.xscroll;
@@ -3519,7 +3527,7 @@ components_sticky = function (exports) {
       stickyRenderTo.style[_.right] = 0;
       stickyRenderTo.style.position = xscroll.userConfig.useOriginScroll ? 'fixed' : 'absolute';
       Util.addClass(self.stickyRenderTo, userConfig.prefix);
-      self.stickyHandler();
+      self.stickyHandler(force);
       self._bindEvt();
     },
     createStickyEl: function () {
@@ -3534,7 +3542,7 @@ components_sticky = function (exports) {
       var self = this, xscroll = self.xscroll;
       xscroll.on('scroll', self.stickyHandler, self);
     },
-    stickyHandler: function () {
+    stickyHandler: function (force) {
       var self = this;
       var xscroll = self.xscroll;
       var userConfig = self.userConfig;
@@ -3556,7 +3564,7 @@ components_sticky = function (exports) {
         return;
       }
       var curStickyIndex = Math.max.apply(null, indexes);
-      if (self.curStickyIndex != curStickyIndex) {
+      if (self.curStickyIndex != curStickyIndex || force) {
         var prevStickyIndex = self.curStickyIndex;
         self.curStickyIndex = curStickyIndex;
         self.curStickyElement = self.stickyElements[curStickyIndex];
@@ -4068,7 +4076,8 @@ core = function (exports) {
         'touchstart',
         'touchmove',
         'touchend',
-        'touchcancel'
+        'touchcancel',
+        'mousedown'
       ];
       for (var i = 0, l = touchEvents.length; i < l; i++) {
         self.renderTo.addEventListener(touchEvents[i], function (e) {
@@ -4494,7 +4503,7 @@ simulate_scroll = function (exports) {
       self.container.style.transformOrigin = '';
       self.content.style.transform = '';
       self.content.style.transformOrigin = '';
-      self.off('touchstart', self._ontouchstart);
+      self.off('touchstart mousedown', self._ontouchstart);
       self.off('touchmove', self._ontouchmove);
       self.destroyScrollBars();
     },
@@ -4670,7 +4679,7 @@ simulate_scroll = function (exports) {
       self.__isEvtBind = true;
       var pinch = new Hammer.Pinch();
       self.mc.add(pinch);
-      self.on('touchstart', self._ontouchstart, self);
+      self.on('touchstart mousedown', self._ontouchstart, self);
       self.on('touchmove', self._ontouchmove, self);
       self.on('tap', self._ontap, self);
       self.on('panstart', self._onpanstart, self);
@@ -4697,7 +4706,7 @@ simulate_scroll = function (exports) {
       this.userConfig.preventTouchMove && e.preventDefault();
     },
     _onpanstart: function (e) {
-      e.preventDefault();
+      this.userConfig.preventTouchMove && e.preventDefault();
       var self = this;
       var scrollLeft = self.getScrollLeft();
       var scrollTop = self.getScrollTop();
@@ -4709,7 +4718,7 @@ simulate_scroll = function (exports) {
       return self;
     },
     _onpan: function (e) {
-      e.preventDefault();
+      this.userConfig.preventTouchMove && e.preventDefault();
       var self = this;
       var boundry = self.boundry;
       var userConfig = self.userConfig;
@@ -4745,7 +4754,6 @@ simulate_scroll = function (exports) {
       return self;
     },
     _onpanend: function (e) {
-      e.preventDefault();
       var self = this;
       var userConfig = self.userConfig;
       var transX = self.computeScroll('x', e.velocityX);

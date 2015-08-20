@@ -250,22 +250,22 @@ li{
         </div>
     </div>
 </div>
-<script src="../../build/standalone/xscroll.js"></script>
-<script src="../../build/standalone/plugins/snap.js"></script>
+<script src="../../lib/sea.js"></script>
 <script>
-(function(){
-        var slider = new XScroll({
-            renderTo:"#slider",
-            touchAction:"pan-y",
-            preventDefault:false
-        }).render();
+    seajs.config({
+      base: "../../build/cmd/",
+      map: [
+        [".js", ".js?" + new Date().getTime()]
 
-        var innerslider = new XScroll({
-            renderTo:"#innerslider"
-        }) 
+        ]
+    })
+
+    seajs.use(['xscroll','plugins/snap'],function(XScroll,Snap){
 
 
-        innerslider.render();
+        var pagewrapper = new XScroll({renderTo:"#pagewrapper",preventDefault:false,preventTouchMove:false}).render();
+        pagewrapper.plug(new Snap())
 
-})()
+        })
+
 </script>

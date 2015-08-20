@@ -329,13 +329,12 @@ Util.extend(XScroll, Base, {
             self.trigger(e.type, e);
         });
         //trigger touch events
-        var touchEvents = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+        var touchEvents = ['touchstart', 'touchmove', 'touchend', 'touchcancel','mousedown'];
         for (var i = 0, l = touchEvents.length; i < l; i++) {
             self.renderTo.addEventListener(touchEvents[i], function(e) {
                 self.trigger(e.type, e);
             });
         }
-
         self.mc.on("tap", function(e) {
             if (e.tapCount == 1) {
                 e.type = "tap";

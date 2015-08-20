@@ -55,6 +55,7 @@ Util.extend(Sticky, Base, {
       width: self.isY ? "width" : "height"
     };
     self.stickyRenderTo = Util.getNode(userConfig.stickyRenderTo);
+    self._handlers = [];
     return self;
   },
   getStickiesPos: function() {
@@ -77,7 +78,8 @@ Util.extend(Sticky, Base, {
     }
     for (var i = 0; i < self.stickiesNum; i++) {
       var pos = getPos(self.stickyElements[i]);
-      pos.el = self.createStickyEl();
+      self._handlers[i] = self._handlers[i] || self.createStickyEl();
+      pos.el = self._handlers[i];
       pos.isRender = false;
       stickiesPos.push(pos);
     }
@@ -103,7 +105,7 @@ Util.extend(Sticky, Base, {
       return Util.getNodes(xscroll.userConfig.stickyElements, xscroll.content);
     }
   },
-  render: function() {
+  render: function(force) {
     var self = this;
     var userConfig = self.userConfig;
     var xscroll = self.xscroll;
@@ -123,7 +125,7 @@ Util.extend(Sticky, Base, {
     stickyRenderTo.style[_.right] = 0;
     stickyRenderTo.style.position = xscroll.userConfig.useOriginScroll ? "fixed" : "absolute";
     Util.addClass(self.stickyRenderTo, userConfig.prefix);
-    self.stickyHandler();
+    self.stickyHandler(force);
     self._bindEvt();
   },
   createStickyEl: function() {
@@ -139,7 +141,7 @@ Util.extend(Sticky, Base, {
       xscroll = self.xscroll;
     xscroll.on("scroll", self.stickyHandler, self);
   },
-  stickyHandler: function() {
+  stickyHandler: function(force) {
     var self = this;
     var xscroll = self.xscroll;
     var userConfig = self.userConfig;
@@ -162,7 +164,7 @@ Util.extend(Sticky, Base, {
     }
 
     var curStickyIndex = Math.max.apply(null, indexes);
-    if (self.curStickyIndex != curStickyIndex) {
+    if (self.curStickyIndex != curStickyIndex || force) {
       var prevStickyIndex = self.curStickyIndex;
       self.curStickyIndex = curStickyIndex;
       self.curStickyElement = self.stickyElements[curStickyIndex];

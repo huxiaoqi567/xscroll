@@ -38,6 +38,11 @@
     .xs-container{
         width: 100%;
     }
+    .scroller{
+        height: 100%;
+        position: absolute;
+        width: 100%;
+    }
     </style>
     <div id="J_Scroll">
         <div class="xs-container">
@@ -154,7 +159,7 @@
             }
             return tmp
         })()
-        var xscroll = new XScroll({
+        var xscroll = window.xscroll = new XScroll({
             renderTo: "#J_Scroll"
         });
 
@@ -168,8 +173,8 @@
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
                 if(row.style.position == "sticky"){
-                    el.innerHTML = '<div class="container"><div class="content">'+row.data.num+'</div></div>';
-                    renderScroll(el);
+                    el.innerHTML = '<div class="scroller"><div class="container"><div class="content">'+row.data.num+'</div></div></div>';
+                    renderScroll(el.querySelector('.scroller'));
                 }else{
                     el.innerHTML = row.data.num;
                 }
@@ -180,7 +185,6 @@
         infinite.append(0,data);
         xscroll.render();
 
-        console.log(infinite)
         function renderScroll(el,background){
             var scroll = new XScroll({
                 renderTo:el,
@@ -197,6 +201,12 @@
             })
             return scroll;
         }
+
+        infinite.on("tap",function(e){
+            var cell = e.cell;
+            infinite.get(cell.sectionId,cell.index).style.background = "red"
+            xscroll.render();
+        })
 
     });
 

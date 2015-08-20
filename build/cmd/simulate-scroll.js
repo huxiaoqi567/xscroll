@@ -81,7 +81,7 @@ Util.extend(SimuScroll, Core, {
     self.container.style.transformOrigin = "";
     self.content.style.transform = "";
     self.content.style.transformOrigin = "";
-    self.off("touchstart", self._ontouchstart);
+    self.off("touchstart mousedown", self._ontouchstart);
     self.off("touchmove", self._ontouchmove);
     self.destroyScrollBars();
   },
@@ -255,7 +255,7 @@ Util.extend(SimuScroll, Core, {
     self.__isEvtBind = true;
     var pinch = new Hammer.Pinch();
     self.mc.add(pinch);
-    self.on("touchstart", self._ontouchstart, self);
+    self.on("touchstart mousedown", self._ontouchstart, self);
     self.on("touchmove", self._ontouchmove, self);
     self.on("tap", self._ontap, self);
     self.on("panstart", self._onpanstart, self);
@@ -283,7 +283,7 @@ Util.extend(SimuScroll, Core, {
     this.userConfig.preventTouchMove && e.preventDefault();
   },
   _onpanstart: function(e) {
-    e.preventDefault();
+    this.userConfig.preventTouchMove && e.preventDefault();
     var self = this;
     var scrollLeft = self.getScrollLeft();
     var scrollTop = self.getScrollTop();
@@ -295,7 +295,7 @@ Util.extend(SimuScroll, Core, {
     return self;
   },
   _onpan: function(e) {
-    e.preventDefault();
+    this.userConfig.preventTouchMove && e.preventDefault();
     var self = this;
     var boundry = self.boundry;
     var userConfig = self.userConfig;
@@ -331,7 +331,6 @@ Util.extend(SimuScroll, Core, {
     return self;
   },
   _onpanend: function(e) {
-    e.preventDefault();
     var self = this;
     var userConfig = self.userConfig;
     var transX = self.computeScroll("x", e.velocityX);

@@ -61,7 +61,6 @@ li a{
 	</div>
 </div>
 <script src="../../lib/sea.js"></script>
-<script src="../../lib/log.js"></script>
 <script>
 	seajs.config({
       base: "../../build/cmd" 
@@ -83,6 +82,7 @@ li a{
     	var ul = xscroll.renderTo.querySelector("ul");
 
     	pullup.on("loading",function(){
+    		console.log("aaa")
     		for(var i = 0;i<10;i++){
     			var li = document.createElement("li");
     			li.innerHTML = i;

@@ -766,7 +766,8 @@ plugins_infinite = function (exports) {
       var offset = self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft();
       self.visibleElements = self.getVisibleElements(offset);
       self.__serializedData = self._computeDomPositions();
-      xscroll.sticky && xscroll.sticky.render();
+      xscroll.sticky && xscroll.sticky.render(true);
+      //force render
       xscroll.fixed && xscroll.fixed.render();
       var size = xscroll[_.height];
       var containerSize = self._containerSize;
@@ -963,10 +964,16 @@ plugins_infinite = function (exports) {
     getCell: function (e) {
       var self = this, cell;
       var el = Util.findParentEl(e.target, '._xs_infinite_elements_', self.xscroll.renderTo);
+      if (!el) {
+        el = Util.findParentEl(e.target, '.xs-sticky-handler', self.xscroll.renderTo);
+      }
       var guid = el && el.getAttribute('xs-guid');
       if (undefined === guid)
         return;
-      return self.__serializedData[guid];
+      return {
+        data: self.__serializedData[guid],
+        el: el
+      };
     },
     _bindEvt: function () {
       var self = this;
@@ -983,7 +990,9 @@ plugins_infinite = function (exports) {
     },
     _cellEventsHandler: function (e) {
       var self = this;
-      e.cell = self.getCell(e);
+      var cell = self.getCell(e);
+      e.cell = cell.data;
+      e.cellEl = cell.el;
       e.cell && self[e.type].call(self, e);
     },
     /**
