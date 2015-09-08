@@ -240,11 +240,11 @@ Util.extend(SimuScroll, Core, {
   _ontap: function(e) {
     var self = this;
     self.boundryCheck();
-    self._preventHref(e);
-    if (!self.isRealScrollingY && !self.isRealScrollingY) {
+    self._unPreventHref(e);
+    if (!self.isRealScrollingX && !self.isRealScrollingY) {
       self._triggerClick(e);
     }
-    self._unPreventHref(e);
+    self._preventHref(e);
     self.isRealScrollingY = false;
     self.isRealScrollingY = false;
   },
@@ -652,7 +652,7 @@ Util.extend(SimuScroll, Core, {
     });
     return self;
   },
-  _preventHref: function(e) {
+  _unPreventHref: function(e) {
     var target = e.target;
     if (target.tagName.toLowerCase() == "a") {
       var href = target.getAttribute("data-xs-href");
@@ -661,7 +661,7 @@ Util.extend(SimuScroll, Core, {
       }
     }
   },
-  _unPreventHref: function(e) {
+  _preventHref: function(e) {
     var target = e.target;
     if (target.tagName.toLowerCase() == "a") {
       var href = target.getAttribute("href");

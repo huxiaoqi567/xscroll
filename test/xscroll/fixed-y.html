@@ -51,7 +51,7 @@ a{
 	<div class="xs-container">
 		<div class="xs-content">
 			<ul>
-				<!-- <li class="xs-sticky"><a href="//xscroll.github.io">xscroll.github.io</a></li> -->
+				<li class="xs-sticky"><a href="//xscroll.github.io">xscroll.github.io</a></li>
 				<li><a href="//xscroll.github.io">xscroll.github.io 1</a></li>
 				<li><a href="//xscroll.github.io">xscroll.github.io 2</a></li>
 				<li class="xs-fixed"><a href="//xscroll.github.io">xscroll.github.io 3</a></li>
@@ -116,7 +116,6 @@ a{
 </div>
 
 <script src="../../lib/sea.js"></script>
-<script src="../../lib/log.js"></script>
 <script>
 	seajs.config({
       base: "../../build/cmd/",
@@ -149,7 +148,7 @@ a{
 
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
-    		// stickyRenderTo:".outer-sticky-container"
+    		stickyRenderTo:".outer-sticky-container",
     		useOriginScroll:true
     	})
 
@@ -159,7 +158,6 @@ a{
     	}
 
     	xscroll.on("fixedchange",function(e){
-    		// console.log(e)
     		new Component({el:e.fixedElement});
     	})
 
@@ -181,7 +179,7 @@ a{
     	window.xscroll = xscroll
 
     	xscroll.on("scroll",function(e){
-    		console.log(e.scrollTop,true)
+    		// console.log(e.scrollTop)
     	})
 
 

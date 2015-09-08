@@ -81,6 +81,7 @@ Util.extend(Infinite, Base, {
 		for (var i = 0; i < self.infiniteLength; i++) {
 			self.infiniteElements[i].style[_.top] = "auto";
 			self.infiniteElements[i].style[transform] = "none";
+			self.infiniteElements[i].style.visibility = "hidden";
 		}
 		self.xscroll && self.xscroll.off("scroll", self._updateByScroll, self);
 		self.xscroll && self.xscroll.off("tap panstart pan panend", self._cellEventsHandler, self);
@@ -106,7 +107,6 @@ Util.extend(Infinite, Base, {
 			return tmp;
 		})();
 		self.elementsPos = {};
-		xscroll.on("scroll", self._updateByScroll, self);
 		return self;
 	},
 	_renderUnRecycledEl: function() {
@@ -188,21 +188,25 @@ Util.extend(Infinite, Base, {
 		var pos = _pos === undefined ? (self.isY ? xscroll.getScrollTop() : xscroll.getScrollLeft()) : _pos;
 		var elementsPos = self.getVisibleElements(pos);
 		var changedRows = self.changedRows = self._getChangedRows(elementsPos);
-		for (var i in changedRows) {
-			if (changedRows[i] == "delete") {
-				self._pushEl(i);
-			}
-			if (changedRows[i] == "add") {
-				var elObj = self._popEl(elementsPos[i][self.guid]);
-				var index = elObj.index;
-				var el = elObj.el;
-				if (el) {
-					self.infiniteElementsCache[index].guid = elementsPos[i].guid;
-					self.__serializedData[elementsPos[i].guid].__infiniteIndex = index;
-					self._renderData(el, elementsPos[i]);
-					self._renderStyle(el, elementsPos[i]);
+		try{
+			for (var i in changedRows) {
+				if (changedRows[i] == "delete") {
+					self._pushEl(i);
+				}
+				if (changedRows[i] == "add") {
+					var elObj = self._popEl(elementsPos[i][self.guid]);
+					var index = elObj.index;
+					var el = elObj.el;
+					if (el) {
+						self.infiniteElementsCache[index].guid = elementsPos[i].guid;
+						self.__serializedData[elementsPos[i].guid].__infiniteIndex = index;
+						self._renderData(el, elementsPos[i]);
+						self._renderStyle(el, elementsPos[i]);
+					}
 				}
 			}
+		}catch(e){
+			console.warn('Not enough infiniteElements setted!');
 		}
 		return self;
 	},
@@ -368,6 +372,7 @@ Util.extend(Infinite, Base, {
 				e.target.style.webkitTransition = "";
 			}
 		});
+		self.xscroll.on("scroll", self._updateByScroll, self);
 		self.xscroll.on("tap panstart pan panend", self._cellEventsHandler, self);
 		return self;
 	},

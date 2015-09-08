@@ -276,7 +276,8 @@ Util.extend(XScroll, Base, {
             userConfig = self.userConfig;
         self.fixed = self.fixed || new Fixed({
             fixedElements:userConfig.fixedElements,
-            xscroll:self
+            xscroll:self,
+            fixedRenderTo:userConfig.fixedRenderTo
         });
         self.fixed.render();
         self.resetSize();

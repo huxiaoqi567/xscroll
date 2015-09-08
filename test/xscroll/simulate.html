@@ -66,6 +66,12 @@ li{
     		// console.log(e.offset)
     	})
 
+    	xscroll.on("tap",function(){
+    		xscroll.scrollTopBy(100,100,'linear',function(){
+    			console.log("xx")
+    		})
+    	})
+
 
     	window.xscroll = xscroll;
 

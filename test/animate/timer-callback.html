@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<style type="text/css">
+* {
+	margin:0;
+	padding: 0;
+}
+li{
+	display: block;
+	line-height: 200px;
+	border: 1px solid;
+}
+.xs-container{
+	opacity: 1;
+	/*-webkit-transform:translateZ(100px) scaleZ(150) scaleX(200) scaleY(300) translateX(123px) ;*/
+	/*-webkit-transform:matrix(1,0,0,1,0,0);*/
+}
+#block{
+	position: absolute;
+	height: 200px;
+	width: 200px;
+    background: red;
+    overflow: hidden;
+}
+#inner{
+    width:1000px;
+    display: block;
+    /*height:1000px;*/
+    overflow: hidden;
+}
+#inner li{
+    display: block;
+    font-size: 40px;
+    width:40px;height: 40px;float: left;
+    border:1px solid;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<div id="block">
+    <ul id="inner">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</div>
+<div style="position:relative;z-index:9999">
+<input type="button" id="run" value="run">
+<input type="button" id="stop" value="stop">
+<input type="button" id="reset" value="reset">
+</div>
+<script src="../../lib/sea.js"></script>
+<script>
+	seajs.config({
+      base: "../../build/cmd" 
+    })
+    seajs.use(["timer"],function(Timer){
+    	var t = new Timer({
+    		duration:2000,
+    		run:function(e){
+    			// console.log(e)
+    		},
+    		end:function(e){
+	    		console.log(block,"finished")
+	    	}
+    	});
+        t.run();
+
+
+
+       
+
+    })
+</script>

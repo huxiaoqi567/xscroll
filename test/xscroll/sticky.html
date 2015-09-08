@@ -97,7 +97,7 @@ li{
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
     		useTransition:false,
-    		// useOriginScroll:true,
+    		useOriginScroll:true,
     		stickyElements:".xs-sticky"
     	})
 
@@ -128,7 +128,7 @@ li{
     		});
     		scroll.render();
     		scroll.content.style.background = background || "none";
-    		xscroll.controller.add(scroll)
+    		xscroll.controller && xscroll.controller.add(scroll)
     		scroll.on("tap",function(e){
     			console.log("tap")
     		})
