@@ -192,7 +192,8 @@
     })
     seajs.use(["xscroll","plugins/lazyload"],function(XScroll,LazyLoad){
         var xscroll = new XScroll({
-            renderTo:"#J_Scroll"
+            renderTo:"#J_Scroll",
+            zoomType:"x"
         });
         var lazyload = new LazyLoad({
             imgsSelector:'img',

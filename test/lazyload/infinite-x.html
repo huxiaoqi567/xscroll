@@ -165,18 +165,18 @@
             for (var i = 0;i<imgs.length;i++) {
                 tmp.push({
                     data:{num: i,src:imgs[i]},
-                    style:{height:200,background:"#fff","color":"#000"}
+                    style:{width:200,background:"#fff","color":"#000"}
                 });
             }
 
             return tmp
         })()
         var xscroll = new XScroll({
-            renderTo: "#J_Scroll"
+            renderTo: "#J_Scroll",
+            zoomType:"x"
         });
 
-        var infinite = new Infinite({
-            zoomType:"x",
+        var infinite = window.infinite = new Infinite({
             infiniteElements:"#J_Scroll .xs-row",
             renderHook:function(el,row){
             el.innerHTML = 

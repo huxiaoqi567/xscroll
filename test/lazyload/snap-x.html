@@ -71,7 +71,8 @@
     seajs.use(["simulate-scroll", "plugins/snap","plugins/lazyload"], function(XScroll, Snap,LazyLoad) {
         var xscroll = new XScroll({
             renderTo: "#J_Scroll",
-            scrollbarX:false
+            scrollbarX:false,
+            zoomType:"x"
         });
         var snap = new Snap({
             snapWidth:remFontSize * 16,

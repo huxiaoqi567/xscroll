@@ -24,6 +24,9 @@ li{
 .xs-sticky{
 	line-height: 100px;
 	border: 1px solid;
+	/*position: sticky;*/
+	/*position: -webkit-sticky;*/
+	/*top:0;*/
 }
 </style>
 </head>
@@ -97,7 +100,7 @@ li{
     	var xscroll = new XScroll({
     		renderTo:"#scroll",
     		useTransition:false,
-    		useOriginScroll:true,
+    		useOriginScroll:false,
     		stickyElements:".xs-sticky"
     	})
 

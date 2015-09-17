@@ -34,21 +34,22 @@
     #J_Scroll{
         overflow-x: scroll;
         overflow-y: hidden;
-         position: absolute;
+        position: absolute;
         width: 100%;
         height: 50%;
-
     }
     #J_Scroll ul{
         position: absolute;
-        height: 100%;
+        height: 10rem;
         width: 81rem;
         font-size: 0;
     }
     #J_Scroll ul li{
         display: block;
+        background: #ccc;
         float: left;
-        font-size: 12px;
+        font-size: 4rem;
+        text-align: center;
         width: 16rem;
         height: 100%;
         border:1px solid #ccc;
@@ -79,8 +80,20 @@
         var xscroll = new XScroll({
             renderTo: "#J_Scroll",
             preventDefault:false,
-            preventTouchMove:false
+            preventTouchMove:false,
+            touchAction:'pan-y'
         });
+
+        xscroll.on('panstart',function(e){
+            // pan-vertical  to lock scroll
+            if(e.direction == 8 || e.direction == 16){
+                xscroll.userConfig.lockX = true;
+            }
+        });
+        xscroll.on('panend',function(e){
+            xscroll._resetLockConfig();
+        })
+
         var snap = new Snap({
             snapWidth:remFontSize * 16 + 2,
             snapColsNum:5,
