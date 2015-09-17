@@ -53,7 +53,7 @@ Util.extend(XScroll, Base, {
      * @memberof XScroll
      * @type {string}
      */
-    version: "3.0.0",
+    version: "3.0.13",
     /**
      * init scroll
      * @memberof XScroll
