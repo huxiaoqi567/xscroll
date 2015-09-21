@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>snap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+     <script type="text/javascript">
+        ! function() {
+            function a() {
+                window.remFontSize = document.documentElement.clientWidth / 16;
+                document.documentElement.style.fontSize = document.documentElement.clientWidth / 16 + "px"
+            }
+            var b = null;
+            window.addEventListener("resize", function() {
+                clearTimeout(b), b = setTimeout(a, 300)
+            }, !1), a()
+        }(window);
+        </script>
+</head>
+<body>
+    <style type="text/css">
+    *{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 1000%;
+
+    }
+    #J_Scroll{
+        overflow-x: scroll;
+        overflow-y: hidden;
+        position: absolute;
+        width: 100%;
+        height: 50%;
+    }
+    #J_Scroll ul{
+        position: absolute;
+        height: 10rem;
+        font-size: 0;
+        white-space: nowrap;
+    }
+    #J_Scroll ul li{
+        display: inline-block;
+        background: #ccc;
+        font-size: 2rem;
+        text-align: center;
+        width: 16rem;
+        height: 100%;
+        border:1px solid #ccc;
+        width: 4rem;
+    }
+    .xs-container{
+        width: 100%;
+        height: 100%;
+
+    }
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row">1</li>
+                <li class="xs-row">2</li>
+                <li class="xs-row">3</li>
+                <li class="xs-row">4</li>
+                <li class="xs-row">5</li>
+                <li class="xs-row">6</li>
+                <li class="xs-row">7</li>
+                <li class="xs-row">8</li>
+                <li class="xs-row">9</li>
+                <li class="xs-row">10</li>
+                <li class="xs-row">11</li>
+                <li class="xs-row">12</li>
+                <li class="xs-row">13</li>
+                <li class="xs-row">14</li>
+                <li class="xs-row">15</li>
+                <li class="xs-row">16</li>
+                <li class="xs-row">17</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script>
+    seajs.config({
+        base: "../../build/cmd" 
+    });
+    seajs.use(["simulate-scroll", "plugins/snap"], function(XScroll, Snap) {
+        var xscroll = new XScroll({
+            renderTo: "#J_Scroll",
+            preventDefault:false,
+            preventTouchMove:false,
+            touchAction:'pan-y'
+        });
+
+        xscroll.on('panstart',function(e){
+            // pan-vertical  to lock scroll
+            if(e.direction == 8 || e.direction == 16){
+                xscroll.userConfig.lockX = true;
+            }
+        });
+        xscroll.on('panend',function(e){
+            xscroll._resetLockConfig();
+        })
+
+        var snap = new Snap({
+            autoStep:true,
+            snapWidth:remFontSize * 4 + 2,
+            snapColsNum:document.querySelectorAll('li').length,
+        });
+        xscroll.plug(snap)
+        xscroll.render();
+
+
+        window.xscroll = xscroll;
+
+    });
+
+    </script>
+</body>
+</html>

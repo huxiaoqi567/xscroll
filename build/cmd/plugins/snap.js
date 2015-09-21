@@ -85,6 +85,7 @@ Util.extend(Snap, Base, {
    */
   snapToCol: function(col, duration, easing, callback) {
     var self = this;
+    var xscroll = self.xscroll;
     var userConfig = self.userConfig;
     var duration = duration || userConfig.snapDuration;
     var easing = easing || userConfig.snapEasing;
@@ -95,7 +96,10 @@ Util.extend(Snap, Base, {
     self.prevColIndex = self.snapColIndex;
     self.snapColIndex = col;
     var left = self.snapColIndex * snapWidth + snapOffsetLeft;
-    self.xscroll.scrollLeft(left, duration, easing, callback);
+    if(left > xscroll.containerWidth - xscroll.boundry.width){
+      left = xscroll.containerWidth - xscroll.boundry.width;
+    }
+    xscroll.scrollLeft(left, duration, easing, callback);
     return self;
   },
   _colChange: function(e) {
@@ -120,6 +124,7 @@ Util.extend(Snap, Base, {
    */
   snapToRow: function(row, duration, easing, callback) {
     var self = this;
+    var xscroll = self.xscroll;
     var userConfig = self.userConfig;
     var duration = duration || userConfig.snapDuration;
     var easing = easing || userConfig.snapEasing;
@@ -130,6 +135,9 @@ Util.extend(Snap, Base, {
     self.prevRowIndex = self.snapRowIndex;
     self.snapRowIndex = row;
     var top = self.snapRowIndex * snapHeight + snapOffsetTop;
+    if(top > xscroll.containerHeight - xscroll.boundry.height){
+      top = xscroll.containerHeight - xscroll.boundry.height;
+    }
     self.xscroll.scrollTop(top, duration, easing,callback);
     return self;
   },
@@ -161,8 +169,8 @@ Util.extend(Snap, Base, {
     var cy = snapHeight / 2;
     var direction = e.direction;
     if (Math.abs(e.velocity) <= 0.2) {
-      var left = Math.abs(self.xscroll.getScrollLeft());
-      var top = Math.abs(self.xscroll.getScrollTop());
+      var left = self.xscroll.getScrollLeft();
+      var top = self.xscroll.getScrollTop();
       var snapColIndex = Math.round(left / snapWidth);
       var snapRowIndex = Math.round(top / snapHeight);
       self.snapTo(snapColIndex, snapRowIndex);

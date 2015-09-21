@@ -3,7 +3,6 @@ var util = {}, events = {}, base = {}, plugins_snap = {};
 util = function (exports) {
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
-  var RE_DASH = /-([a-z])/gi;
   function upperCase() {
     return arguments[1].toUpperCase();
   }
@@ -708,6 +707,7 @@ plugins_snap = function (exports) {
      */
     snapToCol: function (col, duration, easing, callback) {
       var self = this;
+      var xscroll = self.xscroll;
       var userConfig = self.userConfig;
       var duration = duration || userConfig.snapDuration;
       var easing = easing || userConfig.snapEasing;
@@ -718,7 +718,10 @@ plugins_snap = function (exports) {
       self.prevColIndex = self.snapColIndex;
       self.snapColIndex = col;
       var left = self.snapColIndex * snapWidth + snapOffsetLeft;
-      self.xscroll.scrollLeft(left, duration, easing, callback);
+      if (left > xscroll.containerWidth - xscroll.boundry.width) {
+        left = xscroll.containerWidth - xscroll.boundry.width;
+      }
+      xscroll.scrollLeft(left, duration, easing, callback);
       return self;
     },
     _colChange: function (e) {
@@ -743,6 +746,7 @@ plugins_snap = function (exports) {
      */
     snapToRow: function (row, duration, easing, callback) {
       var self = this;
+      var xscroll = self.xscroll;
       var userConfig = self.userConfig;
       var duration = duration || userConfig.snapDuration;
       var easing = easing || userConfig.snapEasing;
@@ -753,6 +757,9 @@ plugins_snap = function (exports) {
       self.prevRowIndex = self.snapRowIndex;
       self.snapRowIndex = row;
       var top = self.snapRowIndex * snapHeight + snapOffsetTop;
+      if (top > xscroll.containerHeight - xscroll.boundry.height) {
+        top = xscroll.containerHeight - xscroll.boundry.height;
+      }
       self.xscroll.scrollTop(top, duration, easing, callback);
       return self;
     },
@@ -784,8 +791,8 @@ plugins_snap = function (exports) {
       var cy = snapHeight / 2;
       var direction = e.direction;
       if (Math.abs(e.velocity) <= 0.2) {
-        var left = Math.abs(self.xscroll.getScrollLeft());
-        var top = Math.abs(self.xscroll.getScrollTop());
+        var left = self.xscroll.getScrollLeft();
+        var top = self.xscroll.getScrollTop();
         var snapColIndex = Math.round(left / snapWidth);
         var snapRowIndex = Math.round(top / snapHeight);
         self.snapTo(snapColIndex, snapRowIndex);

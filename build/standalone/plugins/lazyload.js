@@ -3,7 +3,6 @@ var util = {}, events = {}, base = {}, plugins_lazyload = {};
 util = function (exports) {
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
-  var RE_DASH = /-([a-z])/gi;
   function upperCase() {
     return arguments[1].toUpperCase();
   }

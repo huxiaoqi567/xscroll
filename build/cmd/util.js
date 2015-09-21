@@ -6,8 +6,6 @@ var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g,
 var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g,
 	trim = String.prototype.trim;
 
-var RE_DASH = /-([a-z])/ig;
-
 function upperCase() {
 	return arguments[1].toUpperCase();
 }
