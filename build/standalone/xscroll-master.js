@@ -3,6 +3,11 @@ var util = {}, events = {}, base = {}, easing = {}, timer = {}, animate = {}, ha
 util = function (exports) {
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
+  var _trim = trim ? function (str) {
+    return str == null ? EMPTY : trim.call(str);
+  } : function (str) {
+    return str == null ? EMPTY : (str + '').replace(RE_TRIM, EMPTY);
+  };
   function upperCase() {
     return arguments[1].toUpperCase();
   }
@@ -115,11 +120,7 @@ util = function (exports) {
     * @method
     * @member util
     */
-    trim: trim ? function (str) {
-      return str == null ? EMPTY : trim.call(str);
-    } : function (str) {
-      return str == null ? EMPTY : (str + '').replace(RE_TRIM, EMPTY);
-    },
+    trim: _trim,
     /**
     * Substitutes keywords in a string using an object/array.
     * Removes undef keywords and ignores escaped keywords.
@@ -238,14 +239,20 @@ util = function (exports) {
     * @return {HTMLElement} parent element
     */
     findParentEl: function (el, selector, rootNode) {
-      var rs = null, parent = null, sel = selector.replace(/\.|#/g, '');
+      var rs = null, parent = null;
+      var type = /^#/.test(selector) ? 'id' : /^\./.test(selector) ? 'class' : 'tag';
+      var sel = selector.replace(/\.|#/g, '');
       if (rootNode && typeof rootNode === 'string') {
         rootNode = document.querySelector(rootNode);
       }
       rootNode = rootNode || document.body;
       if (!el || !selector)
         return;
-      if (el.className && el.className.match(sel)) {
+      if (type == 'class' && el.className && el.className.match(sel)) {
+        return el;
+      } else if (type == 'id' && el.id && _trim(el.id) == sel) {
+        return el;
+      } else if (type == 'tag' && el.tagName.toLowerCase() == sel) {
         return el;
       }
       while (!rs) {
@@ -254,7 +261,7 @@ util = function (exports) {
         parent = el.parentNode;
         if (!parent)
           break;
-        if (parent.className && parent.className.match(sel)) {
+        if (type == 'class' && parent.className && parent.className.match(sel) || type == 'id' && parent.id && _trim(parent.id) == sel || type == 'tag' && parent.tagName && parent.tagName.toLowerCase() == sel) {
           rs = parent;
           return rs;
           break;
@@ -3772,7 +3779,8 @@ core = function (exports) {
    * @param {boolean} cfg.useOriginScroll config if use simulate or origin scroll
    * @param {boolean} cfg.bounce config if use has the bounce effect when scrolling outside of the boundry
    * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
-   * @param {boolean} cfg.preventDefault config if prevent the browser default behavior
+   * @param {boolean} cfg.preventDefault prevent touchstart
+   * @param {boolean} cfg.preventTouchMove prevent touchmove
    * @param {string|HTMLElement}  cfg.container config for scroller's container which default value is ".xs-container"
    * @param {string|HTMLElement}  cfg.content config for scroller's content which default value is ".xs-content"
    * @param {object}  cfg.indicatorInsets  config scrollbars position {top: number, left: number, bottom: number, right: number}
@@ -4459,8 +4467,13 @@ simulate_scroll = function (exports) {
    * @param {boolean} cfg.scrollbarX config if the scrollbar-x is visible
    * @param {boolean} cfg.scrollbarY config if the scrollbar-y is visible
    * @param {boolean} cfg.useTransition config if use css3 transition or raf for scroll animation
+   * @param {boolean} cfg.bounce config if use has the bounce effect when scrolling outside of the boundry
+   * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
+   * @param {boolean} cfg.preventDefault prevent touchstart
+   * @param {boolean} cfg.preventTouchMove prevent touchmove
    * @param {string|HTMLElement}  cfg.container config for scroller's container which default value is ".xs-container"
    * @param {string|HTMLElement}  cfg.content config for scroller's content which default value is ".xs-content"
+   * @param {object}  cfg.indicatorInsets  config scrollbars position {top: number, left: number, bottom: number, right: number}
    * @param {string}  cfg.stickyElements config for sticky-positioned elements
    * @param {string}  cfg.fixedElements config for fixed-positioned elements
    * @param {string}  cfg.touchAction config for touchAction of the scroller
@@ -5086,7 +5099,9 @@ simulate_scroll = function (exports) {
       return self;
     },
     _unPreventHref: function (e) {
-      var target = e.target;
+      var target = Util.findParentEl(e.target, 'a', this.renderTo);
+      if (!target)
+        return;
       if (target.tagName.toLowerCase() == 'a') {
         var href = target.getAttribute('data-xs-href');
         if (href) {
@@ -5095,11 +5110,13 @@ simulate_scroll = function (exports) {
       }
     },
     _preventHref: function (e) {
-      var target = e.target;
+      var target = Util.findParentEl(e.target, 'a', this.renderTo);
+      if (!target)
+        return;
       if (target.tagName.toLowerCase() == 'a') {
         var href = target.getAttribute('href');
-        target.setAttribute('href', 'javascript:void(0)');
-        target.setAttribute('data-xs-href', href);
+        href && target.setAttribute('href', 'javascript:void(0)');
+        href && target.setAttribute('data-xs-href', href);
       }
     },
     _triggerClick: function (e) {

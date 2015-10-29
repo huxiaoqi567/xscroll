@@ -3,6 +3,11 @@ var util = {}, events = {}, base = {}, plugins_snap = {};
 util = function (exports) {
   var SUBSTITUTE_REG = /\\?\{([^{}]+)\}/g, EMPTY = '';
   var RE_TRIM = /^[\s\xa0]+|[\s\xa0]+$/g, trim = String.prototype.trim;
+  var _trim = trim ? function (str) {
+    return str == null ? EMPTY : trim.call(str);
+  } : function (str) {
+    return str == null ? EMPTY : (str + '').replace(RE_TRIM, EMPTY);
+  };
   function upperCase() {
     return arguments[1].toUpperCase();
   }
@@ -115,11 +120,7 @@ util = function (exports) {
     * @method
     * @member util
     */
-    trim: trim ? function (str) {
-      return str == null ? EMPTY : trim.call(str);
-    } : function (str) {
-      return str == null ? EMPTY : (str + '').replace(RE_TRIM, EMPTY);
-    },
+    trim: _trim,
     /**
     * Substitutes keywords in a string using an object/array.
     * Removes undef keywords and ignores escaped keywords.
@@ -238,14 +239,20 @@ util = function (exports) {
     * @return {HTMLElement} parent element
     */
     findParentEl: function (el, selector, rootNode) {
-      var rs = null, parent = null, sel = selector.replace(/\.|#/g, '');
+      var rs = null, parent = null;
+      var type = /^#/.test(selector) ? 'id' : /^\./.test(selector) ? 'class' : 'tag';
+      var sel = selector.replace(/\.|#/g, '');
       if (rootNode && typeof rootNode === 'string') {
         rootNode = document.querySelector(rootNode);
       }
       rootNode = rootNode || document.body;
       if (!el || !selector)
         return;
-      if (el.className && el.className.match(sel)) {
+      if (type == 'class' && el.className && el.className.match(sel)) {
+        return el;
+      } else if (type == 'id' && el.id && _trim(el.id) == sel) {
+        return el;
+      } else if (type == 'tag' && el.tagName.toLowerCase() == sel) {
         return el;
       }
       while (!rs) {
@@ -254,7 +261,7 @@ util = function (exports) {
         parent = el.parentNode;
         if (!parent)
           break;
-        if (parent.className && parent.className.match(sel)) {
+        if (type == 'class' && parent.className && parent.className.match(sel) || type == 'id' && parent.id && _trim(parent.id) == sel || type == 'tag' && parent.tagName && parent.tagName.toLowerCase() == sel) {
           rs = parent;
           return rs;
           break;

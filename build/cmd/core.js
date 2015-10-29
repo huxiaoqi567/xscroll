@@ -26,7 +26,8 @@ var BOUNDRY_CHECK_ACCELERATION = 0.1;
  * @param {boolean} cfg.useOriginScroll config if use simulate or origin scroll
  * @param {boolean} cfg.bounce config if use has the bounce effect when scrolling outside of the boundry
  * @param {boolean} cfg.boundryCheck config if scrolling inside of the boundry
- * @param {boolean} cfg.preventDefault config if prevent the browser default behavior
+ * @param {boolean} cfg.preventDefault prevent touchstart
+ * @param {boolean} cfg.preventTouchMove prevent touchmove
  * @param {string|HTMLElement}  cfg.container config for scroller's container which default value is ".xs-container"
  * @param {string|HTMLElement}  cfg.content config for scroller's content which default value is ".xs-content"
  * @param {object}  cfg.indicatorInsets  config scrollbars position {top: number, left: number, bottom: number, right: number}

@@ -1,0 +1,472 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>simple</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+
+* {
+    box-sizing: border-box;
+    position: relative;
+    margin : 0;
+    padding : 0;
+    border-style: solid;
+    border-width : 0;
+}
+
+#__bs_notify__{display:none !important;}
+
+/**
+ * 页面默认宽高
+ */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+/**
+ * 顶级元素为body下面的第一级div， 所有元素都渲染在这个元素内
+ * 这个元素默认属性：
+ * 1. 高度100%
+ * 2. flex为column
+ */
+body > div{
+    display: -webkit-box!important;
+    display: -webkit-flex!important;
+    display: -ms-flexbox!important;
+    display: flex!important;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+
+/**
+ * 对应react-native里边标记flex:*的父元素
+ * 在web里边必须要标记父元素display:flex;才能使用flex属性
+ * flex默认是column的
+ */
+.react-flex {
+    display: -webkit-box!important;
+    display: -webkit-flex!important;
+    display: -ms-flexbox!important;
+    display: flex!important;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+/**
+ * flex direction 兼容
+ */
+.react-flex-column {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.react-flex-row {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+}
+
+/**
+ * justifyContent 兼容
+ */
+.react-flex.justify-start {
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start
+}
+.react-flex.justify-end {
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    -ms-flex-pack: end;
+    justify-content: flex-end
+}
+.react-flex.justify-center {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center
+}
+.react-flex.justify-between {
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between
+}
+.react-flex.justify-around {
+    -webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around
+}
+
+/**
+ * align items的兼容
+ */
+.react-flex.align-start {
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start
+}
+.react-flex.align-end {
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end
+}
+.react-flex.align-center {
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center
+}
+.react-flex.align-stretch {
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch
+}
+.react-flex.align-stretch .react-flex-cell {
+    height: auto!important
+}
+
+
+/**
+ * 对应react-native里边标记有flex:*的元素
+ */
+.react-flex-cell {
+    -webkit-flex-basis: 0;
+    -ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    max-width: 100%;
+}
+
+/**
+ * alignself的兼容
+ */
+.react-flex-cell.align-start {
+    -webkit-align-self: flex-start;
+    -ms-flex-item-align: start;
+    align-self: flex-start;
+}
+.react-flex-cell.align-end {
+    -webkit-align-self: flex-end;
+    -ms-flex-item-align: end;
+    align-self: flex-end;
+}
+.react-flex-cell.align-center {
+    -webkit-align-self: center;
+    -ms-flex-item-align: center;
+    align-self: center;
+}
+.react-flex-cell.align-stretch {
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    height: auto!important;
+}
+
+
+/**
+ * scrollview 的兼容
+ */
+.scrollView {
+    overflow-y: scroll;
+}</style>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+     #J_Scroll{
+        position: absolute;
+        top:0;
+        bottom: 0;
+        width:100%;
+        overflow-x:hidden;
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch;
+     }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li.xs-row{
+        width: 100%;
+        display: block;
+        overflow: hidden;
+        position: relative;
+        box-sizing:border-box;
+        text-align: center;
+        line-height: 40px;
+        color:white;
+        border:1px solid red;
+    }
+    .xs-container{
+        width: 100%;
+    }
+    .goods-item{
+        position: absolute;top: 0;bottom: 0;left: 0;right: 0;
+        width: 100%;box-sizing: border-box;visibility: visible;
+      height: 6.75rem;
+        text-decoration: none;padding: .625rem;margin-bottom: 1px;
+        &:before{
+            content: "";position: absolute;left: .625rem;right: .625rem;height: 1px;bottom: -1px;
+            background: #E4E4E4;
+        }
+        &:after{
+            content: "";display: table;clear: both;
+        }
+    }
+    .goods-pic{
+        float: left;width: 8.25rem;height: 5.5rem;margin-right: .625rem;border-radius: 5px;
+      background: url(//gtms02.alicdn.com/tps/i2/T1Iq4VFx0lXXaqj.77-117-34.png) center center no-repeat #F0F0F0;
+      background-size: 100%;
+      border-radius: 5px;
+    }
+    .goods-pic img{width: 100%;}
+    .goods-link{
+        position: absolute;
+        left: 0;top: 0;right: 0;bottom: 0;z-index: 2;
+    }
+    .goods-title{
+        height: 2.8125rem;line-height: 1.5;font-size: .875rem;color: #333;
+        overflow: hidden;text-overflow: ellipsis;
+        display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;
+    }
+    .goods-now{
+        float: left;
+        color: #FA215F;height: 1.375rem;line-height: 1.375rem;padding: .1875rem 0;
+        font-size: 1.25rem;font-family: "Helvetica Neue";
+        width:50%;
+        text-align: left;
+    }
+    .goods-item .yen{margin-right: 2px;}
+
+
+    .goods-origin,
+    .goods-state{
+      float: left;height: 1.25rem;line-height: 1.25rem;font-family: "Helvetica Neue";color:#AAAAAA;font-size: .75rem;
+    }
+
+    .goods-origin i,.goods-now i{margin-right: 2px;}
+
+
+    .goods-state{float: right;}
+    .coming-soon{
+      color: #44ab00;
+    }
+    .hot-sale{
+      color: lighten(#FA215F,20%);
+    }
+    .have-chance{
+      color: #3883bd;
+    }
+    .fixed-demo{
+        position: fixed;left: 0;right: 0;bottom: 0;
+        word-break: break-all;
+        background: orange;z-index: 10;
+    }
+    
+    .list{
+        -webkit-transition-property: all;
+    }
+
+
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                
+
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script src="http://g.tbcdn.cn/mtb/lib-mtop/1.3.8/mtop.js"></script>
+    <script src="http://g.tbcdn.cn/ju/outlets-m/1.10.8/mods/common/zepto.js"></script>
+    <script>
+    function juicer(str){
+        var attrList = [];
+        var obj = {}
+        obj.render = function(data){
+            function call(match,p1){
+                if (data[p1] != undefined){
+                    return data[p1];
+                }else{
+                    return '';
+                }
+            }
+          var newStr = str.replace(/\{(\w+)\}/gi,call);
+          return newStr;
+        }
+        return obj;
+    }
+        
+   seajs.config({
+      base: "../../build/cmd",
+      map: [
+        [".js", ".js?" + new Date().getTime()]
+
+        ]
+    })
+    seajs.use(["xscroll","plugins/infinite","plugins/pullup","plugins/lazyload"],function(XScroll,Infinite,PullUp,LazyLoad){
+        var TPL = {
+            itemTPL: juicer([
+                '<li><a data-index="" href="javascript:;" data-spm-click="gostr=/jhs;locaid={locaId}" class="goods-item">',
+                    '<div class="goods-pic lazyload" data-src="{fullPicUrl}_420x280q90.jpg'+'">',
+                    '</div>',
+                    '<div class="goods-title">{shortName}</div>',
+                    '<div class="goods-now"><i>&#165;</i>{activityPrice}</div>',
+                    '<del class="goods-origin"><i>&#165;</i>{originalPrice}</del>',
+                    '{@if soldCount == 0}',
+                        '<span class="goods-state hot-sale">热卖中</span>',
+                    '{@else if itemStatus == 1 || itemStatus == 4}',
+                        '<span class="goods-state sale-count">{soldCount}件已售</span>',
+                    '{@else if itemStatus == 0}',
+                        '<span class="goods-state coming-soon">即将开始</span>',
+                    '{@else if itemStatus == 3}',
+                        '<span class="goods-state sale-out">卖光了…</span>',
+                    '{@else if itemStatus == 2}',
+                        '<span class="goods-state have-chance">还有机会</span>',
+                    '{@/if}',
+                '</a></li>'
+                ].join(''))
+        };
+
+
+        lib.mtop.request({
+            // 通用参数
+            api: 'mtop.ju.optionitem.get', // 必须
+            v: '1.0',  // 必须
+            data: {"platformId":"1001","optStr":"","currentPage":1,"pageSize":100}, // 必须
+         }, function (resJson, retType) {
+            var data = resJson.data.model;
+            data = (function() {
+            var tmp = [];
+            data.forEach(function(item){
+                 tmp.push({
+                   data:{num:TPL.itemTPL.render(item)},
+                   style:{height:108}
+               });
+            })
+            return tmp
+        })();
+
+
+            var xscroll = new XScroll({
+                renderTo: "#J_Scroll",
+                preventDefault:true,
+                useTransition:true
+            });
+
+            var infinite = new Infinite({
+                infiniteElements:"#J_Scroll .xs-row",
+                renderHook:function(el,row){
+                    $(row.data.num).css('height','108px');
+                    $(el).html($(row.data.num).html())
+                }
+            });
+
+            var pullup = new PullUp({
+                upContent:"上拉加载更多",
+                downContent:"释放加载更多",
+                loadingContent:"加载中...",
+                bufferHeight:0
+            });
+
+            
+            var lazyload = new LazyLoad({
+                imgsSelector:".lazyload",
+                imgSetter:function(img){
+                    var src = img.getAttribute("data-src");
+                    if(src && img.style.backgroundImage && img.style.backgroundImage.match(new RegExp(src))) {
+                        return;
+                    }
+                    img.style.backgroundImage = 'url('+src+')';
+                }
+            });
+            xscroll.plug(lazyload)
+            xscroll.plug(pullup);
+            xscroll.plug(infinite);
+
+            pullup.on("loading",function(){
+                getData();
+            });
+            getData();
+
+            xscroll.render();
+             function getData(){
+                var data2 = JSON.parse(JSON.stringify(data))
+                infinite.append(0,data2);
+                xscroll.render();
+                 //loading complete
+                pullup.complete();
+            }
+            window.xscroll = xscroll;
+            window.infinite = infinite
+        });
+
+    });
+
+    </script>
+</body>
+</html>
