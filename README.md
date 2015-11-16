@@ -5,7 +5,7 @@ Xscroll - A Javascript Scrolling Framework For Mobile Web
 
 ## Version
 
-2.3.2
+3.1.2
 
 ## Install
 
