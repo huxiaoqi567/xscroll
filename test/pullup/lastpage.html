@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>simple</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+    <style type="text/css">
+    body,ul,li,div,img{
+        padding: 0;margin:0;
+    }
+    img{
+        display: block;
+    }
+    body{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+     #J_Scroll{
+        position: absolute;
+        top:0;
+        bottom: 0;
+        width:100%;
+     }
+    #J_Scroll ul{
+        width: 100%;
+    }
+    #J_Scroll ul li.xs-row{
+        width: 100%;
+        display: block;
+        height: 100px;
+        border-bottom:1px solid;
+        visibility: hidden;
+    }
+    .xs-container{
+        width: 100%;
+    }
+    </style>
+    <div id="J_Scroll">
+        <div class="xs-container">
+            <ul class="xs-content">
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+                <li class="xs-row">row</li>
+
+
+            </ul>
+        </div>
+    </div>
+    <script src="../../lib/sea.js"></script>
+    <script src="../../lib/zepto.js"></script>
+    <script>
+    seajs.config({
+      base: "../../build/cmd" 
+    })
+    seajs.use(["simulate-scroll","plugins/infinite","plugins/pullup"],function(XScroll,Infinite,PullUp){
+
+        var page = 1;
+
+        var totalPage = 2;
+
+        var pageSize = 10;
+
+        var pageCache ={};
+        
+        var xscroll = new XScroll({
+            renderTo: "#J_Scroll"
+        });
+
+
+        var infinite = new Infinite({
+            infiniteElements:"#J_Scroll .xs-row",
+            renderHook:function(el,row){
+                el.innerText = row.data.num;
+            }
+        })
+
+        var pullup = new PullUp({
+            upContent:"上拉加载更多",
+            downContent:"释放加载更多",
+            loadingContent:"加载中...",
+            endContent:"最后一页",
+            bufferHeight:0
+        });
+
+        xscroll.plug(pullup);
+
+        pullup.on("loading",function(){
+            getData();
+        });
+
+        getData();
+
+         function getData(){
+            if(!pageCache[page]){
+                pageCache[page] = 1;
+                $.ajax({
+                    url:"./data.json",
+                    dataType:"json",
+                    success:function(data){
+                        data.splice(pageSize)
+                        if(page > totalPage) {
+                            //last page
+                            pullup.isLoading = false;
+                            pullup._changeStatus("end");
+                            unbindEvents();
+                            return; 
+                        };
+                        infinite.append(0,data);
+                        xscroll.render();
+                         //loading complete
+                        pullup.complete();
+                        page++;
+                    }
+                })
+            }
+        }
+
+
+        function unbindEvents(){
+            xscroll.off("pan", pullup._panHandler);
+            xscroll.off("scroll", pullup._scrollHandler);
+            xscroll.off("scrollend", pullup._scrollEndHandler);
+        }
+
+        xscroll.plug(infinite);
+        xscroll.render();
+
+    });
+
+    </script>
+</body>
+</html>
