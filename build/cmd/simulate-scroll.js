@@ -325,7 +325,7 @@ Util.extend(SimuScroll, Core, {
             max_bob = 0; 
         // if the content's height is less than boundry's height, disable scroll up.
         if(content_height > boundry.height) {
-          max_bob = -(Math.abs(userConfig.maxBoundryOutTop) + boundry.height);  
+          max_bob = -(Math.abs(userConfig.maxBoundryOutBottom) + (content_height - boundry.height));  
         }
         if(y < max_bob) {
           y = max_bob;
