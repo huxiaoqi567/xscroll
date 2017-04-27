@@ -112,7 +112,7 @@ Util.extend(PullUp, Base, {
 		var self = this,
 			xscroll = self.xscroll,
 			scrollTop = xscroll.getScrollTop();
-		if (scrollTop == xscroll.containerHeight - xscroll.height + self.userConfig.height) {
+		if (Math.abs(scrollTop - (xscroll.containerHeight - xscroll.height + self.userConfig.height)) < 1) {
 			self._changeStatus("loading");
 		}
 		return self;
