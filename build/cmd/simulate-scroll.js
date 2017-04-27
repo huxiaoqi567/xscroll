@@ -314,6 +314,23 @@ Util.extend(SimuScroll, Core, {
     var containerHeight = self.containerHeight;
     if (boundryCheck) {
       //over top
+      if(Math.abs(userConfig.maxBoundryOutTop) > 1) {
+        var max_bot = Math.round(Math.abs(userConfig.maxBoundryOutTop) / PAN_RATE);
+        if(y > max_bot) {
+          y = max_bot;
+        }
+      }
+      if(Math.abs(userConfig.maxBoundryOutBottom) > 1) {
+        var content_height = self.content.offsetHeight,
+            max_bob = 0; 
+        // if the content's height is less than boundry's height, disable scroll up.
+        if(content_height > boundry.height) {
+          max_bob = -(Math.abs(userConfig.maxBoundryOutBottom) + (content_height - boundry.height));  
+        }
+        if(y < max_bob) {
+          y = max_bob;
+        }
+      }
       y = y > boundry.top ? bounce ? (y - boundry.top) * PAN_RATE + boundry.top : boundry.top : y;
       //over bottom
       y = y < boundry.bottom - containerHeight ? bounce ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : boundry.bottom - containerHeight : y;
