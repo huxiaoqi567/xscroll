@@ -1,1 +1,0 @@
-define(function(e,r,i){"use strict";var t=e("./util"),n=e("./base"),o=e("./timer"),l=e("./animate"),s=e("./hammer"),a=e("./simulate-scroll"),m=e("./origin-scroll"),u=function(e){var r=e&&e.useOriginScroll?m:a;return new r(e)};return u.Util=t,u.Base=n,u.Timer=o,u.Animate=l,u.Hammer=s,u.Plugins={},"object"==typeof i&&i.exports?void(i.exports=u):window.XScroll=u});

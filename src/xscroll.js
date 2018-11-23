@@ -1,15 +1,16 @@
-"use strict";
+'use strict';
+
 var Util = require('./util'),
-	Base = require('./base'),
-	Timer = require('./timer'),
-	Animate = require('./animate'),
-	Hammer = require('./hammer'),
-	SimuScroll = require('./simulate-scroll'),
-	OriginScroll = require('./origin-scroll');
+  Base = require('./base'),
+  Timer = require('./timer'),
+  Animate = require('./animate'),
+  Hammer = require('hammerjs'),
+  SimuScroll = require('./simulate-scroll'),
+  OriginScroll = require('./origin-scroll');
 var XScroll = function(cfg) {
-		var _ = cfg && cfg.useOriginScroll ? OriginScroll : SimuScroll;
-		return new _(cfg);
-	}
+  var _ = cfg && cfg.useOriginScroll ? OriginScroll : SimuScroll;
+  return new _(cfg);
+};
 /**
  * Util
  * @namespace Util
@@ -47,10 +48,4 @@ XScroll.Hammer = Hammer;
  */
 XScroll.Plugins = {};
 
-if (typeof module == 'object' && module.exports) {
-	module.exports = XScroll;
-}
-/** ignored by jsdoc **/
-else {
-	return window.XScroll = XScroll;
-}
+module.exports = XScroll;

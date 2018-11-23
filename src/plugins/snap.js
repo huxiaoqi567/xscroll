@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Util = require('../util');
 var Base = require('../base');
 /**
@@ -20,12 +20,12 @@ var Snap = function(cfg) {
     snapColIndex: 0,
     snapRowIndex: 0,
     snapDuration: 500,
-    snapEasing: "ease",
+    snapEasing: 'ease',
     snapOffsetLeft: 0,
     snapOffsetTop: 0,
-    autoStep: false //autostep
+    autoStep: false // autostep
   }, cfg);
-}
+};
 
 Util.extend(Snap, Base, {
   /**
@@ -33,7 +33,7 @@ Util.extend(Snap, Base, {
    * @memberOf Snap
    * @type {string}
    */
-  pluginId: "snap",
+  pluginId: 'snap',
   /**
    * plugin initializer
    * @memberOf Snap
@@ -55,8 +55,8 @@ Util.extend(Snap, Base, {
   pluginDestructor: function() {
     var self = this;
     var xscroll = self.xscroll;
-    xscroll.on("panend", xscroll._onpanend, xscroll);
-    xscroll.off("panend", self._snapAnimate, self);
+    xscroll.on('panend', xscroll._onpanend, xscroll);
+    xscroll.off('panend', self._snapAnimate, self);
   },
   /**
    * scroll to a col and row with animation
@@ -95,7 +95,7 @@ Util.extend(Snap, Base, {
     self.prevColIndex = self.snapColIndex;
     self.snapColIndex = col;
     var left = self.snapColIndex * snapWidth + snapOffsetLeft;
-    if(left > xscroll.containerWidth - xscroll.boundry.width){
+    if (left > xscroll.containerWidth - xscroll.boundry.width) {
       left = xscroll.containerWidth - xscroll.boundry.width;
     }
     xscroll.scrollLeft(left, duration, easing, callback);
@@ -104,8 +104,8 @@ Util.extend(Snap, Base, {
   _colChange: function(e) {
     var self = this;
     if (self.prevColIndex != self.snapColIndex) {
-      self.trigger('colchange',Util.mix(e,{
-        type:'colchange',
+      self.trigger('colchange', Util.mix(e, {
+        type: 'colchange',
         curColIndex: self.snapColIndex,
         prevColIndex: self.prevColIndex
       }));
@@ -134,17 +134,17 @@ Util.extend(Snap, Base, {
     self.prevRowIndex = self.snapRowIndex;
     self.snapRowIndex = row;
     var top = self.snapRowIndex * snapHeight + snapOffsetTop;
-    if(top > xscroll.containerHeight - xscroll.boundry.height){
+    if (top > xscroll.containerHeight - xscroll.boundry.height) {
       top = xscroll.containerHeight - xscroll.boundry.height;
     }
-    self.xscroll.scrollTop(top, duration, easing,callback);
+    self.xscroll.scrollTop(top, duration, easing, callback);
     return self;
   },
   _rowChange: function(e) {
     var self = this;
     if (self.prevRowIndex != self.snapRowIndex) {
-      self.trigger('rowchange', Util.mix(e,{
-        type:'rowchange',
+      self.trigger('rowchange', Util.mix(e, {
+        type: 'rowchange',
         curRowIndex: self.snapRowIndex,
         prevRowIndex: self.prevRowIndex,
       }));
@@ -158,6 +158,9 @@ Util.extend(Snap, Base, {
          down  => 16;
   */
   _snapAnimate: function(e) {
+    // hammer.js change the opposite value since 2.0.8
+    e.velocityY = -e.velocityY;
+    e.velocityX = -e.velocityX;
     var self = this;
     var userConfig = self.userConfig;
     var snapWidth = userConfig.snapWidth;
@@ -174,12 +177,12 @@ Util.extend(Snap, Base, {
       var snapRowIndex = Math.round(top / snapHeight);
       self.snapTo(snapColIndex, snapRowIndex);
     } else if (userConfig.autoStep) {
-      var transX = self.xscroll.computeScroll("x", e.velocityX);
-      var transY = self.xscroll.computeScroll("y", e.velocityY);
+      var transX = self.xscroll.computeScroll('x', e.velocityX);
+      var transY = self.xscroll.computeScroll('y', e.velocityY);
       var snapColIndex = transX && transX.pos ? Math.round(transX.pos / snapWidth) : self.snapColIndex;
       var snapRowIndex = transY && transY.pos ? Math.round(transY.pos / snapHeight) : self.snapRowIndex;
       var duration = Math.ceil(transX && transX.duration, transY && transY.duration);
-      if (transX && transX.status == "inside") {
+      if (transX && transX.status == 'inside') {
         self.snapToCol(snapColIndex, duration, transX && transX.easing, function() {
           self.xscroll.boundryCheckX();
         });
@@ -190,7 +193,7 @@ Util.extend(Snap, Base, {
           self.snapColIndex = Math.round(Math.abs(self.xscroll.getScrollLeft()) / snapWidth);
         });
       }
-      if (transY && transY.status == "inside") {
+      if (transY && transY.status == 'inside') {
         self.snapToRow(snapRowIndex, duration, transY && transY.easing, function() {
           self.xscroll.boundryCheckY();
         });
@@ -219,34 +222,28 @@ Util.extend(Snap, Base, {
     self.userConfig.snapHeight = self.userConfig.snapHeight || xscroll.height || 100;
     self.userConfig.snapColsNum = self.userConfig.snapColsNum || Math.max(Math.round(xscroll.containerWidth / xscroll.width), 1);
     self.userConfig.snapRowsNum = self.userConfig.snapRowsNum || Math.max(Math.round(xscroll.containerHeight / xscroll.height), 1);
-    //remove default listener
-    xscroll.off("panend", xscroll._onpanend);
-    xscroll.on("panend", self._snapAnimate, self);
+    // remove default listener
+    xscroll.off('panend', xscroll._onpanend);
+    xscroll.on('panend', self._snapAnimate, self);
     self._bindEvt();
     return self;
   },
-  _bindEvt:function(){
-    var self =this;
+  _bindEvt: function() {
+    var self = this;
     var xscroll = self.xscroll;
-    if(self._isEvtBinded) return;
+    if (self._isEvtBinded) return;
     self._isEvtBinded = true;
-    xscroll.on("scrollend",function(e){
-      if(e.zoomType == 'y' && !xscroll.isBoundryOutTop() && !xscroll.isBoundryOutBottom()){
+    xscroll.on('scrollend', function(e) {
+      if (e.zoomType == 'y' && !xscroll.isBoundryOutTop() && !xscroll.isBoundryOutBottom()) {
         self._rowChange(e);
       }
-    })
-    xscroll.on("scrollend",function(e){
-      if(e.zoomType == 'x' && !xscroll.isBoundryOutLeft() && !xscroll.isBoundryOutRight()){
+    });
+    xscroll.on('scrollend', function(e) {
+      if (e.zoomType == 'x' && !xscroll.isBoundryOutLeft() && !xscroll.isBoundryOutRight()) {
         self._colChange(e);
       }
-    })
+    });
   }
 });
 
-if (typeof module == 'object' && module.exports) {
-  module.exports = Snap;
-}
-/** ignored by jsdoc **/
-else if (window.XScroll && window.XScroll.Plugins) {
-  return XScroll.Plugins.Snap = Snap;
-}
+module.exports = Snap;
