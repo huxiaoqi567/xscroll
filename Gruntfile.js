@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
 
-  var dir = "doc/code/";
+  var dir = "src";
 
   // Project configuration.
   grunt.initConfig({

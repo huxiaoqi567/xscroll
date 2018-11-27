@@ -1,15 +1,23 @@
 const fs = require('fs');
 const port = 8087;
 
-function getEntries() {
+function getEntries(dirPath) {
   let result = {};
-  let dirs = fs.readdirSync(`${__dirname}/demo`);
+  let dirs = fs.readdirSync(dirPath);
   dirs.forEach((dirName) => {
     let matched = dirName.match(/(.+)\.js/);
+    if(fs.statSync(`${dirPath}/${dirName}`).isDirectory()){
+      let res = getEntries(`${dirPath}/${dirName}`);
+      Object.keys(res).forEach((name)=>{
+        result[name] = res[name];
+      })
+    }
+
     if (matched && matched[1]) {
-      result[matched[1]] = `./demo/${matched[1]}.js`
+      result[`${dirPath.replace(__dirname + '/','')}/${matched[1]}`] = `${dirPath}/${matched[1]}.js`
     }
   });
+  console.log(result)
   return result;
 }
 
@@ -17,7 +25,7 @@ function getEntries() {
 
 module.exports = {
   plugins: [],
-  entry: getEntries(),
+  entry: getEntries(`${__dirname}/demo`),
   output: {
     path: __dirname + '/dist/',
     filename: '[name].js'
@@ -29,12 +37,6 @@ module.exports = {
     host: '0.0.0.0',
     publicPath: '/dist/',
     port: port
-  },
-  resolve: {
-    alias: {
-      'xscroll': __dirname + '/src/index.js'
-    },
-    extensions: ['.ts', '.js'],
   },
   module: {
     loaders: [

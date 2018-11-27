@@ -28,7 +28,8 @@ Util.extend(Controller, Base, {
     if (scroll.guid && !self.__scrolls[scroll.guid]) {
       scroll.parentscroll = self.xscroll;
       self._bind(scroll);
-      return self.__scrolls[scroll.guid] = scroll;
+      self.__scrolls[scroll.guid] = scroll;
+      return scroll;
     }
     return;
   },

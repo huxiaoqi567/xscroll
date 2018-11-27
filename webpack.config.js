@@ -1,4 +1,27 @@
 var webpack = require('webpack');
+var fs = require('fs');
+
+function getEntries() {
+  let result = {
+    index: './src/index.js'
+  }
+
+  let dirPath = `${__dirname}/src/plugins`;
+
+
+  let dirs = fs.readdirSync(dirPath);
+  dirs.forEach((dirName) => {
+    let matched = dirName.match(/(.+)\.js/);
+    if (matched && matched[1]) {
+      result[`plugins/${matched[1]}`] = `${dirPath}/${matched[1]}.js`
+    }
+  });
+  console.log(result)
+  return result;
+}
+
+
+
 
 module.exports = {
   plugins: [
@@ -6,9 +29,7 @@ module.exports = {
     //  name: 'common'
     // })
   ],
-  entry: {
-    index: './src/index.js'
-  },
+  entry: getEntries(),
   output: {
     path: __dirname + '/lib/',
     filename: '[name].js',

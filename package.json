@@ -28,6 +28,7 @@
   "scripts": {
     "start": "webpack-dev-server --config webpack.dev.config.js",
     "build": "webpack",
+    "doc":"grunt doc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -204,7 +204,7 @@ Util.extend(Infinite, Base, {
           }
         }
       }
-    } catch (e) {
+    } catch (err) {
       console.warn('Not enough infiniteElements setted!');
     }
     return self;

@@ -3,7 +3,7 @@ var Util = require('./util');
 var Base = require('./base');
 var Easing = require('./easing');
 
-var RAF = window.requestAnimationFrame ||
+var raf = window.requestAnimationFrame ||
 	window.webkitRequestAnimationFrame ||
 	window.mozRequestAnimationFrame ||
 	window.oRequestAnimationFrame ||
@@ -21,7 +21,7 @@ for (var i = 0; i < vendors.length; i++) {
 }
 cancelRAF = cancelRAF || window.clearTimeout;
 
-function Bezier(x1, y1, x2, y2, epsilon) {
+function bezier(x1, y1, x2, y2, epsilon) {
   var curveX = function(t) {
     var v = 1 - t;
     return 3 * v * v * t * x1 + 3 * v * t * t * x2 + t * t * t;
@@ -111,13 +111,13 @@ Util.extend(Timer, Base, {
 		// epsilon determines the precision of the solved values
     var epsilon = (1000 / 60 / duration) / 4;
     var b = Easing[self.cfg.easing];
-    self.easingFn = Bezier(b[0], b[1], b[2], b[3], epsilon);
+    self.easingFn = bezier(b[0], b[1], b[2], b[3], epsilon);
     self._run();
   },
   _run: function() {
     var self = this;
     cancelRAF(self._raf);
-    self._raf = RAF(function() {
+    self._raf = raf(function() {
       self.now = Date.now();
       self.duration = self.now - self.start >= self.cfg.duration ? self.cfg.duration : self.now - self.start;
       self.progress = self.easingFn(self.duration / self.cfg.duration);
