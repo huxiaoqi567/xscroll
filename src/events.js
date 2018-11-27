@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Util = require('./util');
 // Returns a function that will be executed at most one time, no matter how
 // often you call it. Useful for lazy initialization.
@@ -217,10 +217,4 @@ var triggerEvents = function(events, args) {
 Events.bind = Events.on;
 Events.unbind = Events.off;
 
-if (typeof module == 'object' && module.exports) {
-  module.exports = Events;
-}
-/** ignored by jsdoc **/
-else {
-  return Events;
-}
+module.exports = Events;

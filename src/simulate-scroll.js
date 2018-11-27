@@ -1,22 +1,22 @@
-"use strict";
+'use strict';
 var Util = require('./util'),
   Base = require('./base'),
   Core = require('./core'),
   Animate = require('./animate'),
-  Hammer = require('./hammer'),
+  Hammer = require('hammerjs'),
   ScrollBar = require('./components/scrollbar'),
   Controller = require('./components/controller');
-//reduced boundry pan distance
+// reduced boundry pan distance
 var PAN_RATE = 1 - 0.618;
-//constant for scrolling acceleration
+// constant for scrolling acceleration
 var SCROLL_ACCELERATION = 0.0005;
-//constant for outside of boundry acceleration
+// constant for outside of boundry acceleration
 var BOUNDRY_ACCELERATION = 0.03;
-//transform-origin
-var transformOrigin = Util.prefixStyle("transformOrigin");
-//transform
-var transform = Util.prefixStyle("transform");
-/** 
+// transform-origin
+var transformOrigin = Util.prefixStyle('transformOrigin');
+// transform
+var transform = Util.prefixStyle('transform');
+/**
  * @constructor
  * @param {object} cfg config for scroll
  * @param {number} cfg.SCROLL_ACCELERATION  acceleration for scroll, min value make the scrolling smoothly
@@ -52,7 +52,7 @@ function SimuScroll(cfg) {
 }
 
 Util.extend(SimuScroll, Core, {
-  /** 
+  /**
    * @memberof SimuScroll
    * @override
    */
@@ -68,25 +68,25 @@ Util.extend(SimuScroll, Core, {
     self.BOUNDRY_ACCELERATION = self.userConfig.BOUNDRY_ACCELERATION || BOUNDRY_ACCELERATION;
     self._initContainer();
     self.resetSize();
-    //set overflow behaviors
+    // set overflow behaviors
     self._setOverflowBehavior();
     self.defaltConfig = {
       lockY: self.userConfig.lockY,
       lockX: self.userConfig.lockX
-    }
+    };
     return self;
   },
   destroy: function() {
     var self = this;
     SimuScroll.superclass.destroy.call(this);
-    self.renderTo.style.overflow = "";
-    self.renderTo.style.touchAction = "";
-    self.container.style.transform = "";
-    self.container.style.transformOrigin = "";
-    self.content.style.transform = "";
-    self.content.style.transformOrigin = "";
-    self.off("touchstart mousedown", self._ontouchstart);
-    self.off("touchmove", self._ontouchmove);
+    self.renderTo.style.overflow = '';
+    self.renderTo.style.touchAction = '';
+    self.container.style.transform = '';
+    self.container.style.transformOrigin = '';
+    self.content.style.transform = '';
+    self.content.style.transformOrigin = '';
+    self.off('touchstart mousedown', self._ontouchstart);
+    self.off('touchmove', self._ontouchmove);
     self.destroyScrollBars();
   },
   /**
@@ -97,8 +97,8 @@ Util.extend(SimuScroll, Core, {
     var self = this;
     var renderTo = self.renderTo;
     var computeStyle = getComputedStyle(renderTo);
-    self.userConfig.lockX = undefined === self.userConfig.lockX ? ((computeStyle['overflow-x'] == "hidden" || self.width == self.containerWidth) ? true : false) : self.userConfig.lockX;
-    self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == "hidden" || self.height == self.containerHeight) ? true : false) : self.userConfig.lockY;
+    self.userConfig.lockX = undefined === self.userConfig.lockX ? ((computeStyle['overflow-x'] == 'hidden' || self.width == self.containerWidth) ? true : false) : self.userConfig.lockX;
+    self.userConfig.lockY = undefined === self.userConfig.lockY ? ((computeStyle['overflow-y'] == 'hidden' || self.height == self.containerHeight) ? true : false) : self.userConfig.lockY;
     self.userConfig.scrollbarX = undefined === self.userConfig.scrollbarX ? (self.userConfig.lockX ? false : true) : self.userConfig.scrollbarX;
     self.userConfig.scrollbarY = undefined === self.userConfig.scrollbarY ? (self.userConfig.lockY ? false : true) : self.userConfig.scrollbarY;
     return self;
@@ -121,8 +121,8 @@ Util.extend(SimuScroll, Core, {
     var self = this;
     SimuScroll.superclass._initContainer.call(self);
     if (self.__isContainerInited || !self.container || !self.content) return;
-    self.container.style[transformOrigin] = "0 0";
-    self.content.style[transformOrigin] = "0 0";
+    self.container.style[transformOrigin] = '0 0';
+    self.content.style[transformOrigin] = '0 0';
     self.translate(0, 0);
     self.__isContainerInited = true;
     return self;
@@ -154,9 +154,9 @@ Util.extend(SimuScroll, Core, {
    **/
   scrollLeft: function(x, duration, easing, callback) {
     if (this.userConfig.lockX) return;
-    var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+    var translateZ = this.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
     this.x = (undefined === x || isNaN(x) || 0 === x) ? 0 : -Math.round(x);
-    this._animate("x", "translateX(" + this.x + "px) scale(" + this.scale + ")" + translateZ, duration, easing, callback);
+    this._animate('x', 'translateX(' + this.x + 'px) scale(' + this.scale + ')' + translateZ, duration, easing, callback);
     return this;
   },
   /**
@@ -168,9 +168,9 @@ Util.extend(SimuScroll, Core, {
    **/
   scrollTop: function(y, duration, easing, callback) {
     if (this.userConfig.lockY) return;
-    var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+    var translateZ = this.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
     this.y = (undefined === y || isNaN(y) || 0 === y) ? 0 : -Math.round(y);
-    this._animate("y", "translateY(" + this.y + "px) " + translateZ, duration, easing, callback);
+    this._animate('y', 'translateY(' + this.y + 'px) ' + translateZ, duration, easing, callback);
     return this;
   },
   /**
@@ -181,19 +181,19 @@ Util.extend(SimuScroll, Core, {
    * @param scale {number} scale
    **/
   translate: function(x, y, scale) {
-    var translateZ = this.userConfig.gpuAcceleration ? " translateZ(0) " : "";
+    var translateZ = this.userConfig.gpuAcceleration ? ' translateZ(0) ' : '';
     this.x = x || this.x || 0;
     this.y = y || this.y || 0;
     this.scale = scale || this.scale || 1;
-    this.content.style[transform] = "translate(" + this.x + "px,0px) scale(" + this.scale + ") " + translateZ;
-    this.container.style[transform] = "translate(0px," + this.y + "px) " + translateZ;
+    this.content.style[transform] = 'translate(' + this.x + 'px,0px) scale(' + this.scale + ') ' + translateZ;
+    this.container.style[transform] = 'translate(0px,' + this.y + 'px) ' + translateZ;
     return this;
   },
   _animate: function(type, transform, duration, easing, callback) {
     var self = this;
     var duration = duration || 0;
-    var easing = easing || "quadratic";
-    var el = type == "y" ? self.container : self.content;
+    var easing = easing || 'quadratic';
+    var el = type == 'y' ? self.container : self.content;
     var config = {
       css: {
         transform: transform
@@ -204,20 +204,20 @@ Util.extend(SimuScroll, Core, {
         /**
          * @event {@link SimuScroll#"scroll"}
          */
-        self.trigger("scroll", {
+        self.trigger('scroll', {
           scrollTop: self.getScrollTop(),
           scrollLeft: self.getScrollLeft(),
-          type: "scroll"
+          type: 'scroll'
         });
       },
       useTransition: self.userConfig.useTransition,
       end: function(e) {
         callback && callback();
-        if ((self["_bounce" + type] === 0 || self["_bounce" + type] === undefined) && easing != "linear") {
+        if ((self['_bounce' + type] === 0 || self['_bounce' + type] === undefined) && easing != 'linear') {
           self['isScrolling' + type.toUpperCase()] = false;
           self['isRealScrolling' + type.toUpperCase()] = false;
-          self.trigger("scrollend", {
-            type: "scrollend",
+          self.trigger('scrollend', {
+            type: 'scrollend',
             scrollTop: self.getScrollTop(),
             scrollLeft: self.getScrollLeft(),
             zoomType: type,
@@ -231,14 +231,14 @@ Util.extend(SimuScroll, Core, {
     timer.stop();
     timer.reset(config);
     timer.run();
-    self.trigger("scrollanimate", {
-      type: "scrollanimate",
+    self.trigger('scrollanimate', {
+      type: 'scrollanimate',
       scrollTop: -self.y,
       scrollLeft: -self.x,
       duration: duration,
       easing: easing,
       zoomType: type
-    })
+    });
     return this;
   },
   _ontap: function(e) {
@@ -259,14 +259,14 @@ Util.extend(SimuScroll, Core, {
     self.__isEvtBind = true;
     var pinch = new Hammer.Pinch();
     self.mc.add(pinch);
-    self.on("touchstart mousedown", self._ontouchstart, self);
-    self.on("touchmove", self._ontouchmove, self);
-    self.on("tap", self._ontap, self);
-    self.on("panstart", self._onpanstart, self);
-    self.on("pan", self._onpan, self);
-    self.on("panend", self._onpanend, self);
-    //window resize
-    window.addEventListener("resize", function(e) {
+    self.on('touchstart mousedown', self._ontouchstart, self);
+    self.on('touchmove', self._ontouchmove, self);
+    self.on('tap', self._ontap, self);
+    self.on('panstart', self._onpanstart, self);
+    self.on('pan', self._onpan, self);
+    self.on('panend', self._onpanend, self);
+    // window resize
+    window.addEventListener('resize', function(e) {
       setTimeout(function() {
         self.resetSize();
         self.boundryCheck(0);
@@ -293,9 +293,9 @@ Util.extend(SimuScroll, Core, {
     var scrollTop = self.getScrollTop();
     self.stop();
     self.translate(-scrollLeft, -scrollTop);
-    var threshold = self.mc.get("pan").options.threshold;
-    self.thresholdY = e.direction == "8" ? threshold : e.direction == "16" ? -threshold : 0;
-    self.thresholdX = e.direction == "2" ? threshold : e.direction == "4" ? -threshold : 0;
+    var threshold = self.mc.get('pan').options.threshold;
+    self.thresholdY = e.direction == '8' ? threshold : e.direction == '16' ? -threshold : 0;
+    self.thresholdX = e.direction == '2' ? threshold : e.direction == '4' ? -threshold : 0;
     return self;
   },
   _onpan: function(e) {
@@ -312,38 +312,40 @@ Util.extend(SimuScroll, Core, {
     var containerWidth = self.containerWidth;
     var containerHeight = self.containerHeight;
     if (boundryCheck) {
-      //over top
+      // over top
       y = y > boundry.top ? bounce ? (y - boundry.top) * PAN_RATE + boundry.top : boundry.top : y;
-      //over bottom
+      // over bottom
       y = y < boundry.bottom - containerHeight ? bounce ? y + (boundry.bottom - containerHeight - y) * PAN_RATE : boundry.bottom - containerHeight : y;
-      //over left
+      // over left
       x = x > boundry.left ? bounce ? (x - boundry.left) * PAN_RATE + boundry.left : boundry.left : x;
-      //over right
+      // over right
       x = x < boundry.right - containerWidth ? bounce ? x + (boundry.right - containerWidth - x) * PAN_RATE : boundry.right - containerWidth : x;
     }
-    //move to x,y
+    // move to x,y
     self.translate(x, y);
-    //pan trigger the opposite direction
+    // pan trigger the opposite direction
     self.directionX = e.type == 'panleft' ? 'right' : e.type == 'panright' ? 'left' : '';
     self.directionY = e.type == 'panup' ? 'down' : e.type == 'pandown' ? 'up' : '';
-    self.trigger("scroll", {
+    self.trigger('scroll', {
       scrollTop: -y,
       scrollLeft: -x,
-      triggerType: "pan",
-      type: "scroll"
+      triggerType: 'pan',
+      type: 'scroll'
     });
     return self;
   },
   _onpanend: function(e) {
     var self = this;
-    var userConfig = self.userConfig;
-    var transX = self.computeScroll("x", e.velocityX);
-    var transY = self.computeScroll("y", e.velocityY);
+    // hammer.js change the opposite value since 2.0.8
+    e.velocityY = -e.velocityY;
+    e.velocityX = -e.velocityX;
+    var transX = self.computeScroll('x', e.velocityX);
+    var transY = self.computeScroll('y', e.velocityY);
     var scrollLeft = transX ? transX.pos : 0;
     var scrollTop = transY ? transY.pos : 0;
     var duration;
-    if (transX && transY && transX.status == "inside" && transY.status == "inside" && transX.duration && transY.duration) {
-      //ensure the same duration
+    if (transX && transY && transX.status == 'inside' && transY.status == 'inside' && transX.duration && transY.duration) {
+      // ensure the same duration
       duration = Math.max(transX.duration, transY.duration);
     }
     transX && self.scrollLeft(scrollLeft, duration || transX.duration, transX.easing, function(e) {
@@ -352,10 +354,10 @@ Util.extend(SimuScroll, Core, {
     transY && self.scrollTop(scrollTop, duration || transY.duration, transY.easing, function(e) {
       self.boundryCheckY();
     });
-    //judge the direction
-    self.directionX = e.velocityX < 0 ? "left" : "right";
-    self.directionY = e.velocityY < 0 ? "up" : "down";
-    //clear start
+    // judge the direction
+    self.directionX = e.velocityX < 0 ? 'left' : 'right';
+    self.directionY = e.velocityY < 0 ? 'up' : 'down';
+    // clear start
     self.__topstart = null;
     self.__leftstart = null;
     return self;
@@ -446,32 +448,32 @@ Util.extend(SimuScroll, Core, {
     var self = this;
     var userConfig = self.userConfig;
     var boundry = self.boundry;
-    var pos = type == "x" ? self.getScrollLeft() : self.getScrollTop();
-    var boundryStart = type == "x" ? boundry.left : boundry.top;
-    var boundryEnd = type == "x" ? boundry.right : boundry.bottom;
-    var innerSize = type == "x" ? self.containerWidth : self.containerHeight;
+    var pos = type == 'x' ? self.getScrollLeft() : self.getScrollTop();
+    var boundryStart = type == 'x' ? boundry.left : boundry.top;
+    var boundryEnd = type == 'x' ? boundry.right : boundry.bottom;
+    var innerSize = type == 'x' ? self.containerWidth : self.containerHeight;
     var maxSpeed = userConfig.maxSpeed || 2;
     var boundryCheck = userConfig.boundryCheck;
     var bounce = userConfig.bounce;
     var transition = {};
-    var status = "inside";
+    var status = 'inside';
     if (boundryCheck) {
-      if (type == "x" && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
+      if (type == 'x' && (self.isBoundryOutLeft() || self.isBoundryOutRight())) {
         self.boundryCheckX();
         return;
-      } else if (type == "y" && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
+      } else if (type == 'y' && (self.isBoundryOutTop() || self.isBoundryOutBottom())) {
         self.boundryCheckY();
         return;
       }
     }
-    if (type == "x" && self.userConfig.lockX) return;
-    if (type == "y" && self.userConfig.lockY) return;
+    if (type == 'x' && self.userConfig.lockX) return;
+    if (type == 'y' && self.userConfig.lockY) return;
     v = v > maxSpeed ? maxSpeed : v < -maxSpeed ? -maxSpeed : v;
     var a = self.SCROLL_ACCELERATION * (v / (Math.abs(v) || 1));
     var a2 = self.BOUNDRY_ACCELERATION;
     var t = isNaN(v / a) ? 0 : v / a;
     var s = Number(pos) + t * v / 2;
-    //over top boundry check bounce
+    // over top boundry check bounce
     if (s < -boundryStart && boundryCheck) {
       var _s = -boundryStart - pos;
       var _t = (Math.sqrt(-2 * a * _s + v * v) + v) / a;
@@ -480,7 +482,7 @@ Util.extend(SimuScroll, Core, {
       var s2 = v0 / 2 * _t2;
       t = _t + _t2;
       s = bounce ? -boundryStart + s2 : -boundryStart;
-      status = "outside";
+      status = 'outside';
     } else if (s > innerSize - boundryEnd && boundryCheck) {
       var _s = (boundryEnd - innerSize) + pos;
       var _t = (Math.sqrt(-2 * a * _s + v * v) - v) / a;
@@ -489,12 +491,12 @@ Util.extend(SimuScroll, Core, {
       var s2 = v0 / 2 * _t2;
       t = _t + _t2;
       s = bounce ? innerSize - boundryEnd + s2 : innerSize - boundryEnd;
-      status = "outside";
+      status = 'outside';
     }
     if (isNaN(s) || isNaN(t)) return;
     transition.pos = s;
     transition.duration = t;
-    transition.easing = Math.abs(v) > 2 ? "circular" : "quadratic";
+    transition.easing = Math.abs(v) > 2 ? 'circular' : 'quadratic';
     transition.status = status;
     var Type = type.toUpperCase();
     self['isScrolling' + Type] = true;
@@ -509,7 +511,7 @@ Util.extend(SimuScroll, Core, {
   boundryCheckX: function(duration, easing, callback) {
     var self = this;
     if (!self.userConfig.boundryCheck) return;
-    if (typeof arguments[0] == "function") {
+    if (typeof arguments[0] == 'function') {
       callback = arguments[0];
       duration = self.userConfig.BOUNDRY_CHECK_DURATION;
       easing = self.userConfig.BOUNDRY_CHECK_EASING;
@@ -534,7 +536,7 @@ Util.extend(SimuScroll, Core, {
   boundryCheckY: function(duration, easing, callback) {
     var self = this;
     if (!self.userConfig.boundryCheck) return;
-    if (typeof arguments[0] == "function") {
+    if (typeof arguments[0] == 'function') {
       callback = arguments[0];
       duration = self.userConfig.BOUNDRY_CHECK_DURATION;
       easing = self.userConfig.BOUNDRY_CHECK_EASING;
@@ -573,14 +575,14 @@ Util.extend(SimuScroll, Core, {
     if (self.isScrollingX || self.isScrollingY) {
       var scrollTop = self.getScrollTop(),
         scrollLeft = self.getScrollLeft();
-      self.trigger("scrollend", {
+      self.trigger('scrollend', {
         scrollTop: scrollTop,
         scrollLeft: scrollLeft
       });
-      self.trigger("stop", {
+      self.trigger('stop', {
         scrollTop: scrollTop,
         scrollLeft: scrollLeft
-      })
+      });
       self.isScrollingX = false;
       self.isScrollingY = false;
     }
@@ -594,11 +596,11 @@ Util.extend(SimuScroll, Core, {
   render: function() {
     var self = this;
     SimuScroll.superclass.render.call(this);
-    //fixed for scrollbars
-    if (getComputedStyle(self.renderTo).position == "static") {
-      self.renderTo.style.position = "relative";
+    // fixed for scrollbars
+    if (getComputedStyle(self.renderTo).position == 'static') {
+      self.renderTo.style.position = 'relative';
     }
-    self.renderTo.style.overflow = "hidden";
+    self.renderTo.style.overflow = 'hidden';
     self.initScrollBars();
     self.initController();
     return self;
@@ -615,7 +617,7 @@ Util.extend(SimuScroll, Core, {
     if (self.userConfig.scrollbarX) {
       self.scrollbarX = self.scrollbarX || new ScrollBar({
         xscroll: self,
-        type: "x",
+        type: 'x',
         spacing: indicatorInsets.spacing
       });
       self.scrollbarX.render();
@@ -625,7 +627,7 @@ Util.extend(SimuScroll, Core, {
     if (self.userConfig.scrollbarY) {
       self.scrollbarY = self.scrollbarY || new ScrollBar({
         xscroll: self,
-        type: "y",
+        type: 'y',
         spacing: indicatorInsets.spacing
       });
       self.scrollbarY.render();
@@ -657,22 +659,22 @@ Util.extend(SimuScroll, Core, {
     return self;
   },
   _unPreventHref: function(e) {
-    var target = Util.findParentEl(e.target,'a',this.renderTo);
-    if(!target) return;
-    if (target.tagName.toLowerCase() == "a") {
-      var href = target.getAttribute("data-xs-href");
+    var target = Util.findParentEl(e.target, 'a', this.renderTo);
+    if (!target) return;
+    if (target.tagName.toLowerCase() == 'a') {
+      var href = target.getAttribute('data-xs-href');
       if (href) {
-        target.setAttribute("href", href);
+        target.setAttribute('href', href);
       }
     }
   },
   _preventHref: function(e) {
-    var target = Util.findParentEl(e.target,'a',this.renderTo);
-    if(!target) return;
-    if (target.tagName.toLowerCase() == "a") {
-      var href = target.getAttribute("href");
-      href && target.setAttribute("href", "javascript:void(0)");
-      href && target.setAttribute("data-xs-href", href);
+    var target = Util.findParentEl(e.target, 'a', this.renderTo);
+    if (!target) return;
+    if (target.tagName.toLowerCase() == 'a') {
+      var href = target.getAttribute('href');
+      href && target.setAttribute('href', 'javascript:void(0)');
+      href && target.setAttribute('data-xs-href', href);
     }
   },
   _triggerClick: function(e) {
@@ -688,10 +690,4 @@ Util.extend(SimuScroll, Core, {
   }
 });
 
-if (typeof module == 'object' && module.exports) {
-  module.exports = SimuScroll;
-}
-/** ignored by jsdoc **/
-else {
-  return SimuScroll;
-}
+module.exports = SimuScroll;
