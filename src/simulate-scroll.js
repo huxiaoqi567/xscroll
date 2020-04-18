@@ -133,7 +133,7 @@ Util.extend(SimuScroll, Core, {
    * @return {number} scrollTop
    */
   getScrollTop: function() {
-    var transY = window.getComputedStyle(this.container)[transform].match(/[-\d\.*\d*]+/g);
+    var transY = window.getComputedStyle(this.container)[transform].match(/[-\d\.*\d*e\-\d]+/g);
     return transY ? Math.round(transY[5]) === 0 ? 0 : -Math.round(transY[5]) : 0;
   },
   /**
